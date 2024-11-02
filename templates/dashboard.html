@@ -23,8 +23,12 @@
                 {{ note.content }}<br>
                 <small>Last updated: {{ note.last_updated }}</small>
 
-                <button>Delete Note</button>
-                <button>Edit Note</button>
+                <a href="{% url 'delete_note' note.id %}">
+                    <button>Delete Note</button>
+                </a>
+                <a href="{% url 'edit_note' note.id %}">
+                    <button>Edit Note</button>
+                </a>
             </li>
             <hr>
         {% endfor %}
