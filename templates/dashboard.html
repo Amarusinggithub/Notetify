@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Notes</title>
+
+    <!-- Load static files -->
+    {% load static %}
+
+    <!-- Link to a CSS file in the static folder -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+
+<h1>Your Notes, {{ user.username }}</h1>
+
+{% if notes %}
+    <ul>
+        {% for note in notes %}
+            <li>
+                <strong>{{ note.title }}</strong><br>
+                {{ note.content }}<br>
+                <small>Last updated: {{ note.last_updated }}</small>
+
+                <button>Delete Note</button>
+                <button>Edit Note</button>
+            </li>
+            <hr>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>You have no notes.</p>
+{% endif %}
+
+<!-- Add Note Button -->
+<a href="{% url 'create_note' %}">
+    <button>Add Note</button>
+</a>
+
+</body>
+</html>

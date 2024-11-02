@@ -1,15 +1,15 @@
 
 from rest_framework import serializers
 
-from api.models import Task, User
+from api.models import Note, User
 
 
-class TaskSerializer(serializers.ModelSerializer):
+class NoteSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Task
+        model = Note
         fields = (
-            'user', 'title', 'content','description' ,'status', 'priority',
-            'due_date', 'date_created', 'last_updated', 'is_completed'
+            'id', 'user', 'title', 'content'
+            , 'date_created', 'last_updated'
         )
 
 

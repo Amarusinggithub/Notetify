@@ -25,17 +25,12 @@ class MyUserManager(UserManager):
         return self.create_user(email, password, **extra_fields)
 
 class User(AbstractUser, PermissionsMixin):
+    id = models.AutoField(primary_key=True)
     username = models.CharField(max_length=150, unique=True,)
     email = models.EmailField(unique=True)
-    first_name = models.CharField(max_length=30, blank=True)
-    last_name = models.CharField(max_length=30, blank=True)
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
 
-
-    USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = []
-    EMAIL_FIELD =  'email'
+    USERNAME_FIELD = "username"
 
 
 
@@ -45,26 +40,14 @@ class User(AbstractUser, PermissionsMixin):
         return self.email
 
 
-class Task(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="tasks")
+class Note(models.Model):
+    id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="notes")
     title = models.CharField(max_length=500)
-    content = models.CharField(max_length=500)
-    status = models.CharField(max_length=2, choices=[
-        ('P', 'Pending'),
-        ('IP', 'In Progress'),
-        ('C', 'Completed'),
-        ('O', 'On Hold')
-    ], default='P')
-    priority = models.CharField(max_length=1, choices=[
-        ('L', 'Low'),
-        ('M', 'Medium'),
-        ('H', 'High')
-    ], default='M')
-    description = models.TextField(null=True, blank=True)
-    due_date = models.DateTimeField(null=True, blank=True)
+    content = models.TextField()
     date_created = models.DateTimeField(auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True)
-    is_completed = models.BooleanField(default=False)
+
 
     def __str__(self):
-        return f"{self.title} ({self.get_status_display()}) - Priority: {self.get_priority_display()}"
+        return self.title

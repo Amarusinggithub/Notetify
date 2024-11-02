@@ -1,8 +1,9 @@
-from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
-from .models import User, Task
 from typing import Set
 
+from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
+
+from .models import User, Note
 
 
 class MyUserAdmin(UserAdmin):
@@ -43,8 +44,8 @@ class MyUserAdmin(UserAdmin):
 
 
     # Customize the display of the user fields here
-    list_display = ('email','username', 'first_name', 'last_name', 'is_staff','date_joined')
-    search_fields = ('email','username', 'roles','date_joined')
+    list_display = ('email', 'username', 'date_joined')
+    search_fields = ('email', 'username', 'date_joined')
     ordering = ('date_joined',)  # Order by most recent users first
 
 
@@ -54,8 +55,8 @@ class MyUserAdmin(UserAdmin):
     # Set up the fieldsets to control the layout of the user admin page
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
-        ('Personal info', {'fields': ('first_name', 'last_name','username')}),
-        ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
+        ('Personal info', {'fields': ('username',)}),
+        ('Permissions', {'fields': ('is_superuser', 'groups', 'user_permissions')}),
     )
     add_fieldsets = (
         (None, {
@@ -65,11 +66,10 @@ class MyUserAdmin(UserAdmin):
     )
 
 
-
-class TaskAdmin(admin.ModelAdmin):
-    list_display = ('title', 'user', 'status', 'priority', 'due_date', 'is_completed')
-    search_fields = ('title', 'content', 'user__username', 'status', 'priority')
-    list_filter = ('status', 'priority', 'is_completed', 'due_date')
+class NoteAdmin(admin.ModelAdmin):
+    list_display = ('title', 'user',)
+    search_fields = ('title', 'content', 'user__username')
+    list_filter = ('date_created')
     ordering = ('-date_created',)
 
     readonly_fields = [
@@ -78,14 +78,10 @@ class TaskAdmin(admin.ModelAdmin):
     ]
     fieldsets = (
         (None, {'fields': ('title', 'content', 'description', 'user')}),
-        ('Status & Priority', {'fields': ('status', 'priority', 'is_completed')}),
-        ('Important Dates', {'fields': ('due_date', 'date_created', 'last_updated')}),
+
+        ('Important Dates', {'fields': ('date_created', 'last_updated')}),
     )
-
-
-
-
 
 # Register your User model with the custom UserAdmin
 admin.site.register(User, MyUserAdmin)
-admin.site.register(Task)
+admin.site.register(Note)

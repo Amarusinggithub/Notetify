@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+{% load static %}
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!-- SweetAlert library -->
+</head>
+
+<body>
+<div class="container">
+    <div class="register-box">
+        <h2>CREATE ACCOUNT</h2>
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="username">Username</label>
+                {{ form.username }}
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                {{ form.email }}
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                {{ form.password }}
+            </div>
+
+            <button type="submit" class="btn">REGISTER</button>
+        </form>
+
+        <p>Already have an account? <a href="{% url 'login' %}">Login here</a>.</p>
+    </div>
+</div>
+
+<!-- SweetAlert for Django messages -->
+<script>
+    {% if messages %}
+        {% for message in messages %}
+            Swal.fire({
+                icon: '{% if message.tags == "success" %}success{% else %}error{% endif %}', // Dynamically set icon based on message tags
+                title: '{{ message.tags|title }}',
+                text: '{{ message }}',
+                timer: 3000,
+                timerProgressBar: true
+            });
+        {% endfor %}
+    {% endif %}
+</script>
+</body>
+</html>
