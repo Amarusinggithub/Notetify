@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!-- Include SweetAlert library -->
 </head>
 
@@ -14,7 +15,7 @@
 <div class="container">
     <div class="login-box">
         <h2>Login Here</h2>
-        <form method="POST">
+        <form class=" login-form" method="POST">
             {% csrf_token %}
             <div class="form-group">
                 <label for="username">Username</label>
@@ -25,7 +26,7 @@
                 {{ form.password }}
             </div>
 
-            <button type="submit" class="btn">LOGIN</button>
+            <button type="submit" class="login-btn">LOGIN</button>
         </form>
     </div>
 </div>

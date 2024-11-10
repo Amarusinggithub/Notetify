@@ -152,9 +152,7 @@ AUTH_USER_MODEL="api.User"
 
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static')
-]
+STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = os.path.join(BASE_DIR, 'asset')
 
 # Default primary key field type
