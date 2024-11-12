@@ -1,0 +1,85 @@
+button {
+    border-radius: 15px;
+    border: none;
+    padding: 0.75em 1.5em;
+    font-size: 1em;
+    font-weight: 600;
+    font-family: inherit;
+    color: #ffffff;
+    background: linear-gradient(135deg, #007bff, #0056d2);
+    cursor: pointer;
+    outline: none;
+    width: 100%;
+    height: 50px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    background-color: white;
+    width: 300px;
+    height: 500px;
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1);
+}
+
+label {
+    color: black;
+}
+
+input {
+    background-color: white;
+    width: 100%;
+    height: 45px;
+    border: solid 1px black;
+    outline: none;
+    border-radius: 15px;
+    padding-left: 10px;
+    color: black;
+}
+
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    min-width: 100vw;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    background-color: white;
+
+}
+
+
+#root {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    min-width: 100vw;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+.form-ui {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 20px;
+}
+
+

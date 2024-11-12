@@ -1,14 +1,18 @@
 from django.urls import path
 
 from . import views
-from .views import DashboardPageView, SearchResultsView, UpdateNoteView
 
 urlpatterns = [
-    path("register/", views.UserRegistrationView.as_view(), name="register"),
-    path("login/", views.UserLoginView.as_view(), name="login"),
-    path("create_note/", views.NoteView.as_view(), name="create_note"),
-    path('edit_note/<int:pk>/', UpdateNoteView.as_view(), name='edit_note'),
-    path('delete_note/<int:pk>/', views.DeleteNoteView.as_view(), name='delete_note'),
-    path("search/", SearchResultsView.as_view(), name="search_results"),
-    path("", DashboardPageView.as_view(), name="dashboard"),
+   path("api/notes/", views.notes_list, name="notes"),
+   path("api/notes/create_note", views.notes_list, name="create-nate"),
+   path("api/notes/edit_note/<int:pk>/", views.notes_detail, name="edit-note"),
+   path("api/notes/delete_note/<int:pk>/", views.notes_detail, name="delete-note"),
+   path("api/login/", views.LoginView.as_view(), name="api-login"),
+   path('api/register/', views.RegisterView.as_view(), name='api-register'),
+   path('api/logout/', views.LogoutView.as_view(), name='api-logout'),
+   path("csrf/", views.index, name="csrf-token"),
+
+
+
+
 ]

@@ -1,132 +1,96 @@
-from django.contrib import messages
-from django.contrib.auth import authenticate, login
-from django.contrib.auth.decorators import login_required
-from django.db.models import Q
-from django.shortcuts import redirect, get_object_or_404
-from django.urls import reverse_lazy
-from django.utils.decorators import method_decorator
-from django.views.generic import TemplateView, ListView, DeleteView, UpdateView
+from django.contrib.auth import logout, login, authenticate
+from django.http import JsonResponse
+from django.middleware.csrf import get_token
+from rest_framework import status, views
+from rest_framework.decorators import api_view
+from rest_framework.exceptions import ValidationError
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from api.forms import RegistrationForm, LoginForm, NoteForm
 from api.models import Note, User
-from api.serializers import UserSerializer
+from api.serializers import NoteSerializer
 
 
-class UserRegistrationView(TemplateView):
-    template_name = 'register.html'
-
-    def post(self, request, *args, **kwargs):
-        form = RegistrationForm(request.POST)  # Corrected to request.POST
-        if form.is_valid():
-            user = User.objects.create_user(
-                username=form.cleaned_data['username'],
-                email=form.cleaned_data['email'],
-                password=form.cleaned_data['password']
-            )
-            messages.success(self, f"Welcome, {user.username}!")
-            login(request, user)
-            return redirect('dashboard')
-        else:
-            messages.error(request, 'Please correct the errors below.')
-
-    def get(self, request, *args, **kwargs):
-        form = RegistrationForm()
-        return self.render_to_response({'form': form})
+def index(request):
+    csrf_token = get_token(request)
+    return JsonResponse({"csrfToken": csrf_token})
 
 
-class UserLoginView(TemplateView):
-    template_name = 'login.html'
+api_view(["POST", "GET"])
 
-    def post(self, request, *args, **kwargs):
 
-        form = LoginForm(request.POST)
-        if form.is_valid():
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
-            user = authenticate(request, username=username, password=password)
-            if user is not None:
+def notes_list(request):
+    if request.method == "GET":
+        notes = Note.objects.filter(user=request.user)
+        serializer = NoteSerializer(notes, many=True, context={"request": request})
+        if serializer.is_valid():
+            return Response(serializer.data)
+
+    elif request.method == "POST":
+        note = NoteSerializer(data=request.data)
+        if note.is_valid():
+            note.save(user=request.user)
+            return Response(request, status=status.HTTP_201_CREATED)
+        return Response(request, status=status.HTTP_400_BAD_REQUEST)
+
+
+api_view(["PUT", "DELETE"])
+
+
+def notes_detail(request, pk):
+    try:
+        note = Note.objects.get(user=request.user, pk=pk, id=pk)
+    except Note.DoesNotExist:
+        return Response(request, status=status.HTTP_400_BAD_REQUEST)
+
+    if request.method == "DELETE":
+        note.delete()
+        return Response(request, status=status.HTTP_204_NO_CONTENT)
+    elif request.method == "PUT":
+        noteSerializer = NoteSerializer(note, data=request.data, context={"request": request})
+        if noteSerializer.is_valid():
+            noteSerializer.save(user=request.user)
+            return Response(request, status=status.HTTP_204_NO_CONTENT)
+        return Response(noteSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class LogoutView(APIView):
+    def post(self, request):
+        logout(request)
+        return Response({"message": "Logged out successfully"}, status=status.HTTP_200_OK)
+
+
+class LoginView(views.APIView):
+
+    def post(self, request, format=None):
+        data = request.data
+
+        username = data.get('username', None)
+        password = data.get('password', None)
+
+        try:
+            user = authenticate(username=username, password=password)
+        except User.DoesNotExist:
+            user = None
+
+        if user is not None:
+            if user.is_active:
                 login(request, user)
-                messages.success(request, f"Welcome back, {username}!")
-                return redirect('dashboard')
+                return Response({"message": "Login successful"}, status=status.HTTP_200_OK)
             else:
-                messages.error(request, 'Invalid login credentials.')
-
-    def get(self, request, *args, **kwargs):
-        form = LoginForm()
-        return self.render_to_response({'form': form})
+                return Response({"error": "Account is inactive"}, status=status.HTTP_403_FORBIDDEN)
+        else:
+            return Response({"error": "Invalid username or password"}, status=status.HTTP_400_BAD_REQUEST)
 
 
-@method_decorator(login_required(login_url="login"), name="dispatch")
-class NoteView(TemplateView):
-    template_name = "create_note.html"
+class RegisterView(APIView):
+    def post(self, request):
+        email = request.data.get('email')
+        username = request.data.get('username')
+        password = request.data.get('password')
 
-    def get(self, request, *args, **kwargs):
-        form = NoteForm()
-        return self.render_to_response({'form': form})
+        if not email or not username or not password:
+            raise ValidationError("All fields are required")
 
-    def post(self, request, *args, **kwargs):
-        form = NoteForm(request.POST)
-        if form.is_valid():
-            note = form.save(commit=False)
-            note.user = request.user
-            note.save()
-            messages.success(request, "Note created successfully.")
-            return redirect('dashboard')
-
-
-@method_decorator(login_required(login_url="login"), name="dispatch")
-class DashboardPageView(TemplateView):
-    template_name = 'dashboard.html'
-
-    def get(self, request, *args, **kwargs):
-        context = self.get_context_data()
-        return self.render_to_response(context)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['notes'] = self.get_user_notes()
-        context['user'] = self.get_user_data()
-        return context
-
-    def get_user_notes(self):
-        return Note.objects.filter(user=self.request.user)
-
-    def get_user_data(self):
-        return UserSerializer(self.request.user).data
-
-
-@method_decorator(login_required(login_url="login"), name="dispatch")
-class DeleteNoteView(DeleteView):
-    template_name = "dashboard.html"
-    model = Note
-    success_url = reverse_lazy("dashboard")
-
-    def get_queryset(self):
-        return Note.objects.filter(user=self.request.user)
-
-
-@method_decorator(login_required(login_url="login"), name="dispatch")
-class UpdateNoteView(UpdateView):
-    template_name = "edit_note.html"
-    model = Note
-    form_class = NoteForm
-    success_url = reverse_lazy("dashboard")
-
-    def get_object(self, queryset=None):
-        return get_object_or_404(Note, pk=self.kwargs['pk'], user=self.request.user)
-
-    def get_queryset(self):
-        return Note.objects.filter(user=self.request.user)
-
-
-class SearchResultsView(ListView):
-    model = Note
-    template_name = 'dashboard.html'
-
-    def get_queryset(self):
-        query = self.request.GET.get("q")
-        query_notes = Note.objects.filter(
-            Q(title__icontains=query) | Q(content__icontains=query), user=self.request.user
-        )
-        # new
-        return query_notes
+        User.objects.create_user(username=username, email=email, password=password)
+        return Response({"message": "User registered successfully"}, status=status.HTTP_201_CREATED)
