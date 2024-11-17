@@ -45,6 +45,10 @@ class Note(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="notes")
     title = models.CharField(max_length=500)
     content = models.TextField()
+    image = models.ImageField(upload_to='note_images/', blank=True, null=True)
+    isPinned = models.BooleanField(default=False)
+    isFavorite = models.BooleanField(default=False)
+    inRecycleBin = models.BooleanField(default=False)
     date_created = models.DateTimeField(auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True)
 

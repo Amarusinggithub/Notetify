@@ -1,12 +1,5 @@
 import axios from "axios";
-
-
-const getCSRFToken = async () => {
-    const response = await axios.get("http://localhost:8000/csrf/");
-    return response.data.csrfToken;
-};
-
-axios.defaults.withCredentials = true;
+import {getCSRFToken} from "./CSRFTokenService.jsx";
 
 export const login = async (username, password) => {
     try {
@@ -14,7 +7,10 @@ export const login = async (username, password) => {
         const response = await axios.post(
             "http://localhost:8000/api/login/",
             {username, password},
-            {headers: {"X-CSRFToken": csrfToken}}
+            {
+                withCredentials: true,
+                headers: {"X-CSRFToken": csrfToken}, // Include headers here
+            }
         );
         return response.status;
     } catch (error) {
@@ -22,14 +18,17 @@ export const login = async (username, password) => {
         throw error;
     }
 };
-// Sign up function
+
 export const signUp = async (email, username, password) => {
     try {
         const csrfToken = await getCSRFToken();
         const response = await axios.post(
             "http://localhost:8000/api/register/",
             {email, username, password},
-            {headers: {"X-CSRFToken": csrfToken}}
+            {
+                withCredentials: true,
+                headers: {"X-CSRFToken": csrfToken}, // Include headers here
+            }
         );
         console.log(response.data);
         return response.status;
@@ -43,7 +42,10 @@ export const signUp = async (email, username, password) => {
 export const logout = async () => {
     try {
         const csrfToken = await getCSRFToken();
-        const response = await axios.post("http://localhost:8000/api/logout/", {headers: {"X-CSRFToken": csrfToken}});
+        const response = await axios.post("http://localhost:8000/api/logout/", {
+            withCredentials: true,
+            headers: {"X-CSRFToken": csrfToken},
+        },);
         return response.status;
 
     } catch (e) {

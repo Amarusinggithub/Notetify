@@ -2,8 +2,9 @@ from django.contrib.auth import logout, login, authenticate
 from django.http import JsonResponse
 from django.middleware.csrf import get_token
 from rest_framework import status, views
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.exceptions import ValidationError
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -16,32 +17,32 @@ def index(request):
     return JsonResponse({"csrfToken": csrf_token})
 
 
-api_view(["POST", "GET"])
-
-
+@api_view(["POST", "GET"])
+@permission_classes([IsAuthenticated])  # Ensure only authenticated users can access
 def notes_list(request):
     if request.method == "GET":
         notes = Note.objects.filter(user=request.user)
         serializer = NoteSerializer(notes, many=True, context={"request": request})
-        if serializer.is_valid():
-            return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     elif request.method == "POST":
-        note = NoteSerializer(data=request.data)
-        if note.is_valid():
-            note.save(user=request.user)
-            return Response(request, status=status.HTTP_201_CREATED)
-        return Response(request, status=status.HTTP_400_BAD_REQUEST)
+        serializer = NoteSerializer(data=request.data, context={"request": request})
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 api_view(["PUT", "DELETE"])
 
 
+@permission_classes(IsAuthenticated)
 def notes_detail(request, pk):
     try:
         note = Note.objects.get(user=request.user, pk=pk, id=pk)
     except Note.DoesNotExist:
-        return Response(request, status=status.HTTP_400_BAD_REQUEST)
+        return Response(request, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == "DELETE":
         note.delete()
@@ -54,6 +55,7 @@ def notes_detail(request, pk):
         return Response(noteSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@permission_classes(IsAuthenticated)
 class LogoutView(APIView):
     def post(self, request):
         logout(request)
@@ -61,7 +63,7 @@ class LogoutView(APIView):
 
 
 class LoginView(views.APIView):
-
+    permission_classes(IsAuthenticated)
     def post(self, request, format=None):
         data = request.data
 

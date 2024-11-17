@@ -1,0 +1,37 @@
+.note-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    justify-content: center;
+    width: 350px;
+    border-radius: 10px;
+    background-color: cornflowerblue;
+    height: 350px;
+    transition: width 300ms ease 0s, height 300ms ease 0s, z-index 300ms ease 0s, margin-left 300ms ease 0s, margin-right 300ms ease 0s, left 300ms ease 0s, right 300ms ease;
+
+}
+
+.note-card:active {
+    position: fixed;
+    margin-left: auto;
+    margin-right: auto;
+    left: 0;
+    right: 0;
+    color: black;
+    width: 700px;
+    height: 700px;
+    z-index: 100;
+}
+
+.note-card h2 {
+    text-align: center;
+    color: black;
+
+}
+
+.note-card p {
+    text-align: start;
+    color: black;
+
+}

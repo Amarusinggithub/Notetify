@@ -85,7 +85,7 @@ const SignUpForm = () => {
                                onChange={handleChange}/>
                     </div>
 
-                    <div>
+                    <div className={"form-btn"}>
 
                         <button className="btn" onClick={handleSubmit}>Sign Up</button>
 
