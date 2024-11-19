@@ -1,15 +1,15 @@
 from django.contrib.auth import logout, login, authenticate
 from django.http import JsonResponse
 from django.middleware.csrf import get_token
-from rest_framework import status, views
+from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.exceptions import ValidationError
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api.models import Note, User
-from api.serializers import NoteSerializer
+from api.serializers import NoteSerializer, UserSerializer
 
 
 def index(request):
@@ -37,7 +37,7 @@ def notes_list(request):
 api_view(["PUT", "DELETE"])
 
 
-@permission_classes(IsAuthenticated)
+@permission_classes([IsAuthenticated])
 def notes_detail(request, pk):
     try:
         note = Note.objects.get(user=request.user, pk=pk, id=pk)
@@ -55,30 +55,49 @@ def notes_detail(request, pk):
         return Response(noteSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@permission_classes(IsAuthenticated)
+
 class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def post(self, request):
-        logout(request)
-        return Response({"message": "Logged out successfully"}, status=status.HTTP_200_OK)
+        if request.user.is_authenticated:
+            print("User:", request.user)  # Logs the authenticated user
+            print("Session:", request.session)  # Logs the session details
+            print("CSRF Token:", request.headers.get('X-CSRFToken'))  # Logs the CSRF token
+            logout(request)
+            return Response({'message': 'Logged out successfully'}, status=200)
+        else:
+            return Response({'error': 'User is not authenticated'}, status=403)
 
 
-class LoginView(views.APIView):
-    permission_classes(IsAuthenticated)
+class LoginView(APIView):
+    permission_classes = [AllowAny]
+
     def post(self, request, format=None):
-        data = request.data
+        # Debugging CSRF Token
+        print("CSRF Token from Header:", request.headers.get("X-CSRFToken"))
+        print("Expected CSRF Token:", get_token(request))
+        print("Request data:", request.data)
 
+        # Extract username and password from request data
+        data = request.data
         username = data.get('username', None)
         password = data.get('password', None)
 
-        try:
-            user = authenticate(username=username, password=password)
-        except User.DoesNotExist:
-            user = None
+        if not username or not password:
+            return Response({"error": "Username and password are required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Authenticate user
+        user = authenticate(username=username, password=password)
 
         if user is not None:
             if user.is_active:
+                # Log the user in
                 login(request, user)
-                return Response({"message": "Login successful"}, status=status.HTTP_200_OK)
+
+                # Serialize user data
+                serializer = UserSerializer(user, context={"request": request})
+                return Response({"userData": serializer.data, "message": "Login successful"}, status=status.HTTP_200_OK)
             else:
                 return Response({"error": "Account is inactive"}, status=status.HTTP_403_FORBIDDEN)
         else:
@@ -86,13 +105,18 @@ class LoginView(views.APIView):
 
 
 class RegisterView(APIView):
+    permission_classes = [AllowAny]
     def post(self, request):
         email = request.data.get('email')
+
         username = request.data.get('username')
         password = request.data.get('password')
 
         if not email or not username or not password:
             raise ValidationError("All fields are required")
 
-        User.objects.create_user(username=username, email=email, password=password)
-        return Response({"message": "User registered successfully"}, status=status.HTTP_201_CREATED)
+        user = User.objects.create_user(username=username, email=email, password=password)
+        serializer = UserSerializer(user, context={"request": request})
+
+        return Response({"userData": serializer.data, "message": "User registered successfully"},
+                        status=status.HTTP_201_CREATED)

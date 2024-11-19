@@ -1,10 +1,12 @@
-import {useState} from "react";
+import {useContext, useState} from "react";
 import "../../styles/SignUpForm.css";
 import {useNavigate} from "react-router-dom";
 import {signUp} from "../../services/AuthService.jsx";
+import UserContext from "../../context/UserContext.jsx";
 
 
 const SignUpForm = () => {
+    const {setLogin} = useContext(UserContext);
     const [state, setState] = useState({
         email: '',
         password: '', confirmPassword: '', username: '',
@@ -21,12 +23,13 @@ const SignUpForm = () => {
 
         if (state.password !== state.confirmPassword) {
             console.log("Passwords do not match");
-            return;  // Stop form submission if passwords don't match
+            return;
         }
 
         try {
             const response = await signUp(state.email, state.username, state.password);
             if (response === 200) {
+                setLogin(response.data.userData)
                 navigate("/");
             } else {
                 console.log("Signup failed");

@@ -1,14 +1,16 @@
 import axios from "axios";
 import {getCSRFToken} from "./CSRFTokenService.jsx";
 
-
+axios.defaults.withCredentials = true;
 export const getNotes = async () => {
     try {
         const csrfToken = await getCSRFToken();
+
         const response = await axios.get("http://localhost:8000/api/notes/",
             {
+
                 withCredentials: true,
-                headers: {"X-CSRFToken": csrfToken},
+                headers: {"X-CSRFToken": csrfToken,},
             });
         console.log(response.data);
         return response.data;
@@ -20,10 +22,11 @@ export const getNotes = async () => {
 export const createNote = async (note) => {
     try {
         const csrfToken = await getCSRFToken();
-        const response = await axios.post("http://localhost:8000/api/notes/create_note", {note},
+
+        const response = await axios.post('http://localhost:8000/api/notes/create_note', {note},
             {
                 withCredentials: true,
-                headers: {"X-CSRFToken": csrfToken}, // Include headers here
+                headers: {"X-CSRFToken": csrfToken,}, // Include headers here
             });
         console.log(response.data);
         return response.status;
@@ -36,27 +39,37 @@ export const createNote = async (note) => {
 export const updateNote = async (note) => {
     try {
         const csrfToken = await getCSRFToken();
-        const response = await axios.post("http://localhost:8000/api/notes/edit_note/${note.id}", {"note": note},
+
+
+        const response = await axios.put(
+            `http://localhost:8000/api/notes/edit_note/${note.id}/`,
+            {note},
             {
                 withCredentials: true,
-                headers: {"X-CSRFToken": csrfToken},
-            });
+                headers: {"X-CSRFToken": csrfToken,},
+            }
+        );
+
         console.log(response.data);
         return response.status;
     } catch (e) {
-        console.error(e)
+        console.error(e);
+        throw e;
     }
+};
 
-}
 
 export const deleteNote = async (note) => {
     try {
         const csrfToken = await getCSRFToken();
-        const response = await axios.post("http://localhost:8000/api/notes/delete_note/${note.id}/", {"note": note},
+        const response = await axios.delete(
+            `http://localhost:8000/api/notes/delete_note/${note.id}/`, {"note": note},
+
             {
                 withCredentials: true,
-                headers: {"X-CSRFToken": csrfToken}, // Include headers here
-            });
+                headers: {"X-CSRFToken": csrfToken,},
+            }
+        );
         console.log(response.status);
         return response.status;
     } catch (e) {

@@ -8,20 +8,21 @@
     border-radius: 10px;
     background-color: cornflowerblue;
     height: 350px;
-    transition: width 300ms ease 0s, height 300ms ease 0s, z-index 300ms ease 0s, margin-left 300ms ease 0s, margin-right 300ms ease 0s, left 300ms ease 0s, right 300ms ease;
+    transition: all 1000ms ease 0s,;
 
 }
 
-.note-card:active {
+.selected-note {
     position: fixed;
-    margin-left: auto;
-    margin-right: auto;
-    left: 0;
-    right: 0;
-    color: black;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
     width: 700px;
     height: 700px;
     z-index: 100;
+    color: black;
 }
 
 .note-card h2 {
@@ -33,5 +34,5 @@
 .note-card p {
     text-align: start;
     color: black;
-
+    text-wrap: wrap;
 }

@@ -1,10 +1,12 @@
-import {useState} from "react";
+import {useContext, useState} from "react";
 import "../../styles/LoginForm.css";
 
 import {login,} from "../../services/AuthService.jsx";
 import {useNavigate} from "react-router-dom";
+import UserContext from "../../context/UserContext.jsx";
 
 const LoginForm = () => {
+    const {setLogin} = useContext(UserContext);
     const [state, setState] = useState({
         username: '',
         password: '',
@@ -19,7 +21,8 @@ const LoginForm = () => {
         event.preventDefault();
         try {
             const response = await login(state.username, state.password);
-            if (response === 200) {
+            if (response.status === 200) {
+                setLogin(response.data.userData)
                 navigate("/");
             } else {
                 console.log("Login failed");

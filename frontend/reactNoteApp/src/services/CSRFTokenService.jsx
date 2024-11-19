@@ -1,6 +1,17 @@
+// In CSRFTokenService.js
 import axios from "axios";
 
-export const getCSRFToken = async () => {
-    const response = await axios.get("http://localhost:8000/csrf/");
-    return response.data.csrfToken;
+axios.defaults.withCredentials = true;
+let csrfToken = null;
+
+export const initializeCSRFToken = async () => {
+    if (!csrfToken) {
+        const response = await axios.get("http://localhost:8000/csrf/", {
+            withCredentials: true,
+        });
+        csrfToken = response.data.csrfToken;
+        console.log("Fetched CSRF Token:", csrfToken);
+    }
 };
+
+export const getCSRFToken = () => csrfToken;

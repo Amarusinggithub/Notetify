@@ -9,6 +9,7 @@
     overflow-x: auto;
     overflow-y: auto;
     padding: 1rem;
+
 }
 
 .navbar {
@@ -24,6 +25,7 @@
     flex-direction: row;
     flex-wrap: wrap;
     gap: 1rem;
+    background-color: rgb(32, 33, 36);
 
 }
 

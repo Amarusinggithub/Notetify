@@ -35,9 +35,11 @@ ALLOWED_HOSTS = ["*"
 
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
+    'DEFAULT_AUTHENTICATION_CLASSES': ['rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
+                                       'rest_framework.authentication.TokenAuthentication',
     ],
+
 }
 
 
@@ -58,6 +60,7 @@ INSTALLED_APPS = [
     'backend',
     'api',
     "rest_framework",
+    'channels',
     'rest_framework_simplejwt',
     "corsheaders",
     'django_otp',
@@ -77,9 +80,17 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    " http://localhost:5173",
+    "http://localhost:5174",
+    "http://127.0.0.1:5174",
 ]
+
 CORS_ALLOW_CREDENTIALS = True
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5174",
+]
+
+
 
 ROOT_URLCONF = 'backend.urls'
 
@@ -165,10 +176,20 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'login'
 
-CSRF_COOKIE_SAMESITE = 'Lax'  # Allows cookies to be sent across origins
-SESSION_COOKIE_SAMESITE = 'Lax'
-CSRF_COOKIE_HTTPONLY = False  # Allows the CSRF cookie to be read by JavaScript
-SESSION_COOKIE_HTTPONLY = True
+# Allows cross-origin cookies
+CSRF_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SAMESITE = 'None'
+
+# Disable Secure for development; enable it in production
+CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = False
+
+# Allows JavaScript to access the CSRF cookie
+CSRF_COOKIE_HTTPONLY = False
+
+# Allows javascript to access the session cookie
+SESSION_COOKIE_HTTPONLY = False
+
 
 # PROD ONLY
 # CSRF_COOKIE_SECURE = True
