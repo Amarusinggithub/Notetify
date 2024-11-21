@@ -1,6 +1,7 @@
 from django.contrib.auth import logout, login, authenticate
 from django.http import JsonResponse
 from django.middleware.csrf import get_token
+from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.exceptions import ValidationError
@@ -12,13 +13,13 @@ from api.models import Note, User
 from api.serializers import NoteSerializer, UserSerializer
 
 
-def index(request):
+def get_csrf_token(request):
     csrf_token = get_token(request)
     return JsonResponse({"csrfToken": csrf_token})
 
 
 @api_view(["POST", "GET"])
-@permission_classes([IsAuthenticated])  # Ensure only authenticated users can access
+@permission_classes([IsAuthenticated])
 def notes_list(request):
     if request.method == "GET":
         notes = Note.objects.filter(user=request.user)
@@ -33,27 +34,23 @@ def notes_list(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
-api_view(["PUT", "DELETE"])
-
-
+@api_view(["PUT", "DELETE"])
 @permission_classes([IsAuthenticated])
 def notes_detail(request, pk):
-    try:
-        note = Note.objects.get(user=request.user, pk=pk, id=pk)
-    except Note.DoesNotExist:
-        return Response(request, status=status.HTTP_404_NOT_FOUND)
+    note = get_object_or_404(Note, user=request.user, pk=pk)
 
     if request.method == "DELETE":
-        note.delete()
-        return Response(request, status=status.HTTP_204_NO_CONTENT)
-    elif request.method == "PUT":
-        noteSerializer = NoteSerializer(note, data=request.data, context={"request": request})
-        if noteSerializer.is_valid():
-            noteSerializer.save(user=request.user)
-            return Response(request, status=status.HTTP_204_NO_CONTENT)
-        return Response(noteSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+        note.delete()
+        return Response({"message": "Note deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+
+    elif request.method == "PUT":
+
+        serializer = NoteSerializer(note, data=request.data, context={"request": request})
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class LogoutView(APIView):
@@ -79,7 +76,6 @@ class LoginView(APIView):
         print("Expected CSRF Token:", get_token(request))
         print("Request data:", request.data)
 
-        # Extract username and password from request data
         data = request.data
         username = data.get('username', None)
         password = data.get('password', None)
@@ -87,15 +83,13 @@ class LoginView(APIView):
         if not username or not password:
             return Response({"error": "Username and password are required"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Authenticate user
         user = authenticate(username=username, password=password)
 
         if user is not None:
             if user.is_active:
-                # Log the user in
+
                 login(request, user)
 
-                # Serialize user data
                 serializer = UserSerializer(user, context={"request": request})
                 return Response({"userData": serializer.data, "message": "Login successful"}, status=status.HTTP_200_OK)
             else:

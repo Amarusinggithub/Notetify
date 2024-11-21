@@ -6,9 +6,11 @@ import {getNotes} from "../services/NoteService.jsx";
 import {useContext, useEffect, useState} from "react";
 import NoteCard from "../components/home/NoteCard.jsx";
 import UserContext from "../context/UserContext.jsx";
+import NoteContext from "../context/NoteContext.jsx";
 
 const Homepage = () => {
     let navigate = useNavigate();
+    const [selectedNote, setSelectedNote] = useState(false);
     const [notes, setNotes] = useState([]);
     const {userData, setLogout} = useContext(UserContext);
 
@@ -43,20 +45,23 @@ const Homepage = () => {
     };
 
     return (
-        <div className={"container"}>
-            <Navbar text={"Notetify"}/>
-            <div className={"notes"}>
-                {notes &&
-                    notes.map((note) => (
-                        <div key={note.id}>
-                            <NoteCard note={note}/>
-                        </div>
-                    ))}
+        <NoteContext.Provider value={{selectedNote, setSelectedNote}}>
+            <div className={"container"}>
+                <Navbar text={"Notetify"}/>
+                <div className={"notes"}>
+                    {notes &&
+                        notes.map((note) => (
+                            <div key={note.id}>
+                                <NoteCard note={note}/>
+                            </div>
+                        ))}
+                </div>
+                <div>
+                    <button onClick={handleLogout}>Logout</button>
+                </div>
             </div>
-            <div>
-                <button onClick={handleLogout}>Logout</button>
-            </div>
-        </div>
+        </NoteContext.Provider>
+
     );
 };
 

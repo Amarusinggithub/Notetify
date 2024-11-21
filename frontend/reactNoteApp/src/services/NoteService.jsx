@@ -63,7 +63,7 @@ export const deleteNote = async (note) => {
     try {
         const csrfToken = await getCSRFToken();
         const response = await axios.delete(
-            `http://localhost:8000/api/notes/delete_note/${note.id}/`, {"note": note},
+            `http://localhost:8000/api/notes/delete_note/${note.id}/`,
 
             {
                 withCredentials: true,
