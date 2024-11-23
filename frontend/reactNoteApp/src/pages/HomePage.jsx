@@ -10,7 +10,7 @@ import NoteContext from "../context/NoteContext.jsx";
 
 const Homepage = () => {
     let navigate = useNavigate();
-    const [selectedNote, setSelectedNote] = useState(false);
+    const [selectedNote, setSelectedNote] = useState(null);
     const [notes, setNotes] = useState([]);
     const {userData, setLogout} = useContext(UserContext);
 
@@ -51,14 +51,14 @@ const Homepage = () => {
                 <div className={"notes"}>
                     {notes &&
                         notes.map((note) => (
-                            <div key={note.id}>
+                            <div key={note.id} className="note-div">
                                 <NoteCard note={note}/>
                             </div>
                         ))}
                 </div>
-                <div>
-                    <button onClick={handleLogout}>Logout</button>
-                </div>
+
+                <button onClick={handleLogout}>Logout</button>
+
             </div>
         </NoteContext.Provider>
 

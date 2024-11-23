@@ -1,5 +1,7 @@
 
 .container {
+    position: relative;
+    top: 70px;
     width: 100%;
     height: 100%;
     background-color: rgb(32, 33, 36);
@@ -7,8 +9,9 @@
     flex-direction: column;
     justify-content: center;
     overflow-x: auto;
-    overflow-y: auto;
-    padding: 1rem;
+    overflow-y: hidden;
+    padding: 20px;
+
 
 }
 
@@ -20,6 +23,7 @@
 }
 
 .notes {
+    height: 100%;
     width: 100%;
     display: flex;
     flex-direction: row;
@@ -28,4 +32,12 @@
     background-color: rgb(32, 33, 36);
 
 }
+
+.note-div {
+    width: 350px;
+    height: 350px;
+    background-color: rgb(32, 33, 36);
+}
+
+
 

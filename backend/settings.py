@@ -35,13 +35,13 @@ ALLOWED_HOSTS = ["*"
 
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': ['rest_framework.authentication.BasicAuthentication',
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
-                                       'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
     ],
 
 }
-
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'channels',
     'rest_framework_simplejwt',
     "corsheaders",
+
     'django_otp',
     'django_otp.plugins.otp_static',
     'django_otp.plugins.otp_totp',

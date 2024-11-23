@@ -1,72 +1,120 @@
 import "../../styles/NoteCard.css";
-import {useContext, useEffect, useRef} from "react";
-import {deleteNote} from "../../services/NoteService.jsx";
+import {useContext, useEffect, useRef, useState} from "react";
+import {deleteNote, updateNote} from "../../services/NoteService.jsx";
 import NoteContext from "../../context/NoteContext.jsx";
 
-const NoteCard = (note) => {
-
+const NoteCard = ({note}) => {
     const noteRef = useRef(null);
     const {selectedNote, setSelectedNote} = useContext(NoteContext);
-
+    const isSelected = selectedNote && selectedNote.id === note.id;
+    const [noteState, setNoteState] = useState({
+        title: note.title,
+        content: note.content,
+        id: note.id,
+        is_favorite: note.is_favorite,
+        is_pinned: note.is_pinned,
+        in_recycleBin: note.in_recycleBin,
+        date_created: note.date_created,
+        last_updated: note.last_updated
+    });
+    const [isEdited, setIsEdited] = useState(false);
     useEffect(() => {
-        if (selectedNote && noteRef.current) {
+        if (isSelected && noteRef.current) {
             noteRef.current.focus();
         }
-    }, [selectedNote]);
+    }, [isSelected]);
 
-    const handleOnSelected = (event) => {
+    const handleSelect = async (event) => {
         event.preventDefault();
-        event.stopPropagation();
-        setSelectedNote(true);
-    }
 
-    const handleNotSelected = (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        setSelectedNote(false);
-    }
+        if (isSelected && isEdited) {
+            try {
+                const response = await updateNote(noteState);
+                if (response === 200) {
 
-    const handleDeleteNote = async () => {
+                    console.log("Note was updated successfully");
+                    setIsEdited(false)
+                } else {
+                    console.log("Note was not updated successfully");
+                }
+            } catch (error) {
+                console.error("There was an error updating the note", error);
+            }
+    }
+        setSelectedNote(isSelected ? null : note);
+    };
+
+    const handleInput = (e) => {
+        setNoteState({...noteState, [e.target.name]: e.target.value});
+        setIsEdited(true);
+    };
+
+    const handleDeleteNote = async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         try {
-            const response = await deleteNote(note.note);
-            if (response == 200) {
-                console.log("note was deleted successfully");
-                setSelectedNote(false);
+            const response = await deleteNote(note);
+            if (response === 200) {
+                console.log("Note was deleted successfully");
+                setSelectedNote(null);
             } else {
-                console.log("note was not deleted successfully");
+                console.log("Note was not deleted successfully");
             }
-        } catch (e) {
-            console.error("There was a error deleting the note", e);
+        } catch (error) {
+            console.error("There was an error deleting the note", error);
         }
+    };
 
-    }
-
-    useEffect(() => {
-        console.log("this is the note: ", {note})
-
-    }, [note.note]);
-
-
-    return <>
-        <div onClick={handleOnSelected}
-             key={note.note.id}
-             className={`note-card ${selectedNote ? "selected-note" : "note-card"}`}>
-
-
-            <div ref={noteRef} contentEditable={selectedNote ? "true" : "false"}>
-                <h2>{note.note.title}</h2>
-                <p>{note.note.content}</p>
+    return (
+        <div
+            className={`${isSelected ? "notecard-bg" : ""}`}
+            onClick={(e) => handleSelect(e)}
+        >
+            <div
+                onClick={(e) => {
+                    e.stopPropagation();
+                    if (!isSelected) {
+                        handleSelect(e);
+                    }
+                }}
+                className={`note-card ${isSelected ? "selected-note" : ""}`}
+            >
+                <div ref={noteRef} contentEditable={isSelected ? "true" : "false"} className={"note"}>
+                    <div className={"note-title"}>
+                        <h2 onChange={handleInput} name={"title"}>
+                            {noteState.title}
+                        </h2>
+                    </div>
+                    <div className={"note-content"}>
+                        <p onChange={handleInput} name={"content"}>
+                            {noteState.content}
+                        </p>
+                    </div>
+                </div>
+                {isSelected && (
+                    <div className={"function-bar"}>
+                        <button
+                            onClick={handleDeleteNote}
+                            className="delete-btn"
+                            type="button"
+                        >
+                            Delete
+                        </button>
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleSelect(e);
+                            }}
+                            className="close-btn"
+                            type="button"
+                        >
+                            Close
+                        </button>
+                    </div>
+                )}
             </div>
-            {selectedNote && (<div>
-                <button onClick={handleDeleteNote} className={"delete-btn"} type={"submit"}>Delete</button>
-                <button onClick={handleNotSelected} className={"close-btn"} type={"submit"}>Close</button>
-            </div>)
-            }
         </div>
-
-
-    </>
-
-}
+    );
+};
 
 export default NoteCard;

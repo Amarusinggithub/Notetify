@@ -3,7 +3,7 @@ from typing import Set
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import User, Note
+from .models import User
 
 
 class MyUserAdmin(UserAdmin):
@@ -82,6 +82,5 @@ class NoteAdmin(admin.ModelAdmin):
         ('Important Dates', {'fields': ('date_created', 'last_updated')}),
     )
 
-# Register your User model with the custom UserAdmin
+
 admin.site.register(User, MyUserAdmin)
-admin.site.register(Note)

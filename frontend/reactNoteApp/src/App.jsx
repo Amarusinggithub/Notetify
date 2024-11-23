@@ -50,9 +50,7 @@ export default function App() {
 
   return (
       <UserContext.Provider value={{userData, setLogin, setLogout}}>
-        <div>
           <RouterProvider router={router}/>
-        </div>
       </UserContext.Provider>
   );
 }

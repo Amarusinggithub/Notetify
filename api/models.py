@@ -24,15 +24,17 @@ class MyUserManager(UserManager):
 
         return self.create_user(email, password, **extra_fields)
 
+
 class User(AbstractUser, PermissionsMixin):
     id = models.AutoField(primary_key=True)
     username = models.CharField(max_length=150, unique=True,)
     email = models.EmailField(unique=True)
+    profile_picture = models.ImageField(editable=True, upload_to='user_images/', blank=True, null=True)
+
+
 
     REQUIRED_FIELDS = []
     USERNAME_FIELD = "username"
-
-
 
     objects = MyUserManager()
 
@@ -40,18 +42,18 @@ class User(AbstractUser, PermissionsMixin):
         return self.email
 
 
+
 class Note(models.Model):
     id = models.AutoField(primary_key=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="notes")
     title = models.CharField(max_length=500)
     content = models.TextField()
-    image = models.ImageField(upload_to='note_images/', blank=True, null=True)
-    isPinned = models.BooleanField(default=False)
-    isFavorite = models.BooleanField(default=False)
-    inRecycleBin = models.BooleanField(default=False)
+    image = models.ImageField(editable=True, upload_to='note_images/', blank=True, null=True)
+    is_pinned = models.BooleanField(default=False)
+    is_favorite = models.BooleanField(default=False)
+    in_recycleBin = models.BooleanField(default=False)
     date_created = models.DateTimeField(auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True)
-
 
     def __str__(self):
         return self.title
