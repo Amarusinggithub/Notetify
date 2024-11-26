@@ -29,7 +29,7 @@ class User(AbstractUser, PermissionsMixin):
     id = models.AutoField(primary_key=True)
     username = models.CharField(max_length=150, unique=True,)
     email = models.EmailField(unique=True)
-    profile_picture = models.ImageField(editable=True, upload_to='user_images/', blank=True, null=True)
+    profile_picture = models.ImageField(upload_to="avatars/", null=True, blank=True)
 
 
 

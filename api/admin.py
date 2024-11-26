@@ -3,7 +3,7 @@ from typing import Set
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import User
+from .models import User, Note
 
 
 class MyUserAdmin(UserAdmin):
@@ -69,7 +69,7 @@ class MyUserAdmin(UserAdmin):
 class NoteAdmin(admin.ModelAdmin):
     list_display = ('title', 'user',)
     search_fields = ('title', 'content', 'user__username')
-    list_filter = ('date_created')
+    list_filter = ('date_created',)
     ordering = ('-date_created',)
 
     readonly_fields = [
@@ -77,10 +77,11 @@ class NoteAdmin(admin.ModelAdmin):
         'last_updated','user'
     ]
     fieldsets = (
-        (None, {'fields': ('title', 'content', 'description', 'user')}),
+        (None, {'fields': ('title', 'content', 'user')}),
 
         ('Important Dates', {'fields': ('date_created', 'last_updated')}),
     )
 
 
 admin.site.register(User, MyUserAdmin)
+admin.site.register(Note, NoteAdmin)

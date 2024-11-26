@@ -51,6 +51,7 @@ SIMPLE_JWT = {
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -59,11 +60,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'backend',
     'api',
-    "rest_framework",
-    'channels',
+    'rest_framework',
     'rest_framework_simplejwt',
-    "corsheaders",
-
+    'corsheaders',
     'django_otp',
     'django_otp.plugins.otp_static',
     'django_otp.plugins.otp_totp',
@@ -81,14 +80,14 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173", 'http://localhost:8000'
+    "http://localhost:5175",
+    "http://127.0.0.1:5175", 'http://localhost:8000'
 ]
 
 CORS_ALLOW_CREDENTIALS = True
 
 CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:5173", 'http://localhost:8000'
+    "http://localhost:5175", 'http://localhost:8000'
 ]
 
 
@@ -166,7 +165,34 @@ AUTH_USER_MODEL="api.User"
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 
+# Jazmin settings to customize the admin interface
+JAZZMIN_SETTINGS = {
+
+    "site_title": "Notetify Admin Panel",  # Title for the site header
+    "site_header": "NotetifyAdmin",  # Header text in the admin panel
+    "site_brand": "Notetify",  # Branding for the site
+    "welcome_sign": "Welcome to the Notetify Admin Panel",  # Welcome message
+    "login_logo": None,  # You can add a custom logo here (path to image)
+    "login_logo_dark": None,  # Dark mode logo (path to image)
+    "site_logo": None,  # Logo on the admin sidebar (path to image)
+    "site_icon": "fa fa-cogs",  # Icon for the admin interface
+    "topmenu_links": [
+        {"name": "Home", "url": "/", "new_window": False},
+        {"name": "About", "url": "/about", "new_window": True},
+    ], "user_avatar": None,  # Show the user avatar on the admin page
+    "custom_links": {"app_label": [{"name": "View on Website", "url": "/"}]},
+    "footer_icons": [
+        {"name": "GitHub", "url": "https://github.com/", "new_window": True},
+    ],
+    "show_ui_builder": True,  # Show UI builder button
+    "show_sidebar": True,  # Show sidebar in the admin interface
+    "hide_apps": [],  # Hide specific apps from the admin sidebar
+}
+
+
 STATIC_URL = 'static/'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -174,12 +200,14 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Redirect to home page after login/logout
-LOGIN_REDIRECT_URL = 'home'
+LOGIN_REDIRECT_URL = '/admin/'  # Directly to the admin page
+
 LOGOUT_REDIRECT_URL = 'login'
 
 # Allows cross-origin cookies
-CSRF_COOKIE_SAMESITE = 'None'
-SESSION_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_SAMESITE = 'Lax'
+
 
 # Disable Secure for development; enable it in production
 CSRF_COOKIE_SECURE = False
