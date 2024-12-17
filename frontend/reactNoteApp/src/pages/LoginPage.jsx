@@ -1,11 +1,11 @@
 import {useContext, useState} from "react";
-import "../../styles/LoginForm.css";
+import "../styles/LoginForm.css";
 
-import {login,} from "../../services/AuthService.jsx";
+import {login,} from "../services/AuthService.jsx";
 import {useNavigate} from "react-router-dom";
-import UserContext from "../../context/UserContext.jsx";
+import UserContext from "../context/UserContext.jsx";
 
-const LoginForm = () => {
+const LoginPage = () => {
     const {setLogin} = useContext(UserContext);
     const [state, setState] = useState({
         username: '',
@@ -71,4 +71,4 @@ const LoginForm = () => {
         </form>);
 };
 
-export default LoginForm;
+export default LoginPage;

@@ -25,14 +25,14 @@ export const createNote = async (note) => {
 
         const response = await axios.post('http://localhost:8000/api/notes/create_note',
             {
+                "id": note.id,
                 "title": note.title,
                 "content": note.content,
                 "is_favorite": note.is_favorite,
                 "is_pinned": note.is_pinned,
                 "in_recycleBin": note.in_recycleBin,
                 "user": note.user,
-                "date_created": note.date_created,
-                "last_updated": note.last_updated,
+
             },
             {
                 withCredentials: true,
@@ -53,14 +53,15 @@ export const updateNote = async (note) => {
         const response = await axios.put(
             `http://localhost:8000/api/notes/edit_note/${note.id}/`,
             {
+                "id": note.id,
                 "title": note.title,
                 "content": note.content,
                 "is_favorite": note.is_favorite,
                 "is_pinned": note.is_pinned,
                 "in_recycleBin": note.in_recycleBin,
                 "user": note.user,
-                "date_created": note.date_created,
-                "last_updated": note.last_updated,
+
+
             },
             {
                 withCredentials: true,

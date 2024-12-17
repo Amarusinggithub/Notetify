@@ -1,11 +1,11 @@
 import {useContext, useState} from "react";
-import "../../styles/SignUpForm.css";
+import "../styles/SignUpForm.css";
 import {useNavigate} from "react-router-dom";
-import {signUp} from "../../services/AuthService.jsx";
-import UserContext from "../../context/UserContext.jsx";
+import {signUp} from "../services/AuthService.jsx";
+import UserContext from "../context/UserContext.jsx";
 
 
-const SignUpForm = () => {
+const SignUpPage = () => {
     const {setLogin} = useContext(UserContext);
     const [state, setState] = useState({
         email: '',
@@ -102,4 +102,4 @@ const SignUpForm = () => {
 
 };
 
-export default SignUpForm;
+export default SignUpPage;

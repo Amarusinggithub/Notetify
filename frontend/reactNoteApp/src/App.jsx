@@ -4,9 +4,9 @@ import {useEffect, useState} from "react";
 import UserContext from "./context/UserContext";
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import HomePage from "./pages/HomePage.jsx";
-import ErrorPage from "./components/error-page.jsx";
-import LoginForm from "./components/auth/LoginForm.jsx";
-import SignUpForm from "./components/auth/SignUpForm.jsx";
+import ErrorPage from "./pages/error-page.jsx";
+import LoginPage from "./pages/LoginPage.jsx";
+import SignUpPage from "./pages/SignUpPage.jsx";
 import {initializeCSRFToken} from "./services/CSRFTokenService.jsx";
 
 
@@ -40,11 +40,11 @@ export default function App() {
     },
     {
       path: "login",
-      element: <LoginForm/>,
+        element: <LoginPage/>,
     },
     {
       path: "signup",
-      element: <SignUpForm/>,
+        element: <SignUpPage/>,
     },
   ]);
 

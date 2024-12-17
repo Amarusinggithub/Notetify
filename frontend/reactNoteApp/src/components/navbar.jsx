@@ -1,5 +1,7 @@
 import {useState} from "react";
-import "../../styles/navbar.css";
+import "../styles/navbar.css";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faBars, faMagnifyingGlass} from "@fortawesome/free-solid-svg-icons";
 
 const Navbar = (props) => {
     const [search, setSearch] = useState("");
@@ -17,11 +19,14 @@ const Navbar = (props) => {
 
     return (
         <div className={"navbar"}>
-            <div></div>
+            <div><FontAwesomeIcon icon={faBars} className={"search-icon"}/></div>
             <h1> {props.text}</h1>
+            <div></div>
 
             <form onSubmit={handleSearchSubmit} className={"search-container"}>
-                <button type={"submit"}></button>
+                <button type={"submit"}>
+                    <FontAwesomeIcon icon={faMagnifyingGlass} className={"search-icon"}/>
+                </button>
                 <input name={"search"} placeholder={"search..."} value={search} onChange={handleSearchChange}
                        onSubmit={handleSearchSubmit} type={"text"}/></form>
         </div>

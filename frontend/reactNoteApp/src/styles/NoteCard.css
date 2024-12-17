@@ -86,3 +86,21 @@
     color: rgb(232, 234, 237);
     border-bottom: 1px solid rgb(232, 234, 237);
 }
+
+
+.note-title input {
+    height: 40px;
+    text-align: center;
+    outline: none;
+    color: rgb(232, 234, 237);
+    border-bottom: 1px solid rgb(232, 234, 237);
+}
+
+
+.note-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    border-radius: 0 0 10px 10px;
+}

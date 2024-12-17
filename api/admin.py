@@ -69,17 +69,16 @@ class MyUserAdmin(UserAdmin):
 class NoteAdmin(admin.ModelAdmin):
     list_display = ('title', 'user',)
     search_fields = ('title', 'content', 'user__username')
-    list_filter = ('date_created',)
-    ordering = ('-date_created',)
+    list_filter = ()
+    ordering = ()
 
     readonly_fields = [
-        'date_created',
-        'last_updated','user'
+        'user'
     ]
     fieldsets = (
         (None, {'fields': ('title', 'content', 'user')}),
 
-        ('Important Dates', {'fields': ('date_created', 'last_updated')}),
+        ('Important Dates', {'fields': ()}),
     )
 
 

@@ -1,10 +1,10 @@
 import {useNavigate} from "react-router-dom";
 import {logout} from "../services/AuthService.jsx";
-import Navbar from "../components/home/navbar.jsx";
+import Navbar from "../components/navbar.jsx";
 import "../styles/Homepage.css";
 import {getNotes} from "../services/NoteService.jsx";
 import {useContext, useEffect, useState} from "react";
-import NoteCard from "../components/home/NoteCard.jsx";
+import NoteCard from "../components/NoteCard.jsx";
 import UserContext from "../context/UserContext.jsx";
 import NoteContext from "../context/NoteContext.jsx";
 
