@@ -10,17 +10,9 @@
     justify-content: center;
     overflow-x: auto;
     overflow-y: hidden;
-    padding: 20px;
-
-
+    gap: 1rem;
 }
 
-.navbar {
-    position: fixed;
-    top: 0;
-    width: 100%;
-    z-index: 10;
-}
 
 .notes {
     height: 100%;

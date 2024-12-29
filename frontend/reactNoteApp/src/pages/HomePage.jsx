@@ -7,12 +7,14 @@ import {useContext, useEffect, useState} from "react";
 import NoteCard from "../components/NoteCard.jsx";
 import UserContext from "../context/UserContext.jsx";
 import NoteContext from "../context/NoteContext.jsx";
+import Sidebar from "../components/sidebar.jsx";
 
 const Homepage = () => {
     let navigate = useNavigate();
     const [selectedNote, setSelectedNote] = useState(null);
     const [notes, setNotes] = useState([]);
     const {userData, setLogout} = useContext(UserContext);
+    const [isSideNavOpen, setSideNavState] = useState(true);
 
 
 
@@ -45,9 +47,12 @@ const Homepage = () => {
     };
 
     return (
-        <NoteContext.Provider value={{selectedNote, setSelectedNote}}>
+        <NoteContext.Provider value={{selectedNote, setSelectedNote, isSideNavOpen, setSideNavState}}>
+            <Sidebar/>
             <div className={"container"}>
-                <Navbar text={"Notetify"}/>
+
+
+                <Navbar/>
                 <div className={"notes"}>
                     {notes &&
                         notes.map((note) => (
