@@ -13,6 +13,23 @@
     gap: 1rem;
 }
 
+.child-container {
+    z-index: 0;
+    position: relative;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    background-color: rgb(32, 33, 36);
+    justify-content: center;
+    align-items: center;
+
+
+}
+
 
 .notes {
     height: 100%;

@@ -7,7 +7,7 @@ import {useContext, useEffect, useState} from "react";
 import NoteCard from "../components/NoteCard.jsx";
 import UserContext from "../context/UserContext.jsx";
 import NoteContext from "../context/NoteContext.jsx";
-import Sidebar from "../components/sidebar.jsx";
+import SideNav from "../components/sidebar.jsx";
 
 const Homepage = () => {
     let navigate = useNavigate();
@@ -48,11 +48,13 @@ const Homepage = () => {
 
     return (
         <NoteContext.Provider value={{selectedNote, setSelectedNote, isSideNavOpen, setSideNavState}}>
-            <Sidebar/>
+
+
             <div className={"container"}>
 
-
                 <Navbar/>
+                <div className={"child-container"}>
+                    <SideNav/>
                 <div className={"notes"}>
                     {notes &&
                         notes.map((note) => (
@@ -62,7 +64,8 @@ const Homepage = () => {
                         ))}
                 </div>
 
-                <button onClick={handleLogout}>Logout</button>
+                </div>
+
 
             </div>
         </NoteContext.Provider>

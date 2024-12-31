@@ -20,41 +20,31 @@ const NoteCard = ({note}) => {
 
   const noteContentRef = useRef(null);
 
-  /**
-   * Sync component state with new incoming props whenever `note` changes.
-   */
+
   useEffect(() => {
     setNoteState({...note});
     setContentValue(note.content);
   }, [note]);
 
-  /**
-   * Keep the note's content displayed in the `contentEditable` div
-   * updated with the latest `contentValue`.
-   */
+
   useEffect(() => {
     if (noteContentRef.current) {
       noteContentRef.current.innerHTML = contentValue;
     }
   }, [contentValue]);
 
-  /**
-   * Focus on content area if the note is selected.
-   */
+
   useEffect(() => {
     if (isSelected && noteContentRef.current) {
       noteContentRef.current.focus();
     }
   }, [isSelected]);
 
-  /**
-   * Handle blur event to update note content if it has been edited.
-   */
+
   const handleBlur = async () => {
     if (!isEdited) return;
 
     try {
-      // Update the noteState first so subsequent operations are consistent
       setNoteState((prevState) => ({...prevState, content: contentValue}));
 
       const response = await updateNote({
@@ -74,33 +64,25 @@ const NoteCard = ({note}) => {
     }
   };
 
-  /**
-   * Toggle selection state of this note.
-   */
+
   const handleSelect = (event) => {
     event.preventDefault();
     setSelectedNote(isSelected ? null : note);
   };
 
-  /**
-   * Update title in local state and set editing flag.
-   */
+
   const handleTitleInput = (e) => {
     setIsEdited(true);
     setNoteState((prevState) => ({...prevState, title: e.target.value}));
   };
 
-  /**
-   * Update contentValue (the content displayed) and set editing flag.
-   */
+
   const handleContentInput = (e) => {
     setIsEdited(true);
     setContentValue(e.target.innerHTML);
   };
 
-  /**
-   * Delete the note and clear selection if successful.
-   */
+
   const handleDeleteNote = async (e) => {
     e.preventDefault();
     e.stopPropagation();

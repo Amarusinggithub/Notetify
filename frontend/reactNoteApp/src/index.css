@@ -23,8 +23,10 @@
 body {
     background-color: background-color;
     margin: 0;
+    padding: 0;
     display: flex;
     min-height: 100vh;
+    min-width: 100vw;
 }
 
 img {

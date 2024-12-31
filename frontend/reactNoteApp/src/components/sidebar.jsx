@@ -1,36 +1,36 @@
 import {useContext} from "react";
 import NoteContext from "../context/NoteContext.jsx";
-import {faRotateRight,} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {sidebarData} from "./SidebarData.jsx";
+import "../styles/sidebar.css";
 
 const SideNav = () => {
-    const {isSideNavOpen,} = useContext(NoteContext);
-    return (<>
+  const {isSideNavOpen} = useContext(NoteContext);
 
-               <span
-                   style={{
-                       fontSize: "30px",
-                       cursor: "pointer",
-                       marginLeft: isSideNavOpen ? "260px" : "60px",
-                   }}
+  return (
+      <div
+          className="sidenav"
+          style={{
 
-               >
-            </span>
-            <div className="sidenav" style={{width: isSideNavOpen ? "250px" : "50px"}}>
-                <button className={"sidenav-item"}><FontAwesomeIcon icon={faRotateRight} className="icon"/>
-                    <h3>Notes</h3></button>
-                <button className={"sidenav-item"}><FontAwesomeIcon icon={faRotateRight} className="icon"/>
-                    <h3>Favorites</h3></button>
-                <button className={"sidenav-item"}><FontAwesomeIcon icon={faRotateRight} className="icon"/>
-                    <h3>Archived</h3></button>
+            width: isSideNavOpen ? "250px" : "50px"
+          }}
 
-                <button className={"sidenav-item"}><FontAwesomeIcon icon={faRotateRight} className="icon"/>
-                    <h3>Trash</h3></button>
-            </div>
-
-        </>
-
-    )
-}
+      >
+        <ul>
+          {sidebarData.map((item, index) => (
+              <li key={index} style={{
+                borderTopRightRadius: isSideNavOpen ? "40px" : "360px",
+                borderTopLeftRadius: isSideNavOpen ? "0px" : "360px",
+                borderBottomLeftRadius: isSideNavOpen ? "0px" : "360px",
+                borderBottomRightRadius: isSideNavOpen ? "40px" : "360px"
+              }} className="sidenav-item">
+                <FontAwesomeIcon icon={item.icon} className="icon"/>
+                {isSideNavOpen && <h3>{item.title}</h3>}
+              </li>
+          ))}
+        </ul>
+      </div>
+  );
+};
 
 export default SideNav;

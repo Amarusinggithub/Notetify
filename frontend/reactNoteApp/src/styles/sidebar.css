@@ -1,34 +1,29 @@
 .sidenav {
+    position: relative;
     display: flex;
     flex-direction: column;
-    align-items: start;
-    justify-content: end;
-    gap: 1rem;
-    position: fixed;
     top: 0;
     left: 0;
     height: 100%;
-    width: 50;
     background-color: rgb(32, 33, 36);
     overflow-x: hidden;
     transition: width 0.5s;
-    z-index: 100;
 }
 
 .sidenav-item {
+    padding-left: 13px;
+
     width: 100%;
-    border-radius: 0, 0, 10px, 10px;
+    height: 50px;
     display: flex;
-    align-items: center;
-    justify-content: center;
     flex-direction: row;
-    text-align: center;
-    padding: 8px 32px;
-    text-decoration: none;
+    gap: 30px;
+    align-items: center;
+    justify-content: start;
+    background-color: rgb(32, 33, 36);
     font-size: 25px;
     color: white;
-    display: block;
-    transition: 0.3s;
+    transition: 0.5s;
 }
 
 .sidenav-item:hover {
