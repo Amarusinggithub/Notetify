@@ -3,10 +3,10 @@ import './App.css';
 import {useEffect, useState} from "react";
 import UserContext from "./context/UserContext";
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
-import HomePage from "./pages/HomePage.jsx";
+import HomePage from "./features/notes/pages/NotesPage.jsx";
 import ErrorPage from "./pages/error-page.jsx";
-import LoginPage from "./pages/LoginPage.jsx";
-import SignUpPage from "./pages/SignUpPage.jsx";
+import LoginPage from "./features/auth/pages/LoginPage.jsx";
+import SignUpPage from "./features/auth/pages/SignUpPage.jsx";
 import {initializeCSRFToken} from "./services/CSRFTokenService.jsx";
 
 

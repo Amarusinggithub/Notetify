@@ -1,4 +1,5 @@
 
+
 .container {
     position: relative;
     top: 70px;
@@ -8,8 +9,6 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    overflow-x: auto;
-    overflow-y: hidden;
     gap: 1rem;
 }
 
@@ -19,27 +18,30 @@
     top: 0;
     left: 0;
     right: 0;
+    bottom: 0;
     height: 100%;
-    width: 100%;
+    gap: 10px;
     display: flex;
     flex-direction: row;
     background-color: rgb(32, 33, 36);
     justify-content: center;
     align-items: center;
-
-
 }
 
 
 .notes {
-    height: 100%;
-    width: 100%;
+    height: 99%;
+    width: 99%;
     display: flex;
     flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
     flex-wrap: wrap;
-    gap: 1rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 15px;
     background-color: rgb(32, 33, 36);
-
+    padding: 10px;
 }
 
 .note-div {
@@ -47,6 +49,3 @@
     height: 350px;
     background-color: rgb(32, 33, 36);
 }
-
-
-

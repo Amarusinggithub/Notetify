@@ -1,5 +1,5 @@
 import axios from "axios";
-import {getCSRFToken} from "./CSRFTokenService.jsx";
+import {getCSRFToken} from "../../../services/CSRFTokenService.jsx";
 
 
 axios.defaults.withCredentials = true;

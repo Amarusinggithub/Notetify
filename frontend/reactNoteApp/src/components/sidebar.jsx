@@ -1,7 +1,7 @@
 import {useContext} from "react";
-import NoteContext from "../context/NoteContext.jsx";
+import NoteContext from "../features/notes/contexts/NoteContext.jsx";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {sidebarData} from "./SidebarData.jsx";
+import {sidebarData} from "../utils/sidebarData.jsx";
 import "../styles/sidebar.css";
 
 const SideNav = () => {

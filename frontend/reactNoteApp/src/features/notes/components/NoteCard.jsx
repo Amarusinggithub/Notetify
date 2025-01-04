@@ -1,7 +1,7 @@
 import "../styles/NoteCard.css";
 import {useContext, useEffect, useRef, useState} from "react";
-import {deleteNote, updateNote} from "../services/NoteService.jsx";
-import NoteContext from "../context/NoteContext.jsx";
+import {deleteNote} from "../services/NoteService.jsx";
+import NoteContext from "../contexts/NoteContext.jsx";
 
 const NoteCard = ({note}) => {
   const {selectedNote, setSelectedNote} = useContext(NoteContext);
@@ -47,7 +47,7 @@ const NoteCard = ({note}) => {
     try {
       setNoteState((prevState) => ({...prevState, content: contentValue}));
 
-      const response = await updateNote({
+      const response = await editNote({
         ...noteState,
         content: contentValue,
       });

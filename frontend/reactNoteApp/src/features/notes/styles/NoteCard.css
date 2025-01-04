@@ -22,7 +22,7 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
     width: 700px;
     height: 700px;
-    z-index: 100;
+    z-index: 999;
     color: white;
     animation: moveRight 300ms ease-in-out;
 }

@@ -2,7 +2,7 @@ import {useContext, useState} from "react";
 import "../styles/navbar.css";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faBars, faGear, faList, faMagnifyingGlass, faRotateRight,} from "@fortawesome/free-solid-svg-icons";
-import NoteContext from "../context/NoteContext.jsx";
+import NoteContext from "../features/notes/contexts/NoteContext.jsx";
 
 const Navbar = () => {
     const [search, setSearch] = useState("");

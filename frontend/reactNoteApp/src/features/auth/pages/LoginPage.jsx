@@ -3,7 +3,7 @@ import "../styles/LoginForm.css";
 
 import {login,} from "../services/AuthService.jsx";
 import {useNavigate} from "react-router-dom";
-import UserContext from "../context/UserContext.jsx";
+import UserContext from "../../../context/UserContext.jsx";
 
 const LoginPage = () => {
     const {setLogin} = useContext(UserContext);

@@ -2,7 +2,7 @@ import {useContext, useState} from "react";
 import "../styles/SignUpForm.css";
 import {useNavigate} from "react-router-dom";
 import {signUp} from "../services/AuthService.jsx";
-import UserContext from "../context/UserContext.jsx";
+import UserContext from "../../../context/UserContext.jsx";
 
 
 const SignUpPage = () => {
