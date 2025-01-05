@@ -1,38 +1,32 @@
 import "../styles/NoteCard.css";
-import {useContext, useEffect, useRef, useState} from "react";
-import {deleteNote} from "../services/NoteService.jsx";
-import NoteContext from "../contexts/NoteContext.jsx";
+import {useEffect, useRef, useState} from "react";
+import useNote from "../hooks/useNote.jsx";
 
 const NoteCard = ({note}) => {
-  const {selectedNote, setSelectedNote} = useContext(NoteContext);
+  const {
+    selectedNote,
+    setSelectedNote,
+    editNote,
+    removeNote,
+    isLoading,
+    error,
+  } = useNote();
+
   const isSelected = selectedNote && selectedNote.id === note.id;
-
-  const [noteState, setNoteState] = useState({
-    title: note.title,
-    content: note.content,
-    id: note.id,
-    is_favorite: note.is_favorite,
-    is_pinned: note.is_pinned,
-    in_recycleBin: note.in_recycleBin,
-  });
-  const [isEdited, setIsEdited] = useState(false);
-  const [contentValue, setContentValue] = useState(noteState.content);
-
   const noteContentRef = useRef(null);
 
+  const [noteState, setNoteState] = useState({...note});
+  const [isEdited, setIsEdited] = useState(false);
 
   useEffect(() => {
     setNoteState({...note});
-    setContentValue(note.content);
   }, [note]);
-
 
   useEffect(() => {
     if (noteContentRef.current) {
-      noteContentRef.current.innerHTML = contentValue;
+      noteContentRef.current.innerHTML = noteState.content;
     }
-  }, [contentValue]);
-
+  }, [noteState.content]);
 
   useEffect(() => {
     if (isSelected && noteContentRef.current) {
@@ -40,64 +34,36 @@ const NoteCard = ({note}) => {
     }
   }, [isSelected]);
 
+  const handleSave = async () => {
+    await editNote({...noteState});
+    setIsEdited(false);
+  };
 
   const handleBlur = async () => {
-    if (!isEdited) return;
-
-    try {
-      setNoteState((prevState) => ({...prevState, content: contentValue}));
-
-      const response = await editNote({
-        ...noteState,
-        content: contentValue,
-      });
-
-      if (response >= 200 && response < 300) {
-        console.log("Note updated successfully");
-      } else {
-        console.log("Failed to update note");
-      }
-    } catch (error) {
-      console.error("Error updating note:", error.response?.data || error);
-    } finally {
-      setIsEdited(false);
+    if (isEdited) {
+      await handleSave();
     }
   };
 
-
-  const handleSelect = (event) => {
-    event.preventDefault();
+  const handleSelect = (e) => {
+    e.preventDefault();
     setSelectedNote(isSelected ? null : note);
   };
 
-
   const handleTitleInput = (e) => {
     setIsEdited(true);
-    setNoteState((prevState) => ({...prevState, title: e.target.value}));
+    setNoteState((prev) => ({...prev, title: e.target.value}));
   };
-
 
   const handleContentInput = (e) => {
     setIsEdited(true);
-    setContentValue(e.target.innerHTML);
+    setNoteState((prev) => ({...prev, content: e.target.innerHTML}));
   };
-
 
   const handleDeleteNote = async (e) => {
     e.preventDefault();
     e.stopPropagation();
-
-    try {
-      const response = await deleteNote(note);
-      if (response >= 200 && response < 300) {
-        console.log("Note deleted successfully");
-        setSelectedNote(null);
-      } else {
-        console.log("Failed to delete note");
-      }
-    } catch (error) {
-      console.error("Error deleting note:", error);
-    }
+    await removeNote(note);
   };
 
   return (
@@ -111,6 +77,8 @@ const NoteCard = ({note}) => {
             }
           }}
       >
+        {error && <div className="error-banner">{error}</div>}
+
         <div className="note">
           {!isSelected && <div className="note-title">{noteState.title}</div>}
 
@@ -120,14 +88,15 @@ const NoteCard = ({note}) => {
                   onChange={handleTitleInput}
                   onBlur={handleBlur}
                   value={noteState.title}
+                  disabled={isLoading}
               />
           )}
 
           <div
               className="note-content"
               ref={noteContentRef}
-              contentEditable={isSelected}
-              suppressContentEditableWarning={true}
+              contentEditable={isSelected && !isLoading}
+              suppressContentEditableWarning
               onInput={handleContentInput}
               onBlur={handleBlur}
           />
@@ -139,6 +108,7 @@ const NoteCard = ({note}) => {
                   onClick={handleDeleteNote}
                   className="delete-btn"
                   type="button"
+                  disabled={isLoading}
               >
                 Delete
               </button>
@@ -149,9 +119,23 @@ const NoteCard = ({note}) => {
                   }}
                   className="close-btn"
                   type="button"
+                  disabled={isLoading}
               >
                 Close
               </button>
+              {isEdited && (
+                  <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleSave();
+                      }}
+                      className="save-btn"
+                      type="button"
+                      disabled={isLoading}
+                  >
+                    {isLoading ? "Saving..." : "Save"}
+                  </button>
+              )}
             </div>
         )}
       </div>

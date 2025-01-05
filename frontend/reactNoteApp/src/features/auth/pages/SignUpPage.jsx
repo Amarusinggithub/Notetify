@@ -1,22 +1,20 @@
-import {useContext, useState} from "react";
+import {useState} from "react";
 import "../styles/SignUpForm.css";
-import {useNavigate} from "react-router-dom";
-import {signUp} from "../services/AuthService.jsx";
-import UserContext from "../../../context/UserContext.jsx";
+import {useAuth} from "../hooks/useAuth.jsx";
 
 
 const SignUpPage = () => {
-    const {setLogin} = useContext(UserContext);
     const [state, setState] = useState({
         email: '',
         password: '', confirmPassword: '', username: '',
     });
 
+    const {handleSignup} = useAuth();
+
     const handleChange = e => {
         setState({...state, [e.target.name]: e.target.value})
     }
 
-    let navigate = useNavigate();
 
     async function handleSubmit(event) {
         event.preventDefault();
@@ -26,17 +24,10 @@ const SignUpPage = () => {
             return;
         }
 
-        try {
-            const response = await signUp(state.email, state.username, state.password);
-            if (response === 200) {
-                setLogin(response.data.userData)
-                navigate("/");
-            } else {
-                console.log("Signup failed");
-            }
-        } catch (error) {
-            console.error("Error during signup:", error);
-        }
+        handleSignup(state.username, state.email, state.password);
+
+
+
     }
 
 

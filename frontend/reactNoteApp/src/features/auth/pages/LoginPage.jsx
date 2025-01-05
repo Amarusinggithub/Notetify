@@ -1,35 +1,21 @@
-import {useContext, useState} from "react";
+import {useState} from "react";
 import "../styles/LoginForm.css";
-
-import {login,} from "../services/AuthService.jsx";
-import {useNavigate} from "react-router-dom";
-import UserContext from "../../../context/UserContext.jsx";
+import {useAuth} from "../hooks/useAuth.jsx";
 
 const LoginPage = () => {
-    const {setLogin} = useContext(UserContext);
     const [state, setState] = useState({
         username: '',
         password: '',
     });
+    const {handleLogin} = useAuth();
 
     const handleChange = e => {
         setState({...state, [e.target.name]: e.target.value})
     }
-    let navigate = useNavigate();
-
     async function handleSubmit(event) {
         event.preventDefault();
-        try {
-            const response = await login(state.username, state.password);
-            if (response.status === 200) {
-                setLogin(response.data.userData)
-                navigate("/");
-            } else {
-                console.log("Login failed");
-            }
-        } catch (error) {
-            console.error("Error during login:", error);
-        }
+        await handleLogin(state.username, state.password);
+
     }
 
     return (
