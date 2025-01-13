@@ -1,18 +1,19 @@
 import {useContext, useState} from "react";
 import "../styles/navbar.css";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faBars, faGear, faList, faMagnifyingGlass, faRotateRight,} from "@fortawesome/free-solid-svg-icons";
-
+import {faBars, faGear, faList, faMagnifyingGlass, faRotateRight} from "@fortawesome/free-solid-svg-icons";
 import {SideNavContext} from "../context/SideNavContext.jsx";
+import useNote from "../features/notes/hooks/useNote.jsx";
 
 const Navbar = () => {
   const [search, setSearch] = useState("");
   const {isSideNavOpen, setIsSideNavOpen} = useContext(SideNavContext);
-
+  const {handleSearch} = useNote();
 
   const handleSearchChange = (event) => {
-    event.preventDefault();
-    setSearch(event.target.value);
+    const query = event.target.value;
+    setSearch(query);
+    handleSearch(query);
   };
 
   const handleSideMenuChange = (event) => {
@@ -22,11 +23,11 @@ const Navbar = () => {
 
   const handleSearchSubmit = (event) => {
     event.preventDefault();
+    handleSearch(search);
     console.log("Search submitted:", search);
   };
 
   return (
-
       <div className="navbar">
         <button onClick={handleSideMenuChange} className="menu-btn">
           <FontAwesomeIcon icon={faBars} className="menu-icon"/>
@@ -59,7 +60,6 @@ const Navbar = () => {
           </button>
         </div>
       </div>
-
   );
 };
 

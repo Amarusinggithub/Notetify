@@ -1,16 +1,15 @@
 import {useNavigate} from "react-router-dom";
-import "../styles/Notespage.css";
-import NoteCard from "../components/NoteCard.jsx";
 import useNote from "../hooks/useNote.jsx";
+import NoteCard from "../components/NoteCard.jsx";
 
-const NotesPage = () => {
+const TrashPage = () => {
     let navigate = useNavigate();
     const {
 
-        filteredNotes,
+        trashNotes,
         isLoading,
         error,
-
+        fetchNotes,
 
     } = useNote();
 
@@ -18,8 +17,8 @@ const NotesPage = () => {
 
         <div className="container">
             <div className="notes">
-                {filteredNotes &&
-                    filteredNotes.map((note) => (
+                {trashNotes &&
+                    trashNotes.map((note) => (
                         <div key={note.id} className="note-div">
                             <NoteCard note={note}/>
                         </div>
@@ -28,6 +27,5 @@ const NotesPage = () => {
         </div>
 
     );
-};
-
-export default NotesPage;
+}
+export default TrashPage;

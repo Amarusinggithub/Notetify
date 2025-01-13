@@ -4,7 +4,6 @@ import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
 import ErrorPage from "./pages/ErrorPage.jsx";
 import LoginPage from "./features/auth/pages/LoginPage.jsx";
 import SignUpPage from "./features/auth/pages/SignUpPage.jsx";
-import NotesPage from "./features/notes/pages/NotesPage.jsx";
 import MainPage from "./pages/MainPage.jsx";
 import PrivateRoute from "./features/auth/components/privateRoute.jsx";
 import {initializeCSRFToken} from "./services/CSRFTokenService.jsx";
@@ -29,17 +28,12 @@ export default function App() {
                 <Routes>
                   <Route path="/login" element={<LoginPage/>} errorElement={<ErrorPage/>}/>
                   <Route path="/signup" element={<SignUpPage/>} errorElement={<ErrorPage/>}/>
-
-                  <Route element={<PrivateRoute/>}>
-                    <Route path="/notes" element={<NotesPage/>} errorElement={<ErrorPage/>}/>
-                  </Route>
-
-                  <Route element={<PrivateRoute/>}>
                     <Route path="/" element={<MainPage/>} errorElement={<ErrorPage/>}/>
+                  <Route element={<PrivateRoute/>}>
+
                   </Route>
                 </Routes>
               </NoteProvider>
-
             </SideNavProvider>
           </AuthProvider>
         </Router>

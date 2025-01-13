@@ -75,10 +75,10 @@ class NoteAdmin(admin.ModelAdmin):
     readonly_fields = [
         'user'
     ]
-    fieldsets = (
-        (None, {'fields': ('title', 'content', 'user')}),
 
-        ('Important Dates', {'fields': ()}),
+    fieldsets = (
+        (None, {'fields': ('title', 'content', 'user', "is_favorite", "is_pinned", "is_archive", "in_recycleBin")}),
+
     )
 
 

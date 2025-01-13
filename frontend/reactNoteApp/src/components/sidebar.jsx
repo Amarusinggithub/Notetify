@@ -5,7 +5,14 @@ import "../styles/sidebar.css";
 import {SideNavContext} from "../context/SideNavContext.jsx"; // Import the context
 
 const SideNav = () => {
-    const {isSideNavOpen} = useContext(SideNavContext);
+    const {isSideNavOpen, setPage} = useContext(SideNavContext);
+
+
+    const handleOnClick = (index) => {
+        return () => {
+            setPage(index);
+        };
+    }
 
   return (
 
@@ -17,13 +24,14 @@ const SideNav = () => {
       >
           <ul>
               {sidebarData.map((item, index) => (
-                  <li
+                  <li onClick={handleOnClick(index)}
                       key={index}
                       style={{
-                          borderTopRightRadius: isSideNavOpen ? "40px" : "360px",
+                          borderTopRightRadius: isSideNavOpen ? "50px" : "360px",
                           borderTopLeftRadius: isSideNavOpen ? "0px" : "360px",
                           borderBottomLeftRadius: isSideNavOpen ? "0px" : "360px",
-                          borderBottomRightRadius: isSideNavOpen ? "40px" : "360px",
+                          borderBottomRightRadius: isSideNavOpen ? "50px" : "360px",
+                          justifyContent: isSideNavOpen ? "start" : "center",
                       }}
                       className="sidenav-item"
                   >

@@ -51,6 +51,8 @@ class Note(models.Model):
     is_pinned = models.BooleanField(default=False)
     is_favorite = models.BooleanField(default=False)
     in_recycleBin = models.BooleanField(default=False)
+    is_archive = models.BooleanField(default=False)
+
 
     def __str__(self):
         return self.title
