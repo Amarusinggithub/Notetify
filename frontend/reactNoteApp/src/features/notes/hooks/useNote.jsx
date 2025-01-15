@@ -6,7 +6,7 @@ const NoteContext = createContext();
 const NoteProvider = ({children}) => {
     const [notes, setNotes] = useState([]);
     const [filteredNotes, setFilteredNotes] = useState([]);
-
+    const [pinnedNotes, setPinnesdNotes] = useState([]);
     const [favoriteNotes, setFavoriteNotes] = useState([]);
     const [archiveNotes, setArchiveNotes] = useState([]);
     const [trashNotes, setTrashNotes] = useState([]);
@@ -31,7 +31,7 @@ const NoteProvider = ({children}) => {
             const fetchedNotes = await getNotes();
             setNotes(fetchedNotes);
             setFilteredNotes(fetchedNotes);
-
+            setPinnesdNotes(fetchedNotes.filter(note => note.is_pinned === true));
             setFavoriteNotes(fetchedNotes.filter(note => note.is_favorite === true));
             setArchiveNotes(fetchedNotes.filter(note => note.is_archived === true));
             setTrashNotes(fetchedNotes.filter(note => note.is_trashed === true));
@@ -62,7 +62,7 @@ const NoteProvider = ({children}) => {
             const response = await updateNote(note);
             if (response >= 200 && response < 300) {
                 console.log("Note updated successfully");
-                fetchNotes(); // Refresh notes after editing
+                fetchNotes();
             } else {
                 console.log("Failed to update note");
             }
@@ -99,7 +99,7 @@ const NoteProvider = ({children}) => {
     return (
         <NoteContext.Provider
             value={{
-                notes,
+                notes,pinnedNotes,setPinnesdNotes,
                 filteredNotes,
                 favoriteNotes,
                 archiveNotes,

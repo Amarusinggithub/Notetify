@@ -6,6 +6,7 @@ import useNote from "../hooks/useNote.jsx";
 const NotesPage = () => {
     let navigate = useNavigate();
     const {
+        pinnedNotes,
 
         filteredNotes,
         isLoading,
