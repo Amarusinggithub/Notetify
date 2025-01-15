@@ -23,6 +23,8 @@ const AuthProvider = ({children}) => {
     console.log("User logged out");
   };
 
+  
+
   const handleSignup = async (email, username, password) => {
     try {
       setLoading(true);

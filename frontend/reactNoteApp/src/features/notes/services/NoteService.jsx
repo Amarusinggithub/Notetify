@@ -30,7 +30,8 @@ export const createNote = async (note) => {
                 "content": note.content,
                 "is_favorite": note.is_favorite,
                 "is_pinned": note.is_pinned,
-                "in_recycleBin": note.in_recycleBin,
+                "is_trashed": note.in_recycleBin,
+                "is_archived": note.is_archived,
                 "user": note.user,
 
             },
@@ -51,24 +52,23 @@ export const updateNote = async (note) => {
         const csrfToken = await getCSRFToken();
 
         const response = await axios.put(
-            `http://localhost:8000/api/notes/edit_note/${note.id}/`,
-            {
-                "id": note.id,
-                "title": note.title,
-                "content": note.content,
-                "is_favorite": note.is_favorite,
-                "is_pinned": note.is_pinned,
-                "in_recycleBin": note.in_recycleBin,
-                "user": note.user,
-
-
+          `http://localhost:8000/api/notes/edit_note/${note.id}/`,
+          {
+            id: note.id,
+            title: note.title,
+            content: note.content,
+            is_favorite: note.is_favorite,
+            is_pinned: note.is_pinned,
+            is_trashed: note.in_recycleBin,
+            is_archived: note.is_archived,
+            user: note.user,
+          },
+          {
+            withCredentials: true,
+            headers: {
+              "X-CSRFToken": csrfToken,
             },
-            {
-                withCredentials: true,
-                headers: {
-                    "X-CSRFToken": csrfToken,
-                },
-            }
+          }
         );
 
         console.log(response.data);

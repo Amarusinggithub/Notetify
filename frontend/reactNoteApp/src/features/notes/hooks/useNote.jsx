@@ -13,6 +13,9 @@ const NoteProvider = ({children}) => {
     const [selectedNote, setSelectedNote] = useState(null);
     const [isLoading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+
+
+    
     const handleSearch = (query) => {
         if (query.trim() === "") {
             setFilteredNotes(notes);
@@ -24,6 +27,26 @@ const NoteProvider = ({children}) => {
             );
         }
     };
+
+    const handleFavorite = (note) => {
+        note.is_favorite = !note.is_favorite;
+        editNote(note);
+    }
+
+    const handleTrash = (note) => {
+        note.is_trashed = !note.is_trashed;
+        editNote(note);
+    }
+
+    const handleArchive = (note) => {
+        note.is_archived = !note.is_archived;
+        editNote(note);
+    }
+
+    const handlePin = (note) => {
+        note.is_pinned = !note.is_pinned;
+        editNote(note);
+    }
     const fetchNotes = useCallback(async () => {
         try {
             setLoading(true);
@@ -112,7 +135,7 @@ const NoteProvider = ({children}) => {
                 handleSearch,
                 addNote,
                 editNote,
-                removeNote,
+                removeNote,handleArchive,handleFavorite,handleTrash,handlePin
             }}
         >
             {children}
