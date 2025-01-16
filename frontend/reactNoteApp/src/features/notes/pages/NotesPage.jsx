@@ -1,34 +1,43 @@
-import {useNavigate} from "react-router-dom";
 import "../styles/Notespage.css";
 import NoteCard from "../components/NoteCard.jsx";
 import useNote from "../hooks/useNote.jsx";
 
 const NotesPage = () => {
-    let navigate = useNavigate();
-    const {
-        pinnedNotes,
+  const { pinnedNotes, filteredNotes, isLoading, error } = useNote();
 
-        filteredNotes,
-        isLoading,
-        error,
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
 
-    } = useNote();
-
-    return (
-
-        <div className="container">
-            <div className="notes">
-                {filteredNotes &&
-                    filteredNotes.map((note) => (
-                        <div key={note.id} className="note-div">
-                            <NoteCard note={note}/>
-                        </div>
-                    ))}
+  return (
+    <div className="container">
+     
+      {pinnedNotes?.length > 0 && (
+        <div className="pinned-notes">
+          <h2>Pinned Notes</h2>
+          {pinnedNotes.map((note) => (
+            <div key={note.id} className="note-div">
+              <NoteCard note={note} />
             </div>
+          ))}
         </div>
+      )}
 
-    );
+      
+      <div className="all-notes">
+        <h2>All Notes</h2>
+        {filteredNotes?.map((note) => (
+          <div key={note.id} className="note-div">
+            <NoteCard note={note} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 };
 
 export default NotesPage;
