@@ -14,8 +14,6 @@ const NoteProvider = ({children}) => {
     const [isLoading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-
-    
     const handleSearch = (query) => {
         if (query.trim() === "") {
             setFilteredNotes(notes);
@@ -53,11 +51,25 @@ const NoteProvider = ({children}) => {
             setError(null);
             const fetchedNotes = await getNotes();
             setNotes(fetchedNotes);
-            setFilteredNotes(fetchedNotes);
-            setPinnesdNotes(fetchedNotes.filter(note => note.is_pinned === true));
-            setFavoriteNotes(fetchedNotes.filter(note => note.is_favorite === true));
-            setArchiveNotes(fetchedNotes.filter(note => note.is_archived === true));
-            setTrashNotes(fetchedNotes.filter(note => note.is_trashed === true));
+            setFilteredNotes(
+              fetchedNotes.filter((note) => note.is_trashed === false)
+            );
+            setPinnesdNotes(fetchedNotes.filter(note => note.is_pinned === true&&note.is_trashed===false));
+            setFavoriteNotes(
+              fetchedNotes.filter(
+                (note) => note.is_favorite === true && note.is_trashed === false
+              )
+            );
+            setArchiveNotes(
+              fetchedNotes.filter(
+                (note) => note.is_archived === true && note.is_trashed === false
+              )
+            );
+            setTrashNotes(
+              fetchedNotes.filter(
+                (note) => note.is_trashed === true 
+              )
+            );
         } catch (e) {
             setError(e || "");
         } finally {

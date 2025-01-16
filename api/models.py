@@ -50,7 +50,7 @@ class Note(models.Model):
     content = models.TextField()
     is_pinned = models.BooleanField(default=False)
     is_favorite = models.BooleanField(default=False)
-    in_recycleBin = models.BooleanField(default=False)
+    is_trashed = models.BooleanField(default=False)
     is_archive = models.BooleanField(default=False)
 
 

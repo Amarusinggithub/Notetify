@@ -72,12 +72,10 @@ class NoteAdmin(admin.ModelAdmin):
     list_filter = ()
     ordering = ()
 
-    readonly_fields = [
-        'user'
-    ]
+  
 
     fieldsets = (
-        (None, {'fields': ('title', 'content', 'user', "is_favorite", "is_pinned", "is_archive", "in_recycleBin")}),
+        (None, {'fields': ('title', 'content', 'user', "is_favorite", "is_pinned", "is_archive", "is_trashed")}),
 
     )
 
