@@ -15,6 +15,8 @@ const NotesPage = () => {
 
   return (
     <div className="container">
+
+      
      
       {pinnedNotes?.length > 0 && (
         <div className="pinned-notes">

@@ -20,23 +20,33 @@ export default function App() {
   }, []);
 
   return (
-      <div className="App">
-        <Router>
-          <AuthProvider>
-            <SideNavProvider>
-              <NoteProvider>
-                <Routes>
-                  <Route path="/login" element={<LoginPage/>} errorElement={<ErrorPage/>}/>
-                  <Route path="/signup" element={<SignUpPage/>} errorElement={<ErrorPage/>}/>
-                    <Route path="/" element={<MainPage/>} errorElement={<ErrorPage/>}/>
-                  <Route element={<PrivateRoute/>}>
-
-                  </Route>
-                </Routes>
-              </NoteProvider>
-            </SideNavProvider>
-          </AuthProvider>
-        </Router>
-      </div>
+    <div className="App">
+      <Router>
+        <AuthProvider>
+          <SideNavProvider>
+            <NoteProvider>
+              <Routes>
+                <Route
+                  path="/login"
+                  element={<LoginPage />}
+                  errorElement={<ErrorPage />}
+                />
+                <Route
+                  path="/signup"
+                  element={<SignUpPage />}
+                  errorElement={<ErrorPage />}
+                />
+                <Route
+                  path="/"
+                  element={<MainPage />}
+                  errorElement={<ErrorPage />}
+                />
+                <Route element={<PrivateRoute />}></Route>
+              </Routes>
+            </NoteProvider>
+          </SideNavProvider>
+        </AuthProvider>
+      </Router>
+    </div>
   );
 }

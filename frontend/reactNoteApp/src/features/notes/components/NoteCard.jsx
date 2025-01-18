@@ -35,6 +35,8 @@ const NoteCard = ({note}) => {
   }, [isSelected]);
 
   const handleSave = async () => {
+
+    
     await editNote({...noteState});
     setIsEdited(false);
   };
