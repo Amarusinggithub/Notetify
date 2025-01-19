@@ -1,4 +1,4 @@
-import React, {useContext} from "react";
+import {useContext} from "react";
 import SideNav from "../components/sidebar.jsx";
 import Navbar from "../components/navbar.jsx";
 import {SideNavContext} from "../context/SideNavContext.jsx";
@@ -7,6 +7,7 @@ import {Content} from "../features/auth/components/content.jsx";
 
 const MainPage = () => {
     const {isSideNavOpen} = useContext(SideNavContext);
+
 
     return (
         <div className="container">

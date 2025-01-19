@@ -59,6 +59,7 @@ const categorizedNotes = (notesArray) => {
 };
 
 const NoteProvider = ({ children }) => {
+      const [search, setSearch] = useState("");
   const [notes, setNotes] = useState([]);
   const [filteredNotes, setFilteredNotes] = useState([]);
   const [pinnedNotes, setPinnedNotes] = useState([]);
@@ -69,14 +70,14 @@ const NoteProvider = ({ children }) => {
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const handleSearch = (query) => {
-    if (query.trim() === "") {
+  const handleSearch = () => {
+    if (search.trim() === "") {
       setFilteredNotes(notes);
     } else {
       setFilteredNotes(
         notes.filter(
           (note) =>
-            note.title.toLowerCase().includes(query.toLowerCase()) &&
+            note.title.toLowerCase().includes(search.toLowerCase()) &&
             note.is_trashed === false &&
             note.is_archived === false
         )
@@ -188,6 +189,8 @@ const NoteProvider = ({ children }) => {
   return (
     <NoteContext.Provider
       value={{
+        search,
+        setSearch,
         notes,
         pinnedNotes,
         setPinnedNotes,

@@ -1,4 +1,4 @@
-import {useContext, useState} from "react";
+import {useContext} from "react";
 import "../styles/navbar.css";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faBars, faGear, faList, faMagnifyingGlass, faRotateRight} from "@fortawesome/free-solid-svg-icons";
@@ -6,14 +6,14 @@ import {SideNavContext} from "../context/SideNavContext.jsx";
 import useNote from "../features/notes/hooks/useNote.jsx";
 
 const Navbar = () => {
-  const [search, setSearch] = useState("");
+
   const {isSideNavOpen, setIsSideNavOpen} = useContext(SideNavContext);
-  const {handleSearch} = useNote();
+  const {handleSearch,search, setSearch,fetchNotes} = useNote();
 
   const handleSearchChange = (event) => {
     const query = event.target.value;
     setSearch(query);
-    handleSearch(query);
+    handleSearch();
   };
 
   const handleSideMenuChange = (event) => {
@@ -49,7 +49,10 @@ const Navbar = () => {
         </form>
 
         <div className="icons-container">
-          <button>
+          <button onClick={() => {
+          fetchNotes();
+
+          }}>
             <FontAwesomeIcon icon={faRotateRight} className="icon"/>
           </button>
           <button>
