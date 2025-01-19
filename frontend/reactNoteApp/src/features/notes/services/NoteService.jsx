@@ -28,11 +28,10 @@ export const createNote = async (note) => {
           {
             title: note.title,
             content: note.content,
-            is_favorite: note.is_favorite,
+            is_favorited: note.is_favorited,
             is_pinned: note.is_pinned,
             is_trashed: note.is_trashed,
             is_archived: note.is_archived,
-        
           },
           {
             withCredentials: true,
@@ -57,7 +56,7 @@ export const updateNote = async (note) => {
             id: note.id,
             title: note.title,
             content: note.content,
-            is_favorite: note.is_favorite,
+            is_favorited: note.is_favorited,
             is_pinned: note.is_pinned,
             is_trashed: note.is_trashed,
             is_archived: note.is_archived,

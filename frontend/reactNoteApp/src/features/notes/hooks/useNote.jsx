@@ -1,163 +1,223 @@
-import {createContext, useCallback, useContext, useEffect, useState} from "react";
-import {createNote, deleteNote, getNotes, updateNote} from "../services/NoteService.jsx";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import {
+  createNote,
+  deleteNote,
+  getNotes,
+  updateNote,
+} from "../services/NoteService.jsx";
 
 const NoteContext = createContext();
 
-const NoteProvider = ({children}) => {
-    const [notes, setNotes] = useState([]);
-    const [filteredNotes, setFilteredNotes] = useState([]);
-    const [pinnedNotes, setPinnesdNotes] = useState([]);
-    const [favoriteNotes, setFavoriteNotes] = useState([]);
-    const [archiveNotes, setArchiveNotes] = useState([]);
-    const [trashNotes, setTrashNotes] = useState([]);
-    const [selectedNote, setSelectedNote] = useState(null);
-    const [isLoading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
+const categorizedNotes = (notesArray) => {
+  const pinned = [];
+  const favorites = [];
+  const archived = [];
+  const trashed = [];
+  const filtered = [];
 
-    const handleSearch = (query) => {
-        if (query.trim() === "") {
-            setFilteredNotes(notes);
-        } else {
-            setFilteredNotes(
-                notes.filter((note) =>
-                    note.title.toLowerCase().includes(query.toLowerCase())
-                )
-            );
-        }
-    };
-
-    const handleFavorite = (note) => {
-        note.is_favorite = !note.is_favorite;
-        editNote(note);
+  notesArray.forEach((note) => {
+    if (
+      note.is_pinned &&
+      note.is_trashed === false &&
+      note.is_archived === false
+    ) {
+      pinned.push(note);
     }
 
-    const handleTrash = (note) => {
-        note.is_trashed = !note.is_trashed;
-        editNote(note);
+    if (
+      note.is_favorited &&
+      note.is_trashed === false &&
+      note.is_archived === false
+    ) {
+      favorites.push(note);
     }
 
-    const handleArchive = (note) => {
-        note.is_archived = !note.is_archived;
-        editNote(note);
+    if (note.is_archived && note.is_trashed === false) {
+      archived.push(note);
     }
 
-    const handlePin = (note) => {
-        note.is_pinned = !note.is_pinned;
-        editNote(note);
+    if (note.is_trashed && note.is_archived === false) {
+      trashed.push(note);
     }
-    const fetchNotes = useCallback(async () => {
-        try {
-            setLoading(true);
-            setError(null);
-            const fetchedNotes = await getNotes();
-            setNotes(fetchedNotes);
-            setFilteredNotes(
-              fetchedNotes.filter((note) => note.is_trashed === false)
-            );
-            setPinnesdNotes(fetchedNotes.filter(note => note.is_pinned === true&&note.is_trashed===false));
-            setFavoriteNotes(
-              fetchedNotes.filter(
-                (note) => note.is_favorite === true && note.is_trashed === false
-              )
-            );
-            setArchiveNotes(
-              fetchedNotes.filter(
-                (note) => note.is_archived === true && note.is_trashed === false
-              )
-            );
-            setTrashNotes(
-              fetchedNotes.filter(
-                (note) => note.is_trashed === true 
-              )
-            );
-        } catch (e) {
-            setError(e || "");
-        } finally {
-            setLoading(false);
-        }
-    }, []);
 
-    const addNote = async (note) => {
-        try {
-            setLoading(true);
-            setError(null);
-            await createNote(note);
-            fetchNotes();
-        } catch (e) {
-            setError(e || "");
-        } finally {
-            setLoading(false);
-        }
-    };
+    if (
+      note.is_trashed === false &&
+      note.is_archived === false &&
+      note.is_pinned === false
+    ) {
+      filtered.push(note);
+    }
+  });
 
-    const editNote = async (note) => {
-        try {
-            setLoading(true);
-            setError(null);
-            const response = await updateNote(note);
-            if (response >= 200 && response < 300) {
-                console.log("Note updated successfully");
-                fetchNotes();
-            } else {
-                console.log("Failed to update note");
-            }
-        } catch (e) {
-            setError(e || "");
-        } finally {
-            setLoading(false);
-        }
-    };
+  return { pinned, favorites, archived, trashed, filtered };
+};
 
-    const removeNote = async (note) => {
-        try {
-            setLoading(true);
-            setError(null);
-            const response = await deleteNote(note);
-            if (response >= 200 && response < 300) {
-                console.log("Note deleted successfully");
-                setSelectedNote(null);
-                fetchNotes();
-            } else {
-                console.log("Failed to delete note");
-            }
-        } catch (e) {
-            setError(e || "");
-        } finally {
-            setLoading(false);
-        }
-    };
+const NoteProvider = ({ children }) => {
+  const [notes, setNotes] = useState([]);
+  const [filteredNotes, setFilteredNotes] = useState([]);
+  const [pinnedNotes, setPinnedNotes] = useState([]);
+  const [favoriteNotes, setFavoriteNotes] = useState([]);
+  const [archiveNotes, setArchiveNotes] = useState([]);
+  const [trashNotes, setTrashNotes] = useState([]);
+  const [selectedNote, setSelectedNote] = useState(null);
+  const [isLoading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-    useEffect(() => {
-        fetchNotes();
-    }, [fetchNotes]);
+  const handleSearch = (query) => {
+    if (query.trim() === "") {
+      setFilteredNotes(notes);
+    } else {
+      setFilteredNotes(
+        notes.filter(
+          (note) =>
+            note.title.toLowerCase().includes(query.toLowerCase()) &&
+            note.is_trashed === false &&
+            note.is_archived === false
+        )
+      );
+    }
+  };
 
-    return (
-        <NoteContext.Provider
-            value={{
-                notes,pinnedNotes,setPinnesdNotes,
-                filteredNotes,
-                favoriteNotes,
-                archiveNotes,
-                trashNotes,
-                selectedNote,
-                setSelectedNote,
-                isLoading,
-                error,
-                fetchNotes,
-                handleSearch,
-                addNote,
-                editNote,
-                removeNote,handleArchive,handleFavorite,handleTrash,handlePin
-            }}
-        >
-            {children}
-        </NoteContext.Provider>
-    );
+  const handleFavorite = (note) => {
+    note.is_favorited = !note.is_favorited;
+    editNote(note);
+  };
+
+  const handleTrash = (note) => {
+    note.is_trashed = !note.is_trashed;
+    editNote(note);
+  };
+
+  const handleArchive = (note) => {
+    note.is_archived = !note.is_archived;
+    editNote(note);
+  };
+
+  const handlePin = (note) => {
+    note.is_pinned = !note.is_pinned;
+    editNote(note);
+  };
+
+  const refreshCategorizedNotes = (notesArray) => {
+    setNotes(notesArray);
+
+    const { pinned, favorites, archived, trashed, filtered } =
+      categorizedNotes(notesArray);
+    setFilteredNotes(filtered);
+    setPinnedNotes(pinned);
+    setFavoriteNotes(favorites);
+    setArchiveNotes(archived);
+    setTrashNotes(trashed);
+  };
+
+  const fetchNotes = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const fetchedNotes = await getNotes();
+
+      refreshCategorizedNotes(fetchedNotes);
+    } catch (e) {
+      setError(e.message || "Error fetching notes");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const addNote = async (note) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      await createNote(note);
+    } catch (e) {
+      setError(e.message || "Error adding note");
+      fetchNotes();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const editNote = async (note) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await updateNote(note);
+      if (response >= 200 && response < 300) {
+        console.log("Note updated successfully");
+      } else {
+        console.log("Failed to update note");
+      }
+    } catch (e) {
+      setError(e.message || "Error updating note");
+      fetchNotes();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const removeNote = async (note) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await deleteNote(note);
+      if (response >= 200 && response < 300) {
+        console.log("Note deleted successfully");
+        setSelectedNote(null);
+      } else {
+        console.log("Failed to delete note");
+      }
+    } catch (e) {
+      setError(e.message || "Error deleting note");
+      fetchNotes();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotes();
+  }, [fetchNotes]);
+
+  return (
+    <NoteContext.Provider
+      value={{
+        notes,
+        pinnedNotes,
+        setPinnedNotes,
+        filteredNotes,
+        favoriteNotes,
+        archiveNotes,
+        trashNotes,
+        selectedNote,
+        setSelectedNote,
+        isLoading,
+        error,
+        fetchNotes,
+        handleSearch,
+        addNote,
+        editNote,
+        removeNote,
+        handleArchive,
+        handleFavorite,
+        handleTrash,
+        handlePin,
+      }}
+    >
+      {children}
+    </NoteContext.Provider>
+  );
 };
 
 const useNote = () => {
-    return useContext(NoteContext);
+  return useContext(NoteContext);
 };
 
-export {NoteContext, NoteProvider};
+export { NoteContext, NoteProvider };
 export default useNote;

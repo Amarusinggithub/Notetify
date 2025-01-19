@@ -41,6 +41,7 @@ export default function App() {
                   element={<MainPage />}
                   errorElement={<ErrorPage />}
                 />
+
                 <Route element={<PrivateRoute />}></Route>
               </Routes>
             </NoteProvider>

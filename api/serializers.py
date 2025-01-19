@@ -8,7 +8,8 @@ class NoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Note
         fields = (
-            'id', 'user', 'title', 'content', "is_favorite", "is_pinned", "in_recycleBin", "is_archive"
+            'id', 'user', 'title', 'content', "is_favorited", "is_pinned", "is_trashed", "is_archived"
+ 
 
         )
 

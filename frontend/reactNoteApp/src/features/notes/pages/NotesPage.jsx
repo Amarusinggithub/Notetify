@@ -20,7 +20,7 @@ const NotesPage = () => {
      
       {pinnedNotes?.length > 0 && (
         <div className="pinned-notes">
-          <h2>Pinned Notes</h2>
+          <h2>Pinned</h2>
           {pinnedNotes.map((note) => (
             <div key={note.id} className="note-div">
               <NoteCard note={note} />
@@ -31,7 +31,7 @@ const NotesPage = () => {
 
       
       <div className="all-notes">
-        <h2>All Notes</h2>
+        <h2>Others</h2>
         {filteredNotes?.map((note) => (
           <div key={note.id} className="note-div">
             <NoteCard note={note} />

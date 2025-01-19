@@ -49,9 +49,9 @@ class Note(models.Model):
     title = models.CharField(max_length=500)
     content = models.TextField()
     is_pinned = models.BooleanField(default=False)
-    is_favorite = models.BooleanField(default=False)
+    is_favorited = models.BooleanField(default=False)
     is_trashed = models.BooleanField(default=False)
-    is_archive = models.BooleanField(default=False)
+    is_archived = models.BooleanField(default=False)
 
 
     def __str__(self):

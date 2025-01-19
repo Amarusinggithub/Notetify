@@ -24,6 +24,10 @@
 }
 
 .sidenav-item:hover {
+    background-color: rgb(40, 41, 44);
+}
+
+.sidenav-item:active {
     background-color: rgb(65, 51, 28);
 }
 

@@ -75,7 +75,7 @@ class NoteAdmin(admin.ModelAdmin):
   
 
     fieldsets = (
-        (None, {'fields': ('title', 'content', 'user', "is_favorite", "is_pinned", "is_archive", "is_trashed")}),
+        (None, {'fields': ('title', 'content', 'user', "is_favorited", "is_pinned", "is_archived", "is_trashed")}),
 
     )
 

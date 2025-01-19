@@ -19,13 +19,13 @@
 .search-container {
     position: absolute;
     top: 50%;
-    left: 30%;
+    left: 25%;
     transform: translateY(-50%);
     display: flex;
     flex-direction: row;
     align-items: center;
     height: 45px;
-    width: 600px;
+    width: 800px;
     background-color: rgb(82, 83, 85);
     border-radius: 10px;
 }
