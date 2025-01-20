@@ -14,24 +14,29 @@ const NotesPage = () => {
   }
 
   return (
+   
     <div className="container">
-
-      
-     
       {pinnedNotes?.length > 0 && (
-        <div className="pinned-notes">
-          <h2>Pinned</h2>
-          {pinnedNotes.map((note) => (
-            <div key={note.id} className="note-div">
-              <NoteCard note={note} />
-            </div>
-          ))}
-        </div>
+        <>
+          <div className="flex-column">
+            <h1>Pinned Notes</h1>
+          </div>
+
+          <div className="pinned-notes">
+            {pinnedNotes.map((note) => (
+              <div key={note.id} className="note-div">
+                <NoteCard note={note} />
+              </div>
+            ))}
+          </div>
+        </>
       )}
 
-      
+      <div className="flex-column">
+        <h1>Others</h1>
+      </div>
+
       <div className="all-notes">
-        <h2>Others</h2>
         {filteredNotes?.map((note) => (
           <div key={note.id} className="note-div">
             <NoteCard note={note} />

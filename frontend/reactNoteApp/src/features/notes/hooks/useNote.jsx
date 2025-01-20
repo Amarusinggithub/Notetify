@@ -7,9 +7,13 @@ import {
 } from "react";
 import {
   createNote,
+  createTag,
   deleteNote,
+  deleteTag,
   getNotes,
+  getTags,
   updateNote,
+  updateTag,
 } from "../services/NoteService.jsx";
 
 const NoteContext = createContext();
@@ -59,8 +63,9 @@ const categorizedNotes = (notesArray) => {
 };
 
 const NoteProvider = ({ children }) => {
-      const [search, setSearch] = useState("");
+  const [search, setSearch] = useState("");
   const [notes, setNotes] = useState([]);
+  const [tags, setTags] = useState([]);
   const [filteredNotes, setFilteredNotes] = useState([]);
   const [pinnedNotes, setPinnedNotes] = useState([]);
   const [favoriteNotes, setFavoriteNotes] = useState([]);
@@ -83,6 +88,17 @@ const NoteProvider = ({ children }) => {
         )
       );
     }
+  };
+
+  const handleTagClick = (tag) => {
+    setFilteredNotes(
+      notes.filter(
+        (note) =>
+          note.tags.includes(tag) &&
+          note.is_trashed === false &&
+          note.is_archived === false
+      )
+    );
   };
 
   const handleFavorite = (note) => {
@@ -122,8 +138,8 @@ const NoteProvider = ({ children }) => {
       setLoading(true);
       setError(null);
       const fetchedNotes = await getNotes();
-
       refreshCategorizedNotes(fetchedNotes);
+      fetchTags();
     } catch (e) {
       setError(e.message || "Error fetching notes");
     } finally {
@@ -182,41 +198,113 @@ const NoteProvider = ({ children }) => {
     }
   };
 
-  useEffect(() => {
-    fetchNotes();
-  }, [fetchNotes]);
+  const fetchTags = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const fetchedTags = await getTags();
+      setTags(fetchedTags);
+    } catch (e) {
+      setError(e.message || "Error fetching tags");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  return (
-    <NoteContext.Provider
-      value={{
-        search,
-        setSearch,
-        notes,
-        pinnedNotes,
-        setPinnedNotes,
-        filteredNotes,
-        favoriteNotes,
-        archiveNotes,
-        trashNotes,
-        selectedNote,
-        setSelectedNote,
-        isLoading,
-        error,
-        fetchNotes,
-        handleSearch,
-        addNote,
-        editNote,
-        removeNote,
-        handleArchive,
-        handleFavorite,
-        handleTrash,
-        handlePin,
-      }}
-    >
-      {children}
-    </NoteContext.Provider>
-  );
-};
+  const makeTag = async (tag) => {
+    try {
+      setLoading(true);
+      setError(null);
+      await createTag(tag);
+    } catch (e) {
+      setError(e.message || "Error adding tag");
+      fetchNotes();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const editTag = async (tag) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await updateTag(tag);
+      if (response >= 200 && response < 300) {
+        console.log("Tag updated successfully");
+      } else {
+        console.log("Failed to update tag");
+      }
+    } catch (e) {
+      setError(e.message || "Error updating tag");
+      fetchNotes();
+    } finally {
+      setLoading(false);
+    }};
+
+    const removeTag = async (tag) => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await deleteTag(tag);
+        if (response >= 200 && response < 300) {
+          console.log("Tag deleted successfully");
+        } else {
+          console.log("Failed to delete tag");
+        }
+      } catch (e) {
+        setError(e.message || "Error deleting tag");
+        fetchNotes();
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    useEffect(() => {
+      fetchNotes();
+    }, [fetchNotes]);
+
+    return (
+      <NoteContext.Provider
+        value={{
+          search,
+          notes,
+          pinnedNotes,
+          filteredNotes,
+          favoriteNotes,
+          archiveNotes,
+          trashNotes,
+          selectedNote,
+          isLoading,
+          error,
+          tags,
+          setTags,
+          fetchTags,
+          makeTag,
+          editTag,
+          removeTag,
+          fetchNotes,
+          handleSearch,
+          addNote,
+          editNote,
+          removeNote,
+          handleArchive,
+          handleFavorite,
+          handleTrash,
+          handlePin,
+          setSelectedNote,
+          setSearch,
+          setPinnedNotes,
+          setFavoriteNotes,
+          setArchiveNotes,
+          setTrashNotes,
+          handleTagClick,
+        }}
+      >
+        {children}
+      </NoteContext.Provider>
+    );
+  };
+
 
 const useNote = () => {
   return useContext(NoteContext);

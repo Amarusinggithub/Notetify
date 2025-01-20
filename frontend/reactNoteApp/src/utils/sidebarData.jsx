@@ -1,11 +1,10 @@
-// src/components/sidebarData.jsx
 
-import {faArchive, faNoteSticky, faStar, faTrash} from "@fortawesome/free-solid-svg-icons";
+import {faArchive, faLightbulb, faStar, faTrash} from "@fortawesome/free-solid-svg-icons";
 
 export const sidebarData = [
     {
         title: "Notes",
-        icon: faNoteSticky,
+        icon: faLightbulb,
         path: "/notes",
     },
     {
@@ -24,3 +23,6 @@ export const sidebarData = [
         path: "/trash",
     },
 ];
+
+
+

@@ -6,7 +6,7 @@
 }
 
 .child-container {
-    height: calc(100% - 200px);
+    margin-top: 70px; 
     display: flex;
     flex: 1;
 
@@ -21,7 +21,7 @@
 }
 
 .content-container {
-
+    display: flex;
     flex: 1;
     background-color: rgb(32, 33, 36);
 }

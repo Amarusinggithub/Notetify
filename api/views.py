@@ -9,14 +9,12 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from api.models import Note, User
-from api.serializers import NoteSerializer, UserSerializer
-
+from api.models import Note, User,Tag
+from api.serializers import NoteSerializer, UserSerializer,TagSerializer
 
 def get_csrf_token(request):
     csrf_token = get_token(request)
     return JsonResponse({"csrfToken": csrf_token})
-
 
 @api_view(["POST", "GET"])
 @permission_classes([IsAuthenticated])
@@ -33,49 +31,36 @@ def notes_list(request):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 @api_view(["PUT", "DELETE"])
 @permission_classes([IsAuthenticated])
 def notes_detail(request, pk):
     note = get_object_or_404(Note, user=request.user, pk=pk)
 
     if request.method == "DELETE":
-
         note.delete()
         return Response({"message": "Note deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
 
     elif request.method == "PUT":
-
         serializer = NoteSerializer(note, data=request.data, context={"request": request})
         if serializer.is_valid():
             serializer.save(user=request.user)
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
         if request.user.is_authenticated:
-            print("User:", request.user)  # Logs the authenticated user
-            print("Session:", request.session)  # Logs the session details
-            print("CSRF Token:", request.headers.get('X-CSRFToken'))  # Logs the CSRF token
             logout(request)
             return Response({'message': 'Logged out successfully'}, status=200)
         else:
             return Response({'error': 'User is not authenticated'}, status=403)
 
-
 class LoginView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request, format=None):
-        # Debugging CSRF Token
-        print("CSRF Token from Header:", request.headers.get("X-CSRFToken"))
-        print("Expected CSRF Token:", get_token(request))
-        print("Request data:", request.data)
-
         data = request.data
         username = data.get('username', None)
         password = data.get('password', None)
@@ -87,9 +72,7 @@ class LoginView(APIView):
 
         if user is not None:
             if user.is_active:
-
                 login(request, user)
-
                 serializer = UserSerializer(user, context={"request": request})
                 return Response({"userData": serializer.data, "message": "Login successful"}, status=status.HTTP_200_OK)
             else:
@@ -97,12 +80,11 @@ class LoginView(APIView):
         else:
             return Response({"error": "Invalid username or password"}, status=status.HTTP_400_BAD_REQUEST)
 
-
 class RegisterView(APIView):
     permission_classes = [AllowAny]
+
     def post(self, request):
         email = request.data.get('email')
-
         username = request.data.get('username')
         password = request.data.get('password')
 
@@ -114,3 +96,31 @@ class RegisterView(APIView):
 
         return Response({"userData": serializer.data, "message": "User registered successfully"},
                         status=status.HTTP_201_CREATED)
+
+class TagView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        tags = Tag.objects.all()
+        serializer = TagSerializer(tags, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        serializer = TagSerializer(data=request.data, context={"request": request})
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk):  
+        tag = get_object_or_404(Tag, pk=pk)
+        tag.delete()
+        return Response({"message": "Tag deleted successfully"}, status=status.HTTP_204_NO_CONTENT)  
+
+    def put(self, request, pk):
+        tag = get_object_or_404(Tag, pk=pk)
+        serializer = TagSerializer(tag, data=request.data, context={"request": request})
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

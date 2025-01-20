@@ -1,17 +1,20 @@
 
 from rest_framework import serializers
 
-from api.models import Note, User
+from api.models import Note, User,Tag
 
 
 class NoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Note
         fields = (
-            'id', 'user', 'title', 'content', "is_favorited", "is_pinned", "is_trashed", "is_archived"
+            'id', 'user', 'title', 'content', "is_favorited", "is_pinned", "is_trashed", "is_archived","tags",)
  
 
-        )
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = ("id", "name","color", "user",)
 
 
 

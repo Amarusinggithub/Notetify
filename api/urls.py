@@ -3,7 +3,10 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-
+   path("api/tags/", views.TagView.as_view(), name="tags"),
+   path("api/tags/delete_tag/<int:pk>/", views.TagView.as_view(), name="delete-tag"),
+   path("api/tags/edit_tag/<int:pk>/", views.TagView.as_view(), name="edit-tag"),
+   path("api/tags/create_tag/", views.TagView.as_view(), name="create-tag"),
    path("api/notes/", views.notes_list, name="notes"),
    path("api/notes/create_note", views.notes_list, name="create-nate"),
    path("api/notes/edit_note/<int:pk>/", views.notes_detail, name="edit-note"),

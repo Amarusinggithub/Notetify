@@ -3,40 +3,45 @@
     width: 100%;
     flex: 1;
     display: flex;
-    flex-direction: row;
-    align-items: start;
-    justify-content: start;
-    flex-wrap: wrap;
-    overflow-x: hidden;
-    overflow-y: auto;
-    gap: 15px;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    margin-top:30px; 
     background-color: rgb(32, 33, 36);
     padding: 10px;
+      overflow-x: hidden;
+    overflow-y: auto;
 }
 
-.all-notes {
+.flex-column{
     display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    justify-content: flex-start;
+    flex-direction: column;
+gap: 20px;             
+   
 }
 
+.all-notes,
 .pinned-notes {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    justify-content: flex-start;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 130px;             
+  flex-direction: row; 
+  justify-content: flex-start;
+  align-items: flex-start;
+  margin-bottom: 30px;  
+ 
 }
-
 .note-div {
     width: 250px;
     min-width: 200px;
-    height: auto;
     padding: 10px;
     background-color: rgb(32, 33, 36);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 8px;
     box-sizing: border-box;
+      margin: 0;  
+           
+
 }
 
 
