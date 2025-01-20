@@ -5,11 +5,14 @@ import "../styles/sidebar.css";
 import {SideNavContext} from "../context/SideNavContext.jsx"; 
 import { faHashtag} from "@fortawesome/free-solid-svg-icons";
 import useNote from "../features/notes/hooks/useNote.jsx";
+import AddTagPopup from "../features/auth/components/AddTagPopup.jsx";
 
 
 const SideNav = () => {
-    const {isSideNavOpen, setPage} = useContext(SideNavContext);
+    const { isSideNavOpen, setPage, isAddTagPopupOpen, setAddTagPopupOpen } =
+      useContext(SideNavContext);
       const { tags,handleTagClick} = useNote();
+      
 
 
 
@@ -27,8 +30,12 @@ const SideNav = () => {
     };
 
     const handleOnClickAddTag = () => {
-
-    }
+      return () => {
+        setAddTagPopupOpen(true);
+        if(isAddTagPopupOpen){
+        <AddTagPopup />;
+        }
+    }}
 
   return (
     <div
