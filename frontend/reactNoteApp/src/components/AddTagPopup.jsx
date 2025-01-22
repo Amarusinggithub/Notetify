@@ -6,8 +6,9 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useContext, useRef, useState } from "react";
-import useNote from "../../notes/hooks/useNote";
-import { SideNavContext } from "../../../context/SideNavContext";
+import useNote from "../features/notes/hooks/useNote";
+import { SideNavContext } from "../context/SideNavContext";
+
 
 const AddTagPopup = () => {
   const [newTagName, setNewTagName] = useState("");

@@ -1,29 +1,28 @@
-import {useContext} from "react";
+import { useContext } from "react";
 import SideNav from "../components/sidebar.jsx";
 import Navbar from "../components/navbar.jsx";
-import {SideNavContext} from "../context/SideNavContext.jsx";
-import {Content} from "../features/auth/components/content.jsx";
-
+import { SideNavContext } from "../context/SideNavContext.jsx";
+import { Content } from "../components/content.jsx";
+import AddTagPopup from "../components/AddTagPopup.jsx";
 
 const MainPage = () => {
-    const {isSideNavOpen} = useContext(SideNavContext);
+  const { isSideNavOpen, isAddTagPopupOpen } = useContext(SideNavContext);
 
-
-    return (
-        <div className="container">
-            <Navbar/>
-            <div className="child-container">
-                <SideNav/>
-                <div
-                    className="content-container"
-                    style={{marginLeft: isSideNavOpen ? "250px" : "50px"}}
-                >
-                    <Content/>
-                </div>
-            </div>
+  return (
+    <div className="container">
+      <Navbar />
+      <div className="child-container">
+        <SideNav />
+        <div
+          className="content-container"
+          style={{ marginLeft: isSideNavOpen ? "250px" : "50px" }}
+        >
+          <Content />
+          {isAddTagPopupOpen&& (<AddTagPopup/>)}
         </div>
-    );
+      </div>
+    </div>
+  );
 };
 
 export default MainPage;
-

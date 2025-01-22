@@ -1,41 +1,33 @@
-import {useContext} from "react";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {sidebarData,} from "../utils/sidebarData.jsx";
+import { useContext } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { sidebarData } from "../utils/sidebarData.jsx";
 import "../styles/sidebar.css";
-import {SideNavContext} from "../context/SideNavContext.jsx"; 
-import { faHashtag} from "@fortawesome/free-solid-svg-icons";
+import { SideNavContext } from "../context/SideNavContext.jsx";
+import { faPlus ,faTag} from "@fortawesome/free-solid-svg-icons";
 import useNote from "../features/notes/hooks/useNote.jsx";
-import AddTagPopup from "../features/auth/components/AddTagPopup.jsx";
-
 
 const SideNav = () => {
-    const { isSideNavOpen, setPage, isAddTagPopupOpen, setAddTagPopupOpen } =
-      useContext(SideNavContext);
-      const { tags,handleTagClick} = useNote();
-      
+  const { isSideNavOpen, setPage, setAddTagPopupOpen } =
+    useContext(SideNavContext);
+  const { tags, handleTagClick } = useNote();
 
-
-
-    const handleOnClick = (index) => {
-        return () => {
-            setPage(index);
-        };
-    }
-
-    const handleOnClickOfTag = (tag) => {
-      return () => {
-        handleTagClick(tag);
-        setPage(4);
-      };
+  const handleOnClick = (index) => {
+    return () => {
+      setPage(index);
     };
+  };
 
-    const handleOnClickAddTag = () => {
-      return () => {
-        setAddTagPopupOpen(true);
-        if(isAddTagPopupOpen){
-        <AddTagPopup />;
-        }
-    }}
+  const handleTagClicked = (tag) => {
+    return () => {
+      handleTagClick(tag);
+      setPage(4);
+    };
+  };
+
+  const handleCreateTag = () => {
+    console.log("set AddTagPopupOpen to be true");
+      setAddTagPopupOpen(true);
+  };
 
   return (
     <div
@@ -66,7 +58,7 @@ const SideNav = () => {
 
       <ul>
         <li
-          onClick={handleOnClickAddTag()}
+          onClick={handleCreateTag}
           style={{
             borderTopRightRadius: isSideNavOpen ? "50px" : "360px",
             borderTopLeftRadius: isSideNavOpen ? "0px" : "360px",
@@ -76,7 +68,7 @@ const SideNav = () => {
           }}
           className="sidenav-item"
         >
-          <FontAwesomeIcon icon={faHashtag} className="icon" />
+          <FontAwesomeIcon icon={faPlus} className="icon" />
           {isSideNavOpen && <h3>{"Add Tag"}</h3>}
         </li>
 
@@ -84,7 +76,7 @@ const SideNav = () => {
           <ul>
             {tags.map((tag, index) => (
               <li
-                onClick={handleOnClickOfTag(tag)}
+                onClick={handleTagClicked(tag)}
                 key={index}
                 style={{
                   borderTopRightRadius: isSideNavOpen ? "50px" : "360px",
@@ -95,7 +87,7 @@ const SideNav = () => {
                 }}
                 className="sidenav-item"
               >
-                <FontAwesomeIcon icon={faHashtag} className="icon" />
+                <FontAwesomeIcon icon={faTag} className="icon" />
                 {isSideNavOpen && <h3>{tag.name}</h3>}
               </li>
             ))}

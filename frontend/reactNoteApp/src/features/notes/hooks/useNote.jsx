@@ -139,7 +139,6 @@ const NoteProvider = ({ children }) => {
       setError(null);
       const fetchedNotes = await getNotes();
       refreshCategorizedNotes(fetchedNotes);
-      fetchTags();
     } catch (e) {
       setError(e.message || "Error fetching notes");
     } finally {
@@ -198,7 +197,7 @@ const NoteProvider = ({ children }) => {
     }
   };
 
-  const fetchTags = async () => {
+  const fetchTags = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -209,7 +208,7 @@ const NoteProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   const makeTag = async (tag) => {
     try {
@@ -218,7 +217,7 @@ const NoteProvider = ({ children }) => {
       await createTag(tag);
     } catch (e) {
       setError(e.message || "Error adding tag");
-      fetchNotes();
+      fetchTags();
     } finally {
       setLoading(false);
     }
@@ -236,75 +235,76 @@ const NoteProvider = ({ children }) => {
       }
     } catch (e) {
       setError(e.message || "Error updating tag");
-      fetchNotes();
+      fetchTags();
     } finally {
       setLoading(false);
-    }};
-
-    const removeTag = async (tag) => {
-      try {
-        setLoading(true);
-        setError(null);
-        const response = await deleteTag(tag);
-        if (response >= 200 && response < 300) {
-          console.log("Tag deleted successfully");
-        } else {
-          console.log("Failed to delete tag");
-        }
-      } catch (e) {
-        setError(e.message || "Error deleting tag");
-        fetchNotes();
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    useEffect(() => {
-      fetchNotes();
-    }, [fetchNotes]);
-
-    return (
-      <NoteContext.Provider
-        value={{
-          search,
-          notes,
-          pinnedNotes,
-          filteredNotes,
-          favoriteNotes,
-          archiveNotes,
-          trashNotes,
-          selectedNote,
-          isLoading,
-          error,
-          tags,
-          setTags,
-          fetchTags,
-          makeTag,
-          editTag,
-          removeTag,
-          fetchNotes,
-          handleSearch,
-          addNote,
-          editNote,
-          removeNote,
-          handleArchive,
-          handleFavorite,
-          handleTrash,
-          handlePin,
-          setSelectedNote,
-          setSearch,
-          setPinnedNotes,
-          setFavoriteNotes,
-          setArchiveNotes,
-          setTrashNotes,
-          handleTagClick,
-        }}
-      >
-        {children}
-      </NoteContext.Provider>
-    );
+    }
   };
 
+  const removeTag = async (tag) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await deleteTag(tag);
+      if (response >= 200 && response < 300) {
+        console.log("Tag deleted successfully");
+      } else {
+        console.log("Failed to delete tag");
+      }
+    } catch (e) {
+      setError(e.message || "Error deleting tag");
+      fetchTags();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTags();
+    fetchNotes();
+  }, [fetchTags, fetchNotes]);
+
+  return (
+    <NoteContext.Provider
+      value={{
+        search,
+        notes,
+        pinnedNotes,
+        filteredNotes,
+        favoriteNotes,
+        archiveNotes,
+        trashNotes,
+        selectedNote,
+        isLoading,
+        error,
+        tags,
+        setTags,
+        fetchTags,
+        makeTag,
+        editTag,
+        removeTag,
+        fetchNotes,
+        handleSearch,
+        addNote,
+        editNote,
+        removeNote,
+        handleArchive,
+        handleFavorite,
+        handleTrash,
+        handlePin,
+        setSelectedNote,
+        setSearch,
+        setPinnedNotes,
+        setFavoriteNotes,
+        setArchiveNotes,
+        setTrashNotes,
+        handleTagClick,
+      }}
+    >
+      {children}
+    </NoteContext.Provider>
+  );
+};
 
 const useNote = () => {
   return useContext(NoteContext);
