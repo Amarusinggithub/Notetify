@@ -1,31 +1,35 @@
-import {useNavigate} from "react-router-dom";
 import useNote from "../hooks/useNote.jsx";
 import NoteCard from "../components/NoteCard.jsx";
+import { useContext } from "react";
+import { SideNavContext } from "../../../context/SideNavContext.jsx";
 
 const TrashPage = () => {
-    let navigate = useNavigate();
-    const {
+  const { isSideNavOpen } = useContext(SideNavContext);
 
-        trashNotes,
-        isLoading,
-        error,
-        fetchNotes,
+  const { trashNotes, isLoading, error } = useNote();
 
-    } = useNote();
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
-    return (
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
 
-        <div className="container">
-            <div className="notes">
-                {trashNotes &&
-                    trashNotes.map((note) => (
-                        <div key={note.id} className="note-div">
-                            <NoteCard note={note}/>
-                        </div>
-                    ))}
+  return (
+    <div className="container">
+      <div
+        className="all-notes"
+        style={{ maxWidth: isSideNavOpen ? "1200px" : "1400px" }}
+      >
+        {trashNotes &&
+          trashNotes.map((note) => (
+            <div key={note.id} className="note-div">
+              <NoteCard note={note} />
             </div>
-        </div>
-
-    );
-}
+          ))}
+      </div>
+    </div>
+  );
+};
 export default TrashPage;

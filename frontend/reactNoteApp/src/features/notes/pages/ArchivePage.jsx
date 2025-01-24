@@ -13,7 +13,7 @@ const ArchivePage = () => {
   }
   return (
     <div className="container">
-      <div className="notes">
+      <div className="all-notes">
         {archiveNotes &&
           archiveNotes.map((note) => (
             <div key={note.id} className="note-div">
