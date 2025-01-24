@@ -1,5 +1,7 @@
 import { useContext } from "react";
 import SideNav from "../components/sidebar.jsx";
+import "../styles/mainpage.css";
+
 import Navbar from "../components/navbar.jsx";
 import { SideNavContext } from "../context/SideNavContext.jsx";
 import { Content } from "../components/content.jsx";

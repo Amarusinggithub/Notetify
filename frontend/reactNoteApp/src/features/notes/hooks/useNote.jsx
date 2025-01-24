@@ -24,6 +24,7 @@ const categorizedNotes = (notesArray) => {
   const archived = [];
   const trashed = [];
   const filtered = [];
+  const other = [];
 
   notesArray.forEach((note) => {
     if (
@@ -56,17 +57,22 @@ const categorizedNotes = (notesArray) => {
       note.is_pinned === false
     ) {
       filtered.push(note);
+      other.push(note);
     }
   });
 
-  return { pinned, favorites, archived, trashed, filtered };
+  return { pinned, favorites, archived, trashed, filtered, other };
 };
 
 const NoteProvider = ({ children }) => {
   const [search, setSearch] = useState("");
+  const [title, setTitle] = useState("");
+  const [otherNotes, setOtherNotes] = useState([]);
+  const [tagNotes, setTagNotes] = useState([]);
+
   const [notes, setNotes] = useState([]);
   const [tags, setTags] = useState([]);
-  const [filteredNotes, setFilteredNotes] = useState([]);
+  const [searchNotes, setSearchNotes] = useState([]);
   const [pinnedNotes, setPinnedNotes] = useState([]);
   const [favoriteNotes, setFavoriteNotes] = useState([]);
   const [archiveNotes, setArchiveNotes] = useState([]);
@@ -77,9 +83,9 @@ const NoteProvider = ({ children }) => {
 
   const handleSearch = () => {
     if (search.trim() === "") {
-      setFilteredNotes(notes);
+      setSearchNotes([]);
     } else {
-      setFilteredNotes(
+      setSearchNotes(
         notes.filter(
           (note) =>
             note.title.toLowerCase().includes(search.toLowerCase()) &&
@@ -91,10 +97,10 @@ const NoteProvider = ({ children }) => {
   };
 
   const handleTagClick = (tag) => {
-    setFilteredNotes(
+    setTagNotes(
       notes.filter(
         (note) =>
-          note.tags.includes(tag) &&
+          note.tags.includes(tag.id) &&
           note.is_trashed === false &&
           note.is_archived === false
       )
@@ -102,31 +108,32 @@ const NoteProvider = ({ children }) => {
   };
 
   const handleFavorite = (note) => {
-    note.is_favorited = !note.is_favorited;
-    editNote(note);
+    const updatedNote = { ...note, is_favorited: !note.is_favorited };
+    editNote(updatedNote);
   };
 
   const handleTrash = (note) => {
-    note.is_trashed = !note.is_trashed;
-    editNote(note);
+    const updatedNote = { ...note, is_trashed: !note.is_trashed };
+    editNote(updatedNote);
   };
 
   const handleArchive = (note) => {
-    note.is_archived = !note.is_archived;
-    editNote(note);
+    const updatedNote = { ...note, is_archived: !note.is_archived };
+    editNote(updatedNote);
   };
 
   const handlePin = (note) => {
-    note.is_pinned = !note.is_pinned;
-    editNote(note);
+    const updatedNote = { ...note, is_pinned: !note.is_pinned };
+    editNote(updatedNote);
   };
 
   const refreshCategorizedNotes = (notesArray) => {
     setNotes(notesArray);
 
-    const { pinned, favorites, archived, trashed, filtered } =
+    const { pinned, favorites, archived, trashed, filtered, other } =
       categorizedNotes(notesArray);
-    setFilteredNotes(filtered);
+    setOtherNotes(other);
+    setSearchNotes(filtered);
     setPinnedNotes(pinned);
     setFavoriteNotes(favorites);
     setArchiveNotes(archived);
@@ -147,51 +154,62 @@ const NoteProvider = ({ children }) => {
   }, []);
 
   const addNote = async (note) => {
+    const previousNotes = [...notes];
+
+    refreshCategorizedNotes([...notes, note]);
+
     try {
       setLoading(true);
       setError(null);
 
-      await createNote(note);
+      const response = await createNote(note);
+      if (!(response >= 200 && response < 300)) {
+        throw new Error("Failed to add note on server");
+      }
     } catch (e) {
       setError(e.message || "Error adding note");
-      fetchNotes();
+      refreshCategorizedNotes(previousNotes);
     } finally {
       setLoading(false);
     }
   };
 
-  const editNote = async (note) => {
+  const editNote = async (newNote) => {
+    const previousNotes = [...notes];
+    const updatedNotes = notes.map((n) => (n.id === newNote.id ? newNote : n));
+    refreshCategorizedNotes(updatedNotes);
+
     try {
       setLoading(true);
       setError(null);
-      const response = await updateNote(note);
-      if (response >= 200 && response < 300) {
-        console.log("Note updated successfully");
-      } else {
-        console.log("Failed to update note");
+      const response = await updateNote(newNote);
+      if (!(response >= 200 && response < 300)) {
+        throw new Error("Failed to update note on server");
       }
     } catch (e) {
       setError(e.message || "Error updating note");
-      fetchNotes();
+      refreshCategorizedNotes(previousNotes);
     } finally {
       setLoading(false);
     }
   };
 
   const removeNote = async (note) => {
+    const previousNotes = [...notes];
+    const updatedNotes = notes.filter((n) => n.id !== note.id);
+    refreshCategorizedNotes(updatedNotes);
+
     try {
       setLoading(true);
       setError(null);
+
       const response = await deleteNote(note);
-      if (response >= 200 && response < 300) {
-        console.log("Note deleted successfully");
-        setSelectedNote(null);
-      } else {
-        console.log("Failed to delete note");
+      if (!(response >= 200 && response < 300)) {
+        throw new Error("Failed to remove note on server");
       }
     } catch (e) {
       setError(e.message || "Error deleting note");
-      fetchNotes();
+      refreshCategorizedNotes(previousNotes);
     } finally {
       setLoading(false);
     }
@@ -211,49 +229,59 @@ const NoteProvider = ({ children }) => {
   }, []);
 
   const makeTag = async (tag) => {
+    const previousTags = [...tags];
+    setTags([...tags, tag]);
+
     try {
       setLoading(true);
       setError(null);
-      await createTag(tag);
+
+      const response = await createTag(tag);
+
+      if (!(response >= 200 && response < 300)) {
+        throw new Error("Failed to create tag on server");
+      }
     } catch (e) {
       setError(e.message || "Error adding tag");
-      fetchTags();
+      setTags(previousTags);
     } finally {
       setLoading(false);
     }
   };
 
   const editTag = async (tag) => {
+    const previousTags = [...tags];
+    setTags((prevTags) => prevTags.map((t) => (tag.id === t.id ? tag : t)));
+
     try {
       setLoading(true);
       setError(null);
       const response = await updateTag(tag);
-      if (response >= 200 && response < 300) {
-        console.log("Tag updated successfully");
-      } else {
-        console.log("Failed to update tag");
+      if (!(response >= 200 && response < 300)) {
+        throw new Error("Failed to edit tag on server");
       }
     } catch (e) {
       setError(e.message || "Error updating tag");
-      fetchTags();
+      setTags(previousTags);
     } finally {
       setLoading(false);
     }
   };
 
   const removeTag = async (tag) => {
+    const previousTags = [...tags];
+    setTags((tags) => tags.filter((t) => t.id !== tag.id));
+
     try {
       setLoading(true);
       setError(null);
       const response = await deleteTag(tag);
-      if (response >= 200 && response < 300) {
-        console.log("Tag deleted successfully");
-      } else {
-        console.log("Failed to delete tag");
+      if (!(response >= 200 && response < 300)) {
+        throw new Error("Failed to remove note from server");
       }
     } catch (e) {
       setError(e.message || "Error deleting tag");
-      fetchTags();
+      setTags(previousTags);
     } finally {
       setLoading(false);
     }
@@ -268,17 +296,22 @@ const NoteProvider = ({ children }) => {
     <NoteContext.Provider
       value={{
         search,
+        title,
         notes,
         pinnedNotes,
-        filteredNotes,
+        filteredNotes: searchNotes,
         favoriteNotes,
         archiveNotes,
         trashNotes,
         selectedNote,
         isLoading,
+        tagNotes,
         error,
         tags,
+        otherNotes,
         setTags,
+        setTagNotes,
+        setTitle,
         fetchTags,
         makeTag,
         editTag,
@@ -299,6 +332,7 @@ const NoteProvider = ({ children }) => {
         setArchiveNotes,
         setTrashNotes,
         handleTagClick,
+        setOtherNotes,
       }}
     >
       {children}

@@ -82,6 +82,17 @@
     height: 30px;
 }
 
+.menu-logo-title-container{
+position: absolute;
+    top: -7%;
+    left: 1%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
+    gap: 5px;
+}
+
 
 .icons-container button {
     all: unset;
@@ -94,15 +105,26 @@
 
 }
 
+.logo-container {
+    width: 32px;
+    height: 32px;
+    border-radius: 5px; 
+    overflow: hidden; 
+}
+
+.noteify-logo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+}
+
+
 .icons-container button .icon {
     color: white;
     font-size: 20px;
 }
 
 .menu-btn {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
     all: unset;
     cursor: pointer;
     display: flex;
@@ -122,12 +144,10 @@
 }
 
 
-.company-name {
-    position: absolute;
-    top: -14%;
-    left: 3%;
+.title-header {
+    
     color: white;
-    font-size: 28px;
+    font-size: 26px;
     font-weight: 600;
 }
 

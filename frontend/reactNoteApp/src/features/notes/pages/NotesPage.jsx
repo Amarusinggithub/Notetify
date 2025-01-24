@@ -3,7 +3,7 @@ import NoteCard from "../components/NoteCard.jsx";
 import useNote from "../hooks/useNote.jsx";
 
 const NotesPage = () => {
-  const { pinnedNotes, filteredNotes, isLoading, error } = useNote();
+  const { pinnedNotes, otherNotes, isLoading, error } = useNote();
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -14,7 +14,6 @@ const NotesPage = () => {
   }
 
   return (
-   
     <div className="container">
       {pinnedNotes?.length > 0 && (
         <>
@@ -37,7 +36,7 @@ const NotesPage = () => {
       </div>
 
       <div className="all-notes">
-        {filteredNotes?.map((note) => (
+        {otherNotes?.map((note) => (
           <div key={note.id} className="note-div">
             <NoteCard note={note} />
           </div>

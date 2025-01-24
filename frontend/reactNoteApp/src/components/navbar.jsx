@@ -8,7 +8,7 @@ import useNote from "../features/notes/hooks/useNote.jsx";
 const Navbar = () => {
 
   const {isSideNavOpen, setIsSideNavOpen} = useContext(SideNavContext);
-  const {handleSearch,search, setSearch,fetchNotes} = useNote();
+  const {handleSearch,search, setSearch,fetchNotes,title} = useNote();
 
   const handleSearchChange = (event) => {
     const query = event.target.value;
@@ -28,41 +28,61 @@ const Navbar = () => {
   };
 
   return (
-      <div className="navbar">
+    <div className="navbar">
+      <div className="menu-logo-title-container">
         <button onClick={handleSideMenuChange} className="menu-btn">
-          <FontAwesomeIcon icon={faBars} className="menu-icon"/>
+          <FontAwesomeIcon icon={faBars} className="menu-icon" />
         </button>
 
-        <h1 className="company-name">Notetify</h1>
+        {(title.length <= 0 || title === "Notes") && (
+          <div className="logo-container">
+            <img
+              src="assets/favicon-32x32.png"
+              alt="A sample image"
+              width="32"
+              height="32"
+              className={"noteify-logo"}
+            ></img>
+          </div>
+        )}
 
-        <form onSubmit={handleSearchSubmit} className="search-container">
-          <button type="submit">
-            <FontAwesomeIcon icon={faMagnifyingGlass} className="search-icon"/>
-          </button>
-          <input
-              name="search"
-              placeholder="Search"
-              value={search}
-              onChange={handleSearchChange}
-              type="text"
-          />
-        </form>
-
-        <div className="icons-container">
-          <button onClick={() => {
-          fetchNotes();
-
-          }}>
-            <FontAwesomeIcon icon={faRotateRight} className="icon"/>
-          </button>
-          <button>
-            <FontAwesomeIcon icon={faList} className="icon"/>
-          </button>
-          <button>
-            <FontAwesomeIcon icon={faGear} className="icon"/>
-          </button>
-        </div>
+        {(title.length <= 0 || title === "Notes") && (
+          <h1 className="title-header">Notetify</h1>
+        )}
+        {title.length > 0 && title !== "Notes" && (
+          <h1 className="title-header">{title}</h1>
+        )}
       </div>
+
+      <form onSubmit={handleSearchSubmit} className="search-container">
+        <button type="submit">
+          <FontAwesomeIcon icon={faMagnifyingGlass} className="search-icon" />
+        </button>
+        <input
+          name="search"
+          placeholder="Search"
+          value={search}
+          onChange={handleSearchChange}
+          type="text"
+        />
+      </form>
+
+      <div className="icons-container">
+        <button
+          onClick={() => {
+            fetchNotes();
+          }}
+        >
+          <FontAwesomeIcon icon={faRotateRight} className="icon" />
+        </button>
+        <button>
+          <FontAwesomeIcon icon={faList} className="icon" />
+        </button>
+        <button>
+          <FontAwesomeIcon icon={faGear} className="icon" />
+        </button>
+      </div>
+    </div>
   );
 };
 
