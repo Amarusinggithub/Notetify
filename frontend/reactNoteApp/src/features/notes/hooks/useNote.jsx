@@ -62,7 +62,7 @@ const categorizedNotes = (notesArray) => {
 
 const NoteProvider = ({ children }) => {
   const [search, setSearch] = useState("");
-  const [title, setTitle] = useState("");
+  const [title, setTitle] = useState("Notes");
   const [otherNotes, setOtherNotes] = useState([]);
   const [tagNotes, setTagNotes] = useState([]);
   const [notes, setNotes] = useState([]);
@@ -78,12 +78,8 @@ const NoteProvider = ({ children }) => {
   const handleSearch = () => {
     const query = search.trim().toLowerCase();
 
-    if (query === "") {
-      setSearchNotes([]);
-      return;
-    }
-
     switch (title) {
+      case "":
       case "Notes":
         setSearchNotes(
           notes.filter(
@@ -97,20 +93,16 @@ const NoteProvider = ({ children }) => {
 
       case "Favorites":
         setSearchNotes(
-          favoriteNotes.filter(
-            (note) =>
-              note.title.toLowerCase().includes(query) &&
-              !note.is_trashed &&
-              !note.is_archived
+          favoriteNotes.filter((note) =>
+            note.title.toLowerCase().includes(query)
           )
         );
         break;
 
       case "Archive":
         setSearchNotes(
-          archiveNotes.filter(
-            (note) =>
-              note.title.toLowerCase().includes(query) && !note.is_trashed
+          archiveNotes.filter((note) =>
+            note.title.toLowerCase().includes(query)
           )
         );
         break;
@@ -126,8 +118,8 @@ const NoteProvider = ({ children }) => {
           tagNotes.filter(
             (note) =>
               note.title.toLowerCase().includes(query) &&
-              !note.is_trashed &&
-              !note.is_archived
+              note.is_trashed === false &&
+              note.is_archived === false
           )
         );
         break;
@@ -264,7 +256,7 @@ const NoteProvider = ({ children }) => {
         title,
         notes,
         pinnedNotes,
-        filteredNotes: searchNotes,
+        searchNotes,
         favoriteNotes,
         archiveNotes,
         trashNotes,
@@ -275,7 +267,6 @@ const NoteProvider = ({ children }) => {
         otherNotes,
         setTagNotes,
         setTitle,
-
         fetchNotes,
         handleSearch,
         addNote,
