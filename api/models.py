@@ -45,7 +45,7 @@ class User(AbstractUser, PermissionsMixin):
 class Tag(models.Model):
     name = models.CharField(max_length=50, unique=True)
     color= models.CharField(max_length=50, default="RGB(255, 255, 255)")
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="tags")
+    users = models.ManyToManyField(settings.AUTH_USER_MODEL,related_name="tags")
 
     def __str__(self):
         return self.name
@@ -54,15 +54,14 @@ class Tag(models.Model):
 
 class Note(models.Model):
     id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="notes")
+    users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="notes")
     title = models.CharField(max_length=500)
     content = models.TextField()
-    tags= models.ManyToManyField(Tag, related_name="notes")
+    tags = models.ManyToManyField(Tag, related_name="notes",blank=True)
     is_pinned = models.BooleanField(default=False)
     is_favorited = models.BooleanField(default=False)
     is_trashed = models.BooleanField(default=False)
     is_archived = models.BooleanField(default=False)
-
 
     def __str__(self):
         return self.title

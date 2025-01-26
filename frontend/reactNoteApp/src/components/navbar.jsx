@@ -23,7 +23,7 @@ const Navbar = () => {
 
   const handleSearchSubmit = (event) => {
     event.preventDefault();
-    handleSearch(search);
+    handleSearch();
     console.log("Search submitted:", search);
   };
 

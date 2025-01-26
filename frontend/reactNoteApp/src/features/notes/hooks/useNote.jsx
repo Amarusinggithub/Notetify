@@ -7,13 +7,9 @@ import {
 } from "react";
 import {
   createNote,
-  createTag,
   deleteNote,
-  deleteTag,
   getNotes,
-  getTags,
   updateNote,
-  updateTag,
 } from "../services/NoteService.jsx";
 
 const NoteContext = createContext();
@@ -69,9 +65,7 @@ const NoteProvider = ({ children }) => {
   const [title, setTitle] = useState("");
   const [otherNotes, setOtherNotes] = useState([]);
   const [tagNotes, setTagNotes] = useState([]);
-
   const [notes, setNotes] = useState([]);
-  const [tags, setTags] = useState([]);
   const [searchNotes, setSearchNotes] = useState([]);
   const [pinnedNotes, setPinnedNotes] = useState([]);
   const [favoriteNotes, setFavoriteNotes] = useState([]);
@@ -82,17 +76,61 @@ const NoteProvider = ({ children }) => {
   const [error, setError] = useState(null);
 
   const handleSearch = () => {
-    if (search.trim() === "") {
+    const query = search.trim().toLowerCase();
+
+    if (query === "") {
       setSearchNotes([]);
-    } else {
-      setSearchNotes(
-        notes.filter(
-          (note) =>
-            note.title.toLowerCase().includes(search.toLowerCase()) &&
-            note.is_trashed === false &&
-            note.is_archived === false
-        )
-      );
+      return;
+    }
+
+    switch (title) {
+      case "Notes":
+        setSearchNotes(
+          notes.filter(
+            (note) =>
+              note.title.toLowerCase().includes(query) &&
+              !note.is_trashed &&
+              !note.is_archived
+          )
+        );
+        break;
+
+      case "Favorites":
+        setSearchNotes(
+          favoriteNotes.filter(
+            (note) =>
+              note.title.toLowerCase().includes(query) &&
+              !note.is_trashed &&
+              !note.is_archived
+          )
+        );
+        break;
+
+      case "Archive":
+        setSearchNotes(
+          archiveNotes.filter(
+            (note) =>
+              note.title.toLowerCase().includes(query) && !note.is_trashed
+          )
+        );
+        break;
+
+      case "Trash":
+        setSearchNotes(
+          trashNotes.filter((note) => note.title.toLowerCase().includes(query))
+        );
+        break;
+
+      default:
+        setSearchNotes(
+          tagNotes.filter(
+            (note) =>
+              note.title.toLowerCase().includes(query) &&
+              !note.is_trashed &&
+              !note.is_archived
+          )
+        );
+        break;
     }
   };
 
@@ -215,82 +253,9 @@ const NoteProvider = ({ children }) => {
     }
   };
 
-  const fetchTags = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const fetchedTags = await getTags();
-      setTags(fetchedTags);
-    } catch (e) {
-      setError(e.message || "Error fetching tags");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const makeTag = async (tag) => {
-    const previousTags = [...tags];
-    setTags([...tags, tag]);
-
-    try {
-      setLoading(true);
-      setError(null);
-
-      const response = await createTag(tag);
-
-      if (!(response >= 200 && response < 300)) {
-        throw new Error("Failed to create tag on server");
-      }
-    } catch (e) {
-      setError(e.message || "Error adding tag");
-      setTags(previousTags);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const editTag = async (tag) => {
-    const previousTags = [...tags];
-    setTags((prevTags) => prevTags.map((t) => (tag.id === t.id ? tag : t)));
-
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await updateTag(tag);
-      if (!(response >= 200 && response < 300)) {
-        throw new Error("Failed to edit tag on server");
-      }
-    } catch (e) {
-      setError(e.message || "Error updating tag");
-      setTags(previousTags);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const removeTag = async (tag) => {
-    const previousTags = [...tags];
-    setTags((tags) => tags.filter((t) => t.id !== tag.id));
-
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await deleteTag(tag);
-      if (!(response >= 200 && response < 300)) {
-        throw new Error("Failed to remove note from server");
-      }
-    } catch (e) {
-      setError(e.message || "Error deleting tag");
-      setTags(previousTags);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchTags();
     fetchNotes();
-  }, [fetchTags, fetchNotes]);
+  }, [fetchNotes]);
 
   return (
     <NoteContext.Provider
@@ -307,15 +272,10 @@ const NoteProvider = ({ children }) => {
         isLoading,
         tagNotes,
         error,
-        tags,
         otherNotes,
-        setTags,
         setTagNotes,
         setTitle,
-        fetchTags,
-        makeTag,
-        editTag,
-        removeTag,
+
         fetchNotes,
         handleSearch,
         addNote,

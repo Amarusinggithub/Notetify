@@ -4,7 +4,7 @@ import useNote from "../hooks/useNote";
 import { SideNavContext } from "../../../context/SideNavContext";
 
 const SearchPage = () => {
-  const { filteredNotes, isLoading, error } = useNote();
+  const { searchNotes, isLoading, error } = useNote();
   const { isSideNavOpen } = useContext(SideNavContext);
 
   if (isLoading) {
@@ -21,8 +21,7 @@ const SearchPage = () => {
         className="all-notes"
         style={{ maxWidth: isSideNavOpen ? "1200px" : "1400px" }}
       >
-        <h2>Others</h2>
-        {filteredNotes?.map((note) => (
+        {searchNotes?.map((note) => (
           <div key={note.id} className="note-div">
             <NoteCard note={note} />
           </div>

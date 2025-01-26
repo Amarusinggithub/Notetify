@@ -5,11 +5,14 @@ import "../styles/sidebar.css";
 import { SideNavContext } from "../context/SideNavContext.jsx";
 import { faPlus, faTag, faEllipsis } from "@fortawesome/free-solid-svg-icons";
 import useNote from "../features/notes/hooks/useNote.jsx";
+import useTag from "../features/notes/hooks/useTag.jsx";
 
 const SideNav = () => {
   const { isSideNavOpen, setPage, setAddTagPopupOpen } =
     useContext(SideNavContext);
-  const { tags, handleTagClick, setTitle } = useNote();
+  const { handleTagClick, setTitle } = useNote();
+  const { tags } = useTag();
+
   const [temp, setTemp] = useState(sidebarData[0]);
 
   const handleOnClick = (index) => {

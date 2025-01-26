@@ -20,21 +20,21 @@ def get_csrf_token(request):
 @permission_classes([IsAuthenticated])
 def notes_list(request):
     if request.method == "GET":
-        notes = Note.objects.filter(user=request.user)
+        notes = Note.objects.filter(users=request.user)
         serializer = NoteSerializer(notes, many=True, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     elif request.method == "POST":
         serializer = NoteSerializer(data=request.data, context={"request": request})
         if serializer.is_valid():
-            serializer.save(user=request.user)
+            serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(["PUT", "DELETE"])
 @permission_classes([IsAuthenticated])
 def notes_detail(request, pk):
-    note = get_object_or_404(Note, user=request.user, pk=pk)
+    note = get_object_or_404(Note, users=request.user, pk=pk)
 
     if request.method == "DELETE":
         note.delete()
@@ -43,7 +43,7 @@ def notes_detail(request, pk):
     elif request.method == "PUT":
         serializer = NoteSerializer(note, data=request.data, context={"request": request})
         if serializer.is_valid():
-            serializer.save(user=request.user)
+            serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -101,26 +101,26 @@ class TagView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        tags = Tag.objects.all()
+        tags = Tag.objects.filter(users=request.user)
         serializer = TagSerializer(tags, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
         serializer = TagSerializer(data=request.data, context={"request": request})
         if serializer.is_valid():
-            serializer.save(user=request.user)
+            serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk):  
-        tag = get_object_or_404(Tag, pk=pk)
+        tag = get_object_or_404(Tag, pk=pk ,users=request.user)
         tag.delete()
         return Response({"message": "Tag deleted successfully"}, status=status.HTTP_204_NO_CONTENT)  
 
     def put(self, request, pk):
-        tag = get_object_or_404(Tag, pk=pk)
+        tag = get_object_or_404(Tag, pk=pk, users=request.user)
         serializer = TagSerializer(tag, data=request.data, context={"request": request})
         if serializer.is_valid():
-            serializer.save(user=request.user)
+            serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

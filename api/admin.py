@@ -3,17 +3,18 @@ from typing import Set
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import User, Note,Tag
+from .models import User, Note, Tag
 
 
 class MyUserAdmin(UserAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
         is_superuser = request.user.is_superuser
-        disabled_fields = set()  
+        disabled_fields = set()
 
         if not is_superuser:
             disabled_fields |= {
@@ -24,9 +25,9 @@ class MyUserAdmin(UserAdmin):
             }
 
         if (
-                not is_superuser
-                and obj is not None
-                and obj == request.user
+            not is_superuser
+            and obj is not None
+            and obj == request.user
         ):
             disabled_fields |= {
                 'is_staff',
@@ -41,11 +42,9 @@ class MyUserAdmin(UserAdmin):
 
         return form
 
-
     list_display = ('email', 'username', 'date_joined')
     search_fields = ('email', 'username', 'date_joined')
-    ordering = ('date_joined',) 
-
+    ordering = ('date_joined',)
 
     readonly_fields = [
         'date_joined',
@@ -58,36 +57,46 @@ class MyUserAdmin(UserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'username','password1', 'password2'),
+            'fields': ('email', 'username', 'password1', 'password2'),
         }),
     )
 
 
 class NoteAdmin(admin.ModelAdmin):
-    list_display = ('title', 'user',)
-    search_fields = ('title', 'content', 'user__username')
+    list_display = ('title', 'display_users')
+    search_fields = ('title', 'content')
     list_filter = ()
     ordering = ()
-
-  
+    
 
     fieldsets = (
-        (None, {'fields': ('title', 'content', 'user', "is_favorited", "is_pinned", "is_archived", "is_trashed","tags")}),
-
+        (None, {'fields': ('title', 'content', 'users', "is_favorited", "is_pinned", "is_archived", "is_trashed", "tags")}),
     )
-    
-    
-class TagAdimn(admin.ModelAdmin):
-    list_display = ('name','color','user')
+
+    def display_users(self, obj):
+        """ Custom method to display users in list view """
+        return ", ".join([user.username for user in obj.users.all()])
+
+    display_users.short_description = 'Users'
+
+
+class TagAdmin(admin.ModelAdmin):
+    list_display = ('name', 'color', 'display_users')
     search_fields = ('name',)
     list_filter = ()
     ordering = ()
 
     fieldsets = (
-        (None, {'fields': ('name','color','user')}),
+        (None, {'fields': ('name', 'color', 'users')}),
     )
+
+    def display_users(self, obj):
+        """Custom method to display users in list view"""
+        return ", ".join([user.username for user in obj.users.all()])
+
+    display_users.short_description = 'Users'
 
 
 admin.site.register(User, MyUserAdmin)
 admin.site.register(Note, NoteAdmin)
-admin.site.register(Tag, TagAdimn)
+admin.site.register(Tag, TagAdmin)
