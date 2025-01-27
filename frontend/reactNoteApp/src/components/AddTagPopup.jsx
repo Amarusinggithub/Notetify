@@ -1,140 +1,69 @@
-import {
-  faTrash,
-  faCheck,
-  faPencilAlt,
-  faPlus,
-} from "@fortawesome/free-solid-svg-icons";
+import { faXmark, faLightbulb } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useContext, useRef, useState } from "react";
+import { useContext, useState } from "react";
 import { SideNavContext } from "../context/SideNavContext";
 import useTag from "../features/notes/hooks/useTag";
+import "../styles/AddTagPopup.css";
+
+
 
 const AddTagPopup = () => {
-  const [newTagName, setNewTagName] = useState("");
-  const [editingTagId, setEditingTagId] = useState(null);
-  const [tempTagName, setTempTagName] = useState("");
-  const [isAddingTag, setIsAddingTag] = useState(false);
-  const inputEditingRef = useRef(null);
-  const inputAddingRef = useRef(null);
+  const [TagName, setTagName] = useState("");
 
   const { setAddTagPopupOpen } = useContext(SideNavContext);
-  const { addTag, tags, removeTag, editTag } = useTag();
+  const { addTag } = useTag();
 
   const handleClose = () => setAddTagPopupOpen(false);
 
-  const handleDeleteTag = async (tag) => {
-    await removeTag(tag);
+  const handleTagNameChange = (e) => {
+    setTagName(e.target.value);
   };
 
-  const handleNewTagChange = (e) => {
-    setNewTagName(e.target.value);
-  };
-
-  const handleAddNewTag = () => {
-    if (newTagName.trim() !== "") {
-      addTag(newTagName);
-      setNewTagName("");
-      setIsAddingTag(false);
+  const handleAddTagName = () => {
+    if (TagName.trim() !== "") {
+      addTag(TagName);
+      setTagName("");
     }
-  };
-
-  const handleEditStart = (tag) => {
-    setEditingTagId(tag.id);
-    setTempTagName(tag.name);
-    setTimeout(() => inputEditingRef.current?.focus(), 0);
-  };
-
-  const handleEditTagChange = (e) => {
-    setTempTagName(e.target.value);
-  };
-
-  const handleSaveTag = async (updatedTag) => {
-    const newUpdatedTag = { ...updatedTag, name: tempTagName };
-    await editTag(newUpdatedTag);
-    setEditingTagId(null);
+    handleClose();
   };
 
   return (
-    <div className="container-bg">
-      <div className="container">
-        <h1 className="title">Add Tag</h1>
+    <div className="add-tag-popup-bg" onClick={handleClose}>
+      <div className="add-tag-popup-container">
+        <div className="add-tag-header">
+          <h1 className="add-tag-title">Create Tag</h1>
+          <button onClick={handleClose} className="close-btn">
+            <FontAwesomeIcon icon={faXmark} className="close-icon" />
+          </button>
+        </div>
 
-        {isAddingTag ? (
-          <div className="add-tag-input-group">
-            <input
-              ref={inputAddingRef}
-              type="text"
-              placeholder="Enter tag name"
-              value={newTagName}
-              onChange={handleNewTagChange}
-              className="input"
-            />
-            <button onClick={handleAddNewTag} className="button">
-              <FontAwesomeIcon icon={faCheck} className="icon" />
-            </button>
-          </div>
-        ) : (
-          <div className="add-tag-container">
-            <button
-              onClick={() => {
-                setIsAddingTag(true);
-                setTimeout(() => inputAddingRef.current?.focus(), 0);
-              }}
-              className="button"
-            >
-              <FontAwesomeIcon icon={faPlus} className="icon" />
-            </button>
-            <span className="text">Add A Tag</span>
-          </div>
-        )}
+        <input
+          className="add-tag-input"
+          placeholder="Eg. School or Work"
+          value={TagName}
+          onChange={handleTagNameChange}
+        />
 
-        {tags.length > 0 && (
-          <div className="tags-list">
-            {tags.map((tagObj) => {
-              if (editingTagId === tagObj.id) {
-                return (
-                  <div key={tagObj.id} className="tag-item">
-                    <input
-                      ref={inputEditingRef}
-                      type="text"
-                      placeholder="Enter tag name"
-                      value={tempTagName}
-                      onChange={handleEditTagChange}
-                      className="input"
-                    />
-                    <button
-                      onClick={() => handleSaveTag(tagObj)}
-                      className="button"
-                    >
-                      <FontAwesomeIcon icon={faCheck} className="icon" />
-                    </button>
-                  </div>
-                );
-              }
-              return (
-                <div key={tagObj.id} className="tag-item">
-                  <button
-                    onClick={() => handleDeleteTag(tagObj)}
-                    className="button"
-                  >
-                    <FontAwesomeIcon icon={faTrash} className="icon" />
-                  </button>
-                  <span className="text">{tagObj.name}</span>
-                  <button
-                    onClick={() => handleEditStart(tagObj)}
-                    className="button"
-                  >
-                    <FontAwesomeIcon icon={faPencilAlt} className="icon" />
-                  </button>
-                </div>
-              );
-            })}
-          </div>
-        )}
+        <div className="tag-info-container">
+          <FontAwesomeIcon icon={faLightbulb} className="info-icon" />
 
-        <button onClick={handleClose} className="button">
-          Done
-        </button>
+          <div className="tag-info-text">
+            <h3 className="tag-info-title">What is a Tag?</h3>
+            <p className="tag-info-description">
+              Tags help you categorize and quickly find your notes by linking
+              related content under a common label.
+            </p>
+          </div>
+        </div>
+
+        <div className="add-tag-actions">
+          <button onClick={handleClose} className="cancel-btn">
+            Cancel
+          </button>
+          <button onClick={handleAddTagName} className="create-btn">
+            Create Tag
+          </button>
+        </div>
       </div>
     </div>
   );

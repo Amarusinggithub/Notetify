@@ -1,0 +1,98 @@
+.delete-tag-popup-bg {
+  position: fixed;
+  z-index: 100;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-tag-popup-container {
+  background-color: rgb(32, 33, 36);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  width: 500px;
+  border-radius: 10px;
+  padding: 20px;
+  color: white;
+  animation: fadeIn 300ms ease-in-out;
+}
+
+.delete-tag-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.delete-tag-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 1.5rem;
+}
+
+.delete-tag-info-container {
+  display: flex;
+  align-items: center;
+  margin: 20px 0;
+  padding: 10px;
+  background-color: rgb(66, 66, 66);
+  color: white;
+  border-radius: 10px;
+}
+
+.tag-info-text {
+  flex: 1;
+}
+
+.delete-tag-info {
+  font-size: 1rem;
+  color: #ccc;
+}
+
+.delete-tag-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.cancel-btn,
+.create-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 30px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.cancel-btn {
+  background-color: #555;
+  color: white;
+  font-weight: 600;
+}
+
+.delete-btn {
+  background-color: red;
+  color: white;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

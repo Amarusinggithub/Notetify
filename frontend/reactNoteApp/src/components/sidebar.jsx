@@ -109,7 +109,9 @@ const SideNav = () => {
                   {isSideNavOpen && <h3>{tag.name}</h3>}
                 </div>
                 {isSideNavOpen && (
-                  <button className="ellipsis-btn" onClick={() => {}}>
+                  <button className="ellipsis-btn" onClick={() => {
+                    
+                  }}>
                     <FontAwesomeIcon icon={faEllipsis} className="icon" />
                   </button>
                 )}
