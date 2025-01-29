@@ -11,9 +11,16 @@ const SideNav = () => {
   const { isSideNavOpen, setPage, setAddTagPopupOpen } =
     useContext(SideNavContext);
   const { handleTagClick, setTitle } = useNote();
-  const { tags } = useTag();
+  const {
+    tags,
+
+    setWantToDeleteTag,
+    setSelectedTag,
+    setWantToEditTag,
+  } = useTag();
 
   const [temp, setTemp] = useState(sidebarData[0]);
+  const [tempId, setTempId] = useState(null);
 
   const handleOnClick = (index) => {
     return () => {
@@ -109,11 +116,44 @@ const SideNav = () => {
                   {isSideNavOpen && <h3>{tag.name}</h3>}
                 </div>
                 {isSideNavOpen && (
-                  <button className="ellipsis-btn" onClick={() => {
-                    
-                  }}>
-                    <FontAwesomeIcon icon={faEllipsis} className="icon" />
-                  </button>
+                  <div>
+                    <button
+                      className="ellipsis-btn"
+                      onClick={() => {
+                        if (tempId !== tag.id) {
+                          setTempId(tag.id);
+                        } else {
+                          setTempId(null);
+                        }
+                      }}
+                    >
+                      <FontAwesomeIcon icon={faEllipsis} className="icon" />
+                    </button>
+                    {tempId === tag.id && (
+                      <div className="tag-actions">
+                        <button
+                          className="edit--sidenavbtn"
+                          onClick={() => {
+                            setSelectedTag(tag);
+
+                            setWantToEditTag(true);
+                          }}
+                        >
+                          Edit
+                        </button>
+
+                        <button
+                          className="delete-sidenav-btn"
+                          onClick={() => {
+                            setSelectedTag(tag);
+                            setWantToDeleteTag(true);
+                          }}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 )}
               </li>
             ))}

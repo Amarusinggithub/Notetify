@@ -7,12 +7,12 @@ export const getNotes = async () => {
     try {
         const csrfToken = await getCSRFToken();
 
-        const response = await axios.get("http://localhost:8000/api/notes/",
-            {
-
-                withCredentials: true,
-                headers: {"X-CSRFToken": csrfToken,},
-            });
+        const response = await axios.get("http://localhost:8000/api/notes/", {
+          withCredentials: true,
+          headers: {
+            "X-CSRFToken": csrfToken,
+          },
+        });
         console.log(response.data);
         return response.data;
     } catch (e) {
@@ -37,7 +37,10 @@ export const createNote = async (note) => {
           },
           {
             withCredentials: true,
-            headers: { "X-CSRFToken": csrfToken },
+            headers: {
+              "X-CSRFToken": csrfToken,
+              "Content-Type": "application/json",
+            },
           }
         );
         console.log(response.data);
@@ -69,6 +72,7 @@ export const updateNote = async (note) => {
             withCredentials: true,
             headers: {
               "X-CSRFToken": csrfToken,
+              "Content-Type": "application/json",
             },
           }
         );
@@ -86,12 +90,15 @@ export const deleteNote = async (note) => {
     try {
         const csrfToken = await getCSRFToken();
         const response = await axios.delete(
-            `http://localhost:8000/api/notes/delete_note/${note.id}/`,
+          `http://localhost:8000/api/notes/delete_note/${note.id}/`,
 
-            {
-                withCredentials: true,
-                headers: {"X-CSRFToken": csrfToken,},
-            }
+          {
+            withCredentials: true,
+            headers: {
+              "X-CSRFToken": csrfToken,
+              "Content-Type": "application/json",
+            },
+          }
         );
         console.log(response.status);
         return response.status;

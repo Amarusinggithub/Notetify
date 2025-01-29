@@ -1,25 +1,23 @@
-/* eslint-disable react/prop-types */
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useContext, useState, useRef, useEffect } from "react";
-import { SideNavContext } from "../context/SideNavContext";
+import { useState, useRef, useEffect } from "react";
 import useTag from "../features/notes/hooks/useTag";
+import "../styles/EditTagPopup.css";
 
-const EditTagPopup = ({ tag }) => {
+const EditTagPopup = () => {
   const [TagName, setTagName] = useState("");
 
-  const { setAddTagPopupOpen } = useContext(SideNavContext);
-  const { editTag } = useTag();
+  const { editTag, selectedTag, setWantToEditTag } = useTag();
   const editInputRef = useRef();
 
   useEffect(() => {
-    if (tag) {
-      setTagName(tag.name);
+    if (selectedTag) {
+      setTagName(selectedTag.name);
       editInputRef.current.focus();
     }
-  }, [tag]);
+  }, [selectedTag]);
 
-  const handleClose = () => setAddTagPopupOpen(false);
+  const handleClose = () => setWantToEditTag(false);
 
   const handleTagNameChange = (e) => {
     setTagName(e.target.value);
@@ -27,7 +25,7 @@ const EditTagPopup = ({ tag }) => {
 
   const handleEditTagName = () => {
     if (TagName.trim() !== "") {
-      const updatedTag = { ...tag, name: TagName };
+      const updatedTag = { ...selectedTag, name: TagName };
       editTag(updatedTag);
       setTagName("");
     }
@@ -35,8 +33,11 @@ const EditTagPopup = ({ tag }) => {
   };
 
   return (
-    <div className="edit-tag-popup-bg">
-      <div className="edit-tag-popup-container">
+    <div className="edit-tag-popup-bg" onClick={handleClose}>
+      <div
+        className="edit-tag-popup-container"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="edit-tag-header">
           <h1 className="edit-tag-title">Edit Tag</h1>
           <button onClick={handleClose} className="close-btn">
@@ -57,7 +58,7 @@ const EditTagPopup = ({ tag }) => {
             Cancel
           </button>
           <button onClick={handleEditTagName} className="edit-btn">
-            Edit Tag
+            Edit
           </button>
         </div>
       </div>

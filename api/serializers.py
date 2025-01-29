@@ -51,7 +51,7 @@ class NoteSerializer(serializers.ModelSerializer):
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
-        fields = '__all__'
+        exclude = ['users']
 
     def create(self, validated_data):
         users = validated_data.pop('users', [])

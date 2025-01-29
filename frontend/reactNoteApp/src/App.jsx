@@ -38,6 +38,7 @@ export default function App() {
                     element={<SignUpPage />}
                     errorElement={<ErrorPage />}
                   />
+
                   <Route
                     path="/"
                     element={<MainPage />}

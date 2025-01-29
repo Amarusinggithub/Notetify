@@ -1,24 +1,26 @@
-/* eslint-disable react/prop-types */
 import { faXmark, faLightbulb } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useContext } from "react";
-import { SideNavContext } from "../context/SideNavContext";
+
 import useTag from "../features/notes/hooks/useTag";
+import "../styles/DeleteTagPopup.css";
 
-const DeleteTagPopup = ({ tag }) => {
-  const { setAddTagPopupOpen } = useContext(SideNavContext);
-  const { removeTag } = useTag();
 
-  const handleClose = () => setAddTagPopupOpen(false);
+const DeleteTagPopup = () => {
+  const { removeTag, selectedTag, setWantToDeleteTag } = useTag();
+
+  const handleClose = () => setWantToDeleteTag(false);
 
   const handleDeleteTag = () => {
-    removeTag(tag);
+    removeTag(selectedTag);
     handleClose();
   };
 
   return (
-    <div className="delete-tag-popup-bg">
-      <div className="delete-tag-popup-container">
+    <div className="delete-tag-popup-bg" onClick={handleClose}>
+      <div
+        className="delete-tag-popup-container"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="delete-tag-header">
           <h1 className="delete-tag-title">Delete Tag</h1>
           <button onClick={handleClose} className="close-btn">
@@ -43,7 +45,7 @@ const DeleteTagPopup = ({ tag }) => {
             Cancel
           </button>
           <button onClick={handleDeleteTag} className="delete-btn">
-            Delete Tag
+            Delete
           </button>
         </div>
       </div>

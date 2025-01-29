@@ -91,6 +91,29 @@
   font-size: 18px;
 }
 
+.tag-actions{
+  z-index:50px;
+  width: 150px;
+  height: 250px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.delete-sidenav-btn,.edit--sidenavbtn{
+  width: 100%;
+  color: white;
+  font-size: 1rem;
+  background: grey;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 15px;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.3s ease;
+}
+
 .sidenav::-webkit-scrollbar {
   width: 5px;
 }
@@ -111,3 +134,5 @@
 .sidenav-item-tags:hover button {
   display: flex;
 }
+
+

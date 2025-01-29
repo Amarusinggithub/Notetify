@@ -16,9 +16,12 @@ import {
 const TagContext = createContext();
 
 const TagProvider = ({ children }) => {
+  const [selectedTag, setSelectedTag] = useState(null);
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [tags, setTags] = useState([]);
+  const [wantToDeleteTag, setWantToDeleteTag] = useState(false);
+  const [wantToEditTag, setWantToEditTag] = useState(false);
 
   const fetchTags = useCallback(async () => {
     try {
@@ -33,15 +36,28 @@ const TagProvider = ({ children }) => {
     }
   }, []);
 
-  const makeTag = async (tag) => {
+  const makeTag = async (tagName) => {
     const previousTags = [...tags];
-    setTags([...tags, tag]);
+
+    if (tags.some((tag) => tag.name.toLowerCase() === tagName.toLowerCase())) {
+      alert("Tag already exists!");
+      return;
+    }
+
+    const newId = tags.length > 0 ? tags[tags.length - 1].id + 1 : 1;
+
+    const tag = {
+      id: newId,
+      name: tagName,
+    };
+
+  setTags((prevTags) => [...prevTags, tag]);
 
     try {
       setLoading(true);
       setError(null);
 
-      const response = await createTag(tag);
+      const response = await createTag(tagName);
 
       if (!(response >= 200 && response < 300)) {
         throw new Error("Failed to create tag on server");
@@ -98,7 +114,21 @@ const TagProvider = ({ children }) => {
 
   return (
     <TagContext.Provider
-      value={{ tags, error, isLoading, makeTag, fetchTags, removeTag, editTag }}
+      value={{
+        tags,
+        error,
+        selectedTag,
+        isLoading,
+        wantToDeleteTag,
+        wantToEditTag,
+        setSelectedTag,
+        setWantToDeleteTag,
+        setWantToEditTag,
+        makeTag,
+        fetchTags,
+        removeTag,
+        editTag,
+      }}
     >
       {children}
     </TagContext.Provider>

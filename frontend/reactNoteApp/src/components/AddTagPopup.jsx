@@ -1,17 +1,21 @@
 import { faXmark, faLightbulb } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { SideNavContext } from "../context/SideNavContext";
 import useTag from "../features/notes/hooks/useTag";
 import "../styles/AddTagPopup.css";
-
-
 
 const AddTagPopup = () => {
   const [TagName, setTagName] = useState("");
 
   const { setAddTagPopupOpen } = useContext(SideNavContext);
-  const { addTag } = useTag();
+  const { makeTag } = useTag();
+
+  const addInputRef = useRef();
+
+  useEffect(() => {
+    addInputRef.current.focus();
+  }, []);
 
   const handleClose = () => setAddTagPopupOpen(false);
 
@@ -21,7 +25,7 @@ const AddTagPopup = () => {
 
   const handleAddTagName = () => {
     if (TagName.trim() !== "") {
-      addTag(TagName);
+      makeTag(TagName);
       setTagName("");
     }
     handleClose();
@@ -29,7 +33,10 @@ const AddTagPopup = () => {
 
   return (
     <div className="add-tag-popup-bg" onClick={handleClose}>
-      <div className="add-tag-popup-container">
+      <div
+        className="add-tag-popup-container"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="add-tag-header">
           <h1 className="add-tag-title">Create Tag</h1>
           <button onClick={handleClose} className="close-btn">
@@ -38,6 +45,7 @@ const AddTagPopup = () => {
         </div>
 
         <input
+          ref={addInputRef}
           className="add-tag-input"
           placeholder="Eg. School or Work"
           value={TagName}
@@ -61,7 +69,7 @@ const AddTagPopup = () => {
             Cancel
           </button>
           <button onClick={handleAddTagName} className="create-btn">
-            Create Tag
+            Create
           </button>
         </div>
       </div>

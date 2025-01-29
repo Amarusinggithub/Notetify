@@ -106,6 +106,8 @@ class TagView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
+      
+        return Response({"error": "Tag already exists"}, status=status.HTTP_400_BAD_REQUEST)
         serializer = TagSerializer(data=request.data, context={"request": request})
         if serializer.is_valid():
             serializer.save()

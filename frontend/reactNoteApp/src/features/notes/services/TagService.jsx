@@ -3,7 +3,6 @@ import { getCSRFToken } from "../../../services/CSRFTokenService.jsx";
 
 axios.defaults.withCredentials = true;
 
-
 export const getTags = async () => {
   try {
     const csrfToken = await getCSRFToken();
@@ -19,25 +18,30 @@ export const getTags = async () => {
   }
 };
 
-export const createTag = async (tag) => {
+export const createTag = async (tagName) => {
   try {
     const csrfToken = await getCSRFToken();
 
     const response = await axios.post(
       "http://localhost:8000/api/tags/create_tag/",
       {
-        name: tag.name,
-        color: tag.color,
+        name: tagName,
       },
       {
         withCredentials: true,
         headers: { "X-CSRFToken": csrfToken },
+        "Content-Type": "application/json",
       }
     );
     console.log(response.data);
     return response.status;
   } catch (e) {
     console.error(e);
+    return {
+      success: false,
+      error:
+        e.response?.data?.error || "An error occurred while creating the tag",
+    };
   }
 };
 
@@ -57,6 +61,7 @@ export const updateTag = async (tag) => {
         withCredentials: true,
         headers: {
           "X-CSRFToken": csrfToken,
+          "Content-Type": "application/json",
         },
       }
     );
@@ -65,7 +70,12 @@ export const updateTag = async (tag) => {
     return response.status;
   } catch (error) {
     console.error(error);
-    throw error;
+    return {
+      success: false,
+      error:
+        error.response?.data?.error ||
+        "An error occurred while updating the tag",
+    };
   }
 };
 
@@ -77,18 +87,20 @@ export const deleteTag = async (tag) => {
 
       {
         withCredentials: true,
-        headers: { "X-CSRFToken": csrfToken },
+        headers: {
+          "X-CSRFToken": csrfToken,
+          "Content-Type": "application/json",
+        },
       }
     );
     console.log(response.status);
     return response.status;
   } catch (e) {
     console.error(e);
+    return {
+      success: false,
+      error:
+        e.response?.data?.error || "An error occurred while deleting the tag",
+    };
   }
 };
-
-
-
-
-
-

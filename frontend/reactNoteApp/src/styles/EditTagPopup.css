@@ -1,14 +1,14 @@
 .edit-tag-popup-bg {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 100;
-  background-color: rgba(0, 0, 0, 0.75);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+   position: fixed;
+    z-index: 100;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .edit-tag-popup-container {
@@ -16,19 +16,16 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
   width: 500px;
   border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   padding: 20px;
   color: white;
   animation: fadeIn 300ms ease-in-out;
 }
 
 .edit-tag-header {
-  direction: flex;
+  display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 .edit-tag-title {
@@ -54,7 +51,9 @@
   color: white;
   outline: none;
   font-size: 1rem;
+     margin: 20px 0;
 }
+
 
 .edit-tag-actions {
   display: flex;
@@ -63,7 +62,7 @@
 }
 
 .cancel-btn,
-.create-btn {
+.edit-btn {
   padding: 10px 20px;
   border: none;
   border-radius: 30px;

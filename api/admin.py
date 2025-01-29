@@ -81,13 +81,13 @@ class NoteAdmin(admin.ModelAdmin):
 
 
 class TagAdmin(admin.ModelAdmin):
-    list_display = ('name', 'color', 'display_users')
+    list_display = ('name', 'display_users')
     search_fields = ('name',)
     list_filter = ()
     ordering = ()
 
     fieldsets = (
-        (None, {'fields': ('name', 'color', 'users')}),
+        (None, {'fields': ('name',  'users')}),
     )
 
     def display_users(self, obj):
