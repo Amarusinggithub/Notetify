@@ -69,15 +69,15 @@ const NoteCard = ({note}) => {
   };
 
   return (
-      <div className={isSelected ? "notecard-bg" : ""} onClick={handleSelect}>
+    <div className={isSelected ? "notecard-bg" : ""} onClick={handleSelect}>
       <div
-          className={`note-card ${isSelected ? "selected-note" : ""}`}
-          onClick={(e) => {
-            e.stopPropagation();
-            if (!isSelected) {
-              handleSelect(e);
-            }
-          }}
+        className={`note-card ${isSelected ? "selected-note" : ""}`}
+        onClick={(e) => {
+          e.stopPropagation();
+          if (!isSelected) {
+            handleSelect(e);
+          }
+        }}
       >
         {error && <div className="error-banner">{error}</div>}
 
@@ -85,63 +85,67 @@ const NoteCard = ({note}) => {
           {!isSelected && <div className="note-title">{noteState.title}</div>}
 
           {isSelected && (
+            
               <input
-                  className="note-title"
-                  onChange={handleTitleInput}
-                  onBlur={handleBlur}
-                  value={noteState.title}
-                  disabled={isLoading}
+                className="note-title"
+                onChange={handleTitleInput}
+                onBlur={handleBlur}
+                value={noteState.title}
+                disabled={isLoading}
               />
+            
           )}
 
+          
+
           <div
-              className="note-content"
-              ref={noteContentRef}
-              contentEditable={isSelected && !isLoading}
-              suppressContentEditableWarning
-              onInput={handleContentInput}
-              onBlur={handleBlur}
+            className="note-content"
+            ref={noteContentRef}
+            contentEditable={isSelected && !isLoading}
+            suppressContentEditableWarning
+            onInput={handleContentInput}
+            onBlur={handleBlur}
           />
         </div>
 
         {isSelected && (
-            <div className="function-bar">
+          <div className="function-bar">
+            <button
+              onClick={handleDeleteNote}
+              className="note-delete-btn"
+              type="button"
+              disabled={isLoading}
+            >
+              Delete
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleSelect(e);
+              }}
+              className="note-close-btn"
+              type="button"
+              disabled={isLoading}
+            >
+              Close
+            </button>
+            {isEdited && (
               <button
-                  onClick={handleDeleteNote}
-                  className="delete-btn"
-                  type="button"
-                  disabled={isLoading}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleSave();
+                }}
+                className="note-save-btn"
+                type="button"
+                disabled={isLoading}
               >
-                Delete
+                {isLoading ? "Saving..." : "Save"}
               </button>
-              <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleSelect(e);
-                  }}
-                  className="close-btn"
-                  type="button"
-                  disabled={isLoading}
-              >
-                Close
-              </button>
-              {isEdited && (
-                  <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleSave();
-                      }}
-                      className="save-btn"
-                      type="button"
-                      disabled={isLoading}
-                  >
-                    {isLoading ? "Saving..." : "Save"}
-                  </button>
-              )}
-            </div>
+            )}
+          </div>
         )}
       </div>
-      </div>
+    </div>
   );
 };
 

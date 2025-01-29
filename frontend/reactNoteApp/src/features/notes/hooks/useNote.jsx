@@ -185,13 +185,10 @@ const NoteProvider = ({ children }) => {
 
   const addNote = async (note) => {
     const previousNotes = [...notes];
-
     refreshCategorizedNotes([...notes, note]);
-
     try {
       setLoading(true);
       setError(null);
-
       const response = await createNote(note);
       if (!(response >= 200 && response < 300)) {
         throw new Error("Failed to add note on server");
@@ -208,7 +205,6 @@ const NoteProvider = ({ children }) => {
     const previousNotes = [...notes];
     const updatedNotes = notes.map((n) => (n.id === newNote.id ? newNote : n));
     refreshCategorizedNotes(updatedNotes);
-
     try {
       setLoading(true);
       setError(null);
@@ -228,11 +224,9 @@ const NoteProvider = ({ children }) => {
     const previousNotes = [...notes];
     const updatedNotes = notes.filter((n) => n.id !== note.id);
     refreshCategorizedNotes(updatedNotes);
-
     try {
       setLoading(true);
       setError(null);
-
       const response = await deleteNote(note);
       if (!(response >= 200 && response < 300)) {
         throw new Error("Failed to remove note on server");
