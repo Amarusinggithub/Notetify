@@ -16,36 +16,41 @@ def get_csrf_token(request):
     csrf_token = get_token(request)
     return JsonResponse({"csrfToken": csrf_token})
 
-@api_view(["POST", "GET"])
-@permission_classes([IsAuthenticated])
-def notes_list(request):
-    if request.method == "GET":
-        notes = Note.objects.filter(users=request.user)
-        serializer = NoteSerializer(notes, many=True, context={"request": request})
-        return Response(serializer.data, status=status.HTTP_200_OK)
+class RegisterView(APIView):
+    permission_classes = [AllowAny]
 
-    elif request.method == "POST":
-        serializer = NoteSerializer(data=request.data, context={"request": request})
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def post(self, request):
+        email = request.data.get('email')
+        username = request.data.get('username')
+        password = request.data.get('password')
+        if not email or not username or not password:
+            raise ValidationError("All fields are required")
+        user = User.objects.create_user(username=username, email=email, password=password)
+        serializer = UserSerializer(user, context={"request": request})
+        return Response({"userData": serializer.data, "message": "User registered successfully"},
+                        status=status.HTTP_201_CREATED)
 
-@api_view(["PUT", "DELETE"])
-@permission_classes([IsAuthenticated])
-def notes_detail(request, pk):
-    note = get_object_or_404(Note, users=request.user, pk=pk)
 
-    if request.method == "DELETE":
-        note.delete()
-        return Response({"message": "Note deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+class LoginView(APIView):
+    permission_classes = [AllowAny]
 
-    elif request.method == "PUT":
-        serializer = NoteSerializer(note, data=request.data, context={"request": request})
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def post(self, request, format=None):
+        data = request.data
+        username = data.get('username', None)
+        password = data.get('password', None)
+        if not username or not password:
+            return Response({"error": "Username and password are required"}, status=status.HTTP_400_BAD_REQUEST)
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            if user.is_active:
+                login(request, user)
+                serializer = UserSerializer(user, context={"request": request})
+                return Response({"userData": serializer.data, "message": "Login successful"}, status=status.HTTP_200_OK)
+            else:
+                return Response({"error": "Account is inactive"}, status=status.HTTP_403_FORBIDDEN)
+        else:
+            return Response({"error": "Invalid username or password"}, status=status.HTTP_400_BAD_REQUEST)
+
 
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
@@ -57,45 +62,8 @@ class LogoutView(APIView):
         else:
             return Response({'error': 'User is not authenticated'}, status=403)
 
-class LoginView(APIView):
-    permission_classes = [AllowAny]
 
-    def post(self, request, format=None):
-        data = request.data
-        username = data.get('username', None)
-        password = data.get('password', None)
 
-        if not username or not password:
-            return Response({"error": "Username and password are required"}, status=status.HTTP_400_BAD_REQUEST)
-
-        user = authenticate(username=username, password=password)
-
-        if user is not None:
-            if user.is_active:
-                login(request, user)
-                serializer = UserSerializer(user, context={"request": request})
-                return Response({"userData": serializer.data, "message": "Login successful"}, status=status.HTTP_200_OK)
-            else:
-                return Response({"error": "Account is inactive"}, status=status.HTTP_403_FORBIDDEN)
-        else:
-            return Response({"error": "Invalid username or password"}, status=status.HTTP_400_BAD_REQUEST)
-
-class RegisterView(APIView):
-    permission_classes = [AllowAny]
-
-    def post(self, request):
-        email = request.data.get('email')
-        username = request.data.get('username')
-        password = request.data.get('password')
-
-        if not email or not username or not password:
-            raise ValidationError("All fields are required")
-
-        user = User.objects.create_user(username=username, email=email, password=password)
-        serializer = UserSerializer(user, context={"request": request})
-
-        return Response({"userData": serializer.data, "message": "User registered successfully"},
-                        status=status.HTTP_201_CREATED)
 
 class TagView(APIView):
     permission_classes = [IsAuthenticated]
@@ -106,8 +74,6 @@ class TagView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
-      
-        return Response({"error": "Tag already exists"}, status=status.HTTP_400_BAD_REQUEST)
         serializer = TagSerializer(data=request.data, context={"request": request})
         if serializer.is_valid():
             serializer.save()
@@ -122,6 +88,36 @@ class TagView(APIView):
     def put(self, request, pk):
         tag = get_object_or_404(Tag, pk=pk, users=request.user)
         serializer = TagSerializer(tag, data=request.data, context={"request": request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class NoteView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get (self,request):
+        notes = Note.objects.filter(users=request.user)
+        serializer = NoteSerializer(notes, many=True, context={"request": request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self,request):
+        serializer = NoteSerializer(data=request.data, context={"request": request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+    def delete(self,request, pk):
+        note = get_object_or_404(Note, users=request.user, pk=pk)
+        note.delete()
+        return Response({"message": "Note deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+
+    def put(self,request, pk):
+        note = get_object_or_404(Note, users=request.user, pk=pk)
+        serializer = NoteSerializer(note, data=request.data, context={"request": request})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)

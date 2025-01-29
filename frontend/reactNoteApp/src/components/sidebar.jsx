@@ -85,7 +85,7 @@ const SideNav = () => {
             justifyContent: isSideNavOpen ? "start" : "center",
             backgroundColor: temp === true ? " rgb(65, 51, 28)" : "",
           }}
-          className="sidenav-item"
+          className="sidenav-item-add-tag"
         >
           <div className="icon-and-name">
             <FontAwesomeIcon icon={faPlus} className="icon" />
@@ -99,7 +99,10 @@ const SideNav = () => {
           <ul className="tags">
             {tags.map((tag, index) => (
               <li
-                onClick={() => handleTagClicked(tag)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleTagClicked(tag);
+                }}
                 key={index}
                 className="sidenav-item-tags"
                 style={{
@@ -118,8 +121,10 @@ const SideNav = () => {
                 {isSideNavOpen && (
                   <div>
                     <button
+                      style={{ display: tempId == tag.id ? "flex" : "" }}
                       className="ellipsis-btn"
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.stopPropagation();
                         if (tempId !== tag.id) {
                           setTempId(tag.id);
                         } else {
@@ -132,10 +137,11 @@ const SideNav = () => {
                     {tempId === tag.id && (
                       <div className="tag-actions">
                         <button
-                          className="edit--sidenavbtn"
-                          onClick={() => {
+                          style={{ display: "flex" }}
+                          className="edit-sidenav-btn"
+                          onClick={(e) => {
+                            e.stopPropagation();
                             setSelectedTag(tag);
-
                             setWantToEditTag(true);
                           }}
                         >
@@ -143,8 +149,10 @@ const SideNav = () => {
                         </button>
 
                         <button
+                          style={{ display: "flex" }}
                           className="delete-sidenav-btn"
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.stopPropagation();
                             setSelectedTag(tag);
                             setWantToDeleteTag(true);
                           }}

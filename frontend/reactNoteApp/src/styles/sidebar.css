@@ -14,7 +14,8 @@
   padding: 10px 0;
 }
 
-.sidenav-item {
+.sidenav-item,
+.sidenav-item-add-tag {
   width: 100%;
   height: 45px;
   display: flex;
@@ -59,6 +60,7 @@
 }
 
 .sidenav-item:hover,
+.sidenav-item-add-tag:hover 
 .sidenav-item-tags:hover {
   background-color: rgb(40, 41, 44);
 }
@@ -91,27 +93,32 @@
   font-size: 18px;
 }
 
-.tag-actions{
-  z-index:50px;
+.tag-actions {
+  position: absolute;
+  background-color: #555;
+  border: none;
+  border-radius: 10px;
+  z-index: 999px;
+  height: auto;
   width: 150px;
-  height: 250px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 }
 
-.delete-sidenav-btn,.edit--sidenavbtn{
+.delete-sidenav-btn,
+.edit-sidenav-btn {
   width: 100%;
   color: white;
   font-size: 1rem;
-  background: grey;
+  background-color: #555;
+  z-index: 100px;
   border: none;
   border-radius: 10px;
   padding: 10px 15px;
   cursor: pointer;
-  text-align: left;
-  transition: background-color 0.3s ease;
+  text-align: center;
 }
 
 .sidenav::-webkit-scrollbar {
@@ -134,5 +141,3 @@
 .sidenav-item-tags:hover button {
   display: flex;
 }
-
-

@@ -20,10 +20,8 @@ class NoteSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         users = validated_data.pop('users', None)
         instance = super().update(instance, validated_data)
-
         if users is not None:
             instance.users.set(users)
-
         return instance
 
     def validate(self, data):
@@ -68,7 +66,6 @@ class TagSerializer(serializers.ModelSerializer):
 
         if users:
             instance.users.set(users)
-
         return instance
 
 
