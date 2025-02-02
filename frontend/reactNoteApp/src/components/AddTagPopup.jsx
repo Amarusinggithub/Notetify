@@ -25,7 +25,7 @@ const AddTagPopup = () => {
 
   const handleAddTagName = () => {
     if (TagName.trim() !== "") {
-      makeTag(TagName);
+      makeTag(TagName.trim().charAt(0).toUpperCase()+TagName.trim().slice(1));
       setTagName("");
     }
     handleClose();
