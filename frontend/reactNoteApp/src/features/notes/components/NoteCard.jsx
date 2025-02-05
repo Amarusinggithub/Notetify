@@ -3,7 +3,7 @@
 import "../styles/NoteCard.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import useNote from "../hooks/useNote.jsx";
 import {
   faXmark,
@@ -32,6 +32,7 @@ const NoteCard = ({ note }) => {
 
   useEffect(() => {
     setNoteState({ ...note });
+    setIsEdited(false); 
   }, [note]);
 
   const handleSave = async () => {
@@ -41,29 +42,23 @@ const NoteCard = ({ note }) => {
     setIsEdited(false);
   };
 
-  const handleBlur = async () => {
-    if (isEdited) {
-      await handleSave();
-    }
-  };
-
+ 
   const handleSelect = async (e) => {
     e.preventDefault();
-    if (isEdited) {
-      await editNote({ ...noteState });
-    }
-    setSelectedNote(isSelected ? null : { ...note });
+   await handleSave();
+    setSelectedNote(isSelected ? null : note );
   };
 
-  const handleTitleInput = (e) => {
-    setIsEdited(true);
-    setNoteState((prev) => ({ ...prev, title: e.target.value }));
-  };
+const handleTitleInput = (e) => {
+  const newTitle = e.target.value;
+  setNoteState((prev) => ({ ...prev, title: newTitle }));
+  setIsEdited(newTitle !== note.title); 
+};
 
-  const handleContentInput = (newContent) => {
-    setIsEdited(true);
-    setNoteState((prev) => ({ ...prev, content: newContent }));
-  };
+const handleContentInput = (newContent) => {
+  setNoteState((prev) => ({ ...prev, content: newContent }));
+  setIsEdited(newContent !== note.content); 
+};
 
   const handleDeleteNote = async (e) => {
     e.preventDefault();
@@ -148,7 +143,6 @@ const NoteCard = ({ note }) => {
             <input
               className="note-title"
               onChange={handleTitleInput}
-              onBlur={handleBlur}
               value={noteState.title}
               disabled={isLoading}
             />
@@ -164,19 +158,18 @@ const NoteCard = ({ note }) => {
 
         {isSelected && (
           <div className="function-bar">
-            {isEdited && (
+            
               <button
                 onClick={(e) => {
-                  e.stopPropagation();
-                  handleSave();
+                  handleSelect(e);
                 }}
                 className="note-save-btn"
                 type="button"
                 disabled={isLoading}
               >
-                {isLoading ? "Saving..." : "Save"}
+                { "Close"}
               </button>
-            )}
+          
           </div>
         )}
       </div>

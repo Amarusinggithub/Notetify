@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
@@ -16,12 +16,11 @@ import { TablePlugin } from "@lexical/react/LexicalTablePlugin";
 import { TableNode, TableCellNode, TableRowNode } from "@lexical/table";
 
 
-// Node imports:
 import { HeadingNode } from "@lexical/rich-text";
 import { ListNode, ListItemNode } from "@lexical/list";
 
 import Toolbars from "./Toolbar.jsx";
-import "../styles/NoteCard.css";
+import "../styles/NoteContentEditor.css";
 
 const theme = {
   ltr: "ltr",
@@ -98,7 +97,7 @@ function onError(error) {
   console.error(error);
 }
 
-//  fallback default state
+// fallback default state
 const defaultEditorState = JSON.stringify({
   root: {
     children: [
@@ -187,6 +186,7 @@ const NoteContentEditor = ({
   const editorRef = useRef(null);
   const validContent = parseOrDefault(content);
 
+  
   const initialConfig = {
     namespace: "MyEditor",
     theme,
@@ -210,7 +210,10 @@ const NoteContentEditor = ({
   }
 
   return (
-    <LexicalComposer initialConfig={initialConfig} key={note.id}>
+    <LexicalComposer
+      initialConfig={initialConfig}
+      key={`${note.id}-${isSelected}`}
+    >
       <Toolbars />
       <RichTextPlugin
         contentEditable={<ContentEditable className="content-editable" />}
@@ -223,10 +226,10 @@ const NoteContentEditor = ({
       <HistoryPlugin />
       <ListPlugin />
       <LinkPlugin />
+      <AutoFocusPlugin />
       <TablePlugin />
       <TabIndentationPlugin />
       <EditorRefPlugin editorRef={editorRef} />
-      <AutoFocusPlugin />
     </LexicalComposer>
   );
 };
