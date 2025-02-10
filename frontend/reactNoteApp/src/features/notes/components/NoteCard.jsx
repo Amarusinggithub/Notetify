@@ -32,7 +32,7 @@ const NoteCard = ({ note }) => {
 
   useEffect(() => {
     setNoteState({ ...note });
-    setIsEdited(false); 
+    setIsEdited(false);
   }, [note]);
 
   const handleSave = async () => {
@@ -42,23 +42,22 @@ const NoteCard = ({ note }) => {
     setIsEdited(false);
   };
 
- 
   const handleSelect = async (e) => {
     e.preventDefault();
-   await handleSave();
-    setSelectedNote(isSelected ? null : note );
+    await handleSave();
+    setSelectedNote(isSelected ? null : note);
   };
 
-const handleTitleInput = (e) => {
-  const newTitle = e.target.value;
-  setNoteState((prev) => ({ ...prev, title: newTitle }));
-  setIsEdited(newTitle !== note.title); 
-};
+  const handleTitleInput = (e) => {
+    const newTitle = e.target.value;
+    setNoteState((prev) => ({ ...prev, title: newTitle }));
+    setIsEdited(newTitle !== note.title);
+  };
 
-const handleContentInput = (newContent) => {
-  setNoteState((prev) => ({ ...prev, content: newContent }));
-  setIsEdited(newContent !== note.content); 
-};
+  const handleContentInput = (newContent) => {
+    setNoteState((prev) => ({ ...prev, content: newContent }));
+    setIsEdited(newContent !== note.content);
+  };
 
   const handleDeleteNote = async (e) => {
     e.preventDefault();
@@ -158,18 +157,16 @@ const handleContentInput = (newContent) => {
 
         {isSelected && (
           <div className="function-bar">
-            
-              <button
-                onClick={(e) => {
-                  handleSelect(e);
-                }}
-                className="note-save-btn"
-                type="button"
-                disabled={isLoading}
-              >
-                { "Close"}
-              </button>
-          
+            <button
+              onClick={(e) => {
+                handleSelect(e);
+              }}
+              className="note-save-btn"
+              type="button"
+              disabled={isLoading}
+            >
+              {"Close"}
+            </button>
           </div>
         )}
       </div>
