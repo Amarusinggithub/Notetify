@@ -8,6 +8,8 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.token_blacklist.models import OutstandingToken, BlacklistedToken
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from api.models import Note, User,Tag
 from api.serializers import NoteSerializer, UserSerializer,TagSerializer
@@ -15,6 +17,13 @@ from api.serializers import NoteSerializer, UserSerializer,TagSerializer
 def get_csrf_token(request):
     csrf_token = get_token(request)
     return JsonResponse({"csrfToken": csrf_token})
+
+def get_token_for_user(user):
+    refresh=RefreshToken.for_user(user)
+    return {
+        'refresh_token':str(refresh),
+        'access_token':str(refresh.access_token),
+    }
 
 class RegisterView(APIView):
     permission_classes = [AllowAny]
@@ -27,7 +36,9 @@ class RegisterView(APIView):
             raise ValidationError("All fields are required")
         user = User.objects.create_user(username=username, email=email, password=password)
         serializer = UserSerializer(user, context={"request": request})
-        return Response({"userData": serializer.data, "message": "User registered successfully"},
+        tokens=get_token_for_user(user)
+        return Response({"userData": serializer.data, "message": "User registered successfully", "access_token": tokens['access_token'],
+            "refresh_token": tokens['refresh_token']},
                         status=status.HTTP_201_CREATED)
 
 
@@ -43,28 +54,34 @@ class LoginView(APIView):
         user = authenticate(username=username, password=password)
         if user is not None:
             if user.is_active:
-                login(request, user)
                 serializer = UserSerializer(user, context={"request": request})
-                return Response({"userData": serializer.data, "message": "Login successful"}, status=status.HTTP_200_OK)
+                tokens=get_token_for_user(user)
+                return Response({"userData": serializer.data, "message": "Login successful","access_token": tokens['access_token'],
+            "refresh_token": tokens['refresh_token']}, status=status.HTTP_200_OK)
             else:
                 return Response({"error": "Account is inactive"}, status=status.HTTP_403_FORBIDDEN)
         else:
             return Response({"error": "Invalid username or password"}, status=status.HTTP_400_BAD_REQUEST)
 
-
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def post(self, request):
-        if request.user.is_authenticated:
-            logout(request)
-            return Response({'message': 'Logged out successfully'}, status=200)
-        else:
-            return Response({'error': 'User is not authenticated'}, status=403)
+    def post(self, request, *args, **kwargs):
+        # Expect the client to send the refresh token in the request
+        refresh_token = request.data.get('refresh_token')
+        if not refresh_token:
+            return Response({"error": "Refresh token is required"}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            token = RefreshToken(refresh_token)
+            token.blacklist()  # This invalidates the refresh token
+            return Response({"status": "OK, goodbye"}, status=status.HTTP_200_OK)
+        except Exception as e:
+            # Handle any errors during token blacklisting
+            return Response({"error": "Invalid refresh token"}, status=status.HTTP_400_BAD_REQUEST)
 
+        
 
-
-
+    
 class TagView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -122,3 +139,11 @@ class NoteView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    
+class HomeView(APIView):
+     
+   permission_classes = (IsAuthenticated, )
+   def get(self, request):
+    content = { 'message': 'Welcome to the JWT Authentication page using React Js and Django!'}
+    return Response(content)
