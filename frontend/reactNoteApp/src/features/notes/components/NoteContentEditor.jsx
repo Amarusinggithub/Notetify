@@ -181,7 +181,6 @@ const NoteContentEditor = ({
   handleContentInput,
   content,
   isSelected,
-  note,
 }) => {
   const editorRef = useRef(null);
   const validContent = parseOrDefault(content);
@@ -212,7 +211,7 @@ const NoteContentEditor = ({
   return (
     <LexicalComposer
       initialConfig={initialConfig}
-      key={`${note.id}-${isSelected}`}
+      key={isSelected}
     >
       <Toolbars />
       <RichTextPlugin

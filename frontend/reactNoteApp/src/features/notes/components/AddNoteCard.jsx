@@ -26,7 +26,14 @@ const AddNoteCard = () => {
     await handleSave();
     setSelected(isSelected ? false : true);
     if (isSelected === false) {
-      setNoteState();
+      setNoteState({
+        title: "",
+        content: "",
+        is_favorite: false,
+        is_pinned: false,
+        is_trashed: false,
+        is_archived: false,
+      });
     }
   };
 
@@ -70,7 +77,6 @@ const AddNoteCard = () => {
         {error && <div className="error-banner">{error}</div>}
 
         <div className="note">
-          {!isSelected && <div className="note-title">{noteState.title}</div>}
 
           {isSelected && (
             <input
