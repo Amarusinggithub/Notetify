@@ -49,7 +49,10 @@ SIMPLE_JWT = {
 }
 # Application definition
 
+ASGI_APPLICATION='backend.asgi.application'
+
 INSTALLED_APPS = [
+    'daphne',
     'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -67,6 +70,9 @@ INSTALLED_APPS = [
     'django_otp.plugins.otp_static',
     'django_otp.plugins.otp_totp',
 ]
+
+
+ASGI_APPLICATION = 'backend.asgi.application'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -187,6 +193,14 @@ JAZZMIN_SETTINGS = {
     "show_ui_builder": True,  # Show UI builder button
     "show_sidebar": True,  # Show sidebar in the admin interface
     "hide_apps": [],  # Hide specific apps from the admin sidebar
+}
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
 }
 
 

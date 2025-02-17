@@ -23,9 +23,13 @@ const AddNoteCard = () => {
 
   const handleSelect = async (e) => {
     e.preventDefault();
-    await handleSave();
-    setSelected(isSelected ? false : true);
-    if (isSelected === false) {
+    if (isSelected) {
+    if(isEdited){
+      await handleSave();
+    }
+      
+      setSelected(false);
+    } else {
       setNoteState({
         title: "",
         content: "",
@@ -34,6 +38,7 @@ const AddNoteCard = () => {
         is_trashed: false,
         is_archived: false,
       });
+      setSelected(true);
     }
   };
 
@@ -77,11 +82,10 @@ const AddNoteCard = () => {
         {error && <div className="error-banner">{error}</div>}
 
         <div className="note">
-
           {isSelected && (
             <input
               className="note-title"
-              placeholder="Enter Title Here"
+              placeholder="Enter title here"
               onChange={handleTitle}
               value={noteState.title}
               disabled={isLoading}
@@ -100,7 +104,9 @@ const AddNoteCard = () => {
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                handleSelect(e);
+                if (!isSelected) {
+                  handleSelect(e);
+                }
               }}
               className="close-btn"
               type="button"

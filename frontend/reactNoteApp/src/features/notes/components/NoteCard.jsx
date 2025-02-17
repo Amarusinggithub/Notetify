@@ -120,6 +120,7 @@ const NoteCard = ({ note }) => {
                     handlePin(note);
                   }}
                   className="note-pin-btn"
+                  style={{ display: isSelected ? "flex" : "" }}
                 >
                   <FontAwesomeIcon icon={faThumbTack} className="pin-icon" />
                 </button>
@@ -130,6 +131,7 @@ const NoteCard = ({ note }) => {
                     handleFavorite(note);
                   }}
                   className="note-favorite-btn"
+                  style={{ display: isSelected ? "flex" : "" }}
                 >
                   <FontAwesomeIcon icon={faStar} className="favorite-icon" />
                 </button>

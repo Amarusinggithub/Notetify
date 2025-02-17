@@ -51,7 +51,7 @@ const TagProvider = ({ children }) => {
       name: tagName,
     };
 
-  setTags((prevTags) => [...prevTags, tag]);
+    setTags((prevTags) => [...prevTags, tag]);
 
     try {
       setLoading(true);
@@ -109,7 +109,9 @@ const TagProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    fetchTags();
+    if (localStorage.getItem("access_token") != null) {
+      fetchTags();
+    }
   }, [fetchTags]);
 
   return (
