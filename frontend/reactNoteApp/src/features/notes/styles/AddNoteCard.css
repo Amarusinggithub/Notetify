@@ -34,7 +34,6 @@
   color: white;
   transition: all 300ms ease 0ms;
   box-sizing: border-box;
-
   animation: moveRight 300ms ease-in;
 }
 

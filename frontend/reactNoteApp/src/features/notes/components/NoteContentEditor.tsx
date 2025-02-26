@@ -1,11 +1,20 @@
 /* eslint-disable react/prop-types */
-import { useEffect, useRef } from "react";
+import { $getRoot, $createParagraphNode, $createTextNode } from "lexical";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
-import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
+import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
+import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
+import { CollaborationPlugin } from "@lexical/react/LexicalCollaborationPlugin";
+import * as Y from "yjs";
+import React from "react";
+import { Provider } from "@lexical/yjs";
+
+import { WebsocketProvider } from "y-websocket";
+import { useEffect, useCallback, useRef } from "react";
+
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
-import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
+
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
 import { TabIndentationPlugin } from "@lexical/react/LexicalTabIndentationPlugin";
 import { ListPlugin } from "@lexical/react/LexicalListPlugin";
@@ -95,6 +104,7 @@ const theme = {
 
 function onError(error) {
   console.error(error);
+
 }
 
 // fallback default state
@@ -200,8 +210,26 @@ const NoteContentEditor = ({
       TableRowNode,
     ],
     editable: isSelected,
-    editorState: validContent,
+    editorState: null,
   };
+
+
+  function getDocFromMap(id, yjsDocMap) {
+    if (!yjsDocMap.has(id)) {
+      yjsDocMap.set(id, new Y.Doc());
+    }
+    return yjsDocMap.get(id);
+  }
+
+  const providerFactory = useCallback(
+    (id: string, yjsDocMap: Map<string, Y.Doc>) => {
+      const doc = getDocFromMap(id, yjsDocMap);
+      return new WebsocketProvider("ws://localhost:1234", id, doc, {
+        connect: false,
+      }) as unknown as Provider;
+    },
+    []
+  );
 
   function handleOnEditorChange(editorState) {
     const editorStateJSON = editorState.toJSON();
@@ -209,10 +237,7 @@ const NoteContentEditor = ({
   }
 
   return (
-    <LexicalComposer
-      initialConfig={initialConfig}
-      key={isSelected}
-    >
+    <LexicalComposer initialConfig={initialConfig} key={isSelected}>
       <Toolbars />
       <RichTextPlugin
         contentEditable={<ContentEditable className="content-editable" />}
@@ -220,6 +245,16 @@ const NoteContentEditor = ({
           <div className="editor-placeholder">Type your note...</div>
         }
         ErrorBoundary={LexicalErrorBoundary}
+      />
+      <CollaborationPlugin
+        id="lexical/react-rich-collab"
+        providerFactory={providerFactory}
+        // Optional initial editor state in case collaborative Y.Doc won't
+        // have any existing data on server. Then it'll user this value to populate editor.
+        // It accepts same type of values as LexicalComposer editorState
+        // prop (json string, state object, or a function)
+        initialEditorState={validContent}
+        shouldBootstrap={true}
       />
       <OnChangePlugin onChange={handleOnEditorChange} />
       <HistoryPlugin />

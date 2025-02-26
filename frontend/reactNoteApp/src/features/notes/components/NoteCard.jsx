@@ -11,7 +11,7 @@ import {
   faStar,
   faTrashCan,
 } from "@fortawesome/free-solid-svg-icons";
-import NoteContentEditor from "./NoteContentEditor.jsx";
+import NoteContentEditor from "./NoteContentEditor.tsx";
 
 const NoteCard = ({ note }) => {
   const {

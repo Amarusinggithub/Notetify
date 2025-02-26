@@ -53,6 +53,8 @@ ASGI_APPLICATION='backend.asgi.application'
 
 INSTALLED_APPS = [
     'daphne',
+    'channels',
+    'channels_yroom',
     'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -194,6 +196,8 @@ JAZZMIN_SETTINGS = {
     "show_sidebar": True,  # Show sidebar in the admin interface
     "hide_apps": [],  # Hide specific apps from the admin sidebar
 }
+
+
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
