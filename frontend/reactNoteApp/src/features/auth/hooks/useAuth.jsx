@@ -1,10 +1,10 @@
-import { login, logout, signUp } from "../services/AuthService.jsx";
-import { createContext, useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import {login, logout, signUp} from "../services/AuthService.jsx";
+import {createContext, useContext, useState} from "react";
+import {useNavigate} from "react-router-dom";
 
 const AuthContext = createContext();
 
-const AuthProvider = ({ children }) => {
+const AuthProvider = ({children}) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setLoading] = useState(false);
   const [userData, setUserData] = useState(null);
@@ -22,6 +22,8 @@ const AuthProvider = ({ children }) => {
     setIsAuthenticated(false);
     console.log("User logged out");
   };
+
+  
 
   const handleSignup = async (email, username, password) => {
     try {
@@ -86,14 +88,6 @@ const AuthProvider = ({ children }) => {
     }
   };
 
-  useEffect(() => {
-    if (localStorage.getItem("access_token") != null) {
-      setIsAuthenticated(true);
-    } else {
-      setIsAuthenticated(false);
-    }
-  }, [isAuthenticated]);
-
   return (
     <AuthContext.Provider
       value={{
@@ -114,5 +108,5 @@ const AuthProvider = ({ children }) => {
 export default AuthProvider;
 
 export const useAuth = () => {
-  return useContext(AuthContext);
+    return useContext(AuthContext);
 };

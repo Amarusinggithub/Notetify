@@ -11,11 +11,9 @@ import EditTagPopup from "../components/EditTagPopup.jsx";
 import DeleteTagPopup from "../components/DeleteTagPopup.jsx";
 
 import useTag from "../features/notes/hooks/useTag.jsx";
-import useNote from "../features/notes/hooks/useNote.jsx";
 
 const MainPage = () => {
   const { isSideNavOpen, isAddTagPopupOpen } = useContext(SideNavContext);
-  const {}=useNote();
   const { wantToDeleteTag, wantToEditTag } = useTag();
 
   return (

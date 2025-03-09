@@ -210,7 +210,7 @@ const NoteContentEditor = ({
       TableRowNode,
     ],
     editable: isSelected,
-    editorState: null,
+    editorState: validContent,
   };
 
 

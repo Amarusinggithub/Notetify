@@ -240,9 +240,7 @@ const NoteProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    if(localStorage.getItem("access_token")!=null){
-          fetchNotes();
-    }
+    fetchNotes();
   }, [fetchNotes]);
 
   return (

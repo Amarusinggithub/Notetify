@@ -13,6 +13,7 @@ const SideNav = () => {
   const { handleTagClick, setTitle } = useNote();
   const {
     tags,
+
     setWantToDeleteTag,
     setSelectedTag,
     setWantToEditTag,

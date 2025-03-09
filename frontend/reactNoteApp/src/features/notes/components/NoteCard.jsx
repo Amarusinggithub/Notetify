@@ -11,7 +11,7 @@ import {
   faStar,
   faTrashCan,
 } from "@fortawesome/free-solid-svg-icons";
-import NoteContentEditor from "./NoteContentEditor.tsx";
+import Tiptap from "./tiptapEditor.jsx";
 
 const NoteCard = ({ note }) => {
   const {
@@ -24,7 +24,7 @@ const NoteCard = ({ note }) => {
     handlePin,
     error,
   } = useNote();
-  const [noteState, setNoteState] = useState({ ...note });
+  const [noteState, setNoteState] = useState({ ...note});
 
   const isSelected = selectedNote && selectedNote.id === note.id;
 
@@ -32,6 +32,7 @@ const NoteCard = ({ note }) => {
 
   useEffect(() => {
     setNoteState({ ...note });
+    console.log("this is the user note", { ...note });
     setIsEdited(false);
   }, [note]);
 
@@ -50,13 +51,25 @@ const NoteCard = ({ note }) => {
 
   const handleTitleInput = (e) => {
     const newTitle = e.target.value;
-    setNoteState((prev) => ({ ...prev, title: newTitle }));
-    setIsEdited(newTitle !== note.title);
+    setNoteState((prev) => ({
+      ...prev,
+      note: {
+        ...prev.note,
+        title: newTitle,
+      },
+    }));
+    setIsEdited(newTitle !== noteState.note?.title||"");
   };
 
   const handleContentInput = (newContent) => {
-    setNoteState((prev) => ({ ...prev, content: newContent }));
-    setIsEdited(newContent !== note.content);
+    setNoteState((prev) => ({
+      ...prev,
+      note: {
+        ...prev.note,
+        content: newContent,
+      },
+    }));
+    setIsEdited(newContent !== noteState.note?.content||"");
   };
 
   const handleDeleteNote = async (e) => {
@@ -97,7 +110,7 @@ const NoteCard = ({ note }) => {
               </button>
             )}
 
-            {note.is_trashed && (
+            {noteState.is_trashed && (
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -112,48 +125,49 @@ const NoteCard = ({ note }) => {
               </button>
             )}
 
-            {note.is_archived == false && note.is_trashed == false && (
-              <div className="pin-favorite-actions">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handlePin(note);
-                  }}
-                  className="note-pin-btn"
-                  style={{ display: isSelected ? "flex" : "" }}
-                >
-                  <FontAwesomeIcon icon={faThumbTack} className="pin-icon" />
-                </button>
+            {noteState.is_archived == false &&
+              noteState.is_trashed == false && (
+                <div className="pin-favorite-actions">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handlePin(note);
+                    }}
+                    className="note-pin-btn"
+                    style={{ display: isSelected ? "flex" : "" }}
+                  >
+                    <FontAwesomeIcon icon={faThumbTack} className="pin-icon" />
+                  </button>
 
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleFavorite(note);
-                  }}
-                  className="note-favorite-btn"
-                  style={{ display: isSelected ? "flex" : "" }}
-                >
-                  <FontAwesomeIcon icon={faStar} className="favorite-icon" />
-                </button>
-              </div>
-            )}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleFavorite(note);
+                    }}
+                    className="note-favorite-btn"
+                    style={{ display: isSelected ? "flex" : "" }}
+                  >
+                    <FontAwesomeIcon icon={faStar} className="favorite-icon" />
+                  </button>
+                </div>
+              )}
           </div>
-          {!isSelected && <div className="note-title">{noteState.title}</div>}
+          {!isSelected && <div className="note-title">{noteState.note?.title||""}</div>}
 
           {isSelected && (
             <input
               className="note-title"
               onChange={handleTitleInput}
-              value={noteState.title}
+              value={noteState.note?.title||""
+              }
               disabled={isLoading}
             />
           )}
-
-          <NoteContentEditor
-            content={noteState.content}
+          <Tiptap
+            content={noteState.note?.content||""}
             handleContentInput={handleContentInput}
             isSelected={isSelected}
-            note={note}
+            noteId={note?.id}
           />
         </div>
 

@@ -39,13 +39,13 @@ export default function App() {
                     errorElement={<ErrorPage />}
                   />
 
-                  <Route element={<PrivateRoute />}>
-                    <Route
-                      path="/"
-                      element={<MainPage />}
-                      errorElement={<ErrorPage />}
-                    />
-                  </Route>
+                  <Route
+                    path="/"
+                    element={<MainPage />}
+                    errorElement={<ErrorPage />}
+                  />
+
+                  <Route element={<PrivateRoute />}></Route>
                 </Routes>
               </TagProvider>
             </NoteProvider>
