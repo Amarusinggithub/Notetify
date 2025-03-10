@@ -15,6 +15,7 @@ import {
 const NoteContext = createContext();
 
 const categorizedNotes = (notesArray) => {
+  console.log("this is the categorized notes", notesArray);
   const pinned = [];
   const favorites = [];
   const archived = [];
@@ -159,12 +160,15 @@ const NoteProvider = ({ children }) => {
 
   const refreshCategorizedNotes = (notesArray) => {
     setNotes(notesArray);
+    console.log("this is the notes", notesArray);
 
     const { pinned, favorites, archived, trashed, filtered, other } =
       categorizedNotes(notesArray);
     setOtherNotes(other);
     setSearchNotes(filtered);
+    console.log("this is the pinned notes", pinned);
     setPinnedNotes(pinned);
+
     setFavoriteNotes(favorites);
     setArchiveNotes(archived);
     setTrashNotes(trashed);
@@ -240,7 +244,9 @@ const NoteProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    fetchNotes();
+    if (localStorage.getItem("access_token") != null) {
+      fetchNotes();
+    }
   }, [fetchNotes]);
 
   return (

@@ -3,7 +3,7 @@ from typing import Set
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import User, Note, Tag
+from .models import User, Note, Tag,UserNote
 
 
 class MyUserAdmin(UserAdmin):
@@ -70,7 +70,7 @@ class NoteAdmin(admin.ModelAdmin):
     
 
     fieldsets = (
-        (None, {'fields': ('title', 'content', 'users', "is_favorited", "is_pinned", "is_archived", "is_trashed", "tags")}),
+        (None, {'fields': ('title', 'content', 'users', )}),
     )
 
     def display_users(self, obj):
@@ -78,6 +78,20 @@ class NoteAdmin(admin.ModelAdmin):
         return ", ".join([user.username for user in obj.users.all()])
 
     display_users.short_description = 'Users'
+    
+    
+    
+    
+class UserNoteAdmin(admin.ModelAdmin):
+    list_display = ('note', 'user')
+    search_fields = ('tag', 'user')
+    list_filter = ()
+    ordering = ()
+    
+
+    fieldsets = (
+        (None, {'fields': ('user', "is_favorited", "is_pinned", "is_archived", "is_trashed", "tags","note")}),
+    )
 
 
 class TagAdmin(admin.ModelAdmin):
@@ -99,4 +113,6 @@ class TagAdmin(admin.ModelAdmin):
 
 admin.site.register(User, MyUserAdmin)
 admin.site.register(Note, NoteAdmin)
+admin.site.register(UserNote, UserNoteAdmin)
+
 admin.site.register(Tag, TagAdmin)

@@ -11,13 +11,8 @@ const SideNav = () => {
   const { isSideNavOpen, setPage, setAddTagPopupOpen } =
     useContext(SideNavContext);
   const { handleTagClick, setTitle } = useNote();
-  const {
-    tags,
-
-    setWantToDeleteTag,
-    setSelectedTag,
-    setWantToEditTag,
-  } = useTag();
+  const { tags, setWantToDeleteTag, setSelectedTag, setWantToEditTag } =
+    useTag();
 
   const [temp, setTemp] = useState(sidebarData[0]);
   const [tempId, setTempId] = useState(null);

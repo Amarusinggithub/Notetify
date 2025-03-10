@@ -1,28 +1,55 @@
 from rest_framework import serializers
-from api.models import Note, User, Tag
+from api.models import Note, User, Tag,UserNote
 
 
 class NoteSerializer(serializers.ModelSerializer):
     users = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all(), many=True, required=False
     )
-
     class Meta:
         model = Note
         fields = '__all__'
-
-    def create(self, validated_data):
-        users = validated_data.pop('users', [])
-        note = Note.objects.create(**validated_data)
-        note.users.add(self.context['request'].user)
-        return note
-
+        
     def update(self, instance, validated_data):
         users = validated_data.pop('users', None)
         instance = super().update(instance, validated_data)
         if users is not None:
             instance.users.set(users)
         return instance
+
+
+
+
+class UserNoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserNote
+        fields = '__all__'
+        
+        note=NoteSerializer()
+        
+    def create(self, validated_data):
+        note_data = validated_data.pop('note')
+        note = Note.objects.create(**note_data)
+        note.users.add(self.context['request'].user)
+        user_note = UserNote.objects.create(
+            note=note,
+            user=self.context['request'].user,
+            **validated_data
+        )
+        return user_note
+    
+    
+    def to_representation(self, obj):
+        self.fields['note'] = NoteSerializer()
+        return super(UserNoteSerializer, self).to_representation(obj)
+
+    def update(self, instance, validated_data):
+        note_data = validated_data.pop('note', None)
+        if note_data:
+            note_serializer = NoteSerializer(instance=instance.note, data=note_data, partial=True)
+            if note_serializer.is_valid(raise_exception=True):
+                note_serializer.save()
+        return super().update(instance, validated_data)
 
     def validate(self, data):
         if data.get('is_pinned') and data.get('is_archived'):
@@ -42,7 +69,6 @@ class NoteSerializer(serializers.ModelSerializer):
 
         if data.get('is_archived') and data.get('is_pinned') and data.get('is_favorited'):
             raise serializers.ValidationError("An archived note cannot be both pinned and favorited.")
-
         return data
 
 

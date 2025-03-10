@@ -1,10 +1,10 @@
-import {login, logout, signUp} from "../services/AuthService.jsx";
-import {createContext, useContext, useState} from "react";
-import {useNavigate} from "react-router-dom";
+import { login, logout, signUp } from "../services/AuthService.jsx";
+import { createContext, useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext();
 
-const AuthProvider = ({children}) => {
+const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setLoading] = useState(false);
   const [userData, setUserData] = useState(null);
@@ -15,15 +15,15 @@ const AuthProvider = ({children}) => {
     setUserData(userData);
     setIsAuthenticated(true);
     console.log("User data set:", userData);
+    localStorage.setItem("Userdata", JSON.stringify(userData));
   };
 
   const setLogout = () => {
     setUserData(null);
     setIsAuthenticated(false);
     console.log("User logged out");
+    localStorage.removeItem("Userdata");
   };
-
-  
 
   const handleSignup = async (email, username, password) => {
     try {
@@ -34,6 +34,8 @@ const AuthProvider = ({children}) => {
       if (response.status >= 200 && response.status < 300) {
         console.log("Signup successful");
         setLogin(response.data.userData);
+        localStorage.setItem("username", username);
+
         navigate("/");
       } else {
         console.error("Signup failed");
@@ -55,6 +57,8 @@ const AuthProvider = ({children}) => {
       if (response.status >= 200 && response.status < 300) {
         console.log("Login successful");
         setLogin(response.data.userData);
+        localStorage.setItem("userData", userData);
+
         navigate("/");
       } else {
         console.error("Login failed");
@@ -88,6 +92,14 @@ const AuthProvider = ({children}) => {
     }
   };
 
+  useEffect(() => {
+    if (localStorage.getItem("access_token") != null) {
+      setIsAuthenticated(true);
+    } else {
+      setIsAuthenticated(false);
+    }
+  }, [isAuthenticated]);
+
   return (
     <AuthContext.Provider
       value={{
@@ -108,5 +120,5 @@ const AuthProvider = ({children}) => {
 export default AuthProvider;
 
 export const useAuth = () => {
-    return useContext(AuthContext);
+  return useContext(AuthContext);
 };

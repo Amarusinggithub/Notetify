@@ -1,12 +1,16 @@
 import "../styles/Notespage.css";
 import NoteCard from "../components/NoteCard.jsx";
 import useNote from "../hooks/useNote.jsx";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { SideNavContext } from "../../../context/SideNavContext.jsx";
+import AddNoteCard from "../components/AddNoteCard.jsx";
 
 const NotesPage = () => {
   const { pinnedNotes, otherNotes, isLoading, error } = useNote();
   const { isSideNavOpen } = useContext(SideNavContext);
+  useEffect(() => {
+    console.log("this is the pinned notes", pinnedNotes);
+  }, []);
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -18,6 +22,8 @@ const NotesPage = () => {
 
   return (
     <div className="container">
+      <AddNoteCard />
+
       {pinnedNotes?.length > 0 && (
         <>
           <div className="flex-column">

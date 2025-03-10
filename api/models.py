@@ -31,8 +31,6 @@ class User(AbstractUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     profile_picture = models.ImageField(upload_to="avatars/", null=True, blank=True)
 
-
-
     REQUIRED_FIELDS = []
     USERNAME_FIELD = "username"
 
@@ -46,22 +44,34 @@ class Tag(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50, unique=True)
     users = models.ManyToManyField(settings.AUTH_USER_MODEL,related_name="tags")
-
     def __str__(self):
         return self.name
-
-
 
 class Note(models.Model):
     id = models.AutoField(primary_key=True)
     users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="notes")
     title = models.CharField(max_length=500)
     content = models.TextField()
-    tags = models.ManyToManyField(Tag, related_name="notes",blank=True)
+    def __str__(self):
+        return self.title
+    
+    
+class UserNote(models.Model):
+    # NEW FOR THE ROLES
+    class Roles(models.TextChoices):
+        OWNER = "OWNER", "Owner"
+        EDITOR = "EDITOR", "Editor"
+        MEMBER = "MEMBER", "Member"
+
+    role = models.CharField(
+        max_length=20, choices=Roles.choices, default=Roles.OWNER
+    )
+    id = models.AutoField(primary_key=True)
+    user= models.ForeignKey(User, on_delete=models.CASCADE, related_name="User_notes")
+    tags = models.ManyToManyField(Tag, related_name="User_tags",blank=True)
+    note=models.OneToOneField(Note, on_delete=models.CASCADE)
     is_pinned = models.BooleanField(default=False)
     is_favorited = models.BooleanField(default=False)
     is_trashed = models.BooleanField(default=False)
     is_archived = models.BooleanField(default=False)
-
-    def __str__(self):
-        return self.title
+    
