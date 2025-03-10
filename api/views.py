@@ -120,7 +120,7 @@ class NoteView(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors,{"message": "this is errors:{serializer.errors}"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self,request, pk):
         note = get_object_or_404(UserNote, user=request.user, pk=pk)

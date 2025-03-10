@@ -12,7 +12,8 @@ const AddNoteCard = () => {
     noteId = 1; 
   }
   const [noteState, setNoteState] = useState({
-    note: {
+    
+    note_data: {
       title: "",
       content: "",
       users: [],
@@ -65,12 +66,12 @@ const AddNoteCard = () => {
 
   const handleTitle = (e) => {
     const newTitle = e.target.value;
-    setNoteState((prev) => ({ ...prev, title: newTitle }));
+    setNoteState((prev) => ({ ...prev, note_data:{title: newTitle}  }));
     setIsEdited(newTitle !== null && newTitle !== "");
   };
 
   const handleContentInput = (newContent) => {
-    setNoteState((prev) => ({ ...prev, content: newContent }));
+    setNoteState((prev) => ({ ...prev, note_data: { content: newContent } }));
     setIsEdited(newContent !== null && newContent !== "");
   };
 
@@ -101,13 +102,13 @@ const AddNoteCard = () => {
               className="note-title"
               placeholder="Enter title here"
               onChange={handleTitle}
-              value={noteState.note.title}
+              value={noteState.note_data.title}
               disabled={isLoading}
             />
           )}
 
           <Tiptap
-            content={noteState.note.content}
+            content={noteState.note_data.content}
             handleContentInput={handleContentInput}
             isSelected={isSelected}
             noteId={noteId}

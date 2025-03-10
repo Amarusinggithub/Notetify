@@ -74,7 +74,8 @@ export const getNotes = async () => {
 export const createNote = async (note) => {
   try {
     const response = await axiosInstance.post("notes/create_note/", {
-      note: {
+      note: note.note,
+      note_data: {
         title: note.title,
         content: note.content,
         users: [],
@@ -96,7 +97,9 @@ export const updateNote = async (note) => {
   try {
     const response = await axiosInstance.put(`notes/edit_note/${note.id}/`, {
       id: note.id,
-      note: {
+      note: note.note,
+
+      note_data: {
         id: note.note.id,
         title: note.note.title,
         content: note.note.content,

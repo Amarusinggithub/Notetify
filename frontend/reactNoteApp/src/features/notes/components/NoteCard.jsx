@@ -53,7 +53,7 @@ const NoteCard = ({ note }) => {
     const newTitle = e.target.value;
     setNoteState((prev) => ({
       ...prev,
-      note: {
+      note_data: {
         ...prev.note,
         title: newTitle,
       },
@@ -64,7 +64,7 @@ const NoteCard = ({ note }) => {
   const handleContentInput = (newContent) => {
     setNoteState((prev) => ({
       ...prev,
-      note: {
+      note_data: {
         ...prev.note,
         content: newContent,
       },

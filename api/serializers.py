@@ -21,56 +21,76 @@ class NoteSerializer(serializers.ModelSerializer):
 
 
 class UserNoteSerializer(serializers.ModelSerializer):
+    # For read operations - full representation
+    note = NoteSerializer(read_only=True)
+    
+    note_data = serializers.JSONField(write_only=True, required=False)
+    
     class Meta:
         model = UserNote
-        fields = '__all__'
-        
-        note=NoteSerializer()
+        fields = ['id', 'user', 'note', 'note_data', 'is_pinned', 
+                'is_favorited', 'is_trashed', 'is_archived', 'role', 'tags']
         
     def create(self, validated_data):
-        note_data = validated_data.pop('note')
-        note = Note.objects.create(**note_data)
+        note_data = validated_data.pop('note_data', {})
+        note = Note.objects.create(
+            title=note_data.get('title', ''),
+            content=note_data.get('content', '')
+        )
         note.users.add(self.context['request'].user)
+        
+        # If user_id wasn't provided, use the request user
+        if 'user' not in validated_data:
+            validated_data['user'] = self.context['request'].user
+            
         user_note = UserNote.objects.create(
             note=note,
-            user=self.context['request'].user,
             **validated_data
         )
         return user_note
     
-    
     def to_representation(self, obj):
-        self.fields['note'] = NoteSerializer()
-        return super(UserNoteSerializer, self).to_representation(obj)
+        representation = super().to_representation(obj)
+        return representation
 
     def update(self, instance, validated_data):
-        note_data = validated_data.pop('note', None)
+        note_data = validated_data.pop('note_data', None)
         if note_data:
-            note_serializer = NoteSerializer(instance=instance.note, data=note_data, partial=True)
-            if note_serializer.is_valid(raise_exception=True):
-                note_serializer.save()
+            note = instance.note
+            if 'title' in note_data:
+                note.title = note_data['title']
+            if 'content' in note_data:
+                note.content = note_data['content']
+            if 'users' in note_data:
+                # Expecting a list of user IDs
+                user_ids = note_data.pop('users')
+                note.users.set(user_ids)
+            note.save()
+            
         return super().update(instance, validated_data)
 
     def validate(self, data):
-        if data.get('is_pinned') and data.get('is_archived'):
+        is_pinned = data.get('is_pinned', False)
+        is_favorited = data.get('is_favorited', False)
+        is_trashed = data.get('is_trashed', False) 
+        is_archived = data.get('is_archived', False)
+        
+        if is_pinned and is_archived:
             raise serializers.ValidationError("A note cannot be pinned and archived at the same time.")
 
-        if data.get('is_trashed') and data.get('is_pinned'):
+        if is_trashed and is_pinned:
             raise serializers.ValidationError("A trashed note cannot be pinned.")
 
-        if data.get('is_trashed') and data.get('is_archived'):
+        if is_trashed and is_archived:
             raise serializers.ValidationError("A trashed note cannot be archived.")
 
-        if data.get('is_trashed') and data.get('is_favorited'):
+        if is_trashed and is_favorited:
             raise serializers.ValidationError("A trashed note cannot be favorited.")
 
-        if data.get('is_archived') and data.get('is_favorited'):
+        if is_archived and is_favorited:
             raise serializers.ValidationError("An archived note cannot be favorited.")
 
-        if data.get('is_archived') and data.get('is_pinned') and data.get('is_favorited'):
-            raise serializers.ValidationError("An archived note cannot be both pinned and favorited.")
         return data
-
 
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
