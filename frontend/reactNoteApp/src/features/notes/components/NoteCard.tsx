@@ -1,19 +1,48 @@
 /* eslint-disable react/prop-types */
-
 import "../styles/NoteCard.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { useEffect, useState } from "react";
-import useNote from "../hooks/useNote.jsx";
+import React, { useEffect, useState } from "react";
+import useNote from "../hooks/useNote.tsx";
 import {
   faXmark,
   faThumbTack,
   faStar,
   faTrashCan,
 } from "@fortawesome/free-solid-svg-icons";
-import Tiptap from "./tiptapEditor.jsx";
+import NoteContentEditor from "./NoteContentEditor.tsx";
 
-const NoteCard = ({ note }) => {
+interface UserNote {
+  id: number;
+  note: {
+    id: number;
+    title: string;
+    content: string;
+    users: number[];
+  };
+  user: number;
+  tags: number[];
+  is_pinned: boolean;
+  is_trashed: boolean;
+  is_archived: boolean;
+  is_favorited: boolean;
+}
+
+interface UserNoteData {
+  id: number;
+  note_data: {
+    title: string;
+    content: string;
+    users: number[];
+  };
+  tags: number[];
+  is_pinned: boolean;
+  is_trashed: boolean;
+  is_archived: boolean;
+  is_favorited: boolean;
+}
+
+const NoteCard = (note: UserNote | UserNoteData) => {
   const {
     selectedNote,
     setSelectedNote,
@@ -24,62 +53,111 @@ const NoteCard = ({ note }) => {
     handlePin,
     error,
   } = useNote();
-  const [noteState, setNoteState] = useState({ ...note});
+  const [noteState, setNoteState] = useState<UserNote|UserNoteData>({ ...note });
 
   const isSelected = selectedNote && selectedNote.id === note.id;
 
-  const [isEdited, setIsEdited] = useState(false);
+  const [isEdited, setIsEdited] = useState<boolean>(false);
 
   useEffect(() => {
     setNoteState({ ...note });
-    console.log("this is the user note", { ...note });
+    console.log("this is the user note", note);
     setIsEdited(false);
   }, [note]);
 
   const handleSave = async () => {
     if (isEdited) {
+      console.log("sent edited content to server");
       await editNote({ ...noteState });
     }
     setIsEdited(false);
   };
 
-  const handleSelect = async (e) => {
+  const handleSelect = async (
+    e:
+      | React.MouseEvent<HTMLButtonElement, MouseEvent>
+      | React.MouseEvent<HTMLDivElement, MouseEvent>
+  ) => {
     e.preventDefault();
     await handleSave();
     setSelectedNote(isSelected ? null : note);
   };
 
-  const handleTitleInput = (e) => {
+  const isUserNote = (note: UserNote | UserNoteData): note is UserNote => {
+    return (note as UserNote).note !== undefined;
+  };
+
+  const handleTitleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value;
-    setNoteState((prev) => ({
-      ...prev,
-      note_data: {
-        ...prev.note,
-        title: newTitle,
-      },
-    }));
-    setIsEdited(newTitle !== noteState.note?.title||"");
+    setNoteState((prev) => {
+      if (isUserNote(prev)) {
+        return {
+          ...prev,
+          note: {
+            ...prev.note,
+            title: newTitle,
+          },
+        };
+      } else {
+        return {
+          ...prev,
+          note: {
+            ...prev.note_data,
+            title: newTitle,
+          },
+        };
+      }
+    });
+    setIsEdited(
+      isUserNote(noteState)
+        ? newTitle !== noteState.note?.title
+        : newTitle !== noteState.note_data?.title
+    );
   };
 
-  const handleContentInput = (newContent) => {
-    setNoteState((prev) => ({
-      ...prev,
-      note_data: {
-        ...prev.note,
-        content: newContent,
-      },
-    }));
-    setIsEdited(newContent !== noteState.note?.content||"");
+  const handleContentInput = (newContent: string) => {
+    setNoteState((prev) => {
+      if (isUserNote(prev)) {
+        return {
+          ...prev,
+          note: {
+            ...prev.note,
+            content: newContent,
+          },
+        };
+      } else {
+        return {
+          ...prev,
+          note: {
+            ...prev.note_data,
+            content: newContent,
+          },
+        };
+      }
+    });
+    console.log("is edited is set to true");
+    setIsEdited(
+      isUserNote(noteState)
+        ? newContent !== noteState.note?.content
+        : newContent !== noteState.note_data?.content
+    );
   };
 
-  const handleDeleteNote = async (e) => {
+  const handleDeleteNote = async (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
     e.preventDefault();
     e.stopPropagation();
     await removeNote(note);
   };
 
   return (
-    <div className={isSelected ? "notecard-bg" : ""} onClick={handleSelect}>
+    <div
+      className={isSelected ? "notecard-bg" : ""}
+      onClick={(e) => {
+        handleSelect(e);
+      }}
+    >
       <div
         className={`note-card ${isSelected ? "selected-note" : ""}`}
         onClick={(e) => {
@@ -114,7 +192,7 @@ const NoteCard = ({ note }) => {
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleDeleteNote(note);
+                  handleDeleteNote(e);
                 }}
                 className="delete-note-btn"
               >
@@ -152,22 +230,37 @@ const NoteCard = ({ note }) => {
                 </div>
               )}
           </div>
-          {!isSelected && <div className="note-title">{noteState.note?.title||""}</div>}
+          {!isSelected && (
+            <div className="note-title">
+              {isUserNote(noteState)
+                ? noteState.note?.title
+                :  noteState.note_data?.title}
+            </div>
+          )}
 
           {isSelected && (
             <input
               className="note-title"
-              onChange={handleTitleInput}
-              value={noteState.note?.title||""
+              onChange={(e) => {
+                handleTitleInput(e);
+              }}
+              value={
+                isUserNote(noteState)
+                  ? noteState.note?.title
+                  : noteState.note_data?.title
               }
               disabled={isLoading}
             />
           )}
-          <Tiptap
-            content={noteState.note?.content||""}
+          <NoteContentEditor
+            content={
+              isUserNote(noteState)
+                ? noteState.note?.content
+                : noteState.note_data?.content
+            }
             handleContentInput={handleContentInput}
             isSelected={isSelected}
-            noteId={note?.id}
+            note={noteState}
           />
         </div>
 

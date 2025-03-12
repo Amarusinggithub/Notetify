@@ -8,7 +8,7 @@ import { CollaborationPlugin } from "@lexical/react/LexicalCollaborationPlugin";
 import * as Y from "yjs";
 import React from "react";
 import { Provider } from "@lexical/yjs";
-
+import { EditorState, LexicalEditor } from 'lexical';
 import { WebsocketProvider } from "y-websocket";
 import { useEffect, useCallback, useRef } from "react";
 
@@ -28,7 +28,6 @@ import { TableNode, TableCellNode, TableRowNode } from "@lexical/table";
 import { HeadingNode } from "@lexical/rich-text";
 import { ListNode, ListItemNode } from "@lexical/list";
 
-import Toolbars from "./Toolbar.jsx";
 import "../styles/NoteContentEditor.css";
 
 const theme = {
@@ -190,7 +189,7 @@ function parseOrDefault(editorStateStr) {
 const NoteContentEditor = ({
   handleContentInput,
   content,
-  isSelected,
+  isSelected,note
 }) => {
   const editorRef = useRef(null);
   const validContent = parseOrDefault(content);
@@ -214,7 +213,7 @@ const NoteContentEditor = ({
   };
 
 
-  function getDocFromMap(id, yjsDocMap) {
+  function getDocFromMap(id: string, yjsDocMap: Map<string, Y.Doc>) {
     if (!yjsDocMap.has(id)) {
       yjsDocMap.set(id, new Y.Doc());
     }
@@ -231,14 +230,13 @@ const NoteContentEditor = ({
     []
   );
 
-  function handleOnEditorChange(editorState) {
+  function handleOnEditorChange(editorState: EditorState) {
     const editorStateJSON = editorState.toJSON();
     handleContentInput(JSON.stringify(editorStateJSON));
   }
 
   return (
-    <LexicalComposer initialConfig={initialConfig} key={isSelected}>
-      <Toolbars />
+    <LexicalComposer initialConfig={initialConfig} key={`${note.id}-${isSelected}`}>
       <RichTextPlugin
         contentEditable={<ContentEditable className="content-editable" />}
         placeholder={

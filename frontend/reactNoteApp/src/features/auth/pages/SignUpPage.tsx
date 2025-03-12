@@ -1,6 +1,6 @@
-import {useState} from "react";
+import React,{useState} from "react";
 import "../styles/SignUpForm.css";
-import {useAuth} from "../hooks/useAuth.jsx";
+import {useAuth} from "../hooks/useAuth.tsx";
 
 
 const SignUpPage = () => {

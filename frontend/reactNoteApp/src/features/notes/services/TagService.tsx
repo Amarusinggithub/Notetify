@@ -1,5 +1,13 @@
 import axios from "axios";
-import { getCSRFToken } from "../../../services/CSRFTokenService.jsx";
+import React from "react";
+
+import { getCSRFToken } from "../../../services/CSRFTokenService.tsx";
+
+interface Tag {
+  id: number;
+  name: string;
+  users: number[];
+}
 
 const csrfToken = await getCSRFToken();
 
@@ -62,29 +70,20 @@ axiosInstance.interceptors.response.use(
   }
 );
 
-export const getNotes = async () => {
+export const getTags = async () => {
   try {
-    const response = await axiosInstance.get("notes/");
+    const response = await axiosInstance.get("tags/");
     console.log(response.data);
     return response.data;
   } catch (e) {
     console.error(e);
   }
 };
-export const createNote = async (note) => {
+
+export const createTag = async (tagName: string) => {
   try {
-    const response = await axiosInstance.post("notes/create_note/", {
-      note: note.note,
-      note_data: {
-        title: note.title,
-        content: note.content,
-        users: [],
-      },
-      tags: note.tags,
-      is_pinned: note.is_pinned,
-      is_trashed: note.is_trashed,
-      is_archived: note.is_archived,
-      is_favorited: note.is_favorited,
+    const response = await axios.post("tags/create_tag/", {
+      name: tagName,
     });
     console.log(response.data);
     return response.status;
@@ -93,39 +92,24 @@ export const createNote = async (note) => {
   }
 };
 
-export const updateNote = async (note) => {
+export const updateTag = async (tag: Tag) => {
   try {
-    const response = await axiosInstance.put(`notes/edit_note/${note.id}/`, {
-      id: note.id,
-      note: note.note,
-
-      note_data: {
-        id: note.note.id,
-        title: note.note.title,
-        content: note.note.content,
-        users: note.note.users,
-      },
-      user: note.user,
-      tags: note.tags,
-      is_pinned: note.is_pinned,
-      is_trashed: note.is_trashed,
-      is_archived: note.is_archived,
-      is_favorited: note.is_favorited,
+    const response = await axios.put(`tags/edit_tag/${tag.id}/`, {
+      id: tag.id,
+      name: tag.name,
+      users: tag.users,
     });
 
     console.log(response.data);
     return response.status;
   } catch (error) {
     console.error(error);
-    throw error;
   }
 };
 
-export const deleteNote = async (note) => {
+export const deleteTag = async (tag: Tag) => {
   try {
-    const response = await axiosInstance.delete(
-      `notes/delete_note/${note.id}/`
-    );
+    const response = await axios.delete(`tags/delete_tag/${tag.id}/`);
     console.log(response.status);
     return response.status;
   } catch (e) {

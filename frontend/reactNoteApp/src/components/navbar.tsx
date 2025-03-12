@@ -2,8 +2,9 @@ import {useContext} from "react";
 import "../styles/navbar.css";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faBars, faGear, faList, faMagnifyingGlass, faRotateRight} from "@fortawesome/free-solid-svg-icons";
-import {SideNavContext} from "../context/SideNavContext.jsx";
-import useNote from "../features/notes/hooks/useNote.jsx";
+import {SideNavContext} from "../context/SideNavContext.tsx";
+import useNote from "../features/notes/hooks/useNote.tsx";
+import React from "react";
 
 const Navbar = () => {
 

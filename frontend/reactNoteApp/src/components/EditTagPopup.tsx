@@ -1,6 +1,6 @@
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useState, useRef, useEffect } from "react";
+import React,{ useState, useRef, useEffect } from "react";
 import useTag from "../features/notes/hooks/useTag";
 import "../styles/EditTagPopup.css";
 

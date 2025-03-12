@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getCSRFToken } from "../../../services/CSRFTokenService.jsx";
+import { getCSRFToken } from "../../../services/CSRFTokenService.tsx";
 
 const csrfToken = await getCSRFToken();
 
@@ -54,7 +54,9 @@ axiosInstance.interceptors.response.use(
         // Handle refresh token errors by clearing stored tokens and redirecting to the login page.
         console.error("Token refresh failed:", refreshError);
         localStorage.removeItem("access_token");
+
         localStorage.removeItem("refresh_token");
+        console.log("removed tokens");
         return Promise.reject(refreshError);
       }
     }
@@ -62,66 +64,60 @@ axiosInstance.interceptors.response.use(
   }
 );
 
-export const getTags = async () => {
+export const login = async (username, password) => {
   try {
-    const response = await axiosInstance.get("tags/");
-    console.log(response.data);
-    return response.data;
-  } catch (e) {
-    console.error(e);
-  }
-};
-
-export const createTag = async (tagName) => {
-  try {
-    const response = await axios.post("tags/create_tag/", {
-      name: tagName,
-    });
-    console.log(response.data);
-    return response.status;
-  } catch (e) {
-    console.error(e);
-    return {
-      success: false,
-      error:
-        e.response?.data?.error || "An error occurred while creating the tag",
-    };
-  }
-};
-
-export const updateTag = async (tag) => {
-  try {
-    const response = await axios.put(`tags/edit_tag/${tag.id}/`, {
-      id: tag.id,
-      name: tag.name,
-      color: tag.color,
-      users: tag.users,
-    });
-
-    console.log(response.data);
-    return response.status;
+    const response = await axiosInstance.post("login/", { username, password });
+    localStorage.clear();
+    localStorage.setItem("access_token", response.data.access_token);
+    localStorage.setItem("refresh_token", response.data.refresh_token);
+    axiosInstance.defaults.headers.common[
+      "Authorization"
+    ] = `Bearer ${response.data["access_token"]}`;
+    console.log(
+      `this is the access token:${response.data.access_token} and refresh token: ${response.data.refresh_token}`
+    );
+    return response;
   } catch (error) {
-    console.error(error);
-    return {
-      success: false,
-      error:
-        error.response?.data?.error ||
-        "An error occurred while updating the tag",
-    };
+    console.error(
+      "Login error:",
+      error.response ? error.response.data : error.message
+    );
+    throw error;
   }
 };
 
-export const deleteTag = async (tag) => {
+export const signUp = async (email, username, password) => {
   try {
-    const response = await axios.delete(`tags/delete_tag/${tag.id}/`);
-    console.log(response.status);
-    return response.status;
+    const response = await axiosInstance.post("register/", {
+      email,
+      username,
+      password,
+    });
+    localStorage.clear();
+    localStorage.setItem("access_token", response.data.access_token);
+    localStorage.setItem("refresh_token", response.data.refresh_token);
+    axiosInstance.defaults.headers.common[
+      "Authorization"
+    ] = `Bearer ${response.data["access"]}`;
+
+    console.log(response.data);
+    return response;
+  } catch (error) {
+    console.error(
+      "Signup error:",
+      error.response ? error.response.data : error.message
+    );
+    throw error;
+  }
+};
+
+export const logout = async () => {
+  try {
+    const response = await axiosInstance.post("logout/");
+    localStorage.clear();
+
+    return response;
   } catch (e) {
     console.error(e);
-    return {
-      success: false,
-      error:
-        e.response?.data?.error || "An error occurred while deleting the tag",
-    };
   }
 };

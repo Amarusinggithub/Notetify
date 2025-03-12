@@ -1,16 +1,16 @@
 import "./App.css";
-import { useEffect } from "react";
+import React,{ useEffect } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import ErrorPage from "./pages/ErrorPage.jsx";
-import LoginPage from "./features/auth/pages/LoginPage.jsx";
-import SignUpPage from "./features/auth/pages/SignUpPage.jsx";
-import MainPage from "./pages/MainPage.jsx";
-import PrivateRoute from "./features/auth/components/privateRoute.jsx";
-import { initializeCSRFToken } from "./services/CSRFTokenService.jsx";
-import AuthProvider from "./features/auth/hooks/useAuth.jsx";
-import { SideNavProvider } from "./context/SideNavContext.jsx";
-import { NoteProvider } from "./features/notes/hooks/useNote.jsx";
-import { TagProvider } from "./features/notes/hooks/useTag.jsx";
+import ErrorPage from "./pages/ErrorPage.tsx";
+import LoginPage from "./features/auth/pages/LoginPage.tsx";
+import SignUpPage from "./features/auth/pages/SignUpPage.tsx";
+import MainPage from "./pages/MainPage.tsx";
+import PrivateRoute from "./features/auth/components/privateRoute.tsx";
+import { initializeCSRFToken } from "./services/CSRFTokenService.tsx";
+import AuthProvider from "./features/auth/hooks/useAuth.tsx";
+import { SideNavProvider } from "./context/SideNavContext.tsx";
+import { NoteProvider } from "./features/notes/hooks/useNote.tsx";
+import { TagProvider } from "./features/notes/hooks/useTag.tsx";
 
 export default function App() {
   useEffect(() => {

@@ -1,7 +1,38 @@
 import axios from "axios";
-import { getCSRFToken } from "../../../services/CSRFTokenService.jsx";
+import { getCSRFToken } from "../../../services/CSRFTokenService.tsx";
+import React from "react";
 
 const csrfToken = await getCSRFToken();
+
+interface UserNote {
+  id: number;
+  note: {
+    id:number;
+    title: string;
+    content: string;
+    users: number[];
+  };
+  user:number;
+  tags: number[];
+  is_pinned: boolean;
+  is_trashed: boolean;
+  is_archived: boolean;
+  is_favorited: boolean;
+}
+
+interface UserNoteData {
+  id: number;
+  note_data: {
+    title: string;
+    content: string;
+    users: number[];
+  };
+  tags: number[];
+  is_pinned: boolean;
+  is_trashed: boolean;
+  is_archived: boolean;
+  is_favorited: boolean;
+}
 
 const axiosInstance = axios.create({
   baseURL: "http://localhost:8000/api/",
@@ -54,9 +85,7 @@ axiosInstance.interceptors.response.use(
         // Handle refresh token errors by clearing stored tokens and redirecting to the login page.
         console.error("Token refresh failed:", refreshError);
         localStorage.removeItem("access_token");
-
         localStorage.removeItem("refresh_token");
-        console.log("removed tokens");
         return Promise.reject(refreshError);
       }
     }
@@ -64,59 +93,67 @@ axiosInstance.interceptors.response.use(
   }
 );
 
-export const login = async (username, password) => {
+export const getNotes = async () => {
   try {
-    const response = await axiosInstance.post("login/", { username, password });
-    localStorage.clear();
-    localStorage.setItem("access_token", response.data.access_token);
-    localStorage.setItem("refresh_token", response.data.refresh_token);
-    axiosInstance.defaults.headers.common[
-      "Authorization"
-    ] = `Bearer ${response.data["access_token"]}`;
-    console.log(
-      `this is the access token:${response.data.access_token} and refresh token: ${response.data.refresh_token}`
-    );
-    return response;
-  } catch (error) {
-    console.error(
-      "Login error:",
-      error.response ? error.response.data : error.message
-    );
-    throw error;
+    const response = await axiosInstance.get("notes/");
+    console.log(response.data);
+    return response.data;
+  } catch (e) {
+    console.error(e);
+  }
+};
+export const createNote = async (note: UserNoteData) => {
+  try {
+    const response = await axiosInstance.post("notes/create_note/", {
+      note_data: note.note_data,
+      tags: note.tags,
+      is_pinned: note.is_pinned,
+      is_trashed: note.is_trashed,
+      is_archived: note.is_archived,
+      is_favorited: note.is_favorited,
+    });
+    console.log(response.data);
+    return response.status;
+  } catch (e) {
+    console.error(e);
   }
 };
 
-export const signUp = async (email, username, password) => {
+export const updateNote = async (note:UserNote) => {
+  console.log("this");
   try {
-    const response = await axiosInstance.post("register/", {
-      email,
-      username,
-      password,
+    const response = await axiosInstance.put(`notes/edit_note/${note.id}/`, {
+      id: note.id,
+      note: note.note.id,
+
+      note_data: {
+        title: note.note.title,
+        content: note.note.content,
+        users: note.note.users,
+      },
+      user: note.user,
+      tags: note.tags,
+      is_pinned: note.is_pinned,
+      is_trashed: note.is_trashed,
+      is_archived: note.is_archived,
+      is_favorited: note.is_favorited,
     });
-    localStorage.clear();
-    localStorage.setItem("access_token", response.data.access_token);
-    localStorage.setItem("refresh_token", response.data.refresh_token);
-    axiosInstance.defaults.headers.common[
-      "Authorization"
-    ] = `Bearer ${response.data["access"]}`;
 
     console.log(response.data);
-    return response;
+    return response.status;
   } catch (error) {
-    console.error(
-      "Signup error:",
-      error.response ? error.response.data : error.message
-    );
+    console.error(error);
     throw error;
   }
 };
 
-export const logout = async () => {
+export const deleteNote = async (note:UserNote) => {
   try {
-    const response = await axiosInstance.post("logout/");
-    localStorage.clear();
-
-    return response;
+    const response = await axiosInstance.delete(
+      `notes/delete_note/${note.id}/`
+    );
+    console.log(response.status);
+    return response.status;
   } catch (e) {
     console.error(e);
   }

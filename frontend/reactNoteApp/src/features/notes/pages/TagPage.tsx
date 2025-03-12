@@ -1,7 +1,7 @@
-import { useContext } from "react";
-import { SideNavContext } from "../../../context/SideNavContext";
-import NoteCard from "../components/NoteCard";
-import useNote from "../hooks/useNote";
+import React,{ useContext } from "react";
+import { SideNavContext } from "../../../context/SideNavContext.tsx";
+import NoteCard from "../components/NoteCard.tsx";
+import useNote from "../hooks/useNote.tsx";
 
 const TagPage = () => {
   const { tagNotes, isLoading, error } = useNote();

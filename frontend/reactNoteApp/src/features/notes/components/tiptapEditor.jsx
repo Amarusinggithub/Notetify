@@ -44,14 +44,15 @@ const appId = "7j9y6m11";
 const Tiptap = ({ handleContentInput, content, isSelected, noteId }) => {
   const getRandomElement = (list) =>
     list[Math.floor(Math.random() * list.length)];
-
   const getRandomColor = () => getRandomElement(colors);
+
   const getInitialUser = () => {
     return {
-      name: localStorage.getItem("username"),
+      name: localStorage.getItem("username") || "Anonymous",
       color: getRandomColor(),
     };
   };
+
   const [status, setStatus] = useState("connecting");
   const { userData } = useAuth();
   const [currentUser, setCurrentUser] = useState(getInitialUser);
@@ -68,26 +69,26 @@ const Tiptap = ({ handleContentInput, content, isSelected, noteId }) => {
         baseUrl: "ws://localhost:1234/",
         connect: true,
         onConnect: () => {
-          console.log("connected successfully");
+          console.log("Connected successfully");
           console.log("User data set:", userData);
         },
         onDestroy: () => {
-          console.log("destroyed successfully");
+          console.log("Destroyed successfully");
         },
         onDisconnect: () => {
-          console.log("disconnected successfully");
+          console.log("Disconnected successfully");
         },
         onOpen: () => {
-          console.log("open successfully");
+          console.log("Open successfully");
         },
         onClose: () => {
-          console.log("close successfully");
+          console.log("Close successfully");
         },
       }),
-    [room,ydoc]
+    [room, ydoc]
   );
 
-  // extensions
+  // Extensions configuration
   const extensions = [
     Image,
     StarterKit.configure({
@@ -95,44 +96,30 @@ const Tiptap = ({ handleContentInput, content, isSelected, noteId }) => {
     }),
     Placeholder.configure({
       placeholder: "Write something …",
-      // Use different placeholders depending on the node type:
-      // placeholder: ({ node }) => {
-      //   if (node.type.name === 'heading') {
-      //     return 'What’s the title?'
-      //   }
-      //   return 'Can you add some further context?'
-      // },
     }),
     Highlight,
     History,
-
     CharacterCount.extend().configure({
       limit: 10000,
     }),
     Collaboration.extend().configure({
       document: ydoc,
     }),
+    // Initialize CollaborationCursor with currentUser data
     CollaborationCursor.extend().configure({
       provider,
-      user: {
-        name: "user",
-        color: "#958DF1",
-      },
+      user: currentUser,
     }),
   ];
-  
 
   const editor = useEditor({
     enableContentCheck: true,
-    extensions: extensions,
+    extensions,
     autofocus: isSelected,
     editable: isSelected,
     onUpdate({ editor }) {
-      // The content has changed.
-      handleOnEditorChange(JSON.stringify(editor.getJSON()));
-    },
-    onDestroy() {
-      // The editor is being destroyed.
+      // When the content changes, pass the updated JSON string
+      handleContentInput(JSON.stringify(editor.getJSON()));
     },
     onFocus({ editor }) {
       editor.commands.scrollIntoView();
@@ -142,46 +129,40 @@ const Tiptap = ({ handleContentInput, content, isSelected, noteId }) => {
     },
   });
 
-
   useEffect(() => {
-    // this is just an example. do whatever you want to do here
-    // to retrieve your editors content from somewhere
-    editor.commands.setContent(JSON.stringify(content));
-  }, [editor]);
+    if (editor) {
+      // If content is passed as a JSON string, parse it; otherwise assume it is an object.
+      editor.commands.setContent(content);
+    }
+  }, [editor, content]);
 
-
-  function handleOnEditorChange(editorState) {
-    handleContentInput(JSON.stringify(editorState));
-  }
-
+  // Update status changes from provider
   useEffect(() => {
-    // Update status changes
     const statusHandler = (event) => {
       setStatus(event.status);
     };
-
     provider.on("status", statusHandler);
-
     return () => {
       provider.off("status", statusHandler);
     };
   }, [provider]);
 
-  // Save current user to localStorage and emit to editor
-  /*useEffect(() => {
-     if (editor && currentUser) {
-       localStorage.setItem("currentUser", JSON.stringify(currentUser));
-       editor.chain().focus().updateUser(currentUser).run();
-     }
-   }, [editor, currentUser]);*/
+  // Save current user to localStorage and update editor's collaboration user info
+  useEffect(() => {
+    if (editor && currentUser) {
+      localStorage.setItem("currentUser", JSON.stringify(currentUser));
+      // Update the user in the collaboration cursor extension
+      // (Assumes the extension supports the updateUser command)
+      editor.chain().focus().updateUser(currentUser).run();
+    }
+  }, [editor, currentUser]);
 
   const setName = useCallback(() => {
     const name = (window.prompt("Name", currentUser.name) || "")
       .trim()
       .substring(0, 32);
-
     if (name) {
-      return setCurrentUser({ ...currentUser, name });
+      setCurrentUser({ ...currentUser, name });
     }
   }, [currentUser]);
 

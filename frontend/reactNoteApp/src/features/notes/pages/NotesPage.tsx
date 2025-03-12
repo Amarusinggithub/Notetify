@@ -1,9 +1,9 @@
 import "../styles/Notespage.css";
-import NoteCard from "../components/NoteCard.jsx";
-import useNote from "../hooks/useNote.jsx";
-import { useContext, useEffect } from "react";
-import { SideNavContext } from "../../../context/SideNavContext.jsx";
-import AddNoteCard from "../components/AddNoteCard.jsx";
+import NoteCard from "../components/NoteCard.tsx";
+import useNote from "../hooks/useNote.tsx";
+import React,{ useContext, useEffect } from "react";
+import { SideNavContext } from "../../../context/SideNavContext.tsx";
+import AddNoteCard from "../components/AddNoteCard.tsx";
 
 const NotesPage = () => {
   const { pinnedNotes, otherNotes, isLoading, error } = useNote();

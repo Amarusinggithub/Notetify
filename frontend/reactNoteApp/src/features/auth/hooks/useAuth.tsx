@@ -1,5 +1,5 @@
-import { login, logout, signUp } from "../services/AuthService.jsx";
-import { createContext, useContext, useEffect, useState } from "react";
+import { login, logout, signUp } from "../services/AuthService.tsx";
+import React,{ createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext();

@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import React,{ useContext } from "react";
 import NoteCard from "../components/NoteCard";
 import useNote from "../hooks/useNote";
 import { SideNavContext } from "../../../context/SideNavContext";

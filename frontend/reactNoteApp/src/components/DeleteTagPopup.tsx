@@ -1,5 +1,6 @@
 import { faXmark, faLightbulb } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React from "react";
 
 import useTag from "../features/notes/hooks/useTag";
 import "../styles/DeleteTagPopup.css";

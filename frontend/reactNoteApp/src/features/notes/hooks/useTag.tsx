@@ -1,4 +1,4 @@
-import {
+import React,{
   createContext,
   useCallback,
   useContext,
@@ -11,15 +11,21 @@ import {
   deleteTag,
   getTags,
   updateTag,
-} from "../services/TagService.jsx";
+} from "../services/TagService.tsx";
+
+interface Tag {
+  id: number;
+  name: string;
+  users: number[];
+}
 
 const TagContext = createContext();
 
-const TagProvider = ({ children }) => {
-  const [selectedTag, setSelectedTag] = useState(null);
+const TagProvider = ({ children }:any) => {
+  const [selectedTag, setSelectedTag] = useState<Tag|null>(null);
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [tags, setTags] = useState([]);
+  const [tags, setTags] = useState<Tag[]>([]);
   const [wantToDeleteTag, setWantToDeleteTag] = useState(false);
   const [wantToEditTag, setWantToEditTag] = useState(false);
 
@@ -29,14 +35,14 @@ const TagProvider = ({ children }) => {
       setError(null);
       const fetchedTags = await getTags();
       setTags(fetchedTags);
-    } catch (e) {
+    } catch (e:any) {
       setError(e.message || "Error fetching tags");
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const makeTag = async (tagName) => {
+  const makeTag = async (tagName:string) => {
     const previousTags = [...tags];
 
     if (tags.some((tag) => tag.name.toLowerCase() === tagName.toLowerCase())) {
@@ -49,6 +55,7 @@ const TagProvider = ({ children }) => {
     const tag = {
       id: newId,
       name: tagName,
+      users:[]
     };
 
     setTags((prevTags) => [...prevTags, tag]);
@@ -59,10 +66,10 @@ const TagProvider = ({ children }) => {
 
       const response = await createTag(tagName);
 
-      if (!(response >= 200 && response < 300)) {
+      if (!response|| !(response >= 200 && response < 300)) {
         throw new Error("Failed to create tag on server");
       }
-    } catch (e) {
+    } catch (e:any) {
       setError(e.message || "Error adding tag");
       setTags(previousTags);
     } finally {
@@ -70,7 +77,7 @@ const TagProvider = ({ children }) => {
     }
   };
 
-  const editTag = async (tag) => {
+  const editTag = async (tag:Tag) => {
     const previousTags = [...tags];
     setTags((prevTags) => prevTags.map((t) => (tag.id === t.id ? tag : t)));
 
@@ -78,10 +85,10 @@ const TagProvider = ({ children }) => {
       setLoading(true);
       setError(null);
       const response = await updateTag(tag);
-      if (!(response >= 200 && response < 300)) {
+      if (!response||!(response >= 200 && response < 300)) {
         throw new Error("Failed to edit tag on server");
       }
-    } catch (e) {
+    } catch (e:any) {
       setError(e.message || "Error updating tag");
       setTags(previousTags);
     } finally {
@@ -89,7 +96,7 @@ const TagProvider = ({ children }) => {
     }
   };
 
-  const removeTag = async (tag) => {
+  const removeTag = async (tag:Tag) => {
     const previousTags = [...tags];
     setTags((tags) => tags.filter((t) => t.id !== tag.id));
 
@@ -97,10 +104,10 @@ const TagProvider = ({ children }) => {
       setLoading(true);
       setError(null);
       const response = await deleteTag(tag);
-      if (!(response >= 200 && response < 300)) {
+      if (!response|| !(response >= 200 && response < 300)) {
         throw new Error("Failed to remove note from server");
       }
-    } catch (e) {
+    } catch (e:any) {
       setError(e.message || "Error deleting tag");
       setTags(previousTags);
     } finally {

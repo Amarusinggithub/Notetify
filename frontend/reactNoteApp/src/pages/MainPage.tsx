@@ -1,16 +1,16 @@
-import { useContext } from "react";
-import SideNav from "../components/sidebar.jsx";
+import React,{ useContext } from "react";
+import SideNav from "../components/sidebar.tsx";
 import "../styles/mainpage.css";
 
-import Navbar from "../components/navbar.jsx";
-import { SideNavContext } from "../context/SideNavContext.jsx";
-import { Content } from "../components/content.jsx";
-import AddTagPopup from "../components/AddTagPopup.jsx";
-import EditTagPopup from "../components/EditTagPopup.jsx";
+import Navbar from "../components/navbar.tsx";
+import { SideNavContext } from "../context/SideNavContext.tsx";
+import { Content } from "../components/content.tsx";
+import AddTagPopup from "../components/AddTagPopup.tsx";
+import EditTagPopup from "../components/EditTagPopup.tsx";
 
-import DeleteTagPopup from "../components/DeleteTagPopup.jsx";
+import DeleteTagPopup from "../components/DeleteTagPopup.tsx";
 
-import useTag from "../features/notes/hooks/useTag.jsx";
+import useTag from "../features/notes/hooks/useTag.tsx";
 
 const MainPage = () => {
   const { isSideNavOpen, isAddTagPopupOpen } = useContext(SideNavContext);

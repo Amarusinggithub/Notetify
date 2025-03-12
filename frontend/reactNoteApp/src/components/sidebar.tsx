@@ -1,11 +1,11 @@
-import { useContext, useState } from "react";
+import React ,{ useContext, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { sidebarData } from "../utils/sidebarData.jsx";
+import { sidebarData } from "../utils/sidebarData.tsx";
 import "../styles/sidebar.css";
-import { SideNavContext } from "../context/SideNavContext.jsx";
+import { SideNavContext } from "../context/SideNavContext.tsx";
 import { faPlus, faTag, faEllipsis } from "@fortawesome/free-solid-svg-icons";
-import useNote from "../features/notes/hooks/useNote.jsx";
-import useTag from "../features/notes/hooks/useTag.jsx";
+import useNote from "../features/notes/hooks/useNote.tsx";
+import useTag from "../features/notes/hooks/useTag.tsx";
 
 const SideNav = () => {
   const { isSideNavOpen, setPage, setAddTagPopupOpen } =

@@ -1,7 +1,39 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import useNote from "../hooks/useNote";
 import "../styles/AddNoteCard.css";
-import Tiptap from "./tiptapEditor";
+import NoteContentEditor from "./NoteContentEditor";
+
+interface UserNote {
+  id: number;
+  note: {
+    id: number | undefined;
+    title: string;
+    content: string;
+    users: number[];
+  };
+  user: number | undefined;
+  tags: number[];
+  is_pinned: boolean;
+  is_trashed: boolean;
+  is_archived: boolean;
+  is_favorited: boolean;
+}
+
+
+interface UserNoteData {
+  id: number;
+  note_data: {
+    title: string;
+    content: string;
+    users: number[];
+  };
+  tags: number[];
+  is_pinned: boolean;
+  is_trashed: boolean;
+  is_archived: boolean;
+  is_favorited: boolean;
+}
+
 
 const AddNoteCard = () => {
   const { addNote, isLoading, error, notes } = useNote();
@@ -9,17 +41,20 @@ const AddNoteCard = () => {
   if (notes.length > 0) {
     noteId = notes[notes.length - 1].id + 1;
   } else {
-    noteId = 1; 
+    noteId = 1;
   }
-  const [noteState, setNoteState] = useState({
-    
+
+
+  
+  const [noteState, setNoteState] = useState<UserNoteData>({
+    id:noteId,
     note_data: {
       title: "",
       content: "",
       users: [],
     },
-    tags:[],
-    is_pinned:false,
+    tags: [],
+    is_pinned: false,
     is_trashed: false,
     is_archived: false,
     is_favorited: false,
@@ -32,7 +67,9 @@ const AddNoteCard = () => {
     setIsEdited(false);
   }, [isSelected]);
 
-  const handleSelect = async (e) => {
+  const handleSelect = async (e:
+        | React.MouseEvent<HTMLButtonElement, MouseEvent>
+        | React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     e.preventDefault();
     if (isSelected) {
       if (isEdited) {
@@ -42,7 +79,8 @@ const AddNoteCard = () => {
       setSelected(false);
     } else {
       setNoteState({
-        note: {
+        id: noteId,
+        note_data: {
           title: "",
           content: "",
           users: [],
@@ -64,14 +102,17 @@ const AddNoteCard = () => {
     setIsEdited(false);
   };
 
-  const handleTitle = (e) => {
+  const handleTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value;
-    setNoteState((prev) => ({ ...prev, note_data:{title: newTitle}  }));
+    setNoteState((prev) => ({
+      ...prev,
+      note_data: { ...prev.note_data, title: newTitle },
+    }));
     setIsEdited(newTitle !== null && newTitle !== "");
   };
 
-  const handleContentInput = (newContent) => {
-    setNoteState((prev) => ({ ...prev, note_data: { content: newContent } }));
+  const handleContentInput = (newContent:string) => {
+    setNoteState((prev) => ({ ...prev, note_data: {  ...prev.note_data,content: newContent } }));
     setIsEdited(newContent !== null && newContent !== "");
   };
 
@@ -107,11 +148,11 @@ const AddNoteCard = () => {
             />
           )}
 
-          <Tiptap
+          <NoteContentEditor
             content={noteState.note_data.content}
             handleContentInput={handleContentInput}
             isSelected={isSelected}
-            noteId={noteId}
+            note={{ ...noteState }}
           />
         </div>
 

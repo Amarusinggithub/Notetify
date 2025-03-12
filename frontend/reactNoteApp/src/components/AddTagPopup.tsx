@@ -1,6 +1,6 @@
 import { faXmark, faLightbulb } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useContext, useEffect, useRef, useState } from "react";
+import React ,{ useContext, useEffect, useRef, useState } from "react";
 import { SideNavContext } from "../context/SideNavContext";
 import useTag from "../features/notes/hooks/useTag";
 import "../styles/AddTagPopup.css";

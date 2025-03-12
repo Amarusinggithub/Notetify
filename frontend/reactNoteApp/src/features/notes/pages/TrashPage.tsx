@@ -1,7 +1,7 @@
-import useNote from "../hooks/useNote.jsx";
-import NoteCard from "../components/NoteCard.jsx";
-import { useContext } from "react";
-import { SideNavContext } from "../../../context/SideNavContext.jsx";
+import useNote from "../hooks/useNote.tsx";
+import NoteCard from "../components/NoteCard.tsx";
+import React,{ useContext } from "react";
+import { SideNavContext } from "../../../context/SideNavContext.tsx";
 
 const TrashPage = () => {
   const { isSideNavOpen } = useContext(SideNavContext);

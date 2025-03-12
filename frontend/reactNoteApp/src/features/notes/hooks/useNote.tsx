@@ -1,4 +1,4 @@
-import {
+import React, {
   createContext,
   useCallback,
   useContext,
@@ -10,20 +10,57 @@ import {
   deleteNote,
   getNotes,
   updateNote,
-} from "../services/NoteService.jsx";
+} from "../services/NoteService.tsx";
+
+interface UserNote {
+  id: number;
+  note: {
+    id: number;
+    title: string;
+    content: string;
+    users: number[];
+  };
+  user: number;
+  tags: number[];
+  is_pinned: boolean;
+  is_trashed: boolean;
+  is_archived: boolean;
+  is_favorited: boolean;
+}
+
+interface UserNoteData {
+  id: number;
+  note_data: {
+    title: string;
+    content: string;
+    users: number[];
+  };
+  tags: number[];
+  is_pinned: boolean;
+  is_trashed: boolean;
+  is_archived: boolean;
+  is_favorited: boolean;
+}
+
+interface Tag {
+  id: number;
+  name: string;
+  users: number[];
+}
 
 const NoteContext = createContext();
 
-const categorizedNotes = (notesArray) => {
+const categorizedNotes = (notesArray: (UserNote | UserNoteData)[]) => {
   console.log("this is the categorized notes", notesArray);
-  const pinned = [];
-  const favorites = [];
-  const archived = [];
-  const trashed = [];
-  const filtered = [];
-  const other = [];
+  const pinned: (UserNote | UserNoteData)[] = [];
+  const favorites: (UserNote | UserNoteData)[] = [];
+  const archived: (UserNote | UserNoteData)[] = [];
+  const trashed: (UserNote | UserNoteData)[] = [];
+  const filtered: (UserNote | UserNoteData)[] = [];
 
-  notesArray.forEach((note) => {
+  const other: (UserNote | UserNoteData)[] = [];
+
+  notesArray.forEach((note: UserNote | UserNoteData) => {
     if (
       note.is_pinned &&
       note.is_trashed === false &&
@@ -61,20 +98,34 @@ const categorizedNotes = (notesArray) => {
   return { pinned, favorites, archived, trashed, filtered, other };
 };
 
-const NoteProvider = ({ children }) => {
+const NoteProvider = ({ children }: any) => {
   const [search, setSearch] = useState("");
   const [title, setTitle] = useState("Notes");
-  const [otherNotes, setOtherNotes] = useState([]);
-  const [tagNotes, setTagNotes] = useState([]);
-  const [notes, setNotes] = useState([]);
-  const [searchNotes, setSearchNotes] = useState([]);
-  const [pinnedNotes, setPinnedNotes] = useState([]);
-  const [favoriteNotes, setFavoriteNotes] = useState([]);
-  const [archiveNotes, setArchiveNotes] = useState([]);
-  const [trashNotes, setTrashNotes] = useState([]);
-  const [selectedNote, setSelectedNote] = useState(null);
+  const [otherNotes, setOtherNotes] = useState<(UserNote | UserNoteData)[]>([]);
+  const [tagNotes, setTagNotes] = useState<(UserNote | UserNoteData)[]>([]);
+  const [notes, setNotes] = useState<(UserNote | UserNoteData)[]>([]);
+  const [searchNotes, setSearchNotes] = useState<(UserNote | UserNoteData)[]>(
+    []
+  );
+  const [pinnedNotes, setPinnedNotes] = useState<(UserNote | UserNoteData)[]>(
+    []
+  );
+  const [favoriteNotes, setFavoriteNotes] = useState<
+    (UserNote | UserNoteData)[]
+  >([]);
+  const [archiveNotes, setArchiveNotes] = useState<(UserNote | UserNoteData)[]>(
+    []
+  );
+  const [trashNotes, setTrashNotes] = useState<(UserNote | UserNoteData)[]>([]);
+  const [selectedNote, setSelectedNote] = useState<UserNote | null>(null);
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+
+  const isUserNote = (note: UserNote | UserNoteData): note is UserNote => {
+    return (note as UserNote).note !== undefined;
+  };
+
 
   const handleSearch = () => {
     const query = search.trim().toLowerCase();
@@ -83,54 +134,60 @@ const NoteProvider = ({ children }) => {
       case "":
       case "Notes":
         setSearchNotes(
-          notes.filter(
-            (note) =>
-              note.title.toLowerCase().includes(query) &&
-              !note.is_trashed &&
-              !note.is_archived
+          notes.filter((note: UserNote | UserNoteData) =>
+            isUserNote(note)
+              ? note.note.title.toLowerCase().includes(query)
+              : note.note_data.title.toLowerCase().includes(query)
           )
         );
         break;
 
       case "Favorites":
         setSearchNotes(
-          favoriteNotes.filter((note) =>
-            note.title.toLowerCase().includes(query)
+          favoriteNotes.filter((note: UserNote | UserNoteData) =>
+            isUserNote(note)
+              ? note.note.title.toLowerCase().includes(query)
+              : note.note_data.title.toLowerCase().includes(query)
           )
         );
         break;
 
       case "Archive":
         setSearchNotes(
-          archiveNotes.filter((note) =>
-            note.title.toLowerCase().includes(query)
+          archiveNotes.filter((note: UserNote | UserNoteData) =>
+            isUserNote(note)
+              ? note.note.title.toLowerCase().includes(query)
+              : note.note_data.title.toLowerCase().includes(query)
           )
         );
         break;
 
       case "Trash":
         setSearchNotes(
-          trashNotes.filter((note) => note.title.toLowerCase().includes(query))
+          trashNotes.filter((note: UserNote | UserNoteData) =>
+            isUserNote(note)
+              ? note.note.title.toLowerCase().includes(query)
+              : note.note_data.title.toLowerCase().includes(query)
+          )
         );
         break;
 
       default:
         setSearchNotes(
-          tagNotes.filter(
-            (note) =>
-              note.title.toLowerCase().includes(query) &&
-              note.is_trashed === false &&
-              note.is_archived === false
+          tagNotes.filter((note: UserNote | UserNoteData) =>
+            isUserNote(note)
+              ? note.note.title.toLowerCase().includes(query)
+              : note.note_data.title.toLowerCase().includes(query)
           )
         );
         break;
     }
   };
 
-  const handleTagClick = (tag) => {
+  const handleTagClick = (tag: Tag) => {
     setTagNotes(
       notes.filter(
-        (note) =>
+        (note: UserNote | UserNoteData) =>
           note.tags.includes(tag.id) &&
           note.is_trashed === false &&
           note.is_archived === false
@@ -138,27 +195,27 @@ const NoteProvider = ({ children }) => {
     );
   };
 
-  const handleFavorite = (note) => {
+  const handleFavorite = (note: UserNote) => {
     const updatedNote = { ...note, is_favorited: !note.is_favorited };
     editNote(updatedNote);
   };
 
-  const handleTrash = (note) => {
+  const handleTrash = (note: UserNote) => {
     const updatedNote = { ...note, is_trashed: !note.is_trashed };
     editNote(updatedNote);
   };
 
-  const handleArchive = (note) => {
+  const handleArchive = (note: UserNote) => {
     const updatedNote = { ...note, is_archived: !note.is_archived };
     editNote(updatedNote);
   };
 
-  const handlePin = (note) => {
+  const handlePin = (note: UserNote) => {
     const updatedNote = { ...note, is_pinned: !note.is_pinned };
     editNote(updatedNote);
   };
 
-  const refreshCategorizedNotes = (notesArray) => {
+  const refreshCategorizedNotes = (notesArray: (UserNote | UserNoteData)[]) => {
     setNotes(notesArray);
     console.log("this is the notes", notesArray);
 
@@ -180,24 +237,24 @@ const NoteProvider = ({ children }) => {
       setError(null);
       const fetchedNotes = await getNotes();
       refreshCategorizedNotes(fetchedNotes);
-    } catch (e) {
+    } catch (e: any) {
       setError(e.message || "Error fetching notes");
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const addNote = async (note) => {
+  const addNote = async (note: UserNoteData) => {
     const previousNotes = [...notes];
     refreshCategorizedNotes([...notes, note]);
     try {
       setLoading(true);
       setError(null);
       const response = await createNote(note);
-      if (!(response >= 200 && response < 300)) {
+      if (!response || !(response >= 200 && response < 300)) {
         throw new Error("Failed to add note on server");
       }
-    } catch (e) {
+    } catch (e: any) {
       setError(e.message || "Error adding note");
       refreshCategorizedNotes(previousNotes);
     } finally {
@@ -205,7 +262,8 @@ const NoteProvider = ({ children }) => {
     }
   };
 
-  const editNote = async (newNote) => {
+  const editNote = async (newNote: UserNote) => {
+    console.log("use note hook edit note triggered");
     const previousNotes = [...notes];
     const updatedNotes = notes.map((n) => (n.id === newNote.id ? newNote : n));
     refreshCategorizedNotes(updatedNotes);
@@ -216,7 +274,7 @@ const NoteProvider = ({ children }) => {
       if (!(response >= 200 && response < 300)) {
         throw new Error("Failed to update note on server");
       }
-    } catch (e) {
+    } catch (e: any) {
       setError(e.message || "Error updating note");
       refreshCategorizedNotes(previousNotes);
     } finally {
@@ -224,7 +282,7 @@ const NoteProvider = ({ children }) => {
     }
   };
 
-  const removeNote = async (note) => {
+  const removeNote = async (note: UserNote) => {
     const previousNotes = [...notes];
     const updatedNotes = notes.filter((n) => n.id !== note.id);
     refreshCategorizedNotes(updatedNotes);
@@ -232,10 +290,10 @@ const NoteProvider = ({ children }) => {
       setLoading(true);
       setError(null);
       const response = await deleteNote(note);
-      if (!(response >= 200 && response < 300)) {
+      if (!response || !(response >= 200 && response < 300)) {
         throw new Error("Failed to remove note on server");
       }
-    } catch (e) {
+    } catch (e: any) {
       setError(e.message || "Error deleting note");
       refreshCategorizedNotes(previousNotes);
     } finally {
