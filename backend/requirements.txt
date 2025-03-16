@@ -7,8 +7,10 @@ djangorestframework
 django-extensions
 djangorestframework-simplejwt
 psycopg2-binary
+django-quill-editor
 PyJWT
 PyMySQL
+pymysql
 django-storages
 python-dotenv
 arrow
@@ -28,6 +30,5 @@ django-jazzmin
 Pillow
 django_quill
 redis
-django_quill
 channels_redis
-ckeditor
+django-ckeditor

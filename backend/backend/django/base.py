@@ -11,14 +11,12 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 from datetime import timedelta
 from pathlib import Path
+from backend.env import BASE_DIR,env
 import os
 
 from dotenv import load_dotenv
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
-
-
+env.read_env(os.path.join(BASE_DIR,'.env'))
 load_dotenv(os.path.join(BASE_DIR / ".env"))
 
 
@@ -27,14 +25,14 @@ load_dotenv(os.path.join(BASE_DIR / ".env"))
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY") 
+SECRET_KEY = env("DJANGO_SECRET_KEY") 
 
 # 'DJANGO_ALLOWED_HOSTS' should be a single string of hosts with a , between each.
 # For example: 'DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1,[::1]'
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS","127.0.0.1").split(",")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv("DEBUG", "False")
+DEBUG = env.bool("DEBUG", default=True)
 
 
 # REST FRAMEWORK
