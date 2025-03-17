@@ -19,7 +19,7 @@ const EditTagPopup = () => {
 
   const handleClose = () => setWantToEditTag(false);
 
-  const handleTagNameChange = (e) => {
+  const handleTagNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTagName(e.target.value);
   };
 
@@ -50,7 +50,7 @@ const EditTagPopup = () => {
           className="edit-tag-input"
           placeholder="Eg. School or Work"
           value={TagName}
-          onChange={handleTagNameChange}
+          onChange={(e)=>{handleTagNameChange(e)}}
         />
 
         <div className="edit-tag-actions">

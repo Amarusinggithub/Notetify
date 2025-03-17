@@ -14,7 +14,6 @@ import {
   TypeStrikethrough,
   TypeUnderline,
 } from "react-bootstrap-icons";
-import React from "react";
 
 
 export enum RichTextAction {

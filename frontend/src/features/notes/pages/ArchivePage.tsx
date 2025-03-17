@@ -1,6 +1,5 @@
 import NoteCard from "../components/NoteCard";
 import useNote from "../hooks/useNote";
-import React from "react";
 
 interface UserNote {
   id: number;
@@ -16,7 +15,24 @@ interface UserNote {
   is_trashed: boolean;
   is_archived: boolean;
   is_favorited: boolean;
+  role: string;
 }
+
+interface UserNoteData {
+  id: number;
+  note_data: {
+    title: string;
+    content: string;
+    users: number[];
+  };
+  tags: number[];
+  is_pinned: boolean;
+  is_trashed: boolean;
+  is_archived: boolean;
+  is_favorited: boolean;
+  role: string;
+}
+
 
 
 const ArchivePage = () => {
@@ -33,7 +49,7 @@ const ArchivePage = () => {
     <div className="container">
       <div className="all-notes">
         {archiveNotes &&
-          archiveNotes.map((note:UserNote) => (
+          archiveNotes.map((note: UserNote | UserNoteData) => (
             <div key={note.id} className="note-div">
               <NoteCard note={note} />
             </div>

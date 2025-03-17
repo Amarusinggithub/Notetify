@@ -1,7 +1,7 @@
 import "../styles/Notespage.css";
 import NoteCard from "../components/NoteCard.tsx";
 import useNote from "../hooks/useNote.tsx";
-import React,{ useContext, useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { SideNavContext } from "../../../context/SideNavContext.tsx";
 import AddNoteCard from "../components/AddNoteCard.tsx";
 
@@ -43,7 +43,7 @@ const NotesPage = () => {
   const { isSideNavOpen } = useContext(SideNavContext);
   useEffect(() => {
     console.log("this is the pinned notes", pinnedNotes);
-  }, []);
+  }, [pinnedNotes]);
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -60,7 +60,7 @@ const NotesPage = () => {
       {pinnedNotes?.length > 0 && (
         <>
           <div className="flex-column">
-            <h1>Pinned Notes</h1>
+            <h1 data-testid="cypress-pinnedNotes-title">Pinned Notes</h1>
           </div>
 
           <div

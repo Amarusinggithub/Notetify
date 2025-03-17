@@ -11,19 +11,19 @@ const Navbar = () => {
   const {isSideNavOpen, setIsSideNavOpen} = useContext(SideNavContext);
   const {handleSearch,search, setSearch,fetchNotes,title} = useNote();
 
-  const handleSearchChange = (event) => {
-    const query = event.target.value;
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value;
     setSearch(query);
     handleSearch();
   };
 
-  const handleSideMenuChange = (event) => {
-    event.preventDefault();
+  const handleSideMenuChange = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
     setIsSideNavOpen(!isSideNavOpen);
   };
 
-  const handleSearchSubmit = (event) => {
-    event.preventDefault();
+  const handleSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     handleSearch();
     console.log("Search submitted:", search);
   };
@@ -31,7 +31,7 @@ const Navbar = () => {
   return (
     <div className="navbar">
       <div className="menu-logo-title-container">
-        <button onClick={handleSideMenuChange} className="menu-btn">
+        <button onClick={(e)=>{handleSideMenuChange(e)}} className="menu-btn">
           <FontAwesomeIcon icon={faBars} className="menu-icon" />
         </button>
 
@@ -55,7 +55,7 @@ const Navbar = () => {
         )}
       </div>
 
-      <form onSubmit={handleSearchSubmit} className="search-container">
+      <form onSubmit={(e)=>{handleSearchSubmit(e)}} className="search-container">
         <button type="submit">
           <FontAwesomeIcon icon={faMagnifyingGlass} className="search-icon" />
         </button>
@@ -63,7 +63,7 @@ const Navbar = () => {
           name="search"
           placeholder="Search"
           value={search}
-          onChange={handleSearchChange}
+          onChange={(e) =>{ handleSearchChange(e)}}
           type="text"
         />
       </form>

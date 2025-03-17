@@ -1,4 +1,4 @@
-import React ,{ useContext, useState } from "react";
+import{ useContext, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { sidebarData } from "../utils/sidebarData.tsx";
 import "../styles/sidebar.css";
@@ -7,6 +7,12 @@ import { faPlus, faTag, faEllipsis } from "@fortawesome/free-solid-svg-icons";
 import useNote from "../features/notes/hooks/useNote.tsx";
 import useTag from "../features/notes/hooks/useTag.tsx";
 
+interface Tag {
+  id: number;
+  name: string;
+  users: number[];
+}
+
 const SideNav = () => {
   const { isSideNavOpen, setPage, setAddTagPopupOpen } =
     useContext(SideNavContext);
@@ -14,10 +20,10 @@ const SideNav = () => {
   const { tags, setWantToDeleteTag, setSelectedTag, setWantToEditTag } =
     useTag();
 
-  const [temp, setTemp] = useState(sidebarData[0]);
-  const [tempId, setTempId] = useState(null);
+  const [temp, setTemp] = useState<any>(sidebarData[0]);
+  const [tempId, setTempId] = useState<any>(null);
 
-  const handleOnClick = (index) => {
+  const handleOnClick = (index:number) => {
     return () => {
       setPage(index);
       setTemp(sidebarData[index]);
@@ -25,7 +31,7 @@ const SideNav = () => {
     };
   };
 
-  const handleTagClicked = (tag) => {
+  const handleTagClicked = (tag:Tag) => {
     setTemp(tag);
     setTitle(tag.name);
     handleTagClick(tag);
@@ -92,7 +98,7 @@ const SideNav = () => {
         )}
         {tags?.length > 0 && (
           <ul className="tags">
-            {tags.map((tag, index) => (
+            {tags.map((tag:Tag, index:number) => (
               <li
                 onClick={(e) => {
                   e.stopPropagation();

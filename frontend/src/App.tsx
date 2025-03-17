@@ -1,5 +1,5 @@
 import "./App.css";
-import React,{ useEffect } from "react";
+import { useEffect } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import ErrorPage from "./pages/ErrorPage.tsx";
 import LoginPage from "./features/auth/pages/LoginPage.tsx";

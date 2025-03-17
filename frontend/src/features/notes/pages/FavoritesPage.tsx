@@ -1,4 +1,4 @@
-import React,{ useContext } from "react";
+import { useContext } from "react";
 import NoteCard from "../components/NoteCard.tsx";
 import useNote from "../hooks/useNote.tsx";
 import { SideNavContext } from "../../../context/SideNavContext.tsx";
@@ -17,6 +17,7 @@ interface UserNote {
   is_trashed: boolean;
   is_archived: boolean;
   is_favorited: boolean;
+  role: string;
 }
 
 interface UserNoteData {
@@ -31,6 +32,7 @@ interface UserNoteData {
   is_trashed: boolean;
   is_archived: boolean;
   is_favorited: boolean;
+  role: string;
 }
 
 const FavoritesPage = () => {

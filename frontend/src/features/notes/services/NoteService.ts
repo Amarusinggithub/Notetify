@@ -113,7 +113,7 @@ export const createNote = async (note: UserNoteData) => {
       is_trashed: note.is_trashed,
       is_archived: note.is_archived,
       is_favorited: note.is_favorited,
-      user:null,
+      user: null,
     });
     console.log(response.data);
     return response.status;
@@ -122,7 +122,7 @@ export const createNote = async (note: UserNoteData) => {
   }
 };
 
-export const updateNote = async (note:UserNote) => {
+export const updateNote = async (note: UserNote) => {
   console.log("this");
   try {
     const response = await axiosInstance.put(`notes/edit_note/${note.id}/`, {
@@ -150,7 +150,7 @@ export const updateNote = async (note:UserNote) => {
   }
 };
 
-export const deleteNote = async (note:UserNote) => {
+export const deleteNote = async (note: UserNote) => {
   try {
     const response = await axiosInstance.delete(
       `notes/delete_note/${note.id}/`

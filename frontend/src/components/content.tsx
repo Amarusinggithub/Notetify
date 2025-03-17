@@ -11,6 +11,8 @@ import TagPage from "../features/notes/pages/TagPage.js";
 
 export const Content = () => {
   const { search } = useNote();
+  const { page } = useContext(SideNavContext);
+
 
   const SidebarPages = [
     <NotesPage key="notes" />,
@@ -21,7 +23,6 @@ export const Content = () => {
     <TagPage key="tag"/>
   ];
 
-  const { page } = useContext(SideNavContext);
 
   if (search.length > 0) {
     return SidebarPages[4];

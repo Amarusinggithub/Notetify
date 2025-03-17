@@ -2,7 +2,7 @@
 import axios from "axios";
 
 axios.defaults.withCredentials = true;
-let csrfToken = null;
+let csrfToken:any = null;
 
 export const initializeCSRFToken = async () => {
     if (!csrfToken) {

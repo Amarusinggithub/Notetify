@@ -1,12 +1,10 @@
 import axios from "axios";
 import { getCSRFToken } from "../../../services/CSRFTokenService.tsx";
 
-
-
 let csrfToken;
 
-async function  setCSRFToken (){
-csrfToken = await getCSRFToken();
+async function setCSRFToken() {
+  csrfToken = await getCSRFToken();
 }
 setCSRFToken();
 
@@ -71,7 +69,7 @@ axiosInstance.interceptors.response.use(
   }
 );
 
-export const login = async (username:string, password:string) => {
+export const login = async (username: string, password: string) => {
   try {
     const response = await axiosInstance.post("login/", { username, password });
     localStorage.clear();
@@ -84,7 +82,7 @@ export const login = async (username:string, password:string) => {
       `this is the access token:${response.data.access_token} and refresh token: ${response.data.refresh_token}`
     );
     return response;
-  } catch (error:any) {
+  } catch (error: any) {
     console.error(
       "Login error:",
       error.response ? error.response.data : error.message
@@ -93,7 +91,11 @@ export const login = async (username:string, password:string) => {
   }
 };
 
-export const signUp = async (email:string, username:string, password:string) => {
+export const signUp = async (
+  email: string,
+  username: string,
+  password: string
+) => {
   try {
     const response = await axiosInstance.post("register/", {
       email,
@@ -109,7 +111,7 @@ export const signUp = async (email:string, username:string, password:string) => 
 
     console.log(response.data);
     return response;
-  } catch (error:any) {
+  } catch (error: any) {
     console.error(
       "Signup error:",
       error.response ? error.response.data : error.message

@@ -1,8 +1,8 @@
-import React ,{createContext, useState} from "react";
+import{createContext, useState} from "react";
 
 export const SideNavContext = createContext();
 
-export const SideNavProvider = ({children}) => {
+export const SideNavProvider = ({children}:{children:any}) => {
     const [isSideNavOpen, setIsSideNavOpen] = useState(true);
     const [page, setPage] = useState(0);
     const [isAddTagPopupOpen, setAddTagPopupOpen] = useState(false);

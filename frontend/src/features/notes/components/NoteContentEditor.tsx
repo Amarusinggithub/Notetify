@@ -1,16 +1,14 @@
 /* eslint-disable react/prop-types */
-import { $getRoot, $createParagraphNode, $createTextNode } from "lexical";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { CollaborationPlugin } from "@lexical/react/LexicalCollaborationPlugin";
 import * as Y from "yjs";
-import React from "react";
 import { Provider } from "@lexical/yjs";
-import { EditorState, LexicalEditor } from 'lexical';
+import { EditorState } from 'lexical';
 import { WebsocketProvider } from "y-websocket";
-import { useEffect, useCallback, useRef } from "react";
+import { useCallback, useRef } from "react";
 
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
