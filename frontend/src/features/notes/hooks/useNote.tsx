@@ -50,7 +50,7 @@ interface Tag {
   users: number[];
 }
 
-const NoteContext = createContext();
+const NoteContext = createContext<any>({});
 
 const categorizedNotes = (notesArray: (UserNote | UserNoteData)[]) => {
   console.log("this is the categorized notes", notesArray);

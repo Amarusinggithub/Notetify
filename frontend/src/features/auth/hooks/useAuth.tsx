@@ -1,17 +1,22 @@
+// Make sure this path is correct
+import useNote from "../../notes/hooks/useNote.tsx"; // Adjust this path
 import { login, logout, signUp } from "../services/AuthService.ts";
 import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import useTag from "../../notes/hooks/useTag.tsx";
 
-const AuthContext = createContext();
+const AuthContext = createContext<any>({});
 
-const AuthProvider = ({ children }:{children:any}) => {
+const AuthProvider = ({ children }: { children: any }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setLoading] = useState<boolean>(false);
-  const [userData, setUserData] = useState(null);
+  const [userData, setUserData] = useState<any>(null);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const { fetchNotes } = useNote();
+  const { fetchTags } = useTag();
 
-  const setLogin = (userData) => {
+  const setLogin = (userData: any) => {
     setUserData(userData);
     setIsAuthenticated(true);
     console.log("User data set:", userData);
@@ -25,7 +30,11 @@ const AuthProvider = ({ children }:{children:any}) => {
     localStorage.removeItem("Userdata");
   };
 
-  const handleSignup = async (email:string, username:string, password:string) => {
+  const handleSignup = async (
+    email: string,
+    username: string,
+    password: string
+  ) => {
     try {
       setLoading(true);
       setError(null);
@@ -33,12 +42,13 @@ const AuthProvider = ({ children }:{children:any}) => {
       if (response.status >= 200 && response.status < 300) {
         console.log("Signup successful");
         setLogin(response.data.userData);
-        localStorage.setItem("username", username);
         navigate("/");
+        await fetchNotes();
+        await fetchTags();
       } else {
         console.error("Signup failed");
       }
-    } catch (error:any) {
+    } catch (error: any) {
       console.error("Error during signup:", error);
       setError(error);
     } finally {
@@ -46,7 +56,7 @@ const AuthProvider = ({ children }:{children:any}) => {
     }
   };
 
-  const handleLogin = async (username:string, password:string) => {
+  const handleLogin = async (username: string, password: string) => {
     try {
       setLoading(true);
       setError(null);
@@ -54,14 +64,14 @@ const AuthProvider = ({ children }:{children:any}) => {
       const response = await login(username, password);
       if (response.status >= 200 && response.status < 300) {
         console.log("Login successful");
-        setLogin(response.data.userData);
-        localStorage.setItem("userData", userData);
-
         navigate("/");
+        setLogin(response.data.userData);
+        await fetchNotes();
+        await fetchTags();
       } else {
         console.error("Login failed");
       }
-    } catch (error:any) {
+    } catch (error: any) {
       console.error("Error during login:", error);
       setError(error);
     } finally {
@@ -82,7 +92,7 @@ const AuthProvider = ({ children }:{children:any}) => {
       } else {
         console.error("Logout failed");
       }
-    } catch (error:any) {
+    } catch (error: any) {
       console.error("Error during logout:", error);
       setError(error);
     } finally {
@@ -91,11 +101,8 @@ const AuthProvider = ({ children }:{children:any}) => {
   };
 
   useEffect(() => {
-    if (localStorage.getItem("access_token") != null) {
-      setIsAuthenticated(true);
-    } else {
-      setIsAuthenticated(false);
-    }
+    const token = localStorage.getItem("access_token");
+    setIsAuthenticated(Boolean(token));
   }, [isAuthenticated]);
 
   return (

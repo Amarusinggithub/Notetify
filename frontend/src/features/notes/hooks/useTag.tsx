@@ -19,7 +19,7 @@ interface Tag {
   users: number[];
 }
 
-const TagContext = createContext();
+const TagContext = createContext<any>({});
 
 const TagProvider = ({ children }:any) => {
   const [selectedTag, setSelectedTag] = useState<Tag|null>(null);

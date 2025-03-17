@@ -19,6 +19,7 @@ const LoginPage = () => {
 
   return (
     <form
+      data-testid="cypress-Login-form"
       onSubmit={(e) => {
         handleSubmit(e);
       }}
