@@ -1,6 +1,5 @@
 import axios from "axios";
 import { getCSRFToken } from "../../../services/CSRFTokenService.tsx";
-import React from "react";
 
 const csrfToken = await getCSRFToken();
 

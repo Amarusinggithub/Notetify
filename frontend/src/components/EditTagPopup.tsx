@@ -1,6 +1,6 @@
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React,{ useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import useTag from "../features/notes/hooks/useTag";
 import "../styles/EditTagPopup.css";
 
@@ -8,12 +8,15 @@ const EditTagPopup = () => {
   const [TagName, setTagName] = useState("");
 
   const { editTag, selectedTag, setWantToEditTag } = useTag();
-  const editInputRef = useRef();
+  const editInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (selectedTag) {
       setTagName(selectedTag.name);
-      editInputRef.current.focus();
+
+      if (editInputRef.current) {
+        editInputRef.current.focus();
+      }
     }
   }, [selectedTag]);
 
@@ -50,7 +53,9 @@ const EditTagPopup = () => {
           className="edit-tag-input"
           placeholder="Eg. School or Work"
           value={TagName}
-          onChange={(e)=>{handleTagNameChange(e)}}
+          onChange={(e) => {
+            handleTagNameChange(e);
+          }}
         />
 
         <div className="edit-tag-actions">

@@ -5,27 +5,30 @@ import { SideNavContext } from "../context/SideNavContext";
 import useTag from "../features/notes/hooks/useTag";
 import "../styles/AddTagPopup.css";
 
+
 const AddTagPopup = () => {
   const [TagName, setTagName] = useState("");
 
   const { setAddTagPopupOpen } = useContext(SideNavContext);
   const { makeTag } = useTag();
 
-  const addInputRef = useRef();
+  const addInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    addInputRef.current.focus();
+    if (addInputRef.current) {
+      addInputRef.current.focus();
+    }
   }, []);
 
   const handleClose = () => setAddTagPopupOpen(false);
 
-  const handleTagNameChange = (e) => {
+  const handleTagNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTagName(e.target.value);
   };
 
   const handleAddTagName = () => {
     if (TagName.trim() !== "") {
-      makeTag(TagName.trim().charAt(0).toUpperCase()+TagName.trim().slice(1));
+      makeTag(TagName.trim().charAt(0).toUpperCase() + TagName.trim().slice(1));
       setTagName("");
     }
     handleClose();
@@ -49,7 +52,9 @@ const AddTagPopup = () => {
           className="add-tag-input"
           placeholder="Eg. School or Work"
           value={TagName}
-          onChange={handleTagNameChange}
+          onChange={(e) => {
+            handleTagNameChange(e);
+          }}
         />
 
         <div className="tag-info-container">

@@ -41,8 +41,8 @@ const colors = [
 
 const appId = "7j9y6m11";
 
-const Tiptap = ({ handleContentInput, content, isSelected, noteId }) => {
-  const getRandomElement = (list) =>
+const Tiptap = ({ handleContentInput, content, isSelected, noteId }:{handleContentInput:any; content:string; isSelected:boolean; noteId:number;}) => {
+  const getRandomElement = (list:string []) =>
     list[Math.floor(Math.random() * list.length)];
   const getRandomColor = () => getRandomElement(colors);
 
@@ -138,7 +138,7 @@ const Tiptap = ({ handleContentInput, content, isSelected, noteId }) => {
 
   // Update status changes from provider
   useEffect(() => {
-    const statusHandler = (event) => {
+    const statusHandler = (event:any) => {
       setStatus(event.status);
     };
     provider.on("status", statusHandler);
@@ -224,7 +224,7 @@ const Tiptap = ({ handleContentInput, content, isSelected, noteId }) => {
               } online in ${room}`
             : "offline"}
         </label>
-        <button style={{ "--color": currentUser.color }} onClick={setName}>
+        <button style={{ "color": currentUser.color }} onClick={setName}>
           ✎ {currentUser.name}
         </button>
       </div>

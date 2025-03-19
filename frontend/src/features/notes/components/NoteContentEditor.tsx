@@ -28,6 +28,8 @@ import { ListNode, ListItemNode } from "@lexical/list";
 
 import "../styles/NoteContentEditor.css";
 
+
+
 const theme = {
   ltr: "ltr",
   rtl: "rtl",
@@ -135,8 +137,8 @@ const defaultEditorState = JSON.stringify({
 });
 
 // Recursively traverse the editor state and ensure valid indent values for list items.
-function sanitizeEditorState(editorStateObj) {
-  function traverse(node) {
+function sanitizeEditorState(editorStateObj:any) {
+  function traverse(node:any) {
     if (node.type === "listitem") {
       if (typeof node.indent !== "number" || node.indent < 0) {
         console.warn(
@@ -147,7 +149,7 @@ function sanitizeEditorState(editorStateObj) {
       }
     }
     if (node.children && Array.isArray(node.children)) {
-      node.children.forEach((child) => traverse(child));
+      node.children.forEach((child:any) => traverse(child));
     }
   }
   if (editorStateObj && editorStateObj.root) {
@@ -189,12 +191,17 @@ function parseOrDefault(editorStateStr:string) {
 const NoteContentEditor = ({
   handleContentInput,
   content,
-  isSelected,note
+  isSelected,
+  note,
+}: {
+  handleContentInput:any;
+  content:string;
+  isSelected:boolean;
+  note:any;
 }) => {
   const editorRef = useRef(null);
   const validContent = parseOrDefault(content);
 
-  
   const initialConfig = {
     namespace: "MyEditor",
     theme,
@@ -212,7 +219,6 @@ const NoteContentEditor = ({
     editorState: validContent,
   };
 
-
   function getDocFromMap(id: string, yjsDocMap: Map<string, Y.Doc>) {
     if (!yjsDocMap.has(id)) {
       yjsDocMap.set(id, new Y.Doc());
@@ -223,7 +229,7 @@ const NoteContentEditor = ({
   const providerFactory = useCallback(
     (id: string, yjsDocMap: Map<string, Y.Doc>) => {
       const doc = getDocFromMap(id, yjsDocMap);
-      return new WebsocketProvider("ws://localhost:1234", id, doc, {
+      return new WebsocketProvider("ws://localhost:1234", id, doc!, {
         connect: false,
       }) as unknown as Provider;
     },
@@ -236,7 +242,10 @@ const NoteContentEditor = ({
   }
 
   return (
-    <LexicalComposer initialConfig={initialConfig} key={`${note.id}-${isSelected}`}>
+    <LexicalComposer
+      initialConfig={initialConfig}
+      key={`${note.id}-${isSelected}`}
+    >
       <RichTextPlugin
         contentEditable={<ContentEditable className="content-editable" />}
         placeholder={

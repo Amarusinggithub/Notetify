@@ -3,21 +3,7 @@ import useNote from "../hooks/useNote";
 import "../styles/AddNoteCard.css";
 import NoteContentEditor from "./NoteContentEditor";
 
-interface UserNote {
-  id: number;
-  note: {
-    id: number | undefined;
-    title: string;
-    content: string;
-    users: number[];
-  };
-  user: number | undefined;
-  tags: number[];
-  is_pinned: boolean;
-  is_trashed: boolean;
-  is_archived: boolean;
-  is_favorited: boolean;
-}
+
 
 
 interface UserNoteData {
