@@ -29,9 +29,14 @@ const Navbar = () => {
   };
 
   return (
-    <div className="navbar">
+    <div className="fixed	flex flex-row p-10 w-full h- leading-12 z-100 top-0 left-0">
       <div className="menu-logo-title-container">
-        <button onClick={(e)=>{handleSideMenuChange(e)}} className="menu-btn">
+        <button
+          onClick={(e) => {
+            handleSideMenuChange(e);
+          }}
+          className="menu-btn"
+        >
           <FontAwesomeIcon icon={faBars} className="menu-icon" />
         </button>
 
@@ -55,7 +60,12 @@ const Navbar = () => {
         )}
       </div>
 
-      <form onSubmit={(e)=>{handleSearchSubmit(e)}} className="search-container">
+      <form
+        onSubmit={(e) => {
+          handleSearchSubmit(e);
+        }}
+        className="search-container"
+      >
         <button type="submit">
           <FontAwesomeIcon icon={faMagnifyingGlass} className="search-icon" />
         </button>
@@ -63,7 +73,9 @@ const Navbar = () => {
           name="search"
           placeholder="Search"
           value={search}
-          onChange={(e) =>{ handleSearchChange(e)}}
+          onChange={(e) => {
+            handleSearchChange(e);
+          }}
           type="text"
         />
       </form>
