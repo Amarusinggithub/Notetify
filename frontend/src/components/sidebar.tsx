@@ -1,21 +1,18 @@
-import{ useContext, useState } from "react";
+import{  useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { sidebarData } from "../utils/sidebarData.tsx";
 import "../styles/sidebar.css";
-import { SideNavContext } from "../context/SideNavContext.tsx";
+import {  useSideNav } from "../context/SideNavContext.tsx";
 import { faPlus, faTag, faEllipsis } from "@fortawesome/free-solid-svg-icons";
 import useNote from "../features/notes/hooks/useNote.tsx";
 import useTag from "../features/notes/hooks/useTag.tsx";
+import { Tag } from "types/types.ts";
 
-interface Tag {
-  id: number;
-  name: string;
-  users: number[];
-}
+
 
 const SideNav = () => {
   const { isSideNavOpen, setPage, setAddTagPopupOpen } =
-    useContext(SideNavContext);
+    useSideNav();
   const { handleTagClick, setTitle } = useNote();
   const { tags, setWantToDeleteTag, setSelectedTag, setWantToEditTag } =
     useTag();

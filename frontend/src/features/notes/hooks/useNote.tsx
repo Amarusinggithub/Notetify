@@ -1,5 +1,6 @@
-import  {
+import {
   createContext,
+  ReactNode,
   useCallback,
   useContext,
   useEffect,
@@ -10,88 +11,86 @@ import {
   deleteNote,
   getNotes,
   updateNote,
-} from "../services/NoteService.ts";
+} from "../services/NoteService";
+import { Tag, UserNote, UserNoteData } from "types/types";
 
-interface UserNote {
-  id: number;
-  note: {
-    id: number;
-    title: string;
-    content: string;
-    users: number[];
-  };
-  user: number;
-  tags: number[];
-  is_pinned: boolean;
-  is_trashed: boolean;
-  is_archived: boolean;
-  is_favorited: boolean;
-  role: string;
+
+interface NoteContextType {
+  search: string;
+  title: string;
+  notes: (UserNote | UserNoteData)[];
+  pinnedNotes: (UserNote | UserNoteData)[];
+  searchNotes: (UserNote | UserNoteData)[];
+  favoriteNotes: (UserNote | UserNoteData)[];
+  archiveNotes: (UserNote | UserNoteData)[];
+  trashNotes: (UserNote | UserNoteData)[];
+  selectedNote: UserNote | null;
+  isLoading: boolean;
+  tagNotes: (UserNote | UserNoteData)[];
+  error: any;
+  otherNotes: (UserNote | UserNoteData)[];
+  setTagNotes: React.Dispatch<
+    React.SetStateAction<(UserNote | UserNoteData)[]>
+  >;
+  setTitle: React.Dispatch<React.SetStateAction<string>>;
+  fetchNotes: () => Promise<void>;
+  handleSearch: () => void;
+  addNote: (note: UserNoteData) => Promise<void>;
+  editNote: (newNote: UserNote) => Promise<void>;
+  removeNote: (note: UserNote) => Promise<void>;
+  handleArchive: (note: UserNote) => void;
+  handleFavorite: (note: UserNote) => void;
+  handleTrash: (note: UserNote) => void;
+  handlePin: (note: UserNote) => void;
+  setSelectedNote: React.Dispatch<React.SetStateAction<UserNote | null>>;
+  setSearch: React.Dispatch<React.SetStateAction<string>>;
+  setPinnedNotes: React.Dispatch<
+    React.SetStateAction<(UserNote | UserNoteData)[]>
+  >;
+  setFavoriteNotes: React.Dispatch<
+    React.SetStateAction<(UserNote | UserNoteData)[]>
+  >;
+  setArchiveNotes: React.Dispatch<
+    React.SetStateAction<(UserNote | UserNoteData)[]>
+  >;
+  setTrashNotes: React.Dispatch<
+    React.SetStateAction<(UserNote | UserNoteData)[]>
+  >;
+  handleTagClick: (tag: Tag) => void;
+  setOtherNotes: React.Dispatch<
+    React.SetStateAction<(UserNote | UserNoteData)[]>
+  >;
 }
 
-interface UserNoteData {
-  id: number;
-  note_data: {
-    title: string;
-    content: string;
-    users: number[];
-  };
-  tags: number[];
-  is_pinned: boolean;
-  is_trashed: boolean;
-  is_archived: boolean;
-  is_favorited: boolean;
-  role: string;
+interface NoteProviderProps {
+  children: ReactNode;
 }
 
-interface Tag {
-  id: number;
-  name: string;
-  users: number[];
-}
+const NoteContext = createContext<NoteContextType | undefined>(undefined);
 
-const NoteContext = createContext<any>({});
-
+// Categorize notes based on various flags.
 const categorizedNotes = (notesArray: (UserNote | UserNoteData)[]) => {
-  console.log("this is the categorized notes", notesArray);
   const pinned: (UserNote | UserNoteData)[] = [];
   const favorites: (UserNote | UserNoteData)[] = [];
   const archived: (UserNote | UserNoteData)[] = [];
   const trashed: (UserNote | UserNoteData)[] = [];
   const filtered: (UserNote | UserNoteData)[] = [];
-
   const other: (UserNote | UserNoteData)[] = [];
 
   notesArray.forEach((note: UserNote | UserNoteData) => {
-    if (
-      note.is_pinned &&
-      note.is_trashed === false &&
-      note.is_archived === false
-    ) {
+    if (note.is_pinned && !note.is_trashed && !note.is_archived) {
       pinned.push(note);
     }
-
-    if (
-      note.is_favorited &&
-      note.is_trashed === false &&
-      note.is_archived === false
-    ) {
+    if (note.is_favorited && !note.is_trashed && !note.is_archived) {
       favorites.push(note);
     }
-
-    if (note.is_archived && note.is_trashed === false) {
+    if (note.is_archived && !note.is_trashed) {
       archived.push(note);
     }
-
-    if (note.is_trashed && note.is_archived === false) {
+    if (note.is_trashed && !note.is_archived) {
       trashed.push(note);
     }
-
-    if (
-      note.is_trashed === false &&
-      note.is_archived === false &&
-      note.is_pinned === false
-    ) {
+    if (!note.is_trashed && !note.is_archived && !note.is_pinned) {
       filtered.push(note);
       other.push(note);
     }
@@ -100,7 +99,7 @@ const categorizedNotes = (notesArray: (UserNote | UserNoteData)[]) => {
   return { pinned, favorites, archived, trashed, filtered, other };
 };
 
-const NoteProvider = ({ children }: any) => {
+const NoteProvider = ({ children }: NoteProviderProps) => {
   const [search, setSearch] = useState("");
   const [title, setTitle] = useState("Notes");
   const [otherNotes, setOtherNotes] = useState<(UserNote | UserNoteData)[]>([]);
@@ -121,60 +120,56 @@ const NoteProvider = ({ children }: any) => {
   const [trashNotes, setTrashNotes] = useState<(UserNote | UserNoteData)[]>([]);
   const [selectedNote, setSelectedNote] = useState<UserNote | null>(null);
   const [isLoading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<any>(null);
 
+  // Type guard to distinguish between UserNote and UserNoteData.
   const isUserNote = (note: UserNote | UserNoteData): note is UserNote => {
     return (note as UserNote).note !== undefined;
   };
 
   const handleSearch = () => {
     const query = search.trim().toLowerCase();
-
     switch (title) {
       case "":
       case "Notes":
         setSearchNotes(
-          notes.filter((note: UserNote | UserNoteData) =>
+          notes.filter((note) =>
             isUserNote(note)
               ? note.note.title.toLowerCase().includes(query)
               : note.note_data.title.toLowerCase().includes(query)
           )
         );
         break;
-
       case "Favorites":
         setSearchNotes(
-          favoriteNotes.filter((note: UserNote | UserNoteData) =>
+          favoriteNotes.filter((note) =>
             isUserNote(note)
               ? note.note.title.toLowerCase().includes(query)
               : note.note_data.title.toLowerCase().includes(query)
           )
         );
         break;
-
       case "Archive":
         setSearchNotes(
-          archiveNotes.filter((note: UserNote | UserNoteData) =>
+          archiveNotes.filter((note) =>
             isUserNote(note)
               ? note.note.title.toLowerCase().includes(query)
               : note.note_data.title.toLowerCase().includes(query)
           )
         );
         break;
-
       case "Trash":
         setSearchNotes(
-          trashNotes.filter((note: UserNote | UserNoteData) =>
+          trashNotes.filter((note) =>
             isUserNote(note)
               ? note.note.title.toLowerCase().includes(query)
               : note.note_data.title.toLowerCase().includes(query)
           )
         );
         break;
-
       default:
         setSearchNotes(
-          tagNotes.filter((note: UserNote | UserNoteData) =>
+          tagNotes.filter((note) =>
             isUserNote(note)
               ? note.note.title.toLowerCase().includes(query)
               : note.note_data.title.toLowerCase().includes(query)
@@ -187,10 +182,8 @@ const NoteProvider = ({ children }: any) => {
   const handleTagClick = (tag: Tag) => {
     setTagNotes(
       notes.filter(
-        (note: UserNote | UserNoteData) =>
-          note.tags.includes(tag.id) &&
-          note.is_trashed === false &&
-          note.is_archived === false
+        (note) =>
+          note.tags.includes(tag.id!) && !note.is_trashed && !note.is_archived
       )
     );
   };
@@ -217,15 +210,11 @@ const NoteProvider = ({ children }: any) => {
 
   const refreshCategorizedNotes = (notesArray: (UserNote | UserNoteData)[]) => {
     setNotes(notesArray);
-    console.log("this is the notes", notesArray);
-
     const { pinned, favorites, archived, trashed, filtered, other } =
       categorizedNotes(notesArray);
     setOtherNotes(other);
     setSearchNotes(filtered);
-    console.log("this is the pinned notes", pinned);
     setPinnedNotes(pinned);
-
     setFavoriteNotes(favorites);
     setArchiveNotes(archived);
     setTrashNotes(trashed);
@@ -250,7 +239,6 @@ const NoteProvider = ({ children }: any) => {
     try {
       setLoading(true);
       setError(null);
-      
       const response = await createNote(note);
       if (!response || !(response >= 200 && response < 300)) {
         throw new Error("Failed to add note on server");
@@ -264,7 +252,6 @@ const NoteProvider = ({ children }: any) => {
   };
 
   const editNote = async (newNote: UserNote) => {
-    console.log("use note hook edit note triggered");
     const previousNotes = [...notes];
     const updatedNotes = notes.map((n) => (n.id === newNote.id ? newNote : n));
     refreshCategorizedNotes(updatedNotes);
@@ -272,7 +259,7 @@ const NoteProvider = ({ children }: any) => {
       setLoading(true);
       setError(null);
       const response = await updateNote(newNote);
-      if (!(response >= 200 && response < 300)) {
+      if (!response || !(response >= 200 && response < 300)) {
         throw new Error("Failed to update note on server");
       }
     } catch (e: any) {
@@ -351,7 +338,11 @@ const NoteProvider = ({ children }: any) => {
 };
 
 const useNote = () => {
-  return useContext(NoteContext);
+  const context = useContext(NoteContext);
+  if (!context) {
+    throw new Error("useNote must be used within a NoteProvider");
+  }
+  return context;
 };
 
 export { NoteContext, NoteProvider };

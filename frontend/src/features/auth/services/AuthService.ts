@@ -1,86 +1,93 @@
 import axios from "axios";
-import { getCSRFToken } from "../../../services/CSRFTokenService.tsx";
+import { getCSRFToken } from "../../../services/CSRFTokenService";
 
-let csrfToken;
-
-async function setCSRFToken() {
-  csrfToken = await getCSRFToken();
-}
-setCSRFToken();
-
+// Create an Axios instance with defaults.
 const axiosInstance = axios.create({
   baseURL: "http://localhost:8000/api/",
   headers: {
     "Content-Type": "application/json",
-    "X-CSRFToken": csrfToken,
   },
+  withCredentials: true, // Ensure cookies are sent with requests.
 });
 
-axiosInstance.defaults.withCredentials = true;
-
+// Request interceptor to set CSRF token and Authorization header.
 axiosInstance.interceptors.request.use(
-  (request) => {
+  async (request) => {
+    // Dynamically set the CSRF token if it's not already set.
+    if (!request.headers["X-CSRFToken"]) {
+      try {
+        const token = await getCSRFToken();
+        request.headers["X-CSRFToken"] = token;
+      } catch (err) {
+        console.error("Failed to retrieve CSRF token:", err);
+      }
+    }
+    // Set the Authorization header if an access token exists.
     const accessToken = localStorage.getItem("access_token");
     if (accessToken) {
       request.headers["Authorization"] = `Bearer ${accessToken}`;
     }
     return request;
   },
-  (error) => {
+  (error) => Promise.reject(error)
+);
+
+// Response interceptor to handle token refresh on 401 errors.
+axiosInstance.interceptors.response.use(
+  (response) => response, // Return response directly if successful.
+  async (error) => {
+    const originalRequest = error.config;
+    if (
+      error.response &&
+      error.response.status === 401 &&
+      !originalRequest._retry
+    ) {
+      originalRequest._retry = true;
+      try {
+        const refreshToken = localStorage.getItem("refresh_token");
+        if (!refreshToken) {
+          return Promise.reject(error);
+        }
+        // Attempt to refresh the token.
+        const refreshResponse = await axios.post(
+          "http://localhost:8000/token/refresh/",
+          { refreshToken }
+        );
+        const { access_token, refresh_token } = refreshResponse.data;
+        // Store the new tokens.
+        localStorage.setItem("access_token", access_token);
+        localStorage.setItem("refresh_token", refresh_token);
+        // Update the default Authorization header.
+        axiosInstance.defaults.headers.common[
+          "Authorization"
+        ] = `Bearer ${access_token}`;
+        // Retry the original request with the new access token.
+        return axiosInstance(originalRequest);
+      } catch (refreshError) {
+        // On failure, remove tokens and reject the error.
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
+        console.error("Token refresh failed:", refreshError);
+        return Promise.reject(refreshError);
+      }
+    }
     return Promise.reject(error);
   }
 );
 
-axiosInstance.interceptors.response.use(
-  (response) => response, // Directly return successful responses.
-  async (error) => {
-    const originalRequest = error.config;
-    if (error.response.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true; // Mark the request as retried to avoid infinite loops.
-      try {
-        const refreshToken = localStorage.getItem("refresh_token"); // Retrieve the stored refresh token.
-        // Make a request to your auth server to refresh the token.
-        const response = await axios.post(
-          "http://localhost:8000/token/refresh/",
-          {
-            refreshToken,
-          }
-        );
-        const { accessToken, refreshToken: newRefreshToken } = response.data;
-        // Store the new access and refresh tokens.
-        localStorage.setItem("access_token", accessToken);
-        localStorage.setItem("refresh_token", newRefreshToken);
-        // Update the authorization header with the new access token.
-        axiosInstance.defaults.headers.common[
-          "Authorization"
-        ] = `Bearer ${accessToken}`;
-        return axiosInstance(originalRequest); // Retry the original request with the new access token.
-      } catch (refreshError) {
-        // Handle refresh token errors by clearing stored tokens and redirecting to the login page.
-        console.error("Token refresh failed:", refreshError);
-        localStorage.removeItem("access_token");
-
-        localStorage.removeItem("refresh_token");
-        console.log("removed tokens");
-        return Promise.reject(refreshError);
-      }
-    }
-    return Promise.reject(error); // For all other errors, return the error as is.
-  }
-);
 
 export const login = async (username: string, password: string) => {
   try {
     const response = await axiosInstance.post("login/", { username, password });
-    localStorage.clear();
-    localStorage.setItem("access_token", response.data.access_token);
-    localStorage.setItem("refresh_token", response.data.refresh_token);
+    const { access_token, refresh_token } = response.data;
+    // Store tokens specifically, without clearing unrelated data.
+    localStorage.setItem("access_token", access_token);
+    localStorage.setItem("refresh_token", refresh_token);
+    // Update Axios default headers.
     axiosInstance.defaults.headers.common[
       "Authorization"
-    ] = `Bearer ${response.data["access_token"]}`;
-    console.log(
-      `this is the access token:${response.data.access_token} and refresh token: ${response.data.refresh_token}`
-    );
+    ] = `Bearer ${access_token}`;
+    console.log("Login successful. Tokens stored.");
     return response;
   } catch (error: any) {
     console.error(
@@ -102,14 +109,14 @@ export const signUp = async (
       username,
       password,
     });
-    localStorage.clear();
-    localStorage.setItem("access_token", response.data.access_token);
-    localStorage.setItem("refresh_token", response.data.refresh_token);
+    const { access_token, refresh_token } = response.data;
+    // Store tokens consistently.
+    localStorage.setItem("access_token", access_token);
+    localStorage.setItem("refresh_token", refresh_token);
     axiosInstance.defaults.headers.common[
       "Authorization"
-    ] = `Bearer ${response.data["access"]}`;
-
-    console.log(response.data);
+    ] = `Bearer ${access_token}`;
+    console.log("Signup successful. Tokens stored.");
     return response;
   } catch (error: any) {
     console.error(
@@ -123,9 +130,17 @@ export const signUp = async (
 export const logout = async () => {
   try {
     const response = await axiosInstance.post("logout/");
-    localStorage.clear();
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    console.log("Logout successful. Tokens removed.");
     return response;
-  } catch (e) {
-    console.error(e);
+  } catch (error: any) {
+    console.error(
+      "Logout error:",
+      error.response ? error.response.data : error.message
+    );
+    throw error;
   }
 };
+
+export default axiosInstance;

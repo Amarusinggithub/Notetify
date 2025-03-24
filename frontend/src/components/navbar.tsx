@@ -1,14 +1,13 @@
-import {useContext} from "react";
 import "../styles/navbar.css";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faBars, faGear, faList, faMagnifyingGlass, faRotateRight} from "@fortawesome/free-solid-svg-icons";
-import {SideNavContext} from "../context/SideNavContext.tsx";
+import { useSideNav} from "../context/SideNavContext.tsx";
 import useNote from "../features/notes/hooks/useNote.tsx";
 import React from "react";
 
 const Navbar = () => {
 
-  const {isSideNavOpen, setIsSideNavOpen} = useContext(SideNavContext);
+  const {isSideNavOpen, setIsSideNavOpen} = useSideNav();
   const {handleSearch,search, setSearch,fetchNotes,title} = useNote();
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -29,7 +28,7 @@ const Navbar = () => {
   };
 
   return (
-    <div className="fixed	flex flex-row p-10 w-full h- leading-12 z-100 top-0 left-0">
+    <div className="navbar">
       <div className="menu-logo-title-container">
         <button
           onClick={(e) => {

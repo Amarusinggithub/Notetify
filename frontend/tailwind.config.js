@@ -1,11 +1,11 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: [
-    "./src/**/*.{js,jsx,ts,tsx,mdx}",
-    "./public/index.html",
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
+  corePlugins: {
+    preflight: false,
+  },
+  prefix:'tw-',
+  important:true,
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
       zIndex: {
@@ -18,8 +18,16 @@ export default {
       height: {
         70: "4.375rem",
       },
+      animation: {
+        fadeIn: "fadeIn 300ms ease-in-out",
+      },
+      keyframes: {
+        fadeIn: {
+          "0%": { opacity: "0", transform: "scale(0.9)" },
+          "100%": { opacity: "1", transform: "scale(1)" },
+        },
+      },
     },
   },
   plugins: [],
 };
-

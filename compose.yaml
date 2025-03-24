@@ -2,7 +2,9 @@ version: "3.8"
 
 services:
   frontend:
-    build: .
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile
     container_name: react-frontend
     ports:
       - "5173:5173"
@@ -16,12 +18,14 @@ services:
       NODE_ENV: development
     stdin_open: true
     tty: true
-    command: npm start
+    command: npm run dev
     env_file:
-      - .env
+      -  ./frontend/.env
 
   backend:
-    build: .
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
     container_name: django-backend
     ports:
       - "8000:8000"
@@ -39,7 +43,7 @@ services:
       DATABASE_HOST: ${DATABASE_HOST}
       DATABASE_PORT: ${DATABASE_PORT}
     env_file:
-      - .env
+      -  ./backend/.env
 
   db:
     image: mysql

@@ -11,7 +11,7 @@ const DeleteTagPopup = () => {
   const handleClose = () => setWantToDeleteTag(false);
 
   const handleDeleteTag = () => {
-    removeTag(selectedTag);
+    removeTag(selectedTag!);
     handleClose();
   };
 

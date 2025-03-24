@@ -2,23 +2,7 @@ import React, { useEffect, useState } from "react";
 import useNote from "../hooks/useNote";
 import "../styles/AddNoteCard.css";
 import NoteContentEditor from "./NoteContentEditor";
-
-
-
-
-interface UserNoteData {
-  id: number;
-  note_data: {
-    title: string;
-    content: string;
-    users: number[];
-  };
-  tags: number[];
-  is_pinned: boolean;
-  is_trashed: boolean;
-  is_archived: boolean;
-  is_favorited: boolean;
-}
+import { UserNoteData } from "types/types";
 
 
 const AddNoteCard = () => {
@@ -44,6 +28,7 @@ const AddNoteCard = () => {
     is_trashed: false,
     is_archived: false,
     is_favorited: false,
+    role:"Admin"
   });
 
   const [isEdited, setIsEdited] = useState(false);
@@ -76,6 +61,7 @@ const AddNoteCard = () => {
         is_trashed: false,
         is_archived: false,
         is_favorited: false,
+        role: "Admin",
       });
       setSelected(true);
     }

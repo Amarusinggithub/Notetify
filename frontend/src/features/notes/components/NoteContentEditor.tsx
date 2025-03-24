@@ -188,17 +188,19 @@ function parseOrDefault(editorStateStr:string) {
   }
 }
 
+type NoteContentEditorProps={
+  handleContentInput:any;
+  content:string;
+  isSelected:boolean;
+  note:any;
+}
+
 const NoteContentEditor = ({
   handleContentInput,
   content,
   isSelected,
   note,
-}: {
-  handleContentInput:any;
-  content:string;
-  isSelected:boolean;
-  note:any;
-}) => {
+}: NoteContentEditorProps) => {
   const editorRef = useRef(null);
   const validContent = parseOrDefault(content);
 

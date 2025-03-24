@@ -1,39 +1,9 @@
 import axios from "axios";
 import { getCSRFToken } from "../../../services/CSRFTokenService.tsx";
+import { UserNote, UserNoteData } from "types/types.ts";
 
 const csrfToken = await getCSRFToken();
 
-interface UserNote {
-  id: number;
-  note: {
-    id: number;
-    title: string;
-    content: string;
-    users: number[];
-  };
-  user: number;
-  tags: number[];
-  is_pinned: boolean;
-  is_trashed: boolean;
-  is_archived: boolean;
-  is_favorited: boolean;
-  role: string;
-}
-
-interface UserNoteData {
-  id: number;
-  note_data: {
-    title: string;
-    content: string;
-    users: number[];
-  };
-  tags: number[];
-  is_pinned: boolean;
-  is_trashed: boolean;
-  is_archived: boolean;
-  is_favorited: boolean;
-  role: string;
-}
 
 const axiosInstance = axios.create({
   baseURL: "http://localhost:8000/api/",

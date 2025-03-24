@@ -1,20 +1,40 @@
-// Make sure this path is correct
-import useNote from "../../notes/hooks/useNote.tsx"; // Adjust this path
 import { login, logout, signUp } from "../services/AuthService.ts";
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  PropsWithChildren,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { useNavigate } from "react-router-dom";
-import useTag from "../../notes/hooks/useTag.tsx";
 
-const AuthContext = createContext<any>({});
+type AuthProviderProps =PropsWithChildren;
+interface AuthContextType {
+  handleSignup: (
+    email: string,
+    username: string,
+    password: string
+  ) => Promise<void>;
+  handleLogin: (username: string, password: string) => Promise<void>;
+  handleLogout: () => Promise<void>;
+  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  setError: React.Dispatch<React.SetStateAction<any>>;
+  setUserData: React.Dispatch<any>;
+  isAuthenticated: boolean;
+  userData: any;
+  error: any;
+  isLoading: boolean;
+}
 
-const AuthProvider = ({ children }: { children: any }) => {
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+const AuthProvider = ({ children }: AuthProviderProps) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setLoading] = useState<boolean>(false);
   const [userData, setUserData] = useState<any>(null);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-  const { fetchNotes } = useNote();
-  const { fetchTags } = useTag();
 
   const setLogin = (userData: any) => {
     setUserData(userData);
@@ -43,8 +63,6 @@ const AuthProvider = ({ children }: { children: any }) => {
         console.log("Signup successful");
         setLogin(response.data.userData);
         navigate("/");
-        await fetchNotes();
-        await fetchTags();
       } else {
         console.error("Signup failed");
       }
@@ -66,8 +84,6 @@ const AuthProvider = ({ children }: { children: any }) => {
         console.log("Login successful");
         navigate("/");
         setLogin(response.data.userData);
-        await fetchNotes();
-        await fetchTags();
       } else {
         console.error("Login failed");
       }
@@ -102,8 +118,15 @@ const AuthProvider = ({ children }: { children: any }) => {
 
   useEffect(() => {
     const token = localStorage.getItem("access_token");
-    setIsAuthenticated(Boolean(token));
-  }, [isAuthenticated]);
+    const storedUserData = localStorage.getItem("Userdata");
+
+    if (token) {
+      setIsAuthenticated(true);
+      if (storedUserData) {
+        setUserData(JSON.parse(storedUserData));
+      }
+    }
+  }, []);
 
   return (
     <AuthContext.Provider
@@ -111,6 +134,10 @@ const AuthProvider = ({ children }: { children: any }) => {
         handleSignup,
         handleLogin,
         handleLogout,
+        setError,
+        setIsAuthenticated,
+        setLoading,
+        setUserData,
         isAuthenticated,
         userData,
         error,
@@ -125,5 +152,9 @@ const AuthProvider = ({ children }: { children: any }) => {
 export default AuthProvider;
 
 export const useAuth = () => {
-  return useContext(AuthContext);
+  const context = useContext(AuthContext);
+  if(!context){
+    throw new Error("useAuth must be used within AuthProvider");
+  }
+  return context;
 };

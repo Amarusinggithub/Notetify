@@ -1,7 +1,7 @@
 import { faXmark, faLightbulb } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useContext, useEffect, useRef, useState } from "react";
-import { SideNavContext } from "../context/SideNavContext";
+import {  useEffect, useRef, useState } from "react";
+import {  useSideNav } from "../context/SideNavContext";
 import useTag from "../features/notes/hooks/useTag";
 import "../styles/AddTagPopup.css";
 
@@ -9,7 +9,7 @@ import "../styles/AddTagPopup.css";
 const AddTagPopup = () => {
   const [TagName, setTagName] = useState("");
 
-  const { setAddTagPopupOpen } = useContext(SideNavContext);
+  const { setAddTagPopupOpen } = useSideNav();
   const { makeTag } = useTag();
 
   const addInputRef = useRef<HTMLInputElement>(null);
@@ -35,7 +35,8 @@ const AddTagPopup = () => {
   };
 
   return (
-    <div className="add-tag-popup-bg" onClick={handleClose}>
+    <div className="   fixed z-[100] w-full h-full bg-[rgba(0,0,0,0.75)] flex items-center justify-center left-0 top-0;
+" onClick={handleClose}>
       <div
         className="add-tag-popup-container"
         onClick={(e) => e.stopPropagation()}

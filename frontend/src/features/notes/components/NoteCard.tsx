@@ -11,40 +11,11 @@ import {
   faTrashCan,
 } from "@fortawesome/free-solid-svg-icons";
 import NoteContentEditor from "./NoteContentEditor.tsx";
+import { UserNote, UserNoteData } from "types/types.ts";
 
-interface UserNote {
-  id: number;
-  note: {
-    id: number;
-    title: string;
-    content: string;
-    users: number[];
-  };
-  user: number;
-  tags: number[];
-  is_pinned: boolean;
-  is_trashed: boolean;
-  is_archived: boolean;
-  is_favorited: boolean;
-  role: string;
-}
+type NoteCardProps = { note: UserNote | UserNoteData };
 
-interface UserNoteData {
-  id: number;
-  note_data: {
-    title: string;
-    content: string;
-    users: number[];
-  };
-  tags: number[];
-  is_pinned: boolean;
-  is_trashed: boolean;
-  is_archived: boolean;
-  is_favorited: boolean;
-  role:string;
-}
-
-const NoteCard = ({ note }: { note: UserNote | UserNoteData }) => {
+const NoteCard = ({ note }: NoteCardProps) => {
   const {
     selectedNote,
     setSelectedNote,

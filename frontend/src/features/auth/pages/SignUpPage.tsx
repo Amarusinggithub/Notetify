@@ -73,7 +73,7 @@ const SignUpPage = () => {
                 name="password"
                 value={state.password}
                 placeholder="Enter a valid password"
-                               onChange={(e)=>{handleChange(e)}}
+                onChange={(e)=>{handleChange(e)}}
               />
             </div>
 

@@ -1,5 +1,5 @@
-import  { useContext } from "react";
-import { SideNavContext } from "../context/SideNavContext.js";
+import { useContext } from "react";
+import {  useSideNav } from "../context/SideNavContext.js";
 import NotesPage from "../features/notes/pages/NotesPage.js";
 import FavoritesPage from "../features/notes/pages/FavoritesPage.js";
 import ArchivePage from "../features/notes/pages/ArchivePage.js";
@@ -9,10 +9,9 @@ import SearchPage from "../features/notes/pages/SearchPage.js";
 import useNote from "../features/notes/hooks/useNote.js";
 import TagPage from "../features/notes/pages/TagPage.js";
 
-export const Content = () => {
+export const Pages = () => {
   const { search } = useNote();
-  const { page } = useContext(SideNavContext);
-
+  const { page } = useSideNav();
 
   const SidebarPages = [
     <NotesPage key="notes" />,
@@ -20,9 +19,8 @@ export const Content = () => {
     <ArchivePage key="archive" />,
     <TrashPage key="trash" />,
     <SearchPage key="search" />,
-    <TagPage key="tag"/>
+    <TagPage key="tag" />,
   ];
-
 
   if (search.length > 0) {
     return SidebarPages[4];
