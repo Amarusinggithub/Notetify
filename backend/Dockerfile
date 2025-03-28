@@ -1,41 +1,43 @@
-# Use the official Python runtime image
+# syntax=docker/dockerfile:1
 FROM python:3.13  
 
-# 1. Install OS dependencies for building packages and for installing Rust
-RUN apt-get update && apt-get install -y curl build-essential
+# Environment variables for Python
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
 
-# 2. Install Rust & Cargo using rustup
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-
-# 3. Add Cargo to PATH
-ENV PATH="/root/.cargo/bin:${PATH}"
- 
-# Create the app directory
-RUN mkdir /app
- 
-# Set the working directory inside the container
 WORKDIR /app
- 
-# Set environment variables 
-# Prevents Python from writing pyc files to disk
-ENV PYTHONDONTWRITEBYTECODE=1
-#Prevents Python from buffering stdout and stderr
-ENV PYTHONUNBUFFERED=1 
- 
-# Upgrade pip
-RUN pip install --upgrade pip 
- 
-# Copy the Django project  and install dependencies
-COPY requirements.txt  /app/
- 
-# run this command to install all dependencies 
-RUN pip install --no-cache-dir -r requirements.txt
- 
-# Copy the Django project to the container
-COPY . /app/
- 
-# Expose the Django port
+
+# Install essential OS dependencies
+RUN apt-get update && \
+    apt-get install -y curl build-essential && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install Rust (if required by Python dependencies)
+RUN curl https://sh.rustup.rs -sSf | bash -s -- -y --default-toolchain stable
+ENV PATH="/root/.cargo/bin:${PATH}"
+
+# Install Python dependencies (explicit COPY)
+COPY requirements.txt .
+
+# Cache pip dependencies installation efficiently
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install --upgrade pip && \
+    pip install -r requirements.txt
+
+
+# Create non-root user with proper permissions
+ARG UID=10001
+RUN adduser --disabled-password --gecos "" --uid "${UID}" appuser
+
+# Copy the source code and set permissions explicitly
+COPY . /app
+RUN chown -R appuser:appuser /app
+
+# Switch to non-root user
+USER appuser
+
+# Expose Django port
 EXPOSE 8000
- 
-# Run Django’s development server
+
+# Default command to start Django development server
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

@@ -1,6 +1,6 @@
 import {
   createContext,
-  ReactNode,
+  PropsWithChildren,
   useCallback,
   useContext,
   useEffect,
@@ -62,9 +62,7 @@ interface NoteContextType {
   >;
 }
 
-interface NoteProviderProps {
-  children: ReactNode;
-}
+type NoteProviderProps= PropsWithChildren;
 
 const NoteContext = createContext<NoteContextType | undefined>(undefined);
 

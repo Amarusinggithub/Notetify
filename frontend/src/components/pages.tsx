@@ -1,4 +1,3 @@
-import { useContext } from "react";
 import {  useSideNav } from "../context/SideNavContext.js";
 import NotesPage from "../features/notes/pages/NotesPage.js";
 import FavoritesPage from "../features/notes/pages/FavoritesPage.js";

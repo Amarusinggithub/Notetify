@@ -4,6 +4,7 @@ import Collaboration from "@tiptap/extension-collaboration";
 import CollaborationCursor from "@tiptap/extension-collaboration-cursor";
 import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
+import { Extension } from "@tiptap/core";
 
 import { TiptapCollabProvider } from "@hocuspocus/provider";
 
