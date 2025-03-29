@@ -78,7 +78,7 @@ export const getTags = async () => {
 
 export const createTag = async (tagName: string) => {
   try {
-    const response = await axios.post("tags/create_tag/", {
+    const response = await axiosInstance.post("tags/create_tag/", {
       name: tagName,
     });
     console.log(response.data);
@@ -90,7 +90,7 @@ export const createTag = async (tagName: string) => {
 
 export const updateTag = async (tag: Tag) => {
   try {
-    const response = await axios.put(`tags/edit_tag/${tag.id}/`, {
+    const response = await axiosInstance.put(`tags/edit_tag/${tag.id}/`, {
       id: tag.id,
       name: tag.name,
       users: tag.users,
@@ -105,7 +105,7 @@ export const updateTag = async (tag: Tag) => {
 
 export const deleteTag = async (tag: Tag) => {
   try {
-    const response = await axios.delete(`tags/delete_tag/${tag.id}/`);
+    const response = await axiosInstance.delete(`tags/delete_tag/${tag.id}/`);
     console.log(response.status);
     return response.status;
   } catch (e) {

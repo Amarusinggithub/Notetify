@@ -82,7 +82,6 @@ export const createNote = async (note: UserNoteData) => {
       is_trashed: note.is_trashed,
       is_archived: note.is_archived,
       is_favorited: note.is_favorited,
-      user: null,
     });
     console.log(response.data);
     return response.status;

@@ -83,6 +83,7 @@ const TagProvider = ({ children }: TagProviderProps) => {
     try {
       setLoading(true);
       setError(null);
+      console.log(tagName);
 
       const response = await createTag(tagName);
 

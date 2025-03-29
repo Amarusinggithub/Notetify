@@ -18,8 +18,6 @@ class NoteSerializer(serializers.ModelSerializer):
         return instance
 
 
-
-
 class UserNoteSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all(), 
@@ -38,6 +36,8 @@ class UserNoteSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         note_data = validated_data.pop('note_data', {})
+        tags = validated_data.pop('tags', [])
+
         note = Note.objects.create(
             title=note_data.get('title', ''),
             content=note_data.get('content', '')
@@ -46,11 +46,14 @@ class UserNoteSerializer(serializers.ModelSerializer):
         note.users.add(self.context['request'].user)
 
         # If 'user' is not in validated_data, set it to the current request.user
-        if 'user' not in validated_data:
+        if not validated_data.get('user'):
             validated_data['user'] = self.context['request'].user
+
 
         # Create the UserNote
         user_note = UserNote.objects.create(note=note, **validated_data)
+        
+        user_note.tags.set(tags)
     
         return user_note
     

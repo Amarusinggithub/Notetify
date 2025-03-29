@@ -11,9 +11,12 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 from datetime import timedelta
 from pathlib import Path
-import environ
+
+from dotenv import load_dotenv
 import os
 import pymysql
+
+load_dotenv()
 
 
 pymysql.install_as_MySQLdb()  # Ensures pymysql is used as MySQLdb replacement
@@ -21,11 +24,7 @@ pymysql.install_as_MySQLdb()  # Ensures pymysql is used as MySQLdb replacement
 # Base directory of the project
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Initialize environment reader
-env = environ.Env()
 
-# Load .env file
-env.read_env(BASE_DIR / '.env')
 
 
 # Quick-start development settings - unsuitable for production
@@ -33,16 +32,16 @@ env.read_env(BASE_DIR / '.env')
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env("DJANGO_SECRET_KEY") 
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY") 
 
 # 'DJANGO_ALLOWED_HOSTS' should be a single string of hosts with a , between each.
 # For example: 'DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1,[::1]'
 #ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS","127.0.0.1").split(",")
 
-ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["127.0.0.1", "localhost"])
+ALLOWED_HOSTS = ["*"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env.bool("DEBUG", default=True)
+DEBUG = os.environ.get("DEBUG", default=True)
 
 
 # REST FRAMEWORK
@@ -56,7 +55,7 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=3),
-    'SIGNING_KEY': env('SIMPLE_JWT_SIGNING_KEY', default=None) or SECRET_KEY,
+    'SIGNING_KEY':os.environ.get('SIMPLE_JWT_SIGNING_KEY', default=None) or SECRET_KEY,
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True
 }
@@ -141,12 +140,12 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': env('DATABASE_ENGINE', default='django.db.backends.mysql'),
-        'NAME': env('DATABASE_NAME', default='notetify_db'),
-        'USER': env('DATABASE_USERNAME', default='root'),
-        'PASSWORD': env('DATABASE_PASSWORD', default=''),
-        'HOST': env('DATABASE_HOST', default='127.0.0.1'),
-        'PORT': env('DATABASE_PORT', default='3306'),
+        'ENGINE': os.environ.get('DATABASE_ENGINE', default='django.db.backends.mysql'),
+        'NAME': os.environ.get('DATABASE_NAME', default='notetify_db'),
+        'USER': os.environ.get('DATABASE_USERNAME', default='root'),
+        'PASSWORD': os.environ.get('DATABASE_PASSWORD', default=''),
+        'HOST': os.environ.get('DATABASE_HOST', default='127.0.0.1'),
+        'PORT': os.environ.get('DATABASE_PORT', default='3306'),
     }
 }
 
