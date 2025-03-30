@@ -13,7 +13,6 @@ import { NoteProvider } from "./features/notes/hooks/useNote.tsx";
 import { TagProvider } from "./features/notes/hooks/useTag.tsx";
 import { ErrorBoundary } from "react-error-boundary";
 
-
 export default function RootApp() {
   useEffect(() => {
     const initialize = async () => {
@@ -23,37 +22,37 @@ export default function RootApp() {
   }, []);
 
   return (
-      <ErrorBoundary fallback={<div>Something went wrong</div>}>
-        <Router>
-          <AuthProvider>
-            <SideNavProvider>
-              <NoteProvider>
-                <TagProvider>
-                  <Routes>
-                    <Route
-                      path="/login"
-                      element={<LoginPage />}
-                      errorElement={<ErrorPage />}
-                    />
-                    <Route
-                      path="/signup"
-                      element={<SignUpPage />}
-                      errorElement={<ErrorPage />}
-                    />
+    <ErrorBoundary fallback={<div>Something went wrong</div>}>
+      <Router>
+        <NoteProvider>
+          <TagProvider>
+            <AuthProvider>
+              <SideNavProvider>
+                <Routes>
+                  <Route
+                    path="/login"
+                    element={<LoginPage />}
+                    errorElement={<ErrorPage />}
+                  />
+                  <Route
+                    path="/signup"
+                    element={<SignUpPage />}
+                    errorElement={<ErrorPage />}
+                  />
 
-                    <Route element={<PrivateRoute />}>
-                      <Route
-                        path="/"
-                        element={<App />}
-                        errorElement={<ErrorPage />}
-                      />
-                    </Route>
-                  </Routes>
-                </TagProvider>
-              </NoteProvider>
-            </SideNavProvider>
-          </AuthProvider>
-        </Router>
-      </ErrorBoundary>
+                  <Route element={<PrivateRoute />}>
+                    <Route
+                      path="/"
+                      element={<App />}
+                      errorElement={<ErrorPage />}
+                    />
+                  </Route>
+                </Routes>
+              </SideNavProvider>
+            </AuthProvider>
+          </TagProvider>
+        </NoteProvider>
+      </Router>
+    </ErrorBoundary>
   );
 }

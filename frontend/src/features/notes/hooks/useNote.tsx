@@ -14,7 +14,6 @@ import {
 } from "../services/NoteService";
 import { Tag, UserNote, UserNoteData } from "types/types";
 
-
 interface NoteContextType {
   search: string;
   title: string;
@@ -62,7 +61,7 @@ interface NoteContextType {
   >;
 }
 
-type NoteProviderProps= PropsWithChildren;
+type NoteProviderProps = PropsWithChildren;
 
 const NoteContext = createContext<NoteContextType | undefined>(undefined);
 
@@ -288,7 +287,10 @@ const NoteProvider = ({ children }: NoteProviderProps) => {
   };
 
   useEffect(() => {
-    if (localStorage.getItem("access_token") != null) {
+    if (
+      localStorage.getItem("access_token") != null &&
+      localStorage.getItem("access_token") != ""
+    ) {
       fetchNotes();
     }
   }, [fetchNotes]);

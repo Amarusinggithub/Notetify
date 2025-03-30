@@ -17,11 +17,9 @@ interface AuthContextType {
   ) => Promise<void>;
   handleLogin: (username: string, password: string) => Promise<void>;
   handleLogout: () => Promise<void>;
-  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setError: React.Dispatch<React.SetStateAction<any>>;
   setUserData: React.Dispatch<any>;
-  isAuthenticated: boolean;
   userData: any;
   error: any;
   isLoading: boolean;
@@ -30,7 +28,6 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setLoading] = useState<boolean>(false);
   const [userData, setUserData] = useState<any>(null);
   const [error, setError] = useState(null);
@@ -38,14 +35,12 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const setLogin = (userData: any) => {
     setUserData(userData);
-    setIsAuthenticated(true);
     console.log("User data set:", userData);
     localStorage.setItem("Userdata", JSON.stringify(userData));
   };
 
   const setLogout = () => {
     setUserData(null);
-    setIsAuthenticated(false);
     console.log("User logged out");
     localStorage.removeItem("Userdata");
   };
@@ -84,6 +79,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
         console.log("Login successful");
         navigate("/");
         setLogin(response.data.userData);
+
       } else {
         console.error("Login failed");
       }
@@ -120,8 +116,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     const token = localStorage.getItem("access_token");
     const storedUserData = localStorage.getItem("Userdata");
 
-    if (token) {
-      setIsAuthenticated(true);
+    if (token!=null&&token!="") {
       if (storedUserData) {
         setUserData(JSON.parse(storedUserData));
       }
@@ -135,10 +130,8 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
         handleLogin,
         handleLogout,
         setError,
-        setIsAuthenticated,
         setLoading,
         setUserData,
-        isAuthenticated,
         userData,
         error,
         isLoading,

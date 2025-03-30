@@ -137,7 +137,10 @@ const TagProvider = ({ children }: TagProviderProps) => {
   };
 
   useEffect(() => {
-    if (localStorage.getItem("access_token") != null) {
+    if (
+      localStorage.getItem("access_token") != null &&
+      localStorage.getItem("access_token") != ""
+    ) {
       fetchTags();
     }
   }, [fetchTags]);

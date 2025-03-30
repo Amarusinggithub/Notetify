@@ -1,4 +1,3 @@
-import { useAuth } from "features/auth/hooks/useAuth";
 import LoginPage from "features/auth/pages/LoginPage";
 import SignUpPage from "features/auth/pages/SignUpPage";
 import ArchivePage from "features/notes/pages/ArchivePage";
@@ -11,8 +10,11 @@ import App from "pages/MainPage";
 import { createBrowserRouter,  RouterProvider } from "react-router-dom";
 
 const AppRoutes = () => {
-  const { isAuthenticated } = useAuth();
-  const routes = isAuthenticated ? privateRoutes : publicRoutes;
+  const routes =
+    localStorage.getItem("access_token") != null &&
+    localStorage.getItem("access_token") != ""
+      ? privateRoutes
+      : publicRoutes;
   let router = createBrowserRouter(routes);
 
   return <RouterProvider router={router} />;
