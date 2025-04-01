@@ -35,8 +35,7 @@ const AddTagPopup = () => {
   };
 
   return (
-    <div className="   fixed z-[100] w-full h-full bg-[rgba(0,0,0,0.75)] flex items-center justify-center left-0 top-0;
-" onClick={handleClose}>
+    <div className="add-tag-popup-bg" onClick={handleClose}>
       <div
         className="add-tag-popup-container"
         onClick={(e) => e.stopPropagation()}

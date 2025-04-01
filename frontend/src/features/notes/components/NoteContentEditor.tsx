@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
@@ -9,10 +8,8 @@ import { Provider } from "@lexical/yjs";
 import { EditorState } from 'lexical';
 import { WebsocketProvider } from "y-websocket";
 import { useCallback, useRef } from "react";
-
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
-
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
 import { TabIndentationPlugin } from "@lexical/react/LexicalTabIndentationPlugin";
 import { ListPlugin } from "@lexical/react/LexicalListPlugin";
@@ -21,8 +18,6 @@ import { LinkPlugin } from "@lexical/react/LexicalLinkPlugin";
 import { LinkNode } from "@lexical/link";
 import { TablePlugin } from "@lexical/react/LexicalTablePlugin";
 import { TableNode, TableCellNode, TableRowNode } from "@lexical/table";
-
-
 import { HeadingNode } from "@lexical/rich-text";
 import { ListNode, ListItemNode } from "@lexical/list";
 
