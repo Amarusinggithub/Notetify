@@ -206,8 +206,8 @@ const NoteCard = ({ note }: NoteCardProps) => {
           {!isSelected && (
             <div className="note-title">
               {isUserNote(noteState)
-                ? noteState.note?.title || "Untitled Note"
-                : noteState.note_data?.title || "Untitled Note"}
+                ? noteState.note?.title 
+                : noteState.note_data?.title }
             </div>
           )}
 
@@ -219,8 +219,8 @@ const NoteCard = ({ note }: NoteCardProps) => {
               }}
               value={
                 isUserNote(noteState)
-                  ? noteState.note?.title || "Untitled Note"
-                  : noteState.note_data?.title || "Untitled Note"
+                  ? noteState.note?.title 
+                  : noteState.note_data?.title 
               }
               disabled={isLoading}
             />

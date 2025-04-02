@@ -21,6 +21,8 @@ node_modules/
 dist/
 dist-ssr/
 
+.idea
+
 
 cypress.env.json
 # Local environment files

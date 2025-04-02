@@ -11,8 +11,7 @@ import { Tag } from "types/types.ts";
 
 
 const SideNav = () => {
-  const { isSideNavOpen, setPage, setAddTagPopupOpen } =
-    useSideNav();
+  const { isSideNavOpen, setPage, setAddTagPopupOpen } =useSideNav();
   const { handleTagClick, setTitle } = useNote();
   const { tags, setWantToDeleteTag, setSelectedTag, setWantToEditTag } =
     useTag();
@@ -91,7 +90,7 @@ const SideNav = () => {
           </div>
         </li>
         {isSideNavOpen && tags?.length > 0 && (
-          <h3 className="title-tags">{"Tags"}</h3>
+          <h3 className="title-tags">Tags</h3>
         )}
         {tags?.length > 0 && (
           <ul className="tags">

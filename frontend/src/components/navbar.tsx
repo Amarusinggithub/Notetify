@@ -1,14 +1,19 @@
 import "../styles/navbar.css";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faBars, faGear, faList, faMagnifyingGlass, faRotateRight} from "@fortawesome/free-solid-svg-icons";
-import { useSideNav} from "../context/SideNavContext.tsx";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faBars,
+  faGear,
+  faList,
+  faMagnifyingGlass,
+  faRotateRight,
+} from "@fortawesome/free-solid-svg-icons";
+import { useSideNav } from "../context/SideNavContext.tsx";
 import useNote from "../features/notes/hooks/useNote.tsx";
 import React from "react";
 
 const Navbar = () => {
-
-  const {isSideNavOpen, setIsSideNavOpen} = useSideNav();
-  const {handleSearch,search, setSearch,fetchNotes,title} = useNote();
+  const { isSideNavOpen, setIsSideNavOpen } = useSideNav();
+  const { handleSearch, search, setSearch, fetchNotes, title } = useNote();
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
@@ -29,16 +34,15 @@ const Navbar = () => {
 
   return (
     <div className="navbar">
-      <div className="menu-logo-title-container">
-        <button
-          onClick={(e) => {
-            handleSideMenuChange(e);
-          }}
-          className="menu-btn"
-        >
-          <FontAwesomeIcon icon={faBars} className="menu-icon" />
-        </button>
-
+      <button
+        onClick={(e) => {
+          handleSideMenuChange(e);
+        }}
+        className="menu-btn"
+      >
+        <FontAwesomeIcon icon={faBars} className="menu-icon" />
+      </button>
+      <div className="logo-title-container">
         {(title.length <= 0 || title === "Notes") && (
           <div className="logo-container">
             <img
