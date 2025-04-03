@@ -40,6 +40,7 @@ axiosInstance.interceptors.response.use(
     if (
       error.response &&
       error.response.status === 401 &&
+      error.response?.data?.code === "token_not_valid" &&
       !originalRequest._retry
     ) {
       originalRequest._retry = true;
@@ -51,20 +52,26 @@ axiosInstance.interceptors.response.use(
         // Attempt to refresh the token.
         const refreshResponse = await axios.post(
           "http://localhost:8000/token/refresh/",
-          { refreshToken }
+          { refresh: refreshToken }
         );
-        const { access_token, refresh_token } = refreshResponse.data;
+        const { access, refresh } = refreshResponse.data;
         // Store the new tokens.
-        localStorage.setItem("access_token", access_token);
-        localStorage.setItem("refresh_token", refresh_token);
-        // Update the default Authorization header.
+        if (access) {
+          localStorage.setItem("access_token", access);
+        }
+        if (refresh) {
+          localStorage.setItem("refresh_token", refresh);
+        } // Update the default Authorization header.
         axiosInstance.defaults.headers.common[
           "Authorization"
-        ] = `Bearer ${access_token}`;
+        ] = `Bearer ${access}`;
+        originalRequest.headers["Authorization"] = `Bearer ${access}`;
         // Retry the original request with the new access token.
         return axiosInstance(originalRequest);
       } catch (refreshError) {
         // On failure, remove tokens and reject the error.
+        // Optionally alert the user here
+        console.warn("Session expired. Redirecting to login...");
         localStorage.removeItem("access_token");
         localStorage.removeItem("refresh_token");
         console.error("Token refresh failed:", refreshError);
@@ -74,7 +81,6 @@ axiosInstance.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
 
 export const login = async (username: string, password: string) => {
   try {

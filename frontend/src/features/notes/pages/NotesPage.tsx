@@ -35,7 +35,7 @@ const NotesPage = () => {
 
           <div
             className="pinned-notes"
-            style={{ maxWidth: isSideNavOpen ? "1200px" : "1400px" }}
+            style={{ maxWidth: isSideNavOpen ? "1200px" : "1360px" }}
           >
             {pinnedNotes.map((note: UserNote | UserNoteData) => (
               <div key={note.id} className="note-div">

@@ -44,7 +44,7 @@ const SideNav = () => {
     <div
       className="sidenav"
       style={{
-        width: isSideNavOpen ? "250px" : "60px",
+        width: isSideNavOpen ? "250px" : "50px",
       }}
     >
       <ul>
@@ -53,6 +53,7 @@ const SideNav = () => {
             onClick={handleOnClick(index)}
             key={index}
             style={{
+              width: isSideNavOpen ? "210px" : "18px",
               borderTopRightRadius: isSideNavOpen ? "50px" : "360px",
               borderTopLeftRadius: isSideNavOpen ? "0px" : "360px",
               borderBottomLeftRadius: isSideNavOpen ? "0px" : "360px",
@@ -75,6 +76,8 @@ const SideNav = () => {
         <li
           onClick={handleCreateTag}
           style={{
+            width: isSideNavOpen ? "210px" : "18px",
+
             borderTopRightRadius: isSideNavOpen ? "50px" : "360px",
             borderTopLeftRadius: isSideNavOpen ? "0px" : "360px",
             borderBottomLeftRadius: isSideNavOpen ? "0px" : "360px",
@@ -94,7 +97,7 @@ const SideNav = () => {
         )}
         {tags?.length > 0 && (
           <ul className="tags">
-            {tags.map((tag:Tag, index:number) => (
+            {tags.map((tag: Tag, index: number) => (
               <li
                 onClick={(e) => {
                   e.stopPropagation();
@@ -103,6 +106,8 @@ const SideNav = () => {
                 key={index}
                 className="sidenav-item-tags"
                 style={{
+                  width: isSideNavOpen ? "210px" : "18px",
+
                   borderTopRightRadius: isSideNavOpen ? "50px" : "360px",
                   borderTopLeftRadius: isSideNavOpen ? "0px" : "360px",
                   borderBottomLeftRadius: isSideNavOpen ? "0px" : "360px",

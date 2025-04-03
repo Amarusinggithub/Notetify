@@ -35,7 +35,7 @@ const App = () => {
         <SideNav />
         <div
           className="content-container"
-          style={{ marginLeft: isSideNavOpen ? "250px" : "60px" }}
+          style={{ marginLeft: isSideNavOpen ? "250px" : "50px" }}
         >
           <Pages />
           {isAddTagPopupOpen && <AddTagPopup />}

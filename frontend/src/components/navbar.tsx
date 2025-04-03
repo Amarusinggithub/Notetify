@@ -34,22 +34,22 @@ const Navbar = () => {
 
   return (
     <div className="navbar">
-      <button
-        onClick={(e) => {
-          handleSideMenuChange(e);
-        }}
-        className="menu-btn"
-      >
-        <FontAwesomeIcon icon={faBars} className="menu-icon" />
-      </button>
       <div className="logo-title-container">
+        <button
+          onClick={(e) => {
+            handleSideMenuChange(e);
+          }}
+          className="menu-btn"
+        >
+          <FontAwesomeIcon icon={faBars} className="menu-icon" />
+        </button>
         {(title.length <= 0 || title === "Notes") && (
           <div className="logo-container">
             <img
-              src="assets/favicon-32x32.png"
+              src="assets/notetify-logo.png"
               alt="A sample image"
-              width="32"
-              height="32"
+              width="40"
+              height="40"
               className={"noteify-logo"}
             ></img>
           </div>
