@@ -2,15 +2,15 @@ import "./App.css";
 import { useEffect } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import ErrorPage from "./pages/ErrorPage.tsx";
-import LoginPage from "./features/auth/pages/LoginPage.tsx";
-import SignUpPage from "./features/auth/pages/SignUpPage.tsx";
+import LoginPage from "./pages/LoginPage.tsx";
+import SignUpPage from "./pages/SignUpPage.tsx";
 import App from "./pages/MainPage.tsx";
-import PrivateRoute from "./features/auth/components/privateRoute.tsx";
-import { initializeCSRFToken } from "./services/CSRFTokenService.tsx";
-import AuthProvider from "./features/auth/hooks/useAuth.tsx";
-import { SideNavProvider } from "./context/SideNavContext.tsx";
-import { NoteProvider } from "./features/notes/hooks/useNote.tsx";
-import { TagProvider } from "./features/notes/hooks/useTag.tsx";
+import PrivateRoute from "./components/privateRoute.tsx";
+import { initializeCSRFToken } from "./services/CSRFTokenService.ts";
+import AuthProvider from "./hooks/useAuth.tsx";
+import { SideNavProvider } from "./hooks/useSideNav.tsx";
+import { NoteProvider } from "./hooks/useNote.tsx";
+import { TagProvider } from "./hooks/useTag.tsx";
 import { ErrorBoundary } from "react-error-boundary";
 
 export default function RootApp() {

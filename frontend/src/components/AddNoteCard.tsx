@@ -4,7 +4,6 @@ import "../styles/AddNoteCard.css";
 import NoteContentEditor from "./NoteContentEditor";
 import { UserNoteData } from "types/types";
 
-
 const AddNoteCard = () => {
   const { addNote, isLoading, error, notes } = useNote();
   let noteId;
@@ -14,10 +13,8 @@ const AddNoteCard = () => {
     noteId = 1;
   }
 
-
-  
   const [noteState, setNoteState] = useState<UserNoteData>({
-    id:noteId,
+    id: noteId,
     note_data: {
       title: "",
       content: "",
@@ -28,7 +25,7 @@ const AddNoteCard = () => {
     is_trashed: false,
     is_archived: false,
     is_favorited: false,
-    role:"Admin"
+    role: "Admin",
   });
 
   const [isEdited, setIsEdited] = useState(false);
@@ -38,9 +35,11 @@ const AddNoteCard = () => {
     setIsEdited(false);
   }, [isSelected]);
 
-  const handleSelect = async (e:
-        | React.MouseEvent<HTMLButtonElement, MouseEvent>
-        | React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  const handleSelect = async (
+    e:
+      | React.MouseEvent<HTMLButtonElement, MouseEvent>
+      | React.MouseEvent<HTMLDivElement, MouseEvent>
+  ) => {
     e.preventDefault();
     if (isSelected) {
       if (isEdited) {
@@ -83,8 +82,11 @@ const AddNoteCard = () => {
     setIsEdited(newTitle !== null && newTitle !== "");
   };
 
-  const handleContentInput = (newContent:string) => {
-    setNoteState((prev) => ({ ...prev, note_data: {  ...prev.note_data,content: newContent } }));
+  const handleContentInput = (newContent: string) => {
+    setNoteState((prev) => ({
+      ...prev,
+      note_data: { ...prev.note_data, content: newContent },
+    }));
     setIsEdited(newContent !== null && newContent !== "");
   };
 

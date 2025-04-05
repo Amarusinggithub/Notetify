@@ -1,17 +1,15 @@
-import{  useState } from "react";
+import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { sidebarData } from "../utils/sidebarData.tsx";
 import "../styles/sidebar.css";
-import {  useSideNav } from "../context/SideNavContext.tsx";
+import { useSideNav } from "../hooks/useSideNav.tsx";
 import { faPlus, faTag, faEllipsis } from "@fortawesome/free-solid-svg-icons";
-import useNote from "../features/notes/hooks/useNote.tsx";
-import useTag from "../features/notes/hooks/useTag.tsx";
+import useNote from "../hooks/useNote.tsx";
+import useTag from "../hooks/useTag.tsx";
 import { Tag } from "types/types.ts";
 
-
-
 const SideNav = () => {
-  const { isSideNavOpen, setPage, setAddTagPopupOpen } =useSideNav();
+  const { isSideNavOpen, setPage, setAddTagPopupOpen } = useSideNav();
   const { handleTagClick, setTitle } = useNote();
   const { tags, setWantToDeleteTag, setSelectedTag, setWantToEditTag } =
     useTag();
@@ -19,7 +17,7 @@ const SideNav = () => {
   const [temp, setTemp] = useState<any>(sidebarData[0]);
   const [tempId, setTempId] = useState<any>(null);
 
-  const handleOnClick = (index:number) => {
+  const handleOnClick = (index: number) => {
     return () => {
       setPage(index);
       setTemp(sidebarData[index]);
@@ -27,7 +25,7 @@ const SideNav = () => {
     };
   };
 
-  const handleTagClicked = (tag:Tag) => {
+  const handleTagClicked = (tag: Tag) => {
     setTemp(tag);
     setTitle(tag.name);
     handleTagClick(tag);
@@ -53,12 +51,12 @@ const SideNav = () => {
             onClick={handleOnClick(index)}
             key={index}
             style={{
-              width: isSideNavOpen ? "210px" : "18px",
+              width: isSideNavOpen ? "210px" : "14px",
               borderTopRightRadius: isSideNavOpen ? "50px" : "360px",
               borderTopLeftRadius: isSideNavOpen ? "0px" : "360px",
               borderBottomLeftRadius: isSideNavOpen ? "0px" : "360px",
               borderBottomRightRadius: isSideNavOpen ? "50px" : "360px",
-              justifyContent: isSideNavOpen ? "start" : "center",
+              justifyContent: isSideNavOpen ? "start" : "start",
               backgroundColor:
                 sidebarData[index] === temp ? " rgb(65, 51, 28)" : "",
             }}
@@ -76,7 +74,7 @@ const SideNav = () => {
         <li
           onClick={handleCreateTag}
           style={{
-            width: isSideNavOpen ? "210px" : "18px",
+            width: isSideNavOpen ? "210px" : "14px",
 
             borderTopRightRadius: isSideNavOpen ? "50px" : "360px",
             borderTopLeftRadius: isSideNavOpen ? "0px" : "360px",
@@ -106,7 +104,7 @@ const SideNav = () => {
                 key={index}
                 className="sidenav-item-tags"
                 style={{
-                  width: isSideNavOpen ? "210px" : "18px",
+                  width: isSideNavOpen ? "210px" : "14px",
 
                   borderTopRightRadius: isSideNavOpen ? "50px" : "360px",
                   borderTopLeftRadius: isSideNavOpen ? "0px" : "360px",

@@ -1,9 +1,8 @@
 import { faXmark, faLightbulb } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import useTag from "../features/notes/hooks/useTag";
+import useTag from "../hooks/useTag";
 import "../styles/DeleteTagPopup.css";
-
 
 const DeleteTagPopup = () => {
   const { removeTag, selectedTag, setWantToDeleteTag } = useTag();

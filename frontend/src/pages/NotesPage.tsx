@@ -2,12 +2,10 @@ import "../styles/Notespage.css";
 import NoteCard from "../components/NoteCard.tsx";
 import useNote from "../hooks/useNote.tsx";
 import { useEffect } from "react";
-import { useSideNav } from "../../../context/SideNavContext.tsx";
+import { useSideNav } from "../hooks/useSideNav.tsx";
 import AddNoteCard from "../components/AddNoteCard.tsx";
 import { UserNote, UserNoteData } from "types/types.ts";
-
-
-
+import noNotes from "./../../assets/No_Note.png";
 const NotesPage = () => {
   const { pinnedNotes, otherNotes, isLoading, error } = useNote();
   const { isSideNavOpen } = useSideNav();
@@ -17,6 +15,19 @@ const NotesPage = () => {
 
   if (isLoading) {
     return <div>Loading...</div>;
+  }
+
+  if (pinnedNotes.length < 1 && otherNotes.length < 1) {
+    return (
+      <>
+        <img
+          src={noNotes}
+          style={{ width: "100%", height: "auto" }}
+          className="no-notes"
+          alt="No notes"
+        />
+      </>
+    );
   }
 
   if (error) {

@@ -46,7 +46,7 @@ declare module "*.exe";
 declare module "*.apk";
 declare module "*.dll";
 declare module "*.bin";
-declare module "*.iso"; 
+declare module "*.iso";
 declare module "*.dmg";
 declare module "*.deb";
 declare module "*.rpm";

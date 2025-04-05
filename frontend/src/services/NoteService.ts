@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getCSRFToken } from "../../../services/CSRFTokenService.tsx";
+import { getCSRFToken } from "./CSRFTokenService.ts";
 import { UserNote, UserNoteData } from "types/types.ts";
 
 const csrfToken = await getCSRFToken();

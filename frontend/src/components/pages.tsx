@@ -1,12 +1,12 @@
-import {  useSideNav } from "../context/SideNavContext.js";
-import NotesPage from "../features/notes/pages/NotesPage.js";
-import FavoritesPage from "../features/notes/pages/FavoritesPage.js";
-import ArchivePage from "../features/notes/pages/ArchivePage.js";
-import TrashPage from "../features/notes/pages/TrashPage.js";
-import SearchPage from "../features/notes/pages/SearchPage.js";
+import { useSideNav } from "../hooks/useSideNav.js";
+import NotesPage from "../pages/NotesPage.js";
+import FavoritesPage from "../pages/FavoritesPage.js";
+import ArchivePage from "../pages/ArchivePage.js";
+import TrashPage from "../pages/TrashPage.js";
+import SearchPage from "../pages/SearchPage.js";
 
-import useNote from "../features/notes/hooks/useNote.js";
-import TagPage from "../features/notes/pages/TagPage.js";
+import useNote from "../hooks/useNote.js";
+import TagPage from "../pages/TagPage.js";
 
 export const Pages = () => {
   const { search } = useNote();

@@ -1,7 +1,7 @@
 import axios from "axios";
 
-import { getCSRFToken } from "../../../services/CSRFTokenService.tsx";
 import { Tag } from "types/types.ts";
+import { getCSRFToken } from "./CSRFTokenService.ts";
 
 const csrfToken = await getCSRFToken();
 

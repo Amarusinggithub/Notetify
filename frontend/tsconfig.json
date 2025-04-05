@@ -1,5 +1,5 @@
 {
-    "include": ["src", "cypress.config.ts", "cypress/**/*.ts","cypress"],
+    "include": ["src", "cypress.config.ts", "cypress/**/*.ts","cypress", "src/.d.ts"],
 
   "compilerOptions": {
     /* Visit https://aka.ms/tsconfig to read more about this file */

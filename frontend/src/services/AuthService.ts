@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getCSRFToken } from "../../../services/CSRFTokenService";
+import { getCSRFToken } from "./CSRFTokenService.ts";
 
 // Create an Axios instance with defaults.
 const axiosInstance = axios.create({

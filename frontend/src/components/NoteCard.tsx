@@ -41,7 +41,7 @@ const NoteCard = ({ note }: NoteCardProps) => {
   const handleSave = async () => {
     if (isEdited) {
       console.log("sent edited content to server");
-      if (isUserNote(noteState))await editNote(noteState);
+      if (isUserNote(noteState)) await editNote(noteState);
     }
     setIsEdited(false);
   };
@@ -53,7 +53,7 @@ const NoteCard = ({ note }: NoteCardProps) => {
   ) => {
     e.preventDefault();
     await handleSave();
-    if(isUserNote(note))setSelectedNote(isSelected ? null : note);
+    if (isUserNote(note)) setSelectedNote(isSelected ? null : note);
   };
 
   const isUserNote = (note: UserNote | UserNoteData): note is UserNote => {
@@ -121,7 +121,7 @@ const NoteCard = ({ note }: NoteCardProps) => {
   ) => {
     e.preventDefault();
     e.stopPropagation();
-    if(isUserNote(note))await removeNote(note);
+    if (isUserNote(note)) await removeNote(note);
   };
 
   return (
@@ -206,8 +206,8 @@ const NoteCard = ({ note }: NoteCardProps) => {
           {!isSelected && (
             <div className="note-title">
               {isUserNote(noteState)
-                ? noteState.note?.title 
-                : noteState.note_data?.title }
+                ? noteState.note?.title
+                : noteState.note_data?.title}
             </div>
           )}
 
@@ -219,8 +219,8 @@ const NoteCard = ({ note }: NoteCardProps) => {
               }}
               value={
                 isUserNote(noteState)
-                  ? noteState.note?.title 
-                  : noteState.note_data?.title 
+                  ? noteState.note?.title
+                  : noteState.note_data?.title
               }
               disabled={isLoading}
             />

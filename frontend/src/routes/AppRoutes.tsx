@@ -1,13 +1,13 @@
-import LoginPage from "features/auth/pages/LoginPage";
-import SignUpPage from "features/auth/pages/SignUpPage";
-import ArchivePage from "features/notes/pages/ArchivePage";
-import FavoritesPage from "features/notes/pages/FavoritesPage";
-import NotesPage from "features/notes/pages/NotesPage";
-import TagPage from "features/notes/pages/TagPage";
-import TrashPage from "features/notes/pages/TrashPage";
+import LoginPage from "pages/LoginPage";
+import SignUpPage from "pages/SignUpPage";
+import ArchivePage from "pages/ArchivePage";
+import FavoritesPage from "pages/FavoritesPage";
+import NotesPage from "pages/NotesPage";
+import TagPage from "pages/TagPage";
+import TrashPage from "pages/TrashPage";
 import ErrorPage from "pages/ErrorPage";
 import App from "pages/MainPage";
-import { createBrowserRouter,  RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 const AppRoutes = () => {
   const routes =

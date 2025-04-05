@@ -7,8 +7,8 @@ import {
   faMagnifyingGlass,
   faRotateRight,
 } from "@fortawesome/free-solid-svg-icons";
-import { useSideNav } from "../context/SideNavContext.tsx";
-import useNote from "../features/notes/hooks/useNote.tsx";
+import { useSideNav } from "../hooks/useSideNav.tsx";
+import useNote from "../hooks/useNote.tsx";
 import React from "react";
 
 const Navbar = () => {
