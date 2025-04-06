@@ -82,12 +82,12 @@ The frontend will run at: `http://localhost:5173`
 
 Here is a preview of the Notetify UI in action:
 
-
+![Notetify UI](./screenshots/notetify_ui.png)
 ---
 
 ## Environment Variables
 
-Copy the `.env.example` file and create a new `.env` file in both the `backend` and `frontend` directories. Update them with your local configurations.
+Copy the `.env.example` file and create a new `.env` file in both the `backend` , `frontend` and  base  directories. Update them with your local configurations.
 
 ---
 
