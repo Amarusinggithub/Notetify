@@ -1,4 +1,4 @@
-.note-card {
+.add-note-card {
   display: flex;
   padding: 20px;
   flex-direction: column;
@@ -13,7 +13,6 @@
   transition: all 300ms ease 0ms;
   word-wrap: break-word;
   box-sizing: border-box;
-  border: none;
 }
 
 .selected-note {

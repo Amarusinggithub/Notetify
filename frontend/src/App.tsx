@@ -20,6 +20,7 @@ export default function RootApp() {
     };
     initialize();
   }, []);
+  
 
   return (
     <ErrorBoundary fallback={<div>Something went wrong</div>}>

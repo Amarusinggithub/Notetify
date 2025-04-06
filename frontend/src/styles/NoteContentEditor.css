@@ -8,10 +8,9 @@
 }
 
 .editor-placeholder {
-  position: absolute;
+  position: relative;
   color: #aaa;
   font-size: 16px;
-  padding: 10px;
   pointer-events: none;
 }
 

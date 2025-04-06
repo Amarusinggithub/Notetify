@@ -12,6 +12,8 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import NoteContentEditor from "./NoteContentEditor.tsx";
 import { UserNote, UserNoteData } from "types/types.ts";
+import { isUserNote } from "./../utils/helpers.tsx";
+
 
 type NoteCardProps = { note: UserNote | UserNoteData };
 
@@ -56,9 +58,7 @@ const NoteCard = ({ note }: NoteCardProps) => {
     if (isUserNote(note)) setSelectedNote(isSelected ? null : note);
   };
 
-  const isUserNote = (note: UserNote | UserNoteData): note is UserNote => {
-    return (note as UserNote).note !== undefined;
-  };
+
 
   const handleTitleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value;

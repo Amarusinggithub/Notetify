@@ -15,9 +15,6 @@ import {
 } from "../services/TagService.ts";
 import { Tag } from "types/types.ts";
 
-
-
-
 interface TagContextType {
   selectedTag: Tag | null;
   isLoading: boolean;
@@ -64,6 +61,12 @@ const TagProvider = ({ children }: TagProviderProps) => {
 
   const makeTag = async (tagName: string) => {
     const previousTags = [...tags];
+
+
+    if (tagName==null || tagName.length <=0) {
+      console.error("tag was not saved because it was either null or a empty string")
+      return;
+    }
 
     if (tags.some((tag) => tag.name.toLowerCase() === tagName.toLowerCase())) {
       alert("Tag already exists!");

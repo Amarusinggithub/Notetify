@@ -12,9 +12,8 @@ import {
   getNotes,
   updateNote,
 } from "../services/NoteService";
-import { Tag, UserNote, UserNoteData } from "types/types";
-
-
+import { Tag, UserNote, UserNoteData } from "./../types/types";
+import { isUserNote } from "./../utils/helpers";
 
 interface NoteContextType {
   search: string;
@@ -120,11 +119,6 @@ const NoteProvider = ({ children }: NoteProviderProps) => {
   const [selectedNote, setSelectedNote] = useState<UserNote | null>(null);
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState<any>(null);
-
-  // Type guard to distinguish between UserNote and UserNoteData.
-  const isUserNote = (note: UserNote | UserNoteData): note is UserNote => {
-    return (note as UserNote).note !== undefined;
-  };
 
   const handleSearch = () => {
     const query = search.trim().toLowerCase();
@@ -234,6 +228,7 @@ const NoteProvider = ({ children }: NoteProviderProps) => {
 
   const addNote = async (note: UserNoteData) => {
     const previousNotes = [...notes];
+
     refreshCategorizedNotes([...notes, note]);
     try {
       setLoading(true);

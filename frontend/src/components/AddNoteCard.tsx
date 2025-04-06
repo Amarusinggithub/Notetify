@@ -90,18 +90,11 @@ const AddNoteCard = () => {
     setIsEdited(newContent !== null && newContent !== "");
   };
 
-  if (isLoading) {
-    return <div>Loading</div>;
-  }
-
-  if (error) {
-    return <div>Error:{error.message} </div>;
-  }
 
   return (
     <div className={isSelected ? "notecard-bg" : ""} onClick={handleSelect}>
       <div
-        className={`note-card ${isSelected ? "selected-note" : ""}`}
+        className={`add-note-card ${isSelected ? "selected-note" : ""}`}
         onClick={(e) => {
           e.stopPropagation();
           if (!isSelected) {

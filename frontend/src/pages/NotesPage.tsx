@@ -17,6 +17,11 @@ const NotesPage = () => {
     return <div>Loading...</div>;
   }
 
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
+
+  
   if (pinnedNotes.length < 1 && otherNotes.length < 1) {
     return (
       <>
@@ -29,11 +34,6 @@ const NotesPage = () => {
       </>
     );
   }
-
-  if (error) {
-    return <div>Error: {error.message}</div>;
-  }
-
   return (
     <div className="container">
       <AddNoteCard />

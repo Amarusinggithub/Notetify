@@ -110,7 +110,7 @@ const defaultEditorState = JSON.stringify({
         children: [
           {
             type: "text",
-            text: "Type something...",
+            text: "",
             detail: 0,
             format: "",
             mode: "normal",
