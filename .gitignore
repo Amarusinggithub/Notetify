@@ -4,7 +4,7 @@ docker-compose.override.yml
 docker-compose.dev.yml       
 docker-compose.test.yml      
 
-# Keep main Docker files in version control
+
 !Dockerfile
 !docker-compose.yml
 
