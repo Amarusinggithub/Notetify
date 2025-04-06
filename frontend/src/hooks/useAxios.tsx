@@ -2,6 +2,19 @@ import axios from "axios";
 import { getCSRFToken } from "../services/CSRFTokenService";
 
 const useAxios = () => {
+  let isRefreshing = false;
+  let failedQueue: any = [];
+
+  const processQueue = (error: any, token = null) => {
+    failedQueue.forEach((prom: any) => {
+      if (error) {
+        prom.reject(error);
+      } else {
+        prom.resolve(token);
+      }
+    });
+    failedQueue = [];
+  };
   const axiosInstance = axios.create({
     baseURL: "http://localhost:8000/api/",
     headers: {
@@ -38,10 +51,22 @@ const useAxios = () => {
       if (
         error.response &&
         error.response.status === 401 &&
-        error.response?.data?.code === "token_not_valid" &&
         !originalRequest._retry
       ) {
+        if (isRefreshing) {
+          // If a refresh is already in progress, queue the request
+          return new Promise((resolve, reject) => {
+            failedQueue.push({ resolve, reject });
+          })
+            .then((token) => {
+              originalRequest.headers["Authorization"] = `Bearer ${token}`;
+              return axiosInstance(originalRequest);
+            })
+            .catch((err) => Promise.reject(err));
+        }
+
         originalRequest._retry = true;
+        isRefreshing = true;
         try {
           const refreshToken = localStorage.getItem("refresh_token");
           if (!refreshToken) {
@@ -52,6 +77,7 @@ const useAxios = () => {
             { refresh: refreshToken }
           );
           const { access, refresh } = refreshResponse.data;
+         
           if (access) {
             localStorage.setItem("access_token", access);
           }
@@ -62,13 +88,18 @@ const useAxios = () => {
             "Authorization"
           ] = `Bearer ${access}`;
           originalRequest.headers["Authorization"] = `Bearer ${access}`;
+
+          processQueue(null, access);
+
           return axiosInstance(originalRequest);
         } catch (refreshError) {
+          console.error("Token refresh failed:", refreshError);
           console.warn("Session expired. Redirecting to login...");
           localStorage.removeItem("access_token");
           localStorage.removeItem("refresh_token");
-          console.error("Token refresh failed:", refreshError);
           return Promise.reject(refreshError);
+        } finally {
+          isRefreshing = false;
         }
       }
       return Promise.reject(error);

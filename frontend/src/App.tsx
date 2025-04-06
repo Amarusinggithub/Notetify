@@ -15,6 +15,8 @@ import { ErrorBoundary } from "react-error-boundary";
 
 export default function RootApp() {
   useEffect(() => {
+
+
     const initialize = async () => {
       await initializeCSRFToken();
     };
