@@ -77,7 +77,6 @@ const useAxios = () => {
             { refresh: refreshToken }
           );
           const { access, refresh } = refreshResponse.data;
-         
           if (access) {
             localStorage.setItem("access_token", access);
           }
