@@ -1,6 +1,6 @@
 # Notetify
 
-Notetify is a sleek and modern full-stack note-taking application designed to help you easily organize your thoughts, tasks, and plans. It supports tagging, archiving, and pinning notes, along with powerful real-time collaboration features that allow users to share and work together on notes simultaneously. Built with a React frontend and a Django backend, it ensures both a responsive user experience and robust backend performance.
+Notetify is a sleek and modern full-stack note-taking application inspired by Google Keep, designed to help you easily organize your thoughts, tasks, and plans. It supports tagging, archiving, and pinning, favoriting notes, along with powerful real-time collaboration features that allow users to share and work together on notes simultaneously. Built with a React frontend and a Django backend, it ensures both a responsive user experience and robust backend performance.
 
 ---
 
