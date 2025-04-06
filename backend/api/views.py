@@ -47,11 +47,11 @@ class LoginView(APIView):
 
     def post(self, request, format=None):
         data = request.data
-        username = data.get('username', None)
+        email = data.get('email', None)
         password = data.get('password', None)
-        if not username or not password:
-            return Response({"error": "Username and password are required"}, status=status.HTTP_400_BAD_REQUEST)
-        user = authenticate(username=username, password=password)
+        if not email or not password:
+            return Response({"error": "email and password are required"}, status=status.HTTP_400_BAD_REQUEST)
+        user = authenticate(email=email, password=password)
         if user is not None:
             if user.is_active:
                 serializer = UserSerializer(user, context={"request": request})
@@ -61,7 +61,7 @@ class LoginView(APIView):
             else:
                 return Response({"error": "Account is inactive"}, status=status.HTTP_403_FORBIDDEN)
         else:
-            return Response({"error": " This is a Invalid username or password"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": " This is a Invalid email or password"}, status=status.HTTP_400_BAD_REQUEST)
 
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]

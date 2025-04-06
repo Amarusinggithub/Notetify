@@ -1,4 +1,6 @@
 const loginPassword = Cypress.env("LOGIN_PASSWORD");
+const loginEmail = Cypress.env("LOGIN_EMAIL");
+
 
 describe("this is a test to test authentication", () => {
   it("tests the login", () => {
@@ -6,10 +8,8 @@ describe("this is a test to test authentication", () => {
     cy.location("pathname").should("equal", "/login");
 
     cy.get('[data-testid="cypress-Login-title"]').should("exist");
-    cy.get('[data-testid="cypress-Login-UserName-input"]').type("Amar");
-    cy.get('[data-testid="cypress-Login-Password-input"]').type(
-      `${loginPassword}`
-    );
+    cy.get('[data-testid="cypress-Login-Email-input"]').type(`${loginEmail}`);
+    cy.get('[data-testid="cypress-Login-Password-input"]').type(`${loginPassword}`);
     cy.get('[data-testid="cypress-Login-btn"]').click();
 
     cy.location("pathname").should("equal", "/");

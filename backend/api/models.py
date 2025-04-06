@@ -25,12 +25,13 @@ class MyUserManager(UserManager):
 
 class User(AbstractUser, PermissionsMixin):
     id = models.AutoField(primary_key=True)
-    username = models.CharField(max_length=150, unique=True,)
-    email = models.EmailField(unique=True)
+    username = models.CharField(max_length=150)
+    email = models.EmailField(unique=True,max_length=254)
     profile_picture = models.ImageField(upload_to="avatars/", null=True, blank=True)
 
     REQUIRED_FIELDS = []
-    USERNAME_FIELD = "username"
+    USERNAME_FIELD = "email"
+
 
     objects = MyUserManager()
 
@@ -55,7 +56,6 @@ class Note(models.Model):
     
     
 class UserNote(models.Model):
-    # NEW FOR THE ROLES
     class Roles(models.TextChoices):
         OWNER = "OWNER", "Owner"
         EDITOR = "EDITOR", "Editor"

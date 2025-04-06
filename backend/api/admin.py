@@ -9,7 +9,7 @@ from .models import User, Note, Tag,UserNote
 class MyUserAdmin(UserAdmin):
 
     def has_delete_permission(self, request, obj=None):
-        return False
+        return True
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
@@ -114,5 +114,4 @@ class TagAdmin(admin.ModelAdmin):
 admin.site.register(User, MyUserAdmin)
 admin.site.register(Note, NoteAdmin)
 admin.site.register(UserNote, UserNoteAdmin)
-
 admin.site.register(Tag, TagAdmin)

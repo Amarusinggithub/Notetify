@@ -8,7 +8,7 @@ import {
 } from "react";
 import { useNavigate } from "react-router-dom";
 
-type AuthProviderProps =PropsWithChildren;
+type AuthProviderProps = PropsWithChildren;
 interface AuthContextType {
   handleSignup: (
     email: string,
@@ -69,17 +69,17 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
-  const handleLogin = async (username: string, password: string) => {
+  const handleLogin = async (email: string, password: string) => {
     try {
       setLoading(true);
       setError(null);
+      
 
-      const response = await login(username, password);
+      const response = await login(email.trim(), password.trim());
       if (response.status >= 200 && response.status < 300) {
         console.log("Login successful");
         navigate("/");
         setLogin(response.data.userData);
-
       } else {
         console.error("Login failed");
       }
@@ -116,7 +116,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     const token = localStorage.getItem("access_token");
     const storedUserData = localStorage.getItem("Userdata");
 
-    if (token!=null&&token!="") {
+    if (token != null && token != "") {
       if (storedUserData) {
         setUserData(JSON.parse(storedUserData));
       }
@@ -146,7 +146,7 @@ export default AuthProvider;
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if(!context){
+  if (!context) {
     throw new Error("useAuth must be used within AuthProvider");
   }
   return context;

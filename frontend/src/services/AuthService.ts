@@ -3,9 +3,12 @@ import useAxios from "../hooks/useAxios.tsx";
   let axiosInstance = useAxios();
 
 
-export const login = async (username: string, password: string) => {
+export const login = async (email: string, password: string) => {
   try {
-    const response = await axiosInstance.post("login/", { username, password });
+    const response = await axiosInstance.post("login/", {
+      "email": email,
+      "password": password,
+    });
     const { access_token, refresh_token } = response.data;
     // Store tokens specifically, without clearing unrelated data.
     localStorage.setItem("access_token", access_token);
@@ -32,9 +35,9 @@ export const signUp = async (
 ) => {
   try {
     const response = await axiosInstance.post("register/", {
-      email,
-      username,
-      password,
+      "email": email,
+      "username": username,
+      "password":password,
     });
     const { access_token, refresh_token } = response.data;
     // Store tokens consistently.
@@ -70,4 +73,3 @@ export const logout = async () => {
   }
 };
 
-export default axiosInstance;

@@ -34,7 +34,7 @@ const LoginPage = () => {
             <label className="labels">Email</label>
             <input
               data-testid="cypress-Login-Email-input"
-              type="text"
+              type="email"
               className="form-control"
               name="email"
               value={state.email}
