@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import useNote from "../hooks/useNote";
 import "../styles/AddNoteCard.css";
-import NoteContentEditor from "./NoteContentEditor";
+import NoteContentEditor from "./Editor/NoteContentEditor";
 import { UserNoteData } from "types/types";
 
 const AddNoteCard = () => {
-  const { addNote, isLoading, error, notes } = useNote();
+  const { addNote, isLoading, data } = useNote();
   let noteId;
-  if (notes.length > 0) {
-    noteId = notes[notes.length - 1].id + 1;
+  if (data.length > 0) {
+    noteId = data[data.length - 1].id + 1;
   } else {
     noteId = 1;
   }
@@ -90,7 +90,6 @@ const AddNoteCard = () => {
     setIsEdited(newContent !== null && newContent !== "");
   };
 
-
   return (
     <div className={isSelected ? "notecard-bg" : ""} onClick={handleSelect}>
       <div
@@ -102,7 +101,6 @@ const AddNoteCard = () => {
           }
         }}
       >
-        {error && <div className="error-banner">{error}</div>}
 
         <div className="note">
           {isSelected && (

@@ -5,15 +5,15 @@ import useNote from "../hooks/useNote.tsx";
 import noTaggedNotes from "./../../assets/No_tagged_Notes.png";
 
 const TagPage = () => {
-  const { tagNotes, isLoading, error } = useNote();
+  const { tagNotes, isLoading, isError } = useNote();
   const { isSideNavOpen } = useSideNav();
 
   if (isLoading) {
     return <div>Loading...</div>;
   }
 
-  if (error) {
-    return <div>Error: {error.message}</div>;
+  if (isError) {
+    return <div>Error: {isError.message}</div>;
   }
 
   if (tagNotes.length < 1) {

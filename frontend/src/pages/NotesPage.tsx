@@ -7,22 +7,22 @@ import AddNoteCard from "../components/AddNoteCard.tsx";
 import { UserNote, UserNoteData } from "types/types.ts";
 import noNotes from "./../../assets/No_Note.png";
 const NotesPage = () => {
-  const { pinnedNotes, otherNotes, isLoading, error } = useNote();
+  const { pinned, other, isLoading, isError } = useNote();
   const { isSideNavOpen } = useSideNav();
   useEffect(() => {
-    console.log("this is the pinned notes", pinnedNotes);
-  }, [pinnedNotes]);
+    console.log("this is the pinned notes", pinned);
+  }, [pinned]);
 
   if (isLoading) {
     return <div>Loading...</div>;
   }
 
-  if (error) {
-    return <div>Error: {error.message}</div>;
+  if (isError) {
+    return <div>Error: {isError.message}</div>;
   }
 
   
-  if (pinnedNotes.length < 1 && otherNotes.length < 1) {
+  if (pinned.length < 1 && other.length < 1) {
     return (
       <>
         <img
@@ -38,7 +38,7 @@ const NotesPage = () => {
     <div className="container">
       <AddNoteCard />
 
-      {pinnedNotes?.length > 0 && (
+      {pinned?.length > 0 && (
         <>
           <div className="flex-column">
             <h1 data-testid="cypress-pinnedNotes-title">Pinned Notes</h1>
@@ -48,7 +48,7 @@ const NotesPage = () => {
             className="pinned-notes"
             style={{ maxWidth: isSideNavOpen ? "1200px" : "1360px" }}
           >
-            {pinnedNotes.map((note: UserNote | UserNoteData) => (
+            {pinned.map((note: UserNote | UserNoteData) => (
               <div key={note.id} className="note-div">
                 <NoteCard note={note} />
               </div>
@@ -65,7 +65,7 @@ const NotesPage = () => {
         className="all-notes"
         style={{ maxWidth: isSideNavOpen ? "1200px" : "1400px" }}
       >
-        {otherNotes?.map((note: UserNote | UserNoteData) => (
+        {other?.map((note: UserNote | UserNoteData) => (
           <div key={note.id} className="note-div">
             <NoteCard note={note} />
           </div>

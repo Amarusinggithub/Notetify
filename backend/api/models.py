@@ -67,7 +67,7 @@ class UserNote(models.Model):
     id = models.AutoField(primary_key=True)
     user= models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="User_notes")
     tags = models.ManyToManyField(Tag, related_name="User_tags",blank=True)
-    note=models.OneToOneField(Note, on_delete=models.CASCADE)
+    note = models.ForeignKey(Note, on_delete=models.CASCADE)
     is_pinned = models.BooleanField(default=False)
     is_favorited = models.BooleanField(default=False)
     is_trashed = models.BooleanField(default=False)

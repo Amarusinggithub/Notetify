@@ -5,15 +5,15 @@ import { UserNote, UserNoteData } from "types/types";
 import noSearchNotes from "./../../assets/No_Search.png";
 
 const SearchPage = () => {
-  const { searchNotes, isLoading, error } = useNote();
+  const { searchNotes, isLoading, isError } = useNote();
   const { isSideNavOpen } = useSideNav();
 
   if (isLoading) {
     return <div>Loading...</div>;
   }
 
-  if (error) {
-    return <div>Error: {error.message}</div>;
+  if (isError) {
+    return <div>Error: {isError.message}</div>;
   }
 
   if (searchNotes.length < 1) {

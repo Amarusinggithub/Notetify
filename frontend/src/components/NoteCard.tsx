@@ -10,10 +10,9 @@ import {
   faStar,
   faTrashCan,
 } from "@fortawesome/free-solid-svg-icons";
-import NoteContentEditor from "./NoteContentEditor.tsx";
+import NoteContentEditor from "./Editor/NoteContentEditor.tsx";
 import { UserNote, UserNoteData } from "types/types.ts";
 import { isUserNote } from "./../utils/helpers.tsx";
-
 
 type NoteCardProps = { note: UserNote | UserNoteData };
 
@@ -57,8 +56,6 @@ const NoteCard = ({ note }: NoteCardProps) => {
     await handleSave();
     if (isUserNote(note)) setSelectedNote(isSelected ? null : note);
   };
-
-
 
   const handleTitleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value;

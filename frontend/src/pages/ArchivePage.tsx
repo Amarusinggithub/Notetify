@@ -5,13 +5,13 @@ import useNote from "../hooks/useNote";
 import noArchivedNotes from "./../../assets/No_Archive_notes.png";
 
 const ArchivePage = () => {
-  const { archiveNotes, isLoading, error } = useNote();
+  const { archived, isLoading, isError } = useNote();
 
   if (isLoading) {
     return <div>Loading...</div>;
   }
 
-  if (archiveNotes.length < 1) {
+  if (archived.length < 1) {
     return (
       <>
         <img
@@ -24,14 +24,14 @@ const ArchivePage = () => {
     );
   }
 
-  if (error) {
-    return <div>Error: {error.message}</div>;
+  if (isError) {
+    return <div>Error: {isError.message}</div>;
   }
   return (
     <div className="container">
       <div className="all-notes">
-        {archiveNotes &&
-          archiveNotes.map((note: UserNote | UserNoteData) => (
+        {archived &&
+          archived.map((note: UserNote | UserNoteData) => (
             <div key={note.id} className="note-div">
               <NoteCard note={note} />
             </div>

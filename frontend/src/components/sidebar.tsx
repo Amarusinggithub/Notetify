@@ -11,7 +11,7 @@ import { Tag } from "types/types.ts";
 const SideNav = () => {
   const { isSideNavOpen, setPage, setAddTagPopupOpen } = useSideNav();
   const { handleTagClick, setTitle } = useNote();
-  const { tags, setWantToDeleteTag, setSelectedTag, setWantToEditTag } =
+  const { data, setWantToDeleteTag, setSelectedTag, setWantToEditTag } =
     useTag();
 
   const [temp, setTemp] = useState<any>(sidebarData[0]);
@@ -90,12 +90,12 @@ const SideNav = () => {
             {isSideNavOpen && <h3>{"Add Tag"}</h3>}
           </div>
         </li>
-        {isSideNavOpen && tags?.length > 0 && (
+        {isSideNavOpen && data?.length > 0 && (
           <h3 className="title-tags">Tags</h3>
         )}
-        {tags?.length > 0 && (
+        {data?.length > 0 && (
           <ul className="tags">
-            {tags.map((tag: Tag, index: number) => (
+            {data.map((tag: Tag, index: number) => (
               <li
                 onClick={(e) => {
                   e.stopPropagation();

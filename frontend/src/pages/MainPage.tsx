@@ -7,21 +7,12 @@ import EditTagPopup from "../components/EditTagPopup.tsx";
 import DeleteTagPopup from "../components/DeleteTagPopup.tsx";
 import useTag from "../hooks/useTag.tsx";
 import { useSideNav } from "../hooks/useSideNav.tsx";
-import useNote from "../hooks/useNote.tsx";
-import { useEffect } from "react";
 
 const App = () => {
   const { isSideNavOpen, isAddTagPopupOpen } = useSideNav();
-  const { wantToDeleteTag, fetchTags, wantToEditTag } = useTag();
-  const { fetchNotes } = useNote();
+  const { wantToDeleteTag,wantToEditTag } = useTag();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      await fetchNotes();
-      await fetchTags();
-    };
-    fetchData();
-  }, []);
+  
 
   return (
     <div className="container">

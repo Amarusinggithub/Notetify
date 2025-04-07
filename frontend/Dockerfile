@@ -24,7 +24,6 @@ RUN chown -R node:node /usr/src/app
 # Switch to non-root user for security
 USER node
 
-# Expose necessary ports (e.g., Vite dev server on 5173, y-websocket on 1234)
 EXPOSE 5173 1234
 
-CMD ["sh", "-c", "npm run dev & npx y-websocket --port 1234"]
+CMD ["npm run dev:local"]

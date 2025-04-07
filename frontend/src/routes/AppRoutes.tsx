@@ -1,12 +1,12 @@
-import LoginPage from "pages/LoginPage";
-import SignUpPage from "pages/SignUpPage";
-import ArchivePage from "pages/ArchivePage";
-import FavoritesPage from "pages/FavoritesPage";
-import NotesPage from "pages/NotesPage";
-import TagPage from "pages/TagPage";
-import TrashPage from "pages/TrashPage";
-import ErrorPage from "pages/ErrorPage";
-import App from "pages/MainPage";
+import LoginPage from "../pages/LoginPage";
+import SignUpPage from "../pages/SignUpPage";
+import ArchivePage from "../pages/ArchivePage";
+import FavoritesPage from "../pages/FavoritesPage";
+import NotesPage from "../pages/NotesPage";
+import TagPage from "../pages/TagPage";
+import TrashPage from "../pages/TrashPage";
+import ErrorPage from "../pages/ErrorPage";
+import App from "../pages/MainPage";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 const AppRoutes = () => {
@@ -30,10 +30,12 @@ const publicRoutes = [
   {
     path: "/login",
     element: <LoginPage />,
+    errorElement: <ErrorPage />,
   },
   {
     path: "/signup",
     element: <SignUpPage />,
+    errorElement: <ErrorPage />,
   },
 ];
 
@@ -41,6 +43,7 @@ const privateRoutes = [
   {
     path: "/login",
     element: <LoginPage />,
+    errorElement: <ErrorPage />,
   },
   {
     path: "/",
@@ -51,28 +54,35 @@ const privateRoutes = [
         index: true,
         path: "/Notes",
         element: <NotesPage />,
+        errorElement: <ErrorPage />,
       },
       {
         path: "/Favorites",
         element: <FavoritesPage />,
+        errorElement: <ErrorPage />,
       },
       {
         path: "/Archives",
         element: <ArchivePage />,
+        errorElement: <ErrorPage />,
       },
       {
         path: "/Tags",
         element: <TagPage />,
+        errorElement: <ErrorPage />,
+
         Children: [
           {
             path: "/Tags/:tagid",
-            element: <FavoritesPage />,
+            element: <TagPage />,
+            errorElement: <ErrorPage />,
           },
         ],
       },
       {
         path: "/Trash",
         element: <TrashPage />,
+        errorElement: <ErrorPage />,
       },
     ],
   },

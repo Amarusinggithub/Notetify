@@ -7,18 +7,21 @@
     "cy:open": "cypress open",
     "dev": "vite",
     "test": "vitest",
-    "build": "vite build",
+    "build": "tsc && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "server:ws": "cross-env HOST=localhost PORT=1234 YPERSISTENCE=./yjs-wss-db npx y-websocket",
+    "server:webrtc": "cross-env HOST=localhost PORT=1234 npx y-webrtc",
+    "dev:local": "cross-env NODE_ENV=development concurrently \"npm:server:ws\" \"npm:server:webrtc\" \"vite\""
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
     "@fortawesome/free-regular-svg-icons": "^6.7.2",
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
-    "@hocuspocus/provider": "^2.15.2",
     "@lexical/react": "^0.23.1",
     "@lexical/yjs": "^0.24.0",
+    "@tanstack/react-query": "^5.71.10",
     "axios": "^1.7.7",
     "lexical": "^0.23.1",
     "react": "^18.3.1",
@@ -28,7 +31,7 @@
     "universal-cookie": "^7.2.2",
     "y-webrtc": "^10.3.0",
     "y-websocket": "^2.1.0",
-    "yjs": "^13.6.23"
+    "yjs": "^13.6.24"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
@@ -37,6 +40,9 @@
     "@typescript-eslint/eslint-plugin": "^8.26.1",
     "@typescript-eslint/parser": "^8.26.1",
     "@vitejs/plugin-react": "^4.3.3",
+    "autoprefixer": "^10.4.21",
+    "concurrently": "^9.1.2",
+    "cross-env": "^7.0.3",
     "cypress": "^14.2.0",
     "dotenv": "^16.4.7",
     "eslint": "^9.22.0",
@@ -44,6 +50,7 @@
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.14",
     "globals": "^15.11.0",
+    "postcss": "^8.5.3",
     "typescript": "^5.8.2",
     "vite": "^6.2.2",
     "vitest": "^3.1.1"

@@ -8,13 +8,13 @@ import noFavoriteNotes from "./../../assets/No_Favorited_Notes.png";
 const FavoritesPage = () => {
   const { isSideNavOpen } = useSideNav();
 
-  const { favoriteNotes, isLoading, error } = useNote();
+  const { favorites, isLoading, isError } = useNote();
 
   if (isLoading) {
     return <div>Loading...</div>;
   }
 
-  if (favoriteNotes.length < 1) {
+  if (favorites.length < 1) {
     return (
       <>
         <img
@@ -27,8 +27,8 @@ const FavoritesPage = () => {
     );
   }
 
-  if (error) {
-    return <div>Error: {error.message}</div>;
+  if (isError) {
+    return <div>Error: {isError.message}</div>;
   }
   return (
     <div className="container">
@@ -36,8 +36,8 @@ const FavoritesPage = () => {
         className="all-notes"
         style={{ maxWidth: isSideNavOpen ? "1200px" : "1400px" }}
       >
-        {favoriteNotes &&
-          favoriteNotes.map((note: UserNote | UserNoteData) => (
+        {favorites &&
+          favorites.map((note: UserNote | UserNoteData) => (
             <div key={note.id} className="note-div">
               <NoteCard note={note} />
             </div>
