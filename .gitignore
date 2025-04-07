@@ -1,8 +1,10 @@
+# Ignore temporary Docker files
 .dockerignore
 docker-compose.override.yml  # Ignore local-only overrides
 docker-compose.dev.yml       # Ignore dev-specific compose files
 docker-compose.test.yml      # Ignore test-specific compose files
 
+# Keep main Docker files in version control
 !Dockerfile
 !docker-compose.yml
 
@@ -13,6 +15,7 @@ yarn-debug.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Ignore dependencies
 node_modules/
 dist/
 dist-ssr/
@@ -22,28 +25,34 @@ frontend/yjs-wss-db/*
 
 
 cypress.env.json
+# Local environment files
 *.local
 .env  
 
+# Editor & OS-specific files
 .vscode/
-!.vscode/extensions.json  # Keep recommended extensions
+!.vscode/extensions.json  
 .idea/
 .DS_Store
 
+# Python-related (if using Python in backend)
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 .venv/
 
+# Build files
 build/
 coverage/
 .cache/
 out/
 
+# Ignore database files
 *.sqlite3
 *.db
 
+# Ignore secrets and configuration files
 secrets.dev.yaml
 values.dev.yaml
 
