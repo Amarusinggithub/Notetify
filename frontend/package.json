@@ -7,6 +7,7 @@
     "cy:open": "cypress open",
     "dev": "vite",
     "test": "vitest",
+    "coverage": "vitest run --coverage",
     "build": "tsc && vite build",
     "lint": "eslint .",
     "preview": "vite preview",

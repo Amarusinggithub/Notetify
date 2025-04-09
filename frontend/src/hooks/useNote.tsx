@@ -1,9 +1,7 @@
 import {
   createContext,
   PropsWithChildren,
-  useCallback,
   useContext,
-  useEffect,
   useMemo,
   useState,
 } from "react";
@@ -104,12 +102,11 @@ const NoteProvider = ({ children }: NoteProviderProps) => {
       return categorizedNotes(data);
     }, [data]);
 
+
   const [search, setSearch] = useState("");
   const [title, setTitle] = useState("Notes");
   const [tagNotes, setTagNotes] = useState<(UserNote | UserNoteData)[]>([]);
-  const [searchNotes, setSearchNotes] = useState<(UserNote | UserNoteData)[]>(
-    []
-  );
+  const [searchNotes, setSearchNotes] = useState<(UserNote | UserNoteData)[]>([]);
   const [selectedNote, setSelectedNote] = useState<UserNote | null>(null);
 
   const handleSearch = () => {
