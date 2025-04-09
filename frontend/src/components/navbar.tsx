@@ -13,7 +13,7 @@ import React from "react";
 
 const Navbar = () => {
   const { isSideNavOpen, setIsSideNavOpen } = useSideNav();
-  const { handleSearch, search, setSearch, fetchNotes, title } = useNote();
+  const { handleSearch, search, setSearch, title ,refetch} = useNote();
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
@@ -86,7 +86,7 @@ const Navbar = () => {
       <div className="icons-container">
         <button
           onClick={() => {
-            fetchNotes();
+          refetch();
           }}
         >
           <FontAwesomeIcon icon={faRotateRight} className="icon" />

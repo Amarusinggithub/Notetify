@@ -17,6 +17,8 @@ import {
   useQuery,
   useMutation,
   useQueryClient,
+  RefetchOptions,
+  QueryObserverResult,
   
 } from "@tanstack/react-query";
 interface NoteContextType {
@@ -37,6 +39,9 @@ interface NoteContextType {
   setTagNotes: React.Dispatch<
     React.SetStateAction<(UserNote | UserNoteData)[]>
   >;
+  refetch: (
+    options?: RefetchOptions
+  ) => Promise<QueryObserverResult<any, Error>>;
   setTitle: React.Dispatch<React.SetStateAction<string>>;
   handleSearch: () => void;
   addNote: (note: UserNoteData) => Promise<void>;
@@ -91,7 +96,12 @@ const NoteProvider = ({ children }: NoteProviderProps) => {
   const token = localStorage.getItem("access_token");
 
   const queryClient = useQueryClient();
-  const { data = [], isError, isLoading } = useQuery({
+  const {
+    data = [],
+    isError,
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: ["notes"],
     queryFn: getNotes,
     enabled: !!token,
@@ -230,7 +240,7 @@ const NoteProvider = ({ children }: NoteProviderProps) => {
         handlePin,
         setSelectedNote,
         setSearch,
-        handleTagClick,
+        handleTagClick,refetch
       }}
     >
       {children}

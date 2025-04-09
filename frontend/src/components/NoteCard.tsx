@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import "../styles/NoteCard.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -25,7 +24,6 @@ const NoteCard = ({ note }: NoteCardProps) => {
     isLoading,
     handleFavorite,
     handlePin,
-    error,
   } = useNote();
   const [noteState, setNoteState] = useState<UserNote | UserNoteData>(note);
 
@@ -137,8 +135,6 @@ const NoteCard = ({ note }: NoteCardProps) => {
           }
         }}
       >
-        {error && <div className="error-banner">{error}</div>}
-
         <div className="note">
           <div
             className="top-function-header"
