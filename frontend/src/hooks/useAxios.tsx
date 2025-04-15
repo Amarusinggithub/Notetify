@@ -1,7 +1,11 @@
 import axios from "axios";
 import { getCSRFToken } from "../services/CSRFTokenService";
 
+
 const useAxios = () => {
+  const BASE_URL = process.env.BASE_URL;
+  const NOTETIFY_APP_TOKEN_REFRESH_URL =
+    process.env.NOTETIFY_APP_TOKEN_REFRESH_URL;
   let isRefreshing = false;
   let failedQueue: any = [];
 
@@ -16,7 +20,7 @@ const useAxios = () => {
     failedQueue = [];
   };
   const axiosInstance = axios.create({
-    baseURL: "http://localhost:8000/api/",
+    baseURL: `${BASE_URL}`,
     headers: {
       "Content-Type": "application/json",
     },
@@ -73,7 +77,7 @@ const useAxios = () => {
             return Promise.reject(error);
           }
           const refreshResponse = await axios.post(
-            "http://localhost:8000/token/refresh/",
+            `${NOTETIFY_APP_TOKEN_REFRESH_URL}`,
             { refresh: refreshToken }
           );
           const { access, refresh } = refreshResponse.data;

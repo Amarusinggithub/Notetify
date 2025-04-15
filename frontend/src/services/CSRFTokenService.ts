@@ -5,8 +5,9 @@ axios.defaults.withCredentials = true;
 let csrfToken: any = null;
 
 export const initializeCSRFToken = async () => {
+  let CSRF_URL = process.env.CSRF_URL;
   if (!csrfToken) {
-    const response = await axios.get("http://127.0.0.1:8000/csrf/", {
+    const response = await axios.get(`${CSRF_URL}`, {
       withCredentials: true,
     });
     csrfToken = response.data.csrfToken;

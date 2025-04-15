@@ -4,7 +4,7 @@ ARG NODE_VERSION=22.13.0
 FROM node:${NODE_VERSION}-alpine
 
 # Set environment explicitly (adjustable to 'production' or 'development' as needed)
-ENV NODE_ENV=development
+ENV NODE_ENV=production
 
 # Working directory for your app
 WORKDIR /usr/src/app
@@ -24,6 +24,6 @@ RUN chown -R node:node /usr/src/app
 # Switch to non-root user for security
 USER node
 
-EXPOSE 5173 1234
+EXPOSE 5173 1234 3000 4173
 
-CMD ["npm run dev:local"]
+CMD ["npm", "run", "build"]
