@@ -24,9 +24,6 @@ pymysql.install_as_MySQLdb()  # Ensures pymysql is used as MySQLdb replacement
 # Base directory of the project
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
@@ -57,7 +54,8 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'SIGNING_KEY':os.environ.get('SIMPLE_JWT_SIGNING_KEY', default=None) or SECRET_KEY,
     'ROTATE_REFRESH_TOKENS': True,
-    'BLACKLIST_AFTER_ROTATION': True
+    'BLACKLIST_AFTER_ROTATION': True,
+    
 }
 # Application definition
 
@@ -236,20 +234,17 @@ LOGOUT_REDIRECT_URL = 'login'
 
 # Allows cross-origin cookies
 CSRF_COOKIE_SAMESITE = 'Lax'
-SESSION_COOKIE_SAMESITE = 'Lax'
-
-
-# Disable Secure for development; enable it in production
+CSRF_COOKIE_NAME = "csrftoken"
 CSRF_COOKIE_SECURE = False
-SESSION_COOKIE_SECURE = False
-
 # Allows JavaScript to access the CSRF cookie
 CSRF_COOKIE_HTTPONLY = False
 
+
+
+SESSION_COOKIE_SAMESITE = 'Lax'
+# Disable Secure for development; enable it in production
+SESSION_COOKIE_SECURE = False
 # Allows javascript to access the session cookie
 SESSION_COOKIE_HTTPONLY = False
 
 
-# PROD ONLY
-# CSRF_COOKIE_SECURE = True
-# SESSION_COOKIE_SECURE = True

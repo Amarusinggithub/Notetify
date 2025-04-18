@@ -5,13 +5,13 @@ axios.defaults.withCredentials = true;
 let csrfToken: any = null;
 
 export const initializeCSRFToken = async () => {
-  let CSRF_URL = process.env.CSRF_URL;
+  const VITE_CSRF_URL = import.meta.env.VITE_CSRF_URL as string;
+
   if (!csrfToken) {
-    const response = await axios.get(`${CSRF_URL}`, {
+    const response = await axios.get(`${VITE_CSRF_URL}`, {
       withCredentials: true,
     });
-    csrfToken = response.data.csrfToken;
-    console.log("Fetched CSRF Token:", csrfToken);
+    csrfToken = response.data.csrftoken;
   }
 };
 

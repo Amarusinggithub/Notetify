@@ -42,15 +42,12 @@ class UserNoteSerializer(serializers.ModelSerializer):
             title=note_data.get('title', ''),
             content=note_data.get('content', '')
         )
-        # Add the current user to Note's many-to-many "users" field, if applicable
         note.users.add(self.context['request'].user)
 
-        # If 'user' is not in validated_data, set it to the current request.user
         if not validated_data.get('user'):
             validated_data['user'] = self.context['request'].user
 
 
-        # Create the UserNote
         user_note = UserNote.objects.create(note=note, **validated_data)
         
         user_note.tags.set(tags)
@@ -70,7 +67,6 @@ class UserNoteSerializer(serializers.ModelSerializer):
             if 'content' in note_data:
                 note.content = note_data['content']
             if 'users' in note_data:
-                # Expecting a list of user IDs
                 user_ids = note_data.pop('users')
                 note.users.set(user_ids)
             note.save()

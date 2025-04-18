@@ -3,9 +3,9 @@ import { getCSRFToken } from "../services/CSRFTokenService";
 
 
 const useAxios = () => {
-  const BASE_URL = process.env.BASE_URL;
-  const NOTETIFY_APP_TOKEN_REFRESH_URL =
-    process.env.NOTETIFY_APP_TOKEN_REFRESH_URL;
+const BASE_URL = import.meta.env.VITE_BASE_URL as string;
+const NOTETIFY_APP_TOKEN_REFRESH_URL = import.meta.env
+  .VITE_NOTETIFY_APP_TOKEN_REFRESH_URL as string;
   let isRefreshing = false;
   let failedQueue: any = [];
 

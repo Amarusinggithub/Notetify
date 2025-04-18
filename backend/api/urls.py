@@ -16,7 +16,6 @@ urlpatterns = [
     path("api/login/", views.LoginView.as_view(), name="api-login"),
     path("api/register/", views.RegisterView.as_view(), name="api-register"),
     path("api/logout/", views.LogoutView.as_view(), name="api-logout"),
-    path("csrf/", views.get_csrf_token, name="csrf-token"),
     
     
 

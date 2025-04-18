@@ -1,6 +1,5 @@
 from django.contrib.auth import logout, login, authenticate
 from django.http import JsonResponse
-from django.middleware.csrf import get_token
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -14,9 +13,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from api.models import Note, User,Tag,UserNote
 from api.serializers import NoteSerializer, UserSerializer,TagSerializer,UserNoteSerializer
 
-def get_csrf_token(request):
-    csrf_token = get_token(request)
-    return JsonResponse({"csrfToken": csrf_token})
+
 
 def get_token_for_user(user):
     refresh=RefreshToken.for_user(user)

@@ -10,10 +10,8 @@ export const login = async (email: string, password: string) => {
       "password": password,
     });
     const { access_token, refresh_token } = response.data;
-    // Store tokens specifically, without clearing unrelated data.
     localStorage.setItem("access_token", access_token);
     localStorage.setItem("refresh_token", refresh_token);
-    // Update Axios default headers.
     axiosInstance.defaults.headers.common[
       "Authorization"
     ] = `Bearer ${access_token}`;
@@ -56,6 +54,8 @@ export const signUp = async (
     throw error;
   }
 };
+
+
 
 export const logout = async () => {
   try {
