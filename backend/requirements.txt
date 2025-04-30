@@ -34,5 +34,4 @@ channels_redis
 django-ckeditor
 dotenv
 environ
-jazzmin
 yroom

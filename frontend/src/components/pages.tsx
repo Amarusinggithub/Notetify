@@ -1,24 +1,24 @@
 import { useSideNav } from "../hooks/useSideNav.js";
-import NotesPage from "../pages/NotesPage.js";
-import FavoritesPage from "../pages/FavoritesPage.js";
-import ArchivePage from "../pages/ArchivePage.js";
-import TrashPage from "../pages/TrashPage.js";
-import SearchPage from "../pages/SearchPage.js";
+import Home from "../pages/Home.js";
+import Favorite from "../pages/Favorites.js";
+import Archive from "../pages/Archive.js";
+import Trash from "../pages/Trash.js";
+import Search from "../pages/Search.js";
 
 import useNote from "../hooks/useNote.js";
-import TagPage from "../pages/TagPage.js";
+import Tag from "../pages/Tag.js";
 
 export const Pages = () => {
   const { search } = useNote();
   const { page } = useSideNav();
 
   const SidebarPages = [
-    <NotesPage key="notes" />,
-    <FavoritesPage key="favorites" />,
-    <ArchivePage key="archive" />,
-    <TrashPage key="trash" />,
-    <SearchPage key="search" />,
-    <TagPage key="tag" />,
+    <Home key="notes" />,
+    <Favorite key="favorites" />,
+    <Archive key="archive" />,
+    <Trash key="trash" />,
+    <Search key="search" />,
+    <Tag key="tag" />,
   ];
 
   if (search.length > 0) {

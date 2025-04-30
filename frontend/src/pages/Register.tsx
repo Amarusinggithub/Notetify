@@ -1,9 +1,10 @@
 import { useState } from "react";
 import "../styles/SignUpForm.css";
 import { useAuth } from "../hooks/useAuth.tsx";
-import { Link } from "react-router-dom";
+import { Link ,useNavigate} from "react-router";
 
-const SignUpPage = () => {
+const Register = () => {
+  const navigate=useNavigate();
   const [state, setState] = useState({
     email: "",
     password: "",
@@ -11,7 +12,7 @@ const SignUpPage = () => {
     username: "",
   });
 
-  const { handleSignup } = useAuth();
+  const { handleSignup ,isAuthenticated} = useAuth();
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setState({ ...state, [e.target.name]: e.target.value });
@@ -27,7 +28,8 @@ const SignUpPage = () => {
       return;
     }
 
-    handleSignup(state.username, state.email, state.password);
+    await handleSignup(state.username, state.email, state.password);
+       if (isAuthenticated) navigate("/");
   }
 
   return (
@@ -115,4 +117,4 @@ const SignUpPage = () => {
   );
 };
 
-export default SignUpPage;
+export default Register;

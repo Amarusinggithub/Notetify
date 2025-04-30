@@ -1,23 +1,14 @@
-import {
-  createContext,
-  PropsWithChildren,
-  useContext,
-  useState,
-} from "react";
+import { createContext, PropsWithChildren, useContext, useState } from "react";
 
-import {
-  createTag,
-  deleteTag,
-  getTags,
-  updateTag,
-} from "../services/TagService.ts";
+import { createTag, deleteTag, getTags, updateTag } from "../lib/TagService.ts";
 import { Tag } from "types/types.ts";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "./useAuth.tsx";
 
 interface TagContextType {
   selectedTag: Tag | null;
   isLoading: boolean;
-  isError: any
+  isError: any;
   data: Tag[];
   wantToDeleteTag: boolean;
   wantToEditTag: boolean;
@@ -34,13 +25,17 @@ type TagProviderProps = PropsWithChildren;
 const TagContext = createContext<TagContextType | undefined>(undefined);
 
 const TagProvider = ({ children }: TagProviderProps) => {
-  const token = localStorage.getItem("access_token");
+  const { isAuthenticated } = useAuth();
   const queryClient = useQueryClient();
   const {
     data = [],
     isLoading,
     isError,
-  } = useQuery({ queryKey: ["tags"], queryFn: getTags, enabled: !!token });
+  } = useQuery({
+    queryKey: ["tags"],
+    queryFn: getTags,
+    enabled: isAuthenticated,
+  });
 
   const [selectedTag, setSelectedTag] = useState<Tag | null>(null);
   const [wantToDeleteTag, setWantToDeleteTag] = useState<boolean>(false);

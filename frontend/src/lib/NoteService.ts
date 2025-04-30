@@ -1,14 +1,9 @@
-
-import useAxios from "../hooks/useAxios.tsx";
+import axiosInstance from "./AxiosService.ts";
 import { UserNote, UserNoteData } from "types/types.ts";
 
-  let axiosInstance = useAxios();
-
-
 export const getNotes = async () => {
-
   try {
-    const response = await axiosInstance.get("notes/");
+    const response = await axiosInstance.get("api/notes/");
     console.log(response.data);
     return response.data;
   } catch (e) {
@@ -17,7 +12,7 @@ export const getNotes = async () => {
 };
 export const createNote = async (note: UserNoteData) => {
   try {
-    const response = await axiosInstance.post("notes/create_note/", {
+    const response = await axiosInstance.post("api/notes/create_note/", {
       note_data: note.note_data,
       tags: note.tags,
       is_pinned: note.is_pinned,
@@ -25,7 +20,6 @@ export const createNote = async (note: UserNoteData) => {
       is_archived: note.is_archived,
       is_favorited: note.is_favorited,
     });
-    console.log(response.data);
     return response.status;
   } catch (e) {
     console.error(e);
@@ -35,24 +29,26 @@ export const createNote = async (note: UserNoteData) => {
 export const updateNote = async (note: UserNote) => {
   console.log("this");
   try {
-    const response = await axiosInstance.put(`notes/edit_note/${note.id}/`, {
-      id: note.id,
-      note: note.note.id,
+    const response = await axiosInstance.put(
+      `api/notes/edit_note/${note.id}/`,
+      {
+        id: note.id,
+        note: note.note.id,
 
-      note_data: {
-        title: note.note.title,
-        content: note.note.content,
-        users: note.note.users,
-      },
-      user: note.user,
-      tags: note.tags,
-      is_pinned: note.is_pinned,
-      is_trashed: note.is_trashed,
-      is_archived: note.is_archived,
-      is_favorited: note.is_favorited,
-    });
+        note_data: {
+          title: note.note.title,
+          content: note.note.content,
+          users: note.note.users,
+        },
+        user: note.user,
+        tags: note.tags,
+        is_pinned: note.is_pinned,
+        is_trashed: note.is_trashed,
+        is_archived: note.is_archived,
+        is_favorited: note.is_favorited,
+      }
+    );
 
-    console.log(response.data);
     return response.status;
   } catch (error) {
     console.error(error);
@@ -63,9 +59,8 @@ export const updateNote = async (note: UserNote) => {
 export const deleteNote = async (note: UserNote) => {
   try {
     const response = await axiosInstance.delete(
-      `notes/delete_note/${note.id}/`
+      `api/notes/delete_note/${note.id}/`
     );
-    console.log(response.status);
     return response.status;
   } catch (e) {
     console.error(e);

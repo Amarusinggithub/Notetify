@@ -1,17 +1,77 @@
+from uuid import uuid4
 from django.core.cache import cache
-from rest_framework.views import APIView
+import os
+from dotenv import load_dotenv
+from django.views.decorators.http import require_GET
+from django.views.decorators.csrf import ensure_csrf_cookie
+from rest_framework_simplejwt.views import TokenRefreshView
+from rest_framework_simplejwt.exceptions import (
+    ExpiredTokenError,
+    TokenError,
+    InvalidToken,
+)
+from rest_framework.decorators import api_view
+
+
+from django.conf import settings
+from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from uuid import uuid4
-from django.middleware.csrf import get_token
-from django.http import JsonResponse
+from rest_framework.views import APIView
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 
-class MyTokenObtainPairView(TokenObtainPairView):
+load_dotenv()
+DEBUG = os.environ.get("DEBUG", default=True)
+
+
+class CookieTokenRefreshView(TokenRefreshView):
+
+    def finalize_response(self, request, response, *args, **kwargs):
+        return super().finalize_response(request, response, *args, **kwargs)
+
     def post(self, request, *args, **kwargs):
-        response = super().post(request, *args, **kwargs)
-        token = response.data["access"]
-        response.set_cookie("access", token, httponly=True)
+        refresh_token = request.COOKIES.get(settings.SIMPLE_JWT["AUTH_COOKIE_REFRESH"])
+        if not refresh_token:
+            return Response({"detail": "Refresh cookie missing"}, status=401)
+
+        serializer = self.get_serializer(data={"refresh": refresh_token})
+
+        try:
+            serializer.is_valid(raise_exception=True)
+        except (ExpiredTokenError, TokenError, InvalidToken):
+            # delete cookies and tell the SPA to re-login
+            resp = Response({"detail": "Refresh token expired"}, status=401)
+            resp.delete_cookie(settings.SIMPLE_JWT["AUTH_COOKIE"])
+            resp.delete_cookie(settings.SIMPLE_JWT["AUTH_COOKIE_REFRESH"])
+            return resp
+
+        # get new tokens
+        access = serializer.validated_data["access"]
+        refresh = serializer.validated_data.get("refresh", None)
+
+        response = Response(status=200)
+
+        # reset the access cookie
+        response.set_cookie(
+            key=settings.SIMPLE_JWT["AUTH_COOKIE"],
+            value=access,
+            expires=settings.SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"],
+            secure=settings.SIMPLE_JWT["AUTH_COOKIE_SECURE"],
+            httponly=settings.SIMPLE_JWT["AUTH_COOKIE_HTTP_ONLY"],
+            samesite=settings.SIMPLE_JWT["AUTH_COOKIE_SAMESITE"],
+        )
+
+        if refresh:
+            response.set_cookie(
+                key=settings.SIMPLE_JWT["AUTH_COOKIE_REFRESH"],
+                value=refresh,
+                expires=settings.SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"],
+                secure=settings.SIMPLE_JWT["AUTH_COOKIE_SECURE"],
+                httponly=settings.SIMPLE_JWT["AUTH_COOKIE_HTTP_ONLY"],
+                samesite=settings.SIMPLE_JWT["AUTH_COOKIE_SAMESITE"],
+            )
+
         return response
 
 
@@ -25,10 +85,16 @@ class AsgiTokenValidatorView(APIView):
         Response({"uuid": ticket_uuid})
 
 
+@require_GET
+@ensure_csrf_cookie
 def get_csrf_token(request):
-    csrf_token = get_token(request)
-    response = JsonResponse({"csrftoken": csrf_token})
-    response.set_cookie(
-        "csrftoken", csrf_token, secure=True, samesite="Lax", httponly=False
-    )
-    return response
+    return Response( status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(["GET"])
+def verify_token( request):
+    JWT_authenticator = JWTAuthentication()
+    raw_token = request.COOKIES.get(settings.SIMPLE_JWT["AUTH_COOKIE"]) or None
+    validated_token = JWT_authenticator.get_validated_token(raw_token)
+    if validated_token:
+        return Response({"the user is authenticated "}, status=status.HTTP_200_OK)

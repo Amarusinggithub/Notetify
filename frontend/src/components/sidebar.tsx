@@ -7,9 +7,12 @@ import { faPlus, faTag, faEllipsis } from "@fortawesome/free-solid-svg-icons";
 import useNote from "../hooks/useNote.tsx";
 import useTag from "../hooks/useTag.tsx";
 import { Tag } from "types/types.ts";
+import {  useNavigate } from "react-router";
+
 
 const SideNav = () => {
-  const { isSideNavOpen, setPage, setAddTagPopupOpen } = useSideNav();
+  const navigate=useNavigate();
+  const { isSideNavOpen,  setAddTagPopupOpen } = useSideNav();
   const { handleTagClick, setTitle } = useNote();
   const { data, setWantToDeleteTag, setSelectedTag, setWantToEditTag } =
     useTag();
@@ -19,9 +22,9 @@ const SideNav = () => {
 
   const handleOnClick = (index: number) => {
     return () => {
-      setPage(index);
       setTemp(sidebarData[index]);
       setTitle(sidebarData[index].title);
+      navigate(sidebarData[index].path);
     };
   };
 
@@ -29,7 +32,8 @@ const SideNav = () => {
     setTemp(tag);
     setTitle(tag.name);
     handleTagClick(tag);
-    setPage(5);
+          navigate(sidebarData[-1].path);
+
   };
 
   const handleCreateTag = () => {

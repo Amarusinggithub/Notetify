@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
+
 from datetime import timedelta
 from pathlib import Path
 
@@ -19,9 +20,8 @@ import pymysql
 load_dotenv()
 
 
-pymysql.install_as_MySQLdb()  # Ensures pymysql is used as MySQLdb replacement
+pymysql.install_as_MySQLdb()
 
-# Base directory of the project
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
@@ -29,155 +29,176 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY") 
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 
-# 'DJANGO_ALLOWED_HOSTS' should be a single string of hosts with a , between each.
-# For example: 'DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1,[::1]'
-#ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS","127.0.0.1").split(",")
 
-ALLOWED_HOSTS = ["*"]
-
+ALLOWED_HOSTS = ["localhost",]
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG", default=True)
 
 
 # REST FRAMEWORK
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+    "DEFAULT_AUTHENTICATION_CLASSES": ("api.authenticate.CustomAuthentication",)
 }
 
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-    'SIGNING_KEY':os.environ.get('SIMPLE_JWT_SIGNING_KEY', default=None) or SECRET_KEY,
-    'ROTATE_REFRESH_TOKENS': True,
-    'BLACKLIST_AFTER_ROTATION': True,
-    
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ROTATE_REFRESH_TOKENS": False,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "UPDATE_LAST_LOGIN": False,
+    "ALGORITHM": "HS256",
+    "SIGNING_KEY": SECRET_KEY,
+    "VERIFYING_KEY": None,
+    "AUDIENCE": None,
+    "ISSUER": None,
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
+    "USER_ID_FIELD": "id",
+    "USER_ID_CLAIM": "user_id",
+    "USER_AUTHENTICATION_RULE": "rest_framework_simplejwt.authentication.default_user_authentication_rule",
+    "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
+    "TOKEN_TYPE_CLAIM": "token_type",
+    "JTI_CLAIM": "jti",
+    "SLIDING_TOKEN_REFRESH_EXP_CLAIM": "refresh_exp",
+    "SLIDING_TOKEN_LIFETIME": timedelta(minutes=5),
+    "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),
+    # custom
+    "AUTH_COOKIE": "access_token",  # Cookie name. Enables cookies if value is set.
+    "AUTH_COOKIE_REFRESH": "refresh_token",
+    "AUTH_COOKIE_DOMAIN": "localhost",  # A string like "example.com", or None for standard domain cookie.
+    "AUTH_COOKIE_SECURE": False,  # Whether the auth cookies should be secure (https:// only).
+    "AUTH_COOKIE_HTTP_ONLY": True,  # Http only cookie flag.It's not fetch by javascript.
+    "AUTH_COOKIE_PATH": "/",  # The path of the auth cookie.
+    "AUTH_COOKIE_SAMESITE": "Lax",  # Whether to set the flag restricting cookie leaks on cross-site requests. This can be 'Lax', 'Strict', or None to disable the flag.
 }
 # Application definition
 
-ASGI_APPLICATION='backend.asgi.application'
+ASGI_APPLICATION = "backend.asgi.application"
 
 INSTALLED_APPS = [
-    'daphne',
-    'channels',
-    'channels_yroom',
-    'jazzmin',
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'backend',
-    'api',
-    'rest_framework',
-    'rest_framework_simplejwt',
-    'rest_framework_simplejwt.token_blacklist',
-    'corsheaders',
-    'django_otp',
-    'django_otp.plugins.otp_static',
-    'django_otp.plugins.otp_totp',
+    "daphne",
+    "channels",
+    "channels_yroom",
+    "jazzmin",
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "backend",
+    "api",
+    "rest_framework",
+    "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",
+    "corsheaders",
+    "django_otp",
+    "django_otp.plugins.otp_static",
+    "django_otp.plugins.otp_totp",
 ]
 
 
-ASGI_APPLICATION = 'backend.asgi.application'
+ASGI_APPLICATION = "backend.asgi.application"
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware','django_otp.middleware.OTPMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "backend.middleware.CustomCsrfMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django_otp.middleware.OTPMiddleware",
 ]
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
-    "http://127.0.0.1:5173", 'http://localhost:8000',"http://localhost:4173"
+    "http://127.0.0.1:5173",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+    "http://localhost:4173",
+    "http://localhost:3000",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
 
 CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:5173", 'http://localhost:8000',"http://localhost:4173"
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+    "http://localhost:4173",
+    "http://localhost:3000",
 ]
 
 
-
-ROOT_URLCONF = 'backend.urls'
+ROOT_URLCONF = "backend.urls"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR.joinpath('frontend')],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [BASE_DIR.joinpath("frontend")],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'backend.wsgi.application'
+WSGI_APPLICATION = "backend.wsgi.application"
 
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
-
-
 DATABASES = {
-    'default': {
-        'ENGINE': os.environ.get('DATABASE_ENGINE', default='django.db.backends.mysql'),
-        'NAME': os.environ.get('DATABASE_NAME', default='notetify_db'),
-        'USER': os.environ.get('DATABASE_USERNAME', default='root'),
-        'PASSWORD': os.environ.get('DATABASE_PASSWORD', default=''),
-        'HOST': os.environ.get('DATABASE_HOST', default='127.0.0.1'),
-        'PORT': os.environ.get('DATABASE_PORT', default='3306'),
+    "default": {
+        "ENGINE": os.environ.get("DATABASE_ENGINE", default="django.db.backends.mysql"),
+        "NAME": os.environ.get("DATABASE_NAME", default="notetify_db"),
+        "USER": os.environ.get("DATABASE_USERNAME", default="root"),
+        "PASSWORD": os.environ.get("DATABASE_PASSWORD", default=""),
+        "HOST": os.environ.get("DATABASE_HOST", default="127.0.0.1"),
+        "PORT": os.environ.get("DATABASE_PORT", default="3306"),
     }
 }
 
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
+LANGUAGE_CODE = "en-us"
 
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
+TIME_ZONE = "UTC"
 
 USE_I18N = True
 
 USE_TZ = True
 
-AUTH_USER_MODEL="api.User"
+AUTH_USER_MODEL = "api.User"
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
@@ -185,7 +206,6 @@ AUTH_USER_MODEL="api.User"
 
 # Jazmin settings to customize the admin interface
 JAZZMIN_SETTINGS = {
-
     "site_title": "Notetify Admin Panel",  # Title for the site header
     "site_header": "NotetifyAdmin",  # Header text in the admin panel
     "site_brand": "Notetify",  # Branding for the site
@@ -197,7 +217,8 @@ JAZZMIN_SETTINGS = {
     "topmenu_links": [
         {"name": "Home", "url": "/", "new_window": False},
         {"name": "About", "url": "/about", "new_window": True},
-    ], "user_avatar": None,  # Show the user avatar on the admin page
+    ],
+    "user_avatar": None,  # Show the user avatar on the admin page
     "custom_links": {"app_label": [{"name": "View on Website", "url": "/"}]},
     "footer_icons": [
         {"name": "GitHub", "url": "https://github.com/", "new_window": True},
@@ -217,34 +238,26 @@ CHANNEL_LAYERS = {
     },
 }
 
-
-STATIC_URL = 'static/'
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+STATIC_URL = "static/"
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Redirect to home page after login/logout
-LOGIN_REDIRECT_URL = '/admin/'  # Directly to the admin page
+LOGIN_REDIRECT_URL = "/admin/"
 
-LOGOUT_REDIRECT_URL = 'login'
+LOGOUT_REDIRECT_URL = "login"
 
-# Allows cross-origin cookies
-CSRF_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_NAME = "csrftoken"
+CSRF_COOKIE_DOMAIN = "localhost"
 CSRF_COOKIE_SECURE = False
-# Allows JavaScript to access the CSRF cookie
 CSRF_COOKIE_HTTPONLY = False
 
-
-
-SESSION_COOKIE_SAMESITE = 'Lax'
-# Disable Secure for development; enable it in production
+SESSION_COOKIE_SAMESITE = "Lax"
 SESSION_COOKIE_SECURE = False
-# Allows javascript to access the session cookie
-SESSION_COOKIE_HTTPONLY = False
-
-
+SESSION_COOKIE_HTTPONLY = True

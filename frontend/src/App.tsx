@@ -1,27 +1,18 @@
 import "./App.css";
 import { useEffect } from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import ErrorPage from "./pages/ErrorPage.tsx";
-import LoginPage from "./pages/LoginPage.tsx";
-import SignUpPage from "./pages/SignUpPage.tsx";
-import App from "./pages/MainPage.tsx";
-import PrivateRoute from "./components/privateRoute.tsx";
-import { initializeCSRFToken } from "./services/CSRFTokenService.ts";
+import { ErrorBoundary } from "react-error-boundary";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ensureCSRFToken } from "./lib/AxiosService.ts";
+import AppRoutes from "./routes/AppRoutes.tsx";
 import AuthProvider from "./hooks/useAuth.tsx";
-import { SideNavProvider } from "./hooks/useSideNav.tsx";
 import { NoteProvider } from "./hooks/useNote.tsx";
 import { TagProvider } from "./hooks/useTag.tsx";
-import { ErrorBoundary } from "react-error-boundary";
-import {
-  
-  QueryClient,
-  QueryClientProvider,
-} from "@tanstack/react-query";
+import { SideNavProvider } from "./hooks/useSideNav.tsx";
 
-export default function RootApp() {
+export default function App() {
   useEffect(() => {
     const initialize = async () => {
-      await initializeCSRFToken();
+      await ensureCSRFToken();
     };
     initialize();
   }, []);
@@ -30,38 +21,17 @@ export default function RootApp() {
 
   return (
     <ErrorBoundary fallback={<div>Something went wrong</div>}>
-      <Router>
-        <QueryClientProvider client={queryClient}>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
           <NoteProvider>
             <TagProvider>
-              <AuthProvider>
-                <SideNavProvider>
-                  <Routes>
-                    <Route
-                      path="/login"
-                      element={<LoginPage />}
-                      errorElement={<ErrorPage />}
-                    />
-                    <Route
-                      path="/signup"
-                      element={<SignUpPage />}
-                      errorElement={<ErrorPage />}
-                    />
-
-                    <Route element={<PrivateRoute />}>
-                      <Route
-                        path="/"
-                        element={<App />}
-                        errorElement={<ErrorPage />}
-                      />
-                    </Route>
-                  </Routes>
-                </SideNavProvider>
-              </AuthProvider>
+              <SideNavProvider>
+                <AppRoutes />
+              </SideNavProvider>
             </TagProvider>
           </NoteProvider>
-        </QueryClientProvider>
-      </Router>
+        </AuthProvider>
+      </QueryClientProvider>
     </ErrorBoundary>
   );
 }

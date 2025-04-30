@@ -1,10 +1,11 @@
 import { UserNote, UserNoteData } from "types/types";
 import NoteCard from "../components/NoteCard";
 import useNote from "../hooks/useNote";
+import { Link } from "react-router";
 
 import noArchivedNotes from "./../../assets/No_Archive_notes.png";
 
-const ArchivePage = () => {
+const Archive = () => {
   const { archived, isLoading, isError } = useNote();
 
   if (isLoading) {
@@ -33,7 +34,9 @@ const ArchivePage = () => {
         {archived &&
           archived.map((note: UserNote | UserNoteData) => (
             <div key={note.id} className="note-div">
-              <NoteCard note={note} />
+              <Link key={note.id} to={`/archive/${note.id}`}>
+                <NoteCard note={note} route={"/archive"} />
+              </Link>{" "}
             </div>
           ))}
       </div>
@@ -41,4 +44,4 @@ const ArchivePage = () => {
   );
 };
 
-export default ArchivePage;
+export default Archive;

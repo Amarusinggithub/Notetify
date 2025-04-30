@@ -10,7 +10,7 @@ import {
   deleteNote,
   getNotes,
   updateNote,
-} from "../services/NoteService";
+} from "../lib/NoteService.ts";
 import { Tag, UserNote, UserNoteData } from "./../types/types";
 import { isUserNote } from "./../utils/helpers";
 import {
@@ -19,8 +19,11 @@ import {
   useQueryClient,
   RefetchOptions,
   QueryObserverResult,
-  
 } from "@tanstack/react-query";
+import { useAuth } from "./useAuth.tsx";
+
+
+
 interface NoteContextType {
   search: string;
   title: string;
@@ -93,7 +96,7 @@ const categorizedNotes = (notesArray: (UserNote | UserNoteData)[]) => {
 };
 
 const NoteProvider = ({ children }: NoteProviderProps) => {
-  const token = localStorage.getItem("access_token");
+  const { isAuthenticated } = useAuth();
 
   const queryClient = useQueryClient();
   const {
@@ -104,7 +107,7 @@ const NoteProvider = ({ children }: NoteProviderProps) => {
   } = useQuery({
     queryKey: ["notes"],
     queryFn: getNotes,
-    enabled: !!token,
+    enabled: isAuthenticated,
   });
 
   const { pinned, favorites, archived, trashed, filtered, other } =
@@ -112,11 +115,12 @@ const NoteProvider = ({ children }: NoteProviderProps) => {
       return categorizedNotes(data);
     }, [data]);
 
-
   const [search, setSearch] = useState("");
   const [title, setTitle] = useState("Notes");
   const [tagNotes, setTagNotes] = useState<(UserNote | UserNoteData)[]>([]);
-  const [searchNotes, setSearchNotes] = useState<(UserNote | UserNoteData)[]>([]);
+  const [searchNotes, setSearchNotes] = useState<(UserNote | UserNoteData)[]>(
+    []
+  );
   const [selectedNote, setSelectedNote] = useState<UserNote | null>(null);
 
   const handleSearch = () => {
@@ -227,7 +231,8 @@ const NoteProvider = ({ children }: NoteProviderProps) => {
         selectedNote,
         isLoading,
         tagNotes,
-        isError,data,
+        isError,
+        data,
         setTagNotes,
         setTitle,
         handleSearch,
@@ -240,7 +245,8 @@ const NoteProvider = ({ children }: NoteProviderProps) => {
         handlePin,
         setSelectedNote,
         setSearch,
-        handleTagClick,refetch
+        handleTagClick,
+        refetch,
       }}
     >
       {children}

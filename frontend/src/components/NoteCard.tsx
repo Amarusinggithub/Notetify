@@ -12,10 +12,14 @@ import {
 import NoteContentEditor from "./Editor/NoteContentEditor.tsx";
 import { UserNote, UserNoteData } from "types/types.ts";
 import { isUserNote } from "./../utils/helpers.tsx";
+import { useNavigate } from "react-router";
 
-type NoteCardProps = { note: UserNote | UserNoteData };
 
-const NoteCard = ({ note }: NoteCardProps) => {
+type NoteCardProps = { note: UserNote | UserNoteData ,route:string};
+
+const NoteCard = ({ note,route }: NoteCardProps) => {
+    const navigate = useNavigate();
+
   const {
     selectedNote,
     setSelectedNote,
@@ -53,6 +57,7 @@ const NoteCard = ({ note }: NoteCardProps) => {
     e.preventDefault();
     await handleSave();
     if (isUserNote(note)) setSelectedNote(isSelected ? null : note);
+    if(isSelected)navigate(route);
   };
 
   const handleTitleInput = (e: React.ChangeEvent<HTMLInputElement>) => {

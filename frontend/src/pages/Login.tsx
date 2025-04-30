@@ -2,15 +2,15 @@
 import React, { useState } from "react";
 import "../styles/LoginForm.css";
 import { useAuth } from "../hooks/useAuth.tsx";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router";
 
-
-const LoginPage = () => {
+const Login = () => {
+  const navigate = useNavigate();
   const [state, setState] = useState({
     email: "",
     password: "",
   });
-  const { handleLogin } = useAuth();
+  const { handleLogin, isAuthenticated } = useAuth();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setState({ ...state, [e.target.name]: e.target.value });
@@ -19,6 +19,7 @@ const LoginPage = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     await handleLogin(state.email, state.password);
+    if (isAuthenticated) navigate("/");
   };
 
   return (
@@ -74,4 +75,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default Login;

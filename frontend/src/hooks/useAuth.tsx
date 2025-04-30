@@ -1,12 +1,12 @@
-import { login, logout, signUp } from "../services/AuthService.ts";
+import { login, logout, signUp, verifyAuth } from "../lib/AuthService.ts";
 import {
   createContext,
   PropsWithChildren,
+  useCallback,
   useContext,
   useEffect,
   useState,
 } from "react";
-import { useNavigate } from "react-router-dom";
 
 type AuthProviderProps = PropsWithChildren;
 interface AuthContextType {
@@ -20,29 +20,34 @@ interface AuthContextType {
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setError: React.Dispatch<React.SetStateAction<any>>;
   setUserData: React.Dispatch<any>;
+  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
   userData: any;
   error: any;
   isLoading: boolean;
+  isAuthenticated: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const AuthProvider = ({ children }: AuthProviderProps) => {
   const [isLoading, setLoading] = useState<boolean>(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+
   const [userData, setUserData] = useState<any>(null);
   const [error, setError] = useState(null);
-  const navigate = useNavigate();
 
-  const setLogin = (userData: any) => {
+  const setAuth = (userData: any) => {
+    setIsAuthenticated(true);
     setUserData(userData);
     console.log("User data set:", userData);
     localStorage.setItem("Userdata", JSON.stringify(userData));
   };
 
   const setLogout = () => {
+    setIsAuthenticated(false);
     setUserData(null);
     console.log("User logged out");
-    localStorage.removeItem("Userdata");
+    localStorage.removeItem("userData");
   };
 
   const handleSignup = async (
@@ -56,8 +61,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
       const response = await signUp(email, username, password);
       if (response.status >= 200 && response.status < 300) {
         console.log("Signup successful");
-        setLogin(response.data.userData);
-        navigate("/");
+        await setAuth(response.data.userData);
       } else {
         console.error("Signup failed");
       }
@@ -73,13 +77,10 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     try {
       setLoading(true);
       setError(null);
-      
-
       const response = await login(email.trim(), password.trim());
       if (response.status >= 200 && response.status < 300) {
         console.log("Login successful");
-        navigate("/");
-        setLogin(response.data.userData);
+        await setAuth(response.data.userData);
       } else {
         console.error("Login failed");
       }
@@ -95,33 +96,38 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     try {
       setLoading(true);
       setError(null);
-
-      const response = await logout();
-      if (!response || !(response.status >= 200 && response.status < 300)) {
-        console.log("Logout successful");
-        setLogout();
-        navigate("/login");
-      } else {
-        console.error("Logout failed");
-      }
+      await logout();
     } catch (error: any) {
       console.error("Error during logout:", error);
       setError(error);
     } finally {
+      setLogout();
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    const token = localStorage.getItem("access_token");
-    const storedUserData = localStorage.getItem("Userdata");
-
-    if (token != null && token != "") {
-      if (storedUserData) {
-        setUserData(JSON.parse(storedUserData));
+  const confirmAuth = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await verifyAuth();
+      if (response.status >= 200 && response.status < 300) {
+        setAuth(response.data);
       }
+    } catch (e: any) {
+      setLogout();
+      setError(e);
+    } finally {
+      setLoading(false);
     }
-  }, []);
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    let cached = localStorage.getItem("userData");
+
+    if (cached) setAuth(JSON.parse(cached));
+    confirmAuth();
+  }, [confirmAuth]);
 
   return (
     <AuthContext.Provider
@@ -130,11 +136,13 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
         handleLogin,
         handleLogout,
         setError,
+        setIsAuthenticated,
         setLoading,
         setUserData,
         userData,
         error,
         isLoading,
+        isAuthenticated,
       }}
     >
       {children}

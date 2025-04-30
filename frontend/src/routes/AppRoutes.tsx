@@ -1,88 +1,92 @@
-import LoginPage from "../pages/LoginPage";
-import SignUpPage from "../pages/SignUpPage";
-import ArchivePage from "../pages/ArchivePage";
-import FavoritesPage from "../pages/FavoritesPage";
-import NotesPage from "../pages/NotesPage";
-import TagPage from "../pages/TagPage";
-import TrashPage from "../pages/TrashPage";
-import ErrorPage from "../pages/ErrorPage";
-import App from "../pages/MainPage";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import Login from "../pages/Login.tsx";
+import Register from "../pages/Register.tsx";
+import Archive from "../pages/Archive.tsx";
+import Favorite from "../pages/Favorites.tsx";
+import Home from "../pages/Home.tsx";
+import Tag from "../pages/Tag.tsx";
+import Trash from "../pages/Trash.tsx";
+import MainLayout from "../pages/layout.tsx";
+import { createBrowserRouter, RouterProvider } from "react-router";
+import Landing from "../pages/Landing.tsx";
+import { useAuth } from "./../hooks/useAuth.tsx";
+import Search from "../pages/Search.tsx";
 
 const AppRoutes = () => {
-  const routes =
-    localStorage.getItem("access_token") != null &&
-    localStorage.getItem("access_token") != ""
-      ? privateRoutes
-      : publicRoutes;
+  const { isAuthenticated } = useAuth();
+  const routes = isAuthenticated ? publicRoutes : privateRoutes;
   let router = createBrowserRouter(routes);
 
   return <RouterProvider router={router} />;
 };
 
 export default AppRoutes;
+
 const publicRoutes = [
   {
     path: "/",
-    element: <App />,
-    errorElement: <ErrorPage />,
+    Component: Landing,
   },
-  {
-    path: "/login",
-    element: <LoginPage />,
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: "/signup",
-    element: <SignUpPage />,
-    errorElement: <ErrorPage />,
-  },
+  { path: "/login", Component: Login },
+  { path: "/register", Component: Register },
 ];
 
 const privateRoutes = [
   {
-    path: "/login",
-    element: <LoginPage />,
-    errorElement: <ErrorPage />,
-  },
-  {
     path: "/",
-    element: <App />,
-    errorElement: <ErrorPage />,
+    Component: MainLayout,
     children: [
       {
         index: true,
-        path: "/Notes",
-        element: <NotesPage />,
-        errorElement: <ErrorPage />,
+        Component: Home,
       },
       {
-        path: "/Favorites",
-        element: <FavoritesPage />,
-        errorElement: <ErrorPage />,
+        path: ":noteid",
+        Component: Home,
       },
       {
-        path: "/Archives",
-        element: <ArchivePage />,
-        errorElement: <ErrorPage />,
-      },
-      {
-        path: "/Tags",
-        element: <TagPage />,
-        errorElement: <ErrorPage />,
-
-        Children: [
+        path: "favorite",
+        Component: Favorite,
+        children: [
           {
-            path: "/Tags/:tagid",
-            element: <TagPage />,
-            errorElement: <ErrorPage />,
+            path: "/favorite/:noteid",
           },
         ],
       },
       {
-        path: "/Trash",
-        element: <TrashPage />,
-        errorElement: <ErrorPage />,
+        path: "archive",
+        Component: Archive,
+        children: [
+          {
+            path: "/archive/:noteid",
+          },
+        ],
+      },
+      {
+        path: "tag",
+        Component: Tag,
+        children: [
+          {
+            path: "/tag/:tagid",
+          },
+        ],
+      },
+      {
+        path: "trash",
+        Component: Trash,
+        children: [
+          {
+            path: "/trash/:noteid",
+          },
+        ],
+      },
+      {
+        path: "search",
+        Component: Search,
+        children: [
+          {
+            path: "/search/:noteid",
+          },
+        ],
       },
     ],
   },

@@ -1,17 +1,13 @@
-import useAxios from "../hooks/useAxios.tsx";
-
-  let axiosInstance = useAxios();
-
+import { getCookie } from "../utils/cookies.ts";
+import axiosInstance from "./AxiosService.ts";
 
 export const login = async (email: string, password: string) => {
   try {
-    const response = await axiosInstance.post("login/", {
-      "email": email,
-      "password": password,
+    const response = await axiosInstance.post("api/login/", {
+      email: email,
+      password: password,
     });
-    const { access_token, refresh_token } = response.data;
-    localStorage.setItem("access_token", access_token);
-    localStorage.setItem("refresh_token", refresh_token);
+    let access_token = getCookie("access_token");
     axiosInstance.defaults.headers.common[
       "Authorization"
     ] = `Bearer ${access_token}`;
@@ -32,15 +28,12 @@ export const signUp = async (
   password: string
 ) => {
   try {
-    const response = await axiosInstance.post("register/", {
-      "email": email,
-      "username": username,
-      "password":password,
+    const response = await axiosInstance.post("api/register/", {
+      email: email,
+      username: username,
+      password: password,
     });
-    const { access_token, refresh_token } = response.data;
-    // Store tokens consistently.
-    localStorage.setItem("access_token", access_token);
-    localStorage.setItem("refresh_token", refresh_token);
+    let access_token = getCookie("access_token");
     axiosInstance.defaults.headers.common[
       "Authorization"
     ] = `Bearer ${access_token}`;
@@ -55,14 +48,9 @@ export const signUp = async (
   }
 };
 
-
-
 export const logout = async () => {
   try {
-    const response = await axiosInstance.post("logout/");
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("refresh_token");
-    console.log("Logout successful. Tokens removed.");
+    const response = await axiosInstance.post("api/logout/");
     return response;
   } catch (error: any) {
     console.error(
@@ -72,4 +60,19 @@ export const logout = async () => {
     throw error;
   }
 };
+
+
+export const verifyAuth= async () => {
+  try {
+    const response = await axiosInstance.get("auth/me/");
+    return response;
+  } catch (error: any) {
+    console.error(
+      "error:",
+      error.response ? error.response.data : error.message
+    );
+    throw error;
+  }
+};
+
 

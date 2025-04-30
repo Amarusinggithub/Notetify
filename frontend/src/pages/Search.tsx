@@ -3,8 +3,9 @@ import useNote from "../hooks/useNote";
 import { useSideNav } from "../hooks/useSideNav";
 import { UserNote, UserNoteData } from "types/types";
 import noSearchNotes from "./../../assets/No_Search.png";
+import { Link } from "react-router";
 
-const SearchPage = () => {
+const Search = () => {
   const { searchNotes, isLoading, isError } = useNote();
   const { isSideNavOpen } = useSideNav();
 
@@ -37,7 +38,9 @@ const SearchPage = () => {
       >
         {searchNotes?.map((note: UserNote | UserNoteData) => (
           <div key={note.id} className="note-div">
-            <NoteCard note={note} />
+            <Link key={note.id} to={`/tearch/${note.id}`}>
+              <NoteCard note={note} route={"/tearch"} />
+            </Link>{" "}
           </div>
         ))}
       </div>
@@ -45,4 +48,4 @@ const SearchPage = () => {
   );
 };
 
-export default SearchPage;
+export default Search;

@@ -6,7 +6,11 @@ import { useSideNav } from "../hooks/useSideNav.tsx";
 import AddNoteCard from "../components/AddNoteCard.tsx";
 import { UserNote, UserNoteData } from "types/types.ts";
 import noNotes from "./../../assets/No_Note.png";
-const NotesPage = () => {
+import { Link } from "react-router";
+
+
+
+const Home = () => {
   const { pinned, other, isLoading, isError } = useNote();
   const { isSideNavOpen } = useSideNav();
   useEffect(() => {
@@ -21,7 +25,6 @@ const NotesPage = () => {
     return <div>Error: {isError.message}</div>;
   }
 
-  
   if (pinned.length < 1 && other.length < 1) {
     return (
       <>
@@ -50,7 +53,9 @@ const NotesPage = () => {
           >
             {pinned.map((note: UserNote | UserNoteData) => (
               <div key={note.id} className="note-div">
-                <NoteCard note={note} />
+                <Link key={note.id} to={`/${note.id}`}>
+                  <NoteCard note={note} route={"/"} />
+                </Link>{" "}
               </div>
             ))}
           </div>
@@ -67,7 +72,9 @@ const NotesPage = () => {
       >
         {other?.map((note: UserNote | UserNoteData) => (
           <div key={note.id} className="note-div">
-            <NoteCard note={note} />
+            <Link key={note.id} to={`/${note.id}`}>
+              <NoteCard note={note} route={"/"} />
+            </Link>
           </div>
         ))}
       </div>
@@ -75,4 +82,4 @@ const NotesPage = () => {
   );
 };
 
-export default NotesPage;
+export default Home;

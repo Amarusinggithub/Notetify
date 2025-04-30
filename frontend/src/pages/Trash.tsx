@@ -1,50 +1,52 @@
-import NoteCard from "../components/NoteCard.tsx";
 import useNote from "../hooks/useNote.tsx";
+import NoteCard from "../components/NoteCard.tsx";
 import { useSideNav } from "../hooks/useSideNav.tsx";
 import { UserNote, UserNoteData } from "types/types.ts";
+import noTrashedNotes from "./../../assets/No_trashed_notes.png";
+import { Link } from "react-router";
 
-import noFavoriteNotes from "./../../assets/No_Favorited_Notes.png";
-
-const FavoritesPage = () => {
+const Trash = () => {
   const { isSideNavOpen } = useSideNav();
 
-  const { favorites, isLoading, isError } = useNote();
+  const { trashed, isLoading, isError } = useNote();
 
   if (isLoading) {
     return <div>Loading...</div>;
   }
 
-  if (favorites.length < 1) {
+  if (isError) {
+    return <div>Error: {isError.message}</div>;
+  }
+
+  if (trashed.length < 1) {
     return (
       <>
         <img
-          src={noFavoriteNotes}
+          src={noTrashedNotes}
           style={{ width: "100%", height: "auto" }}
           className="no-notes"
-          alt="No favorited notes"
+          alt="No tagged notes"
         />
       </>
     );
   }
 
-  if (isError) {
-    return <div>Error: {isError.message}</div>;
-  }
   return (
     <div className="container">
       <div
         className="all-notes"
         style={{ maxWidth: isSideNavOpen ? "1200px" : "1400px" }}
       >
-        {favorites &&
-          favorites.map((note: UserNote | UserNoteData) => (
+        {trashed &&
+          trashed.map((note: UserNote | UserNoteData) => (
             <div key={note.id} className="note-div">
-              <NoteCard note={note} />
+              <Link key={note.id} to={`/trash/${note.id}`}>
+                <NoteCard note={note} route={"/trash"} />
+              </Link>{" "}
             </div>
           ))}
       </div>
     </div>
   );
 };
-
-export default FavoritesPage;
+export default Trash;
