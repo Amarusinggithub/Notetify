@@ -10,15 +10,14 @@ import {
   faTrashCan,
 } from "@fortawesome/free-solid-svg-icons";
 import NoteContentEditor from "./Editor/NoteContentEditor.tsx";
-import { UserNote, UserNoteData } from "types/types.ts";
-import { isUserNote } from "./../utils/helpers.tsx";
+import { UserNote, UserNoteData } from "types/index.ts";
+import { isUserNote } from "./../utils/helpers.ts";
 import { useNavigate } from "react-router";
 
+type NoteCardProps = { note: UserNote | UserNoteData; route: string };
 
-type NoteCardProps = { note: UserNote | UserNoteData ,route:string};
-
-const NoteCard = ({ note,route }: NoteCardProps) => {
-    const navigate = useNavigate();
+const NoteCard = ({ note, route }: NoteCardProps) => {
+  const navigate = useNavigate();
 
   const {
     selectedNote,
@@ -57,7 +56,7 @@ const NoteCard = ({ note,route }: NoteCardProps) => {
     e.preventDefault();
     await handleSave();
     if (isUserNote(note)) setSelectedNote(isSelected ? null : note);
-    if(isSelected)navigate(route);
+    if (isSelected) navigate(route);
   };
 
   const handleTitleInput = (e: React.ChangeEvent<HTMLInputElement>) => {

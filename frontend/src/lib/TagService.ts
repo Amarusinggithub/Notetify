@@ -1,4 +1,4 @@
-import { Tag } from "types/types.ts";
+import { Tag } from "types/index.ts";
 import axiosInstance from "./AxiosService.ts";
 
 export const getTags = async () => {

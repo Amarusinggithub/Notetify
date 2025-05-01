@@ -1,4 +1,3 @@
-import { getCookie } from "../utils/cookies.ts";
 import axiosInstance from "./AxiosService.ts";
 
 export const login = async (email: string, password: string) => {
@@ -7,10 +6,7 @@ export const login = async (email: string, password: string) => {
       email: email,
       password: password,
     });
-    let access_token = getCookie("access_token");
-    axiosInstance.defaults.headers.common[
-      "Authorization"
-    ] = `Bearer ${access_token}`;
+
     console.log("Login successful. Tokens stored.");
     return response;
   } catch (error: any) {
@@ -33,10 +29,7 @@ export const signUp = async (
       username: username,
       password: password,
     });
-    let access_token = getCookie("access_token");
-    axiosInstance.defaults.headers.common[
-      "Authorization"
-    ] = `Bearer ${access_token}`;
+
     console.log("Signup successful. Tokens stored.");
     return response;
   } catch (error: any) {
@@ -61,8 +54,7 @@ export const logout = async () => {
   }
 };
 
-
-export const verifyAuth= async () => {
+export const verifyAuth = async () => {
   try {
     const response = await axiosInstance.get("auth/me/");
     return response;
@@ -74,5 +66,3 @@ export const verifyAuth= async () => {
     throw error;
   }
 };
-
-

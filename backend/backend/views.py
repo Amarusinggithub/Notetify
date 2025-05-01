@@ -49,9 +49,8 @@ class CookieTokenRefreshView(TokenRefreshView):
         # get new tokens
         access = serializer.validated_data["access"]
         refresh = serializer.validated_data.get("refresh", None)
-
         response = Response(status=200)
-
+        
         # reset the access cookie
         response.set_cookie(
             key=settings.SIMPLE_JWT["AUTH_COOKIE"],
@@ -61,7 +60,6 @@ class CookieTokenRefreshView(TokenRefreshView):
             httponly=settings.SIMPLE_JWT["AUTH_COOKIE_HTTP_ONLY"],
             samesite=settings.SIMPLE_JWT["AUTH_COOKIE_SAMESITE"],
         )
-
         if refresh:
             response.set_cookie(
                 key=settings.SIMPLE_JWT["AUTH_COOKIE_REFRESH"],
@@ -97,4 +95,4 @@ def verify_token( request):
     raw_token = request.COOKIES.get(settings.SIMPLE_JWT["AUTH_COOKIE"]) or None
     validated_token = JWT_authenticator.get_validated_token(raw_token)
     if validated_token:
-        return Response({"the user is authenticated "}, status=status.HTTP_200_OK)
+        return Response({}, status=status.HTTP_200_OK)

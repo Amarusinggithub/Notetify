@@ -7,6 +7,7 @@ import {
   useEffect,
   useState,
 } from "react";
+import { USERDATA_STORAGE_KEY } from "./../types/index.ts";
 
 type AuthProviderProps = PropsWithChildren;
 interface AuthContextType {
@@ -25,6 +26,7 @@ interface AuthContextType {
   error: any;
   isLoading: boolean;
   isAuthenticated: boolean;
+  checkingAuth: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -32,22 +34,20 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const AuthProvider = ({ children }: AuthProviderProps) => {
   const [isLoading, setLoading] = useState<boolean>(false);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-
+  const [checkingAuth, setCheckingAuth] = useState<boolean>(true);
   const [userData, setUserData] = useState<any>(null);
   const [error, setError] = useState(null);
 
   const setAuth = (userData: any) => {
     setIsAuthenticated(true);
     setUserData(userData);
-    console.log("User data set:", userData);
-    localStorage.setItem("Userdata", JSON.stringify(userData));
+    localStorage.setItem(USERDATA_STORAGE_KEY, JSON.stringify(userData));
   };
 
-  const setLogout = () => {
+  const setNotAuth =  () => {
     setIsAuthenticated(false);
     setUserData(null);
-    console.log("User logged out");
-    localStorage.removeItem("userData");
+    localStorage.removeItem(USERDATA_STORAGE_KEY);
   };
 
   const handleSignup = async (
@@ -80,7 +80,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
       const response = await login(email.trim(), password.trim());
       if (response.status >= 200 && response.status < 300) {
         console.log("Login successful");
-        await setAuth(response.data.userData);
+        setAuth(response.data.userData);
       } else {
         console.error("Login failed");
       }
@@ -101,29 +101,28 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
       console.error("Error during logout:", error);
       setError(error);
     } finally {
-      setLogout();
+      setNotAuth();
       setLoading(false);
     }
   };
 
   const confirmAuth = useCallback(async () => {
     try {
-      setLoading(true);
-      setError(null);
       const response = await verifyAuth();
       if (response.status >= 200 && response.status < 300) {
         setAuth(response.data);
+      } else {
+        await setNotAuth();
       }
     } catch (e: any) {
-      setLogout();
-      setError(e);
+      setNotAuth();
     } finally {
-      setLoading(false);
+      setCheckingAuth(false);
     }
   }, [isAuthenticated]);
 
   useEffect(() => {
-    let cached = localStorage.getItem("userData");
+    let cached = localStorage.getItem(USERDATA_STORAGE_KEY);
 
     if (cached) setAuth(JSON.parse(cached));
     confirmAuth();
@@ -139,6 +138,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
         setIsAuthenticated,
         setLoading,
         setUserData,
+        checkingAuth,
         userData,
         error,
         isLoading,

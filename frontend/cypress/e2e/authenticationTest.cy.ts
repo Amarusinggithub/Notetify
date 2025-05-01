@@ -4,7 +4,7 @@ const loginEmail = Cypress.env("LOGIN_EMAIL");
 
 describe("this is a test to test authentication", () => {
   it("tests the login", () => {
-    cy.visit("http://localhost:5173/");
+    cy.visit("http://localhost:5173/login");
     cy.location("pathname").should("equal", "/login");
 
     cy.get('[data-testid="cypress-Login-title"]').should("exist");

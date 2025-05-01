@@ -22,11 +22,7 @@ export const sidebarData = [
     icon: faTrash,
     path: "/trash",
   },
-  {
-    title: "Tag",
-    icon: faTrash,
-    path: "/tag",
-  },
+
 ];
 
 

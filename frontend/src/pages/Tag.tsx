@@ -1,10 +1,9 @@
-import { UserNote, UserNoteData } from "types/types.ts";
+import { UserNote, UserNoteData } from "types/index.ts";
 import { useSideNav } from "../hooks/useSideNav.tsx";
 import NoteCard from "../components/NoteCard.tsx";
 import useNote from "../hooks/useNote.tsx";
 import noTaggedNotes from "./../../assets/No_tagged_Notes.png";
 import { Link } from "react-router";
-
 
 const Tag = () => {
   const { tagNotes, isLoading, isError } = useNote();

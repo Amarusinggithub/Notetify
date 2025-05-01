@@ -11,7 +11,7 @@ import {
   getNotes,
   updateNote,
 } from "../lib/NoteService.ts";
-import { Tag, UserNote, UserNoteData } from "./../types/types";
+import { Tag, UserNote, UserNoteData } from "../types/index.ts";
 import { isUserNote } from "./../utils/helpers";
 import {
   useQuery,
@@ -21,8 +21,6 @@ import {
   QueryObserverResult,
 } from "@tanstack/react-query";
 import { useAuth } from "./useAuth.tsx";
-
-
 
 interface NoteContextType {
   search: string;
@@ -149,7 +147,6 @@ const NoteProvider = ({ children }: NoteProviderProps) => {
         ? note.note.title.toLowerCase().includes(query)
         : note.note_data.title.toLowerCase().includes(query)
     );
-
     setSearchNotes(filteredNotes);
   };
 
@@ -207,7 +204,6 @@ const NoteProvider = ({ children }: NoteProviderProps) => {
   const removeNoteMutation = useMutation({
     mutationFn: deleteNote,
     onSuccess: () => {
-      // Invalidate and refetch
       queryClient.invalidateQueries({ queryKey: ["notes"] });
     },
   });

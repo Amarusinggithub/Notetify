@@ -1,24 +1,36 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { sidebarData } from "../utils/sidebarData.tsx";
+import { sidebarData } from "../utils/sidebarData.ts";
 import "../styles/sidebar.css";
 import { useSideNav } from "../hooks/useSideNav.tsx";
 import { faPlus, faTag, faEllipsis } from "@fortawesome/free-solid-svg-icons";
 import useNote from "../hooks/useNote.tsx";
 import useTag from "../hooks/useTag.tsx";
-import { Tag } from "types/types.ts";
-import {  useNavigate } from "react-router";
-
+import { Tag } from "types/index.ts";
+import { useLocation, useNavigate } from "react-router";
 
 const SideNav = () => {
-  const navigate=useNavigate();
-  const { isSideNavOpen,  setAddTagPopupOpen } = useSideNav();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { isSideNavOpen, setAddTagPopupOpen } = useSideNav();
   const { handleTagClick, setTitle } = useNote();
   const { data, setWantToDeleteTag, setSelectedTag, setWantToEditTag } =
     useTag();
 
   const [temp, setTemp] = useState<any>(sidebarData[0]);
   const [tempId, setTempId] = useState<any>(null);
+
+  let path = location.pathname;
+  useEffect(() => {
+    for (let i = 0; i < sidebarData.length; i++) {
+      if (path === sidebarData[i].path) {
+        setTemp(sidebarData[i]);
+        setTitle(sidebarData[i].title);
+        navigate(sidebarData[i].path);
+        console.log("this ran");
+      }
+    }
+  }, [path]);
 
   const handleOnClick = (index: number) => {
     return () => {
@@ -32,13 +44,11 @@ const SideNav = () => {
     setTemp(tag);
     setTitle(tag.name);
     handleTagClick(tag);
-          navigate(sidebarData[-1].path);
-
+    navigate("/tag/" + tag.id);
   };
 
   const handleCreateTag = () => {
     setTemp(true);
-    console.log("set AddTagPopupOpen to be true");
     setAddTagPopupOpen(true);
   };
 

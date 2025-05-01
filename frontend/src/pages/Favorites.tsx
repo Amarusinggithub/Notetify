@@ -1,7 +1,7 @@
 import NoteCard from "../components/NoteCard.tsx";
 import useNote from "../hooks/useNote.tsx";
 import { useSideNav } from "../hooks/useSideNav.tsx";
-import { UserNote, UserNoteData } from "types/types.ts";
+import { UserNote, UserNoteData } from "types/index.ts";
 import { Link } from "react-router";
 import noFavoriteNotes from "./../../assets/No_favorited_notes.png";
 
@@ -40,8 +40,8 @@ const Favorite = () => {
           favorites.map((note: UserNote | UserNoteData) => (
             <div key={note.id} className="note-div">
               <Link key={note.id} to={`/favorite/${note.id}`}>
-                <NoteCard note={note} route={"/favorites"} />
-              </Link>{" "}
+                <NoteCard note={note} route={"/favorite"} />
+              </Link>
             </div>
           ))}
       </div>

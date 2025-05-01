@@ -1,4 +1,4 @@
-import { UserNote, UserNoteData } from "types/types";
+import { UserNote, UserNoteData } from "types";
 import NoteCard from "../components/NoteCard";
 import useNote from "../hooks/useNote";
 import { Link } from "react-router";

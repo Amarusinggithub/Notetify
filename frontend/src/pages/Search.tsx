@@ -1,7 +1,7 @@
 import NoteCard from "../components/NoteCard";
 import useNote from "../hooks/useNote";
 import { useSideNav } from "../hooks/useSideNav";
-import { UserNote, UserNoteData } from "types/types";
+import { UserNote, UserNoteData } from "types";
 import noSearchNotes from "./../../assets/No_Search.png";
 import { Link } from "react-router";
 

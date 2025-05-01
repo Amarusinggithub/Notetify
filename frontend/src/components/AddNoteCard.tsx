@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import useNote from "../hooks/useNote";
 import "../styles/AddNoteCard.css";
 import NoteContentEditor from "./Editor/NoteContentEditor";
-import { UserNoteData } from "types/types";
+import { UserNoteData } from "types";
 
 const AddNoteCard = () => {
   const { addNote, isLoading, data } = useNote();
@@ -101,7 +101,6 @@ const AddNoteCard = () => {
           }
         }}
       >
-
         <div className="note">
           {isSelected && (
             <input

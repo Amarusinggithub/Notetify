@@ -31,5 +31,7 @@ USER node
 
 EXPOSE 5173 1234 3000 4173
 
-CMD ["sh", "entrypoint.sh"]
+#CMD ["sh", "entrypoint.sh"]
+
+CMD ["npm","run","dev"]
 

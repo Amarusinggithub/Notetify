@@ -6,17 +6,28 @@ import Home from "../pages/Home.tsx";
 import Tag from "../pages/Tag.tsx";
 import Trash from "../pages/Trash.tsx";
 import MainLayout from "../pages/layout.tsx";
-import { createBrowserRouter, RouterProvider } from "react-router";
+import { createBrowserRouter, RouterProvider,Navigate } from "react-router";
 import Landing from "../pages/Landing.tsx";
 import { useAuth } from "./../hooks/useAuth.tsx";
 import Search from "../pages/Search.tsx";
+import { useMemo } from "react";
 
 const AppRoutes = () => {
-  const { isAuthenticated } = useAuth();
-  const routes = isAuthenticated ? publicRoutes : privateRoutes;
-  let router = createBrowserRouter(routes);
+  const { isAuthenticated, checkingAuth } = useAuth();
+  if (checkingAuth) return null; 
 
-  return <RouterProvider router={router} />;
+  const routes = isAuthenticated ? privateRoutes : publicRoutes;
+
+  let router = useMemo(() => {
+    return createBrowserRouter(routes);
+  }, [routes]);
+
+  return (
+    <RouterProvider
+      router={router}
+      key={isAuthenticated ? "authenticated" : "notAuthenticated"}
+    />
+  );
 };
 
 export default AppRoutes;
@@ -28,6 +39,7 @@ const publicRoutes = [
   },
   { path: "/login", Component: Login },
   { path: "/register", Component: Register },
+  { path: "*", Component: () => <Navigate to="/" replace /> },
 ];
 
 const privateRoutes = [
@@ -48,7 +60,7 @@ const privateRoutes = [
         Component: Favorite,
         children: [
           {
-            path: "/favorite/:noteid",
+            path: ":noteid",
           },
         ],
       },
@@ -57,7 +69,7 @@ const privateRoutes = [
         Component: Archive,
         children: [
           {
-            path: "/archive/:noteid",
+            path: ":noteid",
           },
         ],
       },
@@ -66,7 +78,7 @@ const privateRoutes = [
         Component: Tag,
         children: [
           {
-            path: "/tag/:tagid",
+            path: ":noteid",
           },
         ],
       },
@@ -75,7 +87,7 @@ const privateRoutes = [
         Component: Trash,
         children: [
           {
-            path: "/trash/:noteid",
+            path: ":noteid",
           },
         ],
       },
@@ -84,10 +96,11 @@ const privateRoutes = [
         Component: Search,
         children: [
           {
-            path: "/search/:noteid",
+            path: ":noteid",
           },
         ],
       },
+      { path: "*", Component: () => <Navigate to="/" replace /> },
     ],
   },
 ];

@@ -4,11 +4,9 @@ import useNote from "../hooks/useNote.tsx";
 import { useEffect } from "react";
 import { useSideNav } from "../hooks/useSideNav.tsx";
 import AddNoteCard from "../components/AddNoteCard.tsx";
-import { UserNote, UserNoteData } from "types/types.ts";
+import { UserNote, UserNoteData } from "types/index.ts";
 import noNotes from "./../../assets/No_Note.png";
 import { Link } from "react-router";
-
-
 
 const Home = () => {
   const { pinned, other, isLoading, isError } = useNote();

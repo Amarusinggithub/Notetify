@@ -1,4 +1,3 @@
-
 import "axios";
 
 declare module "axios" {
@@ -7,6 +6,7 @@ declare module "axios" {
   }
 }
 
+export const USERDATA_STORAGE_KEY = "userData";
 export interface UserNote {
   id: number;
   note: {
@@ -38,8 +38,6 @@ export interface UserNoteData {
   is_favorited: boolean;
   role: string;
 }
-
-
 
 export interface Tag {
   id?: number;

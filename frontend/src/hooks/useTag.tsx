@@ -1,7 +1,7 @@
 import { createContext, PropsWithChildren, useContext, useState } from "react";
 
 import { createTag, deleteTag, getTags, updateTag } from "../lib/TagService.ts";
-import { Tag } from "types/types.ts";
+import { Tag } from "types/index.ts";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "./useAuth.tsx";
 
