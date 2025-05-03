@@ -6,6 +6,8 @@ declare module "axios" {
   }
 }
 
+
+export const CSRF_TOKEN_COOKIE_NAME = "csrftoken";
 export const USERDATA_STORAGE_KEY = "userData";
 export interface UserNote {
   id: number;

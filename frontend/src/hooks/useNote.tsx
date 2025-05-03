@@ -54,7 +54,6 @@ interface NoteContextType {
   handlePin: (note: UserNote) => void;
   setSelectedNote: React.Dispatch<React.SetStateAction<UserNote | null>>;
   setSearch: React.Dispatch<React.SetStateAction<string>>;
-
   handleTagClick: (tag: Tag) => void;
 }
 
@@ -62,7 +61,6 @@ type NoteProviderProps = PropsWithChildren;
 
 const NoteContext = createContext<NoteContextType | undefined>(undefined);
 
-// Categorize notes based on various flags.
 const categorizedNotes = (notesArray: (UserNote | UserNoteData)[]) => {
   const pinned: (UserNote | UserNoteData)[] = [];
   const favorites: (UserNote | UserNoteData)[] = [];

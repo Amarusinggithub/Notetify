@@ -27,7 +27,14 @@ const SideNav = () => {
         setTemp(sidebarData[i]);
         setTitle(sidebarData[i].title);
         navigate(sidebarData[i].path);
-        console.log("this ran");
+      }
+    }
+
+    for (let j = 0; j < data.length; j++) {
+      if (path === "/tag/" + data[j].id) {
+        setTemp(data[j].id);
+        setTitle(data[j].name);
+        handleTagClick(data[j]);
       }
     }
   }, [path]);
@@ -41,7 +48,7 @@ const SideNav = () => {
   };
 
   const handleTagClicked = (tag: Tag) => {
-    setTemp(tag);
+    setTemp(tag.id);
     setTitle(tag.name);
     handleTagClick(tag);
     navigate("/tag/" + tag.id);
@@ -125,7 +132,7 @@ const SideNav = () => {
                   borderBottomLeftRadius: isSideNavOpen ? "0px" : "360px",
                   borderBottomRightRadius: isSideNavOpen ? "50px" : "360px",
                   justifyContent: isSideNavOpen ? "start" : "center",
-                  backgroundColor: tag === temp ? " rgb(65, 51, 28)" : "",
+                  backgroundColor: tag.id === temp ? " rgb(65, 51, 28)" : "",
                 }}
               >
                 <div className="icon-and-name">

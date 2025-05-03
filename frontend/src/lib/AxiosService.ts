@@ -1,5 +1,6 @@
 import axios from "axios";
 import Cookies from "js-cookie";
+import { CSRF_TOKEN_COOKIE_NAME } from "./../types/index.ts";
 
 let isRefreshing = false;
 let failedQueue: {
@@ -7,28 +8,31 @@ let failedQueue: {
   reject: (e?: unknown) => void;
 }[] = [];
 
-const axiosInstance = axios.create({
-  baseURL: `http://localhost:8000/`,
-  headers: {
-    "Content-Type": "application/json",
-  },
-  withCredentials: true,
-  xsrfCookieName: "csrftoken",
-  xsrfHeaderName: "X-CSRFToken",
-});
-
-const processQueue = (error: any) => {
+const processQueue = (error?: any) => {
   failedQueue.forEach((prom: any) => {
     error ? prom.reject(error) : prom.resolve();
   });
   failedQueue = [];
 };
 
+const axiosInstance = axios.create({
+  baseURL: `http://localhost:8000/`,
+  headers: {
+    "Content-Type": "application/json",
+  },
+  withCredentials: true,
+  xsrfCookieName: CSRF_TOKEN_COOKIE_NAME,
+  xsrfHeaderName: "X-CSRFToken",
+});
+
 // Response interceptor to handle token refresh on 401 errors.
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+        if (originalRequest.url?.includes("token/refresh")) {
+          return Promise.reject(error);
+        }
     if (
       error.response &&
       error.response.status === 401 &&
@@ -49,13 +53,11 @@ axiosInstance.interceptors.response.use(
       isRefreshing = true;
       try {
         await axiosInstance.post("token/refresh/");
-        processQueue(null);
+        processQueue();
 
         return axiosInstance(originalRequest);
       } catch (refreshError) {
-        console.error("Token refresh failed:", refreshError);
-        console.warn("Session expired. Redirecting to login...");
-
+        processQueue(refreshError); 
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
@@ -66,7 +68,7 @@ axiosInstance.interceptors.response.use(
 );
 
 export async function ensureCSRFToken() {
-  let csrfToken: any = Cookies.get("csrftoken");
+  let csrfToken: any = Cookies.get(CSRF_TOKEN_COOKIE_NAME);
   if (!csrfToken) {
     await axiosInstance.get(`csrf/`);
   }

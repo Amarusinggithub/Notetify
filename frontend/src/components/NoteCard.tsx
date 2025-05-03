@@ -56,7 +56,7 @@ const NoteCard = ({ note, route }: NoteCardProps) => {
     e.preventDefault();
     await handleSave();
     if (isUserNote(note)) setSelectedNote(isSelected ? null : note);
-    if (isSelected) navigate(route);
+    if (isSelected && route!=="") navigate(route);
   };
 
   const handleTitleInput = (e: React.ChangeEvent<HTMLInputElement>) => {

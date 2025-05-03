@@ -44,7 +44,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     localStorage.setItem(USERDATA_STORAGE_KEY, JSON.stringify(userData));
   };
 
-  const setNotAuth =  () => {
+  const setNotAuth = () => {
     setIsAuthenticated(false);
     setUserData(null);
     localStorage.removeItem(USERDATA_STORAGE_KEY);
@@ -61,7 +61,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
       const response = await signUp(email, username, password);
       if (response.status >= 200 && response.status < 300) {
         console.log("Signup successful");
-        await setAuth(response.data.userData);
+        setAuth(response.data);
       } else {
         console.error("Signup failed");
       }
@@ -80,7 +80,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
       const response = await login(email.trim(), password.trim());
       if (response.status >= 200 && response.status < 300) {
         console.log("Login successful");
-        setAuth(response.data.userData);
+        setAuth(response.data);
       } else {
         console.error("Login failed");
       }
@@ -112,14 +112,14 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
       if (response.status >= 200 && response.status < 300) {
         setAuth(response.data);
       } else {
-        await setNotAuth();
+        setNotAuth();
       }
     } catch (e: any) {
       setNotAuth();
     } finally {
       setCheckingAuth(false);
     }
-  }, [isAuthenticated]);
+  }, []);
 
   useEffect(() => {
     let cached = localStorage.getItem(USERDATA_STORAGE_KEY);

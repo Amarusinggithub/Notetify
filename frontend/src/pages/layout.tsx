@@ -7,10 +7,13 @@ import DeleteTagPopup from "../components/DeleteTagPopup.tsx";
 import useTag from "../hooks/useTag.tsx";
 import { useSideNav } from "../hooks/useSideNav.tsx";
 import { Outlet } from "react-router";
+import useNote from "../hooks/useNote.tsx";
+import Search from "./Search.tsx";
 
 const MainLayout = () => {
   const { isSideNavOpen, isAddTagPopupOpen } = useSideNav();
   const { wantToDeleteTag, wantToEditTag } = useTag();
+  const {search}=useNote();
 
   return (
     <div className="container">
@@ -21,10 +24,10 @@ const MainLayout = () => {
           className="content-container"
           style={{ marginLeft: isSideNavOpen ? "250px" : "50px" }}
         >
-          <Outlet />
+          {search && search.trim().length >= 1 ? <Search /> : <Outlet />}
           {isAddTagPopupOpen && <AddTagPopup />}
-          {wantToDeleteTag === true && <DeleteTagPopup />}
-          {wantToEditTag === true && <EditTagPopup />}
+          {wantToDeleteTag && <DeleteTagPopup />}
+          {wantToEditTag && <EditTagPopup />}
         </div>
       </div>
     </div>

@@ -1,5 +1,4 @@
 from django.contrib.auth import authenticate
-from django.http import Http404
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
@@ -10,9 +9,6 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from api.models import User, Tag, UserNote
 from api.serializers import UserSerializer, TagSerializer, UserNoteSerializer
 from django.conf import settings
-
-
-
 
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)

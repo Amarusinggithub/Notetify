@@ -8,8 +8,9 @@ from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework_simplejwt.exceptions import (
     ExpiredTokenError,
     TokenError,
-    InvalidToken,
+    InvalidToken, AuthenticationFailed
 )
+
 from rest_framework.decorators import api_view
 
 
@@ -91,8 +92,21 @@ def get_csrf_token(request):
 
 @api_view(["GET"])
 def verify_token( request):
-    JWT_authenticator = JWTAuthentication()
+    auth = JWTAuthentication()
     raw_token = request.COOKIES.get(settings.SIMPLE_JWT["AUTH_COOKIE"]) or None
-    validated_token = JWT_authenticator.get_validated_token(raw_token)
-    if validated_token:
-        return Response({}, status=status.HTTP_200_OK)
+    if (raw_token==None) :
+        return Response(
+            {"error": "Token is invalid or expired"},
+            status=status.HTTP_401_UNAUTHORIZED,
+        )
+
+    try:
+        validated_token = auth.get_validated_token(raw_token)
+        if validated_token:
+            user=auth.get_user(validated_token=validated_token)
+            return Response({}, status=status.HTTP_200_OK)
+    except  (InvalidToken, AuthenticationFailed,ExpiredTokenError,TokenError):
+        return Response(
+            {"error": "Token is invalid or expired"},
+            status=status.HTTP_401_UNAUTHORIZED,
+        )

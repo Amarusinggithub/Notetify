@@ -6,26 +6,22 @@ import Home from "../pages/Home.tsx";
 import Tag from "../pages/Tag.tsx";
 import Trash from "../pages/Trash.tsx";
 import MainLayout from "../pages/layout.tsx";
-import { createBrowserRouter, RouterProvider,Navigate } from "react-router";
+import { createBrowserRouter, RouterProvider, Navigate } from "react-router";
 import Landing from "../pages/Landing.tsx";
 import { useAuth } from "./../hooks/useAuth.tsx";
 import Search from "../pages/Search.tsx";
-import { useMemo } from "react";
 
 const AppRoutes = () => {
   const { isAuthenticated, checkingAuth } = useAuth();
-  if (checkingAuth) return null; 
+  if (checkingAuth) return null;
 
-  const routes = isAuthenticated ? privateRoutes : publicRoutes;
-
-  let router = useMemo(() => {
-    return createBrowserRouter(routes);
-  }, [routes]);
 
   return (
     <RouterProvider
-      router={router}
-      key={isAuthenticated ? "authenticated" : "notAuthenticated"}
+      router={createBrowserRouter(
+        isAuthenticated ? privateRoutes : publicRoutes
+      )}
+      key={isAuthenticated ? "auth" : "guest"}
     />
   );
 };
