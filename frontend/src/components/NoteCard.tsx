@@ -36,13 +36,13 @@ const NoteCard = ({ note, route }: NoteCardProps) => {
 
   useEffect(() => {
     setNoteState(note);
-    console.log("this is the user note", note);
+    //console.log("this is the user note", note);
     setIsEdited(false);
   }, [note]);
 
   const handleSave = async () => {
     if (isEdited) {
-      console.log("sent edited content to server");
+    //  console.log("sent edited content to server");
       if (isUserNote(noteState)) await editNote(noteState);
     }
     setIsEdited(false);
@@ -107,7 +107,7 @@ const NoteCard = ({ note, route }: NoteCardProps) => {
         };
       }
     });
-    console.log("is edited maybe set to true");
+    //console.log("is edited maybe set to true");
     setIsEdited(
       isUserNote(noteState)
         ? newContent !== noteState.note?.content

@@ -33,6 +33,7 @@ const AddNoteCard = () => {
 
   useEffect(() => {
     setIsEdited(false);
+    console.log(isSelected)
   }, [isSelected]);
 
   const handleSelect = async (

@@ -29,9 +29,9 @@ RUN chown -R node:node /usr/src/app
 # Switch to non-root user for security
 USER node
 
-EXPOSE 5173 1234 3000 4173
+EXPOSE 5173 1234 3000 4173 1235
 
 #CMD ["sh", "entrypoint.sh"]
 
-CMD ["npm","run","dev"]
+CMD ["npm","run","dev:local"]
 

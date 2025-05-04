@@ -1,32 +1,27 @@
+
+import type { EditorState } from "lexical";
+
 // fallback default state
 const defaultEditorState = JSON.stringify({
   root: {
     children: [
       {
         type: "paragraph",
-        children: [
-          {
-            type: "text",
-            text: "",
-            detail: 0,
-            format: "",
-            mode: "normal",
-            style: "",
-          },
-        ],
-        direction: "ltr",
+        children: [],
+        direction: null,
         format: "",
         indent: 0,
         version: 1,
       },
     ],
-    direction: "ltr",
+    direction: null,
     format: "",
     indent: 0,
     type: "root",
     version: 1,
   },
 });
+
 
 // Recursively traverse the editor state and ensure valid indent values for list items.
 function sanitizeEditorState(editorStateObj:any) {
@@ -51,8 +46,8 @@ function sanitizeEditorState(editorStateObj:any) {
 }
 
 // Parse the incoming state or fallback to default, then sanitize.
-export default function parseOrDefault(editorStateStr:string) {
-      console.log("this is the content:", editorStateStr);
+/*export default function parseOrDefault(editorStateStr:string) {
+     // console.log("this is the content:", editorStateStr);
 
   try {
     if (!editorStateStr || editorStateStr.trim() === "") {
@@ -61,7 +56,7 @@ export default function parseOrDefault(editorStateStr:string) {
     }
     const parsed = JSON.parse(editorStateStr);
     const sanitized = sanitizeEditorState(parsed);
-    console.log("Sanitized editor state:", sanitized);
+    //console.log("Sanitized editor state:", sanitized);
     // Check if the sanitized state has at least one child node:
     if (
       !sanitized.root ||
@@ -78,4 +73,70 @@ export default function parseOrDefault(editorStateStr:string) {
     console.error("Failed to parse editor state. Using default state.", error);
     return defaultEditorState;
   }
+}*/
+
+
+
+interface LexicalJSONNode {
+  type: string;
+  children?: LexicalJSONNode[];
+  indent?: number;
+  // …other common props…
+}
+
+interface LexicalJSONRoot {
+  root: LexicalJSONNode & { children: LexicalJSONNode[] };
+}
+
+export const DEFAULT_JSON = JSON.stringify({
+  root: {
+    children: [
+      {
+        type: "paragraph",
+        children: [],
+        direction: null,
+        format: "",
+        indent: 0,
+        version: 1,
+      },
+    ],
+    type: "root",
+    direction: null,
+    format: "",
+    indent: 0,
+    version: 1,
+  },
+});
+
+
+
+
+export default function parseOrDefault(input: string): string {
+  if (!input.trim()) {
+    console.warn("Empty state; using default.");
+    return DEFAULT_JSON;
+  }
+  try {
+    const obj = JSON.parse(input) as LexicalJSONRoot;
+    sanitize(obj.root);
+    if (!obj.root.children.length) {
+      console.warn("Root has no children; using default.");
+      return DEFAULT_JSON;
+    }
+    return JSON.stringify(obj);
+  } catch (err) {
+    console.error("Parse error; using default.", err);
+    return DEFAULT_JSON;
+  }
+}
+
+
+function sanitize(node: LexicalJSONNode) {
+  if (
+    node.type === "listitem" &&
+    (!Number.isInteger(node.indent) || node.indent! < 0)
+  ) {
+    node.indent = 0;
+  }
+  node.children?.forEach(sanitize);
 }

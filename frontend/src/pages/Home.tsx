@@ -12,7 +12,7 @@ const Home = () => {
   const { pinned, other, isLoading, isError } = useNote();
   const { isSideNavOpen } = useSideNav();
   useEffect(() => {
-    console.log("this is the pinned notes", pinned);
+    //console.log("this is the pinned notes", pinned);
   }, [pinned]);
 
   if (isLoading) {

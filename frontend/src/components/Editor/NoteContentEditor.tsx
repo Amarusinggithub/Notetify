@@ -2,7 +2,7 @@ import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { CollaborationPlugin } from "@lexical/react/LexicalCollaborationPlugin";
 import * as Y from "yjs";
 import { Provider } from "@lexical/yjs";
-import { EditorState } from "lexical";
+import { $createParagraphNode, $getRoot, LexicalEditor } from "lexical";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { EditorRefPlugin } from "@lexical/react/LexicalEditorRefPlugin";
@@ -12,9 +12,10 @@ import { HeadingNode } from "@lexical/rich-text";
 import { ListNode, ListItemNode } from "@lexical/list";
 import EditorTheme from "./EditorTheme.ts";
 import { getRandomUserProfile, UserProfile } from "./getRandomUserProfile.ts";
+import type { EditorState } from "lexical";
 
 import "../../styles/NoteContentEditor.module.css";
-import parseOrDefault from "./helpers.ts";
+import parseOrDefault, { DEFAULT_JSON } from "./helpers.ts";
 import { createWebRTCProvider, createWebsocketProvider } from "./providers.ts";
 import Editor from "./Editor.tsx";
 
@@ -37,9 +38,10 @@ const NoteContentEditor = ({
 }: NoteContentEditorProps) => {
   const editorRef = useRef(null);
   const validContent = parseOrDefault(content);
-  const providerName =
-    new URLSearchParams(window.location.search).get("provider") ?? "webrtc";
-  const [userProfile, setUserProfile] = useState(() => getRandomUserProfile(""));
+  //const providerName =new URLSearchParams(window.location.search).get("provider") ?? "webrtc";
+  const [userProfile, setUserProfile] = useState(() =>
+    getRandomUserProfile("")
+  );
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [yjsProvider, setYjsProvider] = useState<null | Provider>(null);
   const [connected, setConnected] = useState(false);
@@ -48,6 +50,7 @@ const NoteContentEditor = ({
   const initialConfig = {
     namespace: "MyEditor",
     theme: EditorTheme,
+
     onError: (error: Error) => {
       throw error;
     },
@@ -90,9 +93,8 @@ const NoteContentEditor = ({
   const providerFactory = useCallback(
     (id: string, yjsDocMap: Map<string, Y.Doc>) => {
       const provider =
-        providerName === "webrtc"
-          ? createWebRTCProvider(id, yjsDocMap)
-          : createWebsocketProvider(id, yjsDocMap);
+        //providerName === "webrtc"? createWebRTCProvider(id, yjsDocMap):
+        createWebsocketProvider(id, yjsDocMap);
       provider.on("status", (event: any) => {
         setConnected(
           // Websocket provider
@@ -107,8 +109,9 @@ const NoteContentEditor = ({
       setTimeout(() => setYjsProvider(provider), 0);
 
       return provider;
-    },
-    [providerName]
+    }, //    [providerName]
+
+    []
   );
 
   const handleConnectionToggle = () => {
@@ -122,7 +125,8 @@ const NoteContentEditor = ({
     }
   };
 
-  function handleOnEditorChange(editorState: EditorState) {
+  function handleOnEditorChange(editorState) {
+    editorRef.current = editorState;
     const editorStateJSON = editorState.toJSON();
     handleContentInput(JSON.stringify(editorStateJSON));
   }
@@ -136,16 +140,16 @@ const NoteContentEditor = ({
         {/* With CollaborationPlugin - we MUST NOT use @lexical/react/LexicalHistoryPlugin */}
 
         <p>
-          <b>Active users:</b>{" "}
+          <b>Active users:</b>
           {activeUsers.map(({ name, color, userId }, idx) => (
             <Fragment key={userId}>
-              <span style={{ color }}>{name}</span>
+              <span style={{ color }}>{"Amar"}</span>
               {idx === activeUsers.length - 1 ? "" : ", "}
             </Fragment>
           ))}
         </p>
         <CollaborationPlugin
-          id="lexical/react-rich-collab"
+          id={`note-${note.id}`}
           providerFactory={providerFactory}
           // Optional initial editor state in case collaborative Y.Doc won't
           // have any existing data on server. Then it'll user this value to populate editor.
@@ -155,7 +159,7 @@ const NoteContentEditor = ({
           // Unless you have a way to avoid race condition between 2+ users trying to do bootstrap simultaneously
           // you should never try to bootstrap on client. It's better to perform bootstrap within Yjs server.
           initialEditorState={validContent}
-          shouldBootstrap={false}
+          shouldBootstrap={true}
           username={userProfile.name}
           cursorColor={userProfile.color}
           cursorsContainerRef={containerRef}
