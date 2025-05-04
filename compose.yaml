@@ -1,13 +1,10 @@
-
 services:
-
-
   db:
     image: mysql:latest
     healthcheck:
-        test: ["CMD", "mysqladmin" ,"ping", "-h", "${MYSQL_SERVER_NAME}"]
-        timeout: 10s
-        retries: 10
+      test: ["CMD", "mysqladmin", "ping", "-h", "${MYSQL_SERVER_NAME}"]
+      timeout: 10s
+      retries: 10
     restart: always
     volumes:
       - db-data:/var/lib/mysql
@@ -21,9 +18,8 @@ services:
     env_file:
       - .env
 
-
   backend:
-    build: 
+    build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: notetify-backend
@@ -46,7 +42,7 @@ services:
       - .env
 
   frontend:
-    build: 
+    build:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: notetify-frontend
@@ -55,6 +51,8 @@ services:
       - "1234:1234"
       - "3000:3000"
       - "4173:4173"
+      - "1235:1235"
+
     depends_on:
       - backend
       - db

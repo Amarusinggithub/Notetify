@@ -9,12 +9,10 @@ import MainLayout from "../pages/layout.tsx";
 import { createBrowserRouter, RouterProvider, Navigate } from "react-router";
 import Landing from "../pages/Landing.tsx";
 import { useAuth } from "./../hooks/useAuth.tsx";
-import Search from "../pages/Search.tsx";
 
 const AppRoutes = () => {
   const { isAuthenticated, checkingAuth } = useAuth();
   if (checkingAuth) return null;
-
 
   return (
     <RouterProvider
@@ -87,14 +85,14 @@ const privateRoutes = [
           },
         ],
       },
+
       {
-        path: "search",
-        Component: Search,
-        children: [
-          {
-            path: ":noteid",
-          },
-        ],
+        path: "/login",
+        Component: () => <Navigate to="/" replace />,
+      },
+      {
+        path: "/register",
+        Component: () => <Navigate to="/" replace />,
       },
       { path: "*", Component: () => <Navigate to="/" replace /> },
     ],

@@ -12,11 +12,10 @@ import { HeadingNode } from "@lexical/rich-text";
 import { ListNode, ListItemNode } from "@lexical/list";
 import EditorTheme from "./EditorTheme.ts";
 import { getRandomUserProfile, UserProfile } from "./getRandomUserProfile.ts";
-import type { EditorState } from "lexical";
 
 import "../../styles/NoteContentEditor.module.css";
-import parseOrDefault, { DEFAULT_JSON } from "./helpers.ts";
-import { createWebRTCProvider, createWebsocketProvider } from "./providers.ts";
+import parseOrDefault from "./helpers.ts";
+import {  createWebsocketProvider } from "./providers.ts";
 import Editor from "./Editor.tsx";
 
 type NoteContentEditorProps = {
@@ -93,14 +92,11 @@ const NoteContentEditor = ({
   const providerFactory = useCallback(
     (id: string, yjsDocMap: Map<string, Y.Doc>) => {
       const provider =
-        //providerName === "webrtc"? createWebRTCProvider(id, yjsDocMap):
         createWebsocketProvider(id, yjsDocMap);
       provider.on("status", (event: any) => {
         setConnected(
           // Websocket provider
-          event.status === "connected" ||
-            // WebRTC provider has different approact to status reporting
-            ("connected" in event && event.connected === true)
+          event.status === "connected"
         );
       });
 
@@ -109,7 +105,7 @@ const NoteContentEditor = ({
       setTimeout(() => setYjsProvider(provider), 0);
 
       return provider;
-    }, //    [providerName]
+    },
 
     []
   );
@@ -131,6 +127,16 @@ const NoteContentEditor = ({
     handleContentInput(JSON.stringify(editorStateJSON));
   }
 
+  /*  <p>
+         <b>Active users:</b>
+          {activeUsers.map(({ name, color, userId }, idx) => (
+            <Fragment key={userId}>
+              <span style={{ color }}>{"Amar"}</span>
+              {idx === activeUsers.length - 1 ? "" : ", "}
+            </Fragment>
+          ))}
+        </p>*/
+
   return (
     <div ref={containerRef}>
       <LexicalComposer
@@ -139,15 +145,7 @@ const NoteContentEditor = ({
       >
         {/* With CollaborationPlugin - we MUST NOT use @lexical/react/LexicalHistoryPlugin */}
 
-        <p>
-          <b>Active users:</b>
-          {activeUsers.map(({ name, color, userId }, idx) => (
-            <Fragment key={userId}>
-              <span style={{ color }}>{"Amar"}</span>
-              {idx === activeUsers.length - 1 ? "" : ", "}
-            </Fragment>
-          ))}
-        </p>
+      
         <CollaborationPlugin
           id={`note-${note.id}`}
           providerFactory={providerFactory}
