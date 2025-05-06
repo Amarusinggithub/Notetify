@@ -4,7 +4,7 @@ ARG NODE_VERSION=22.13.0
 FROM node:${NODE_VERSION}-alpine
 
 # Set environment explicitly (adjustable to 'production' or 'development' as needed)
-ENV NODE_ENV=production
+ENV NODE_ENV=development
 
 # Working directory for your app
 WORKDIR /usr/src/app
@@ -14,7 +14,7 @@ COPY package.json package-lock.json ./
 
 COPY entrypoint.sh .
 
-RUN chmod +x ./entrypoint.sh
+#RUN chmod +x ./entrypoint.sh
 
 
 RUN --mount=type=cache,target=/root/.npm \
@@ -29,9 +29,9 @@ RUN chown -R node:node /usr/src/app
 # Switch to non-root user for security
 USER node
 
-EXPOSE 5173 1234 3000 4173 1235
+EXPOSE 5173 1234   
 
 #CMD ["sh", "entrypoint.sh"]
 
-CMD ["npm","run","dev:local"]
+CMD ["npm","run","dev:docker"]
 

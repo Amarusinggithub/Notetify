@@ -11,9 +11,9 @@
     "build": "tsc && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "server:ws": "cross-env HOST=localhost PORT=1234 YPERSISTENCE=./yjs-wss-db npx y-websocket",
-    "server:webrtc": "cross-env HOST=localhost PORT=1235 npx y-webrtc",
-    "dev:local": "cross-env NODE_ENV=development concurrently \"npm:server:ws\" \"npm:server:webrtc\" \"vite\""
+    "dev:docker": "cross-env HOST=0.0.0.0 NODE_ENV=development concurrently \"npm:server:ws\"  \"vite --host 0.0.0.0 --port 5173\"",
+    "server:ws": "cross-env HOST=$HOST PORT=1234 YPERSISTENCE=./yjs-wss-db npx y-websocket",
+    "dev:local": "cross-env NODE_ENV=development concurrently \"npm:server:ws\" \"vite\""
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.7.2",

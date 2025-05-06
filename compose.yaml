@@ -14,7 +14,7 @@ services:
       MYSQL_ROOT_USER: ${DATABASE_USERNAME}
       MYSQL_ROOT_HOST: ${DATABASE_HOST}
     ports:
-      - "3306:3306"
+      - "3307:3306"
     env_file:
       - .env
 
@@ -26,7 +26,8 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
       DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
       DEBUG: ${DEBUG}
@@ -36,7 +37,7 @@ services:
       DATABASE_NAME: ${DATABASE_NAME}
       DATABASE_USERNAME: ${DATABASE_USERNAME}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
-      DATABASE_HOST: ${DATABASE_HOST}
+      DATABASE_HOST: db #${DATABASE_HOST}
       DATABASE_PORT: ${DATABASE_PORT}
     env_file:
       - .env
@@ -49,23 +50,23 @@ services:
     ports:
       - "5173:5173"
       - "1234:1234"
-      - "3000:3000"
-      - "4173:4173"
-      - "1235:1235"
-
     depends_on:
-      - backend
-      - db
+      backend:
+        condition: service_started
+      db:
+        condition: service_healthy
     volumes:
-      - .:/app
-      - /app/node_modules
+      - ./frontend:/usr/src/app
+      - node_modules_frontend:/usr/src/app/node_modules
     environment:
-      NODE_ENV: production
+      NODE_ENV: development
     stdin_open: true
     tty: true
-    command: npm run dev
+    command: npm run dev:docker
     env_file:
       - .env
 
 volumes:
   db-data:
+  node_modules_frontend:
+

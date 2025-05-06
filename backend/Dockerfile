@@ -1,51 +1,62 @@
-# Stage 1: Base build stage
-FROM python:3.13-slim AS builder
- 
-# Create the app directory
-RUN mkdir /app
- 
-# Set the working directory
+# syntax=docker/dockerfile:1
+
+ARG PYTHON_VERSION=3.12
+FROM python:${PYTHON_VERSION}-slim AS builder
+
 WORKDIR /app
- 
-# Set environment variables to optimize Python
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1 
- 
-# Upgrade pip and install dependencies
-RUN pip install --upgrade pip 
- 
-# Copy the requirements file first (better caching)
-COPY requirements.txt /app/
- 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
- 
-# Stage 2: Production stage
-FROM python:3.13-slim
- 
-RUN useradd -m -r appuser && \
-   mkdir /app && \
-   chown -R appuser /app
- 
-# Copy the Python dependencies from the builder stage
-COPY --from=builder /usr/local/lib/python3.13/site-packages/ /usr/local/lib/python3.13/site-packages/
-COPY --from=builder /usr/local/bin/ /usr/local/bin/
- 
-# Set the working directory
+
+# 1. system deps only once (cacheable)
+#RUN apt-get update && apt-get install -y --no-install-recommends \
+   #     build-essential gcc pkg-config libmariadb-dev && \
+  #  rm -rf /var/lib/apt/lists/*
+
+    RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        build-essential \
+        curl \
+        gcc \
+        libssl-dev \
+        pkg-config && \
+    curl https://sh.rustup.rs -sSf | sh -s -- -y && \
+    # Make Cargo available in subsequent layers
+    echo 'source $HOME/.cargo/env' >> /etc/profile.d/cargo.sh && \
+    # Reduce image size
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+    
+# 2. copy requirement manifest & install
+COPY requirements.txt .
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install --upgrade pip && \
+    pip wheel --no-cache-dir --no-deps -r requirements.txt
+
+FROM python:${PYTHON_VERSION}-slim
+
+# security: create non‑root user
+RUN useradd -m -r appuser
+
 WORKDIR /app
- 
-# Copy application code
+
+# install runtime deps (no build-essential, no rust)
+COPY --from=builder /usr/app /usr/app        
+RUN pip install --no-cache-dir /usr/app/*.whl && rm -rf /usr/app
+
+# copy project source
 COPY --chown=appuser:appuser . .
- 
-# Set environment variables to optimize Python
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1 
- 
-# Switch to non-root user
+
+# collect static at build time (optional)
+RUN python manage.py collectstatic --noinput
+
 USER appuser
- 
-# Expose the application port
-EXPOSE 8000 
- 
-# Start the application using Gunicorn
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    DJANGO_SETTINGS_MODULE=notetify_backend.settings
+
+EXPOSE 8000
+
+# health check (adjust URL/path)
+HEALTHCHECK --interval=30s --timeout=3s CMD \
+  curl --fail http://localhost:8000/healthz || exit 1
+
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "notetify_backend.wsgi:application"]
