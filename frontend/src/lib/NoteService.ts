@@ -3,7 +3,7 @@ import { UserNote, UserNoteData } from "types/index.ts";
 
 export const getNotes = async () => {
   try {
-    const response = await axiosInstance.get("api/notes/");
+    const response = await axiosInstance.get("notes/");
     console.log(response.data);
     return response.data;
   } catch (e) {
@@ -12,7 +12,7 @@ export const getNotes = async () => {
 };
 export const createNote = async (note: UserNoteData) => {
   try {
-    const response = await axiosInstance.post("api/notes/create_note/", {
+    const response = await axiosInstance.post("notes/create_note/", {
       note_data: note.note_data,
       tags: note.tags,
       is_pinned: note.is_pinned,
@@ -30,7 +30,7 @@ export const updateNote = async (note: UserNote) => {
   console.log("this");
   try {
     const response = await axiosInstance.put(
-      `api/notes/edit_note/${note.id}/`,
+      `notes/edit_note/${note.id}/`,
       {
         id: note.id,
         note: note.note.id,
@@ -59,7 +59,7 @@ export const updateNote = async (note: UserNote) => {
 export const deleteNote = async (note: UserNote) => {
   try {
     const response = await axiosInstance.delete(
-      `api/notes/delete_note/${note.id}/`
+      `notes/delete_note/${note.id}/`
     );
     return response.status;
   } catch (e) {

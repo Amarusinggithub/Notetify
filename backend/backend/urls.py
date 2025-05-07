@@ -10,12 +10,12 @@ from .views import AsgiTokenValidatorView,get_csrf_token,CookieTokenRefreshView,
 
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
-    path("token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path("token/refresh/", CookieTokenRefreshView.as_view(), name="token_refresh"),
-    path("path_for_ws_connection/", AsgiTokenValidatorView.as_view()),
-    path("csrf/", get_csrf_token, name="csrf-token"),
-    path("auth/me/", verify_token, name="verify-token"),
+    path("api/admin/", admin.site.urls),
+    path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("api/token/refresh/", CookieTokenRefreshView.as_view(), name="token_refresh"),
+    path("api/ws/", AsgiTokenValidatorView.as_view()),
+    path("api/csrf/", get_csrf_token, name="csrf-token"),
+    path("api/auth/me/", verify_token, name="verify-token"),
     path("", include("api.urls")),
 ]
 

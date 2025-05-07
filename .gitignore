@@ -24,7 +24,9 @@ frontend/yjs-wss-db/*
 cypress.env.json
 *.local
 .env  
-
+.env.production
+.env.development
+.env.local
 .vscode/
 !.vscode/extensions.json  
 .idea/

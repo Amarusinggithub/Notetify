@@ -3,60 +3,119 @@
 ARG PYTHON_VERSION=3.12
 FROM python:${PYTHON_VERSION}-slim AS builder
 
-WORKDIR /app
+WORKDIR /src
 
-# 1. system deps only once (cacheable)
-#RUN apt-get update && apt-get install -y --no-install-recommends \
-   #     build-essential gcc pkg-config libmariadb-dev && \
-  #  rm -rf /var/lib/apt/lists/*
-
-    RUN apt-get update && \
+# Install build dependencies with cache mount for faster rebuilds
+RUN --mount=type=cache,target=/var/cache/apt \
+    apt-get update && \
     apt-get install -y --no-install-recommends \
         build-essential \
         curl \
         gcc \
         libssl-dev \
-        pkg-config && \
-    curl https://sh.rustup.rs -sSf | sh -s -- -y && \
-    # Make Cargo available in subsequent layers
-    echo 'source $HOME/.cargo/env' >> /etc/profile.d/cargo.sh && \
-    # Reduce image size
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-    
-# 2. copy requirement manifest & install
-COPY requirements.txt .
+        pkg-config \
+    && rm -rf /var/lib/apt/lists/*
+
+
+
+# Copy requirements and build wheels, caching pip downloads
+ARG REQUIREMENTS_FILE
+
+COPY ./requirements.txt ./
+
+COPY ./$REQUIREMENTS_FILE ./
+
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip install --upgrade pip && \
-    pip wheel --no-cache-dir --no-deps -r requirements.txt
+    pip wheel --no-cache-dir --no-deps -r $REQUIREMENTS_FILE && \
+    # Remove PyJWT wheel to avoid version conflict with djangorestframework-simplejwt
+    rm -f PyJWT-*.whl
 
-FROM python:${PYTHON_VERSION}-slim
+# development stage
+FROM python:${PYTHON_VERSION}-slim AS development
 
-# security: create non‑root user
-RUN useradd -m -r appuser
+# Create a non-root user and application directory
+RUN useradd -m -r appuser && \
+    mkdir /app && \
+    chown -R appuser:appuser /app
 
 WORKDIR /app
 
-# install runtime deps (no build-essential, no rust)
-COPY --from=builder /usr/app /usr/app        
-RUN pip install --no-cache-dir /usr/app/*.whl && rm -rf /usr/app
+# Install only the wheels built in the previous stage (PyJWT will be fetched at install time)
+COPY --from=builder /src/*.whl /app/
+RUN pip install --no-cache-dir /app/*.whl && \
+    rm -rf /app/*.whl
 
-# copy project source
+    
+COPY entrypoint.dev.sh .
+
+RUN chmod +x . entrypoint.dev.sh
+
+# Copy application source code
 COPY --chown=appuser:appuser . .
 
-# collect static at build time (optional)
-RUN python manage.py collectstatic --noinput
 
+# Switch to non-root user
 USER appuser
 
+# Environment settings
 ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    DJANGO_SETTINGS_MODULE=notetify_backend.settings
+    PYTHONUNBUFFERED=1
 
+# Expose application port
 EXPOSE 8000
 
-# health check (adjust URL/path)
-HEALTHCHECK --interval=30s --timeout=3s CMD \
-  curl --fail http://localhost:8000/healthz || exit 1
+# Default command
+#CMD ["python3", "manage.py", "runserver"]
 
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "notetify_backend.wsgi:application"]
+CMD  ["sh", "entrypoint.dev.sh"]
+
+
+
+
+
+# production stage
+FROM python:${PYTHON_VERSION}-slim AS production
+
+# Create a non-root user and application directory
+RUN useradd -m -r appuser && \
+    mkdir /app && \
+    chown -R appuser:appuser /app
+
+WORKDIR /app
+
+COPY ../nginx/nginx.conf /etc/nginx/conf.d/default.conf
+
+
+# Install only the wheels built in the previous stage (PyJWT will be fetched at install time)
+COPY --from=builder /src/*.whl /app/
+RUN pip install --no-cache-dir /app/*.whl && \
+    rm -rf /app/*.whl
+
+COPY entrypoint.prod.sh .
+
+RUN chmod +x . entrypoint.prod.sh
+
+# Copy application source code
+COPY --chown=appuser:appuser . .
+
+
+# Switch to non-root user
+USER appuser
+
+# Environment settings
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+# Expose application port
+EXPOSE 8000
+
+# Healthcheck
+HEALTHCHECK --interval=30s --timeout=3s \
+    CMD curl --fail http://localhost:8000/healthz || exit 1
+
+# Default command
+#CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "backend.wsgi:application"]
+
+CMD ["sh", "entrypoint.prod.sh"]
+

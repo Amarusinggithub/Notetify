@@ -12,17 +12,30 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from datetime import timedelta
 from pathlib import Path
-
 from dotenv import load_dotenv
+
 import os
 import pymysql
-
-load_dotenv()
-
 
 pymysql.install_as_MySQLdb()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# base.py sits at …/backend/backend/django/base.py
+PROJECT_MODULE = Path(__file__).resolve().parents[2]
+# → …/Notetify/backend/backend
+
+# Outer backend folder (manage.py lives here)
+PROJECT_ROOT = PROJECT_MODULE.parent
+# → …/Notetify/backend
+
+#  this Loads .env (for  dev) or .env.production (for prod)
+ENV_FILE = PROJECT_ROOT / (
+    ".env.production" if os.getenv("DJANGO_ENV") == "production" else ".env"
+)
+if ENV_FILE.exists():
+    load_dotenv(ENV_FILE)
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -32,7 +45,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 
 
-ALLOWED_HOSTS = ["localhost",]
+ALLOWED_HOSTS = [
+    "localhost",
+]
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG", default=True)
 
@@ -141,7 +156,7 @@ ROOT_URLCONF = "backend.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR.joinpath("frontend")],
+        "DIRS": [],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -241,6 +256,7 @@ CHANNEL_LAYERS = {
 STATIC_URL = "static/"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

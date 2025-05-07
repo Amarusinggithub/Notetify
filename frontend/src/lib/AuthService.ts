@@ -2,7 +2,7 @@ import axiosInstance from "./AxiosService.ts";
 
 export const login = async (email: string, password: string) => {
   try {
-    const response = await axiosInstance.post("api/login/", {
+    const response = await axiosInstance.post("login/", {
       email: email,
       password: password,
     });
@@ -24,7 +24,7 @@ export const signUp = async (
   password: string
 ) => {
   try {
-    const response = await axiosInstance.post("api/register/", {
+    const response = await axiosInstance.post("register/", {
       email: email,
       username: username,
       password: password,
@@ -43,7 +43,7 @@ export const signUp = async (
 
 export const logout = async () => {
   try {
-    const response = await axiosInstance.post("api/logout/");
+    const response = await axiosInstance.post("logout/");
     return response;
   } catch (error: any) {
     console.error(

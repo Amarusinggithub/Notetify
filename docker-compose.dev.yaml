@@ -1,16 +1,16 @@
 services:
-  db:
+  db_dev:
     networks:
       - notetify-net
     image: mysql:latest
-    container_name: notetify_db
+    container_name: notetify_db_dev
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u","root", "${MYSQL_SERVER_NAME}","-p${MYSQL_ROOT_PASSWORD}"]
       timeout: 10s
       retries: 10
     restart: always
     volumes:
-      - db-data:/var/lib/mysql
+      - db-data-dev:/var/lib/mysql
     environment:
       MYSQL_DATABASE: ${DATABASE_NAME}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
@@ -21,7 +21,7 @@ services:
     env_file:
       - .env.development
 
-  backend:
+  backend_dev:
     networks:
       - notetify-net
     build:
@@ -29,14 +29,14 @@ services:
       dockerfile: Dockerfile
       target: development
       args:
-        - REQUIREMENTS_FILE=requirements.txt
+        - REQUIREMENTS_FILE=requirements_dev.txt
     command: sh ./entrypoint.dev.sh
-    container_name: notetify-backend
+    container_name: notetify-backend_dev
     restart: always
     ports:
       - "8000:8000"
     depends_on:
-      db:
+      db_dev:
         condition: service_healthy
     environment:
       DJANGO_ENV: ${DJANGO_ENV}
@@ -53,7 +53,6 @@ services:
     env_file:
       - .env.development
 
-
   test:
     networks:
       - notetify-net
@@ -67,21 +66,22 @@ services:
     env_file:
     - .env.development
 
-  frontend:
+
+  frontend_dev:
     networks:
       - notetify-net
     build:
       context: ./frontend
       dockerfile: Dockerfile
       target: development
-    container_name: notetify-frontend
+    container_name: notetify-frontend_dev
     ports:
       - "3000:3000"
       - "1234:1234"
     depends_on:
-      backend:
+      backend_dev:
         condition: service_started
-      db:
+      db_dev:
         condition: service_healthy
     volumes:
       - ./frontend:/usr/src/app
@@ -89,19 +89,17 @@ services:
     environment:
       NODE_ENV: ${NODE_ENV}
       VITE_BASE_URL: ${VITE_BASE_URL}
-
     stdin_open: true
     tty: true
     command: ["npm", "run", "dev:docker"] 
     env_file:
       - .env.development
 
-
 networks:
   notetify-net:
     driver: bridge
 
 volumes:
-  db-data:
+  db-data-dev:
   node_modules_frontend:
 

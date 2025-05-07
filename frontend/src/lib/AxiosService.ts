@@ -16,7 +16,7 @@ const processQueue = (error?: any) => {
 };
 
 const axiosInstance = axios.create({
-  baseURL: `http://localhost:8000/`,
+  baseURL: `${import.meta.env.VITE_BASE_URL}`,
   headers: {
     "Content-Type": "application/json",
   },
@@ -30,9 +30,9 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-        if (originalRequest.url?.includes("token/refresh")) {
-          return Promise.reject(error);
-        }
+    if (originalRequest.url?.includes("token/refresh")) {
+      return Promise.reject(error);
+    }
     if (
       error.response &&
       error.response.status === 401 &&
@@ -57,7 +57,7 @@ axiosInstance.interceptors.response.use(
 
         return axiosInstance(originalRequest);
       } catch (refreshError) {
-        processQueue(refreshError); 
+        processQueue(refreshError);
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;

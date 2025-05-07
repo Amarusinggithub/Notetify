@@ -2,6 +2,9 @@
 
 When you're ready, start your application by running:
 `docker compose up --build`.
+`docker-compose -f docker-compose.dev.yaml up --build`.
+`docker-compose -f docker-compose.prod.yaml up --build`.
+
 
 Your application will be available at http://localhost:8000.
 

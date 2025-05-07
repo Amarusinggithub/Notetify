@@ -1,16 +1,18 @@
+version: "3.9"
+
 services:
-  db:
+  db_prod:
     networks:
       - notetify-net
     image: mysql:latest
-    container_name: notetify_db
+    container_name: notetify-db-prod
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u","root", "${MYSQL_SERVER_NAME}","-p${MYSQL_ROOT_PASSWORD}"]
       timeout: 10s
       retries: 10
     restart: always
     volumes:
-      - db-data:/var/lib/mysql
+      - db-data-prod:/var/lib/mysql
     environment:
       MYSQL_DATABASE: ${DATABASE_NAME}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
@@ -19,25 +21,28 @@ services:
     ports:
       - "3307:3306"
     env_file:
-      - .env.development
+      - .env.production
 
-  backend:
+  backend_prod:
     networks:
       - notetify-net
     build:
       context: ./backend
       dockerfile: Dockerfile
-      target: development
+      target: production
       args:
-        - REQUIREMENTS_FILE=requirements.txt
-    command: sh ./entrypoint.dev.sh
-    container_name: notetify-backend
+        - REQUIREMENTS_FILE=requirements_prod.txt
+    command: sh ./entrypoint.prod.sh
+    container_name: notetify-backend-prod
     restart: always
-    ports:
+    expose:
       - "8000:8000"
     depends_on:
-      db:
+      db_prod:
         condition: service_healthy
+   # volumes:
+     # - django_static:/app/staticfiles
+      #- media_volume:/app/media
     environment:
       DJANGO_ENV: ${DJANGO_ENV}
       DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
@@ -48,60 +53,50 @@ services:
       DATABASE_NAME: ${DATABASE_NAME}
       DATABASE_USERNAME: ${DATABASE_USERNAME}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
-      DATABASE_HOST: ${DATABASE_HOST}
+      DATABASE_HOST: db
       DATABASE_PORT: ${DATABASE_PORT}
     env_file:
-      - .env.development
+      - .env.production
 
-
-  test:
-    networks:
-      - notetify-net
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-      target: development
-    command: ["pytest"]
-    depends_on:
-    - db_dev
-    env_file:
-    - .env.development
-
-  frontend:
+  frontend_prod:
     networks:
       - notetify-net
     build:
       context: ./frontend
       dockerfile: Dockerfile
-      target: development
-    container_name: notetify-frontend
-    ports:
-      - "3000:3000"
-      - "1234:1234"
-    depends_on:
-      backend:
-        condition: service_started
-      db:
-        condition: service_healthy
+      target: production
+    container_name: notetify-frontend-prod
+    command: ["true"]
     volumes:
-      - ./frontend:/usr/src/app
-      - node_modules_frontend:/usr/src/app/node_modules
+      - static_volume:/usr/src/app/dist
     environment:
       NODE_ENV: ${NODE_ENV}
       VITE_BASE_URL: ${VITE_BASE_URL}
-
-    stdin_open: true
-    tty: true
-    command: ["npm", "run", "dev:docker"] 
     env_file:
-      - .env.development
+      - .env.production
 
+  nginx:
+    image: nginx:stable-alpine
+    container_name: notetify-nginx
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - static_volume:/usr/share/nginx/html:ro
+      #- django_static:/usr/share/nginx/static:ro
+      #- media_volume:/usr/share/nginx/media:ro
+    depends_on:
+      - backend_prod
+      - frontend_prod
 
 networks:
   notetify-net:
     driver: bridge
 
 volumes:
-  db-data:
+  db-data-prod:
   node_modules_frontend:
-
+  static_volume:
+ # django_static:
+  #media_volume:
