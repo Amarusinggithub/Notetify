@@ -5,6 +5,8 @@ FROM python:${PYTHON_VERSION}-slim AS builder
 
 WORKDIR /src
 
+COPY ../nginx/nginx.conf /etc/nginx/conf.d/default.conf
+
 # Install build dependencies with cache mount for faster rebuilds
 RUN --mount=type=cache,target=/var/cache/apt \
     apt-get update && \
@@ -15,8 +17,6 @@ RUN --mount=type=cache,target=/var/cache/apt \
         libssl-dev \
         pkg-config \
     && rm -rf /var/lib/apt/lists/*
-
-
 
 # Copy requirements and build wheels, caching pip downloads
 ARG REQUIREMENTS_FILE
@@ -45,15 +45,13 @@ WORKDIR /app
 COPY --from=builder /src/*.whl /app/
 RUN pip install --no-cache-dir /app/*.whl && \
     rm -rf /app/*.whl
-
-    
+  
 COPY entrypoint.dev.sh .
 
 RUN chmod +x . entrypoint.dev.sh
 
 # Copy application source code
 COPY --chown=appuser:appuser . .
-
 
 # Switch to non-root user
 USER appuser
@@ -62,15 +60,9 @@ USER appuser
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
-# Expose application port
 EXPOSE 8000
 
-# Default command
-#CMD ["python3", "manage.py", "runserver"]
-
 CMD  ["sh", "entrypoint.dev.sh"]
-
-
 
 
 
@@ -83,9 +75,6 @@ RUN useradd -m -r appuser && \
     chown -R appuser:appuser /app
 
 WORKDIR /app
-
-COPY ../nginx/nginx.conf /etc/nginx/conf.d/default.conf
-
 
 # Install only the wheels built in the previous stage (PyJWT will be fetched at install time)
 COPY --from=builder /src/*.whl /app/
@@ -113,9 +102,6 @@ EXPOSE 8000
 # Healthcheck
 HEALTHCHECK --interval=30s --timeout=3s \
     CMD curl --fail http://localhost:8000/healthz || exit 1
-
-# Default command
-#CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "backend.wsgi:application"]
 
 CMD ["sh", "entrypoint.prod.sh"]
 

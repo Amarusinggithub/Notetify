@@ -6,12 +6,15 @@ FROM node:${NODE_VERSION}-alpine AS build
 # Working directory for your app
 WORKDIR /usr/src/app
 
+COPY ../nginx/nginx.conf /etc/nginx/conf.d/default.conf
+
 # Install dependencies separately to leverage caching
 COPY package.json package-lock.json ./
 
 
 RUN --mount=type=cache,target=/root/.npm \
     npm ci
+
 
 # Copy your app's source code into the container
 COPY . .
@@ -30,7 +33,6 @@ RUN npm run build
 FROM node:${NODE_VERSION}-alpine  AS development
 ENV NODE_ENV=development
 
-
 WORKDIR /usr/src/app
 
 # Install dependencies separately to leverage caching
@@ -39,9 +41,9 @@ COPY package.json package-lock.json ./
 RUN --mount=type=cache,target=/root/.npm \
     npm ci
 
-#COPY entrypoint.sh .
+COPY entrypoint.sh .
 
-#RUN chmod +x ./entrypoint.sh
+RUN chmod +x ./entrypoint.sh
 
 # Copy the full source code
 COPY . .
@@ -56,16 +58,13 @@ USER node
 # Expose port for the development server
 EXPOSE 3000 1234
 
-#CMD ["sh", "entrypoint.sh"]
-
-CMD ["npm", "run","dev:docker"]
+CMD ["sh", "entrypoint.sh"]
 
 
 
 # Production Stage
 FROM nginx:stable-alpine AS production
 ENV NODE_ENV=production
-COPY ../nginx/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /usr/src/app/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /usr/src/app/dist /usr/share/nginx/html
 RUN chown -R nginx:nginx /usr/share/nginx/html

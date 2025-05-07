@@ -36,6 +36,8 @@ jobs:
     - name: Recreate .env from secret
       run: echo "${{ secrets.PROD_ENV_FILE }}" > .env
     - run: npm ci
+    - name: Run tests
+      run: npm test
     - run: npm run build
 
 
