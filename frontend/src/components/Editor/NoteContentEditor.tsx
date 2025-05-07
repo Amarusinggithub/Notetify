@@ -121,7 +121,7 @@ const NoteContentEditor = ({
     }
   };
 
-  function handleOnEditorChange(editorState) {
+  function handleOnEditorChange(editorState:any) {
     editorRef.current = editorState;
     const editorStateJSON = editorState.toJSON();
     handleContentInput(JSON.stringify(editorStateJSON));
