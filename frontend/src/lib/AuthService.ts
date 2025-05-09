@@ -59,10 +59,7 @@ export const verifyAuth = async () => {
     const response = await axiosInstance.get("auth/me/");
     return response;
   } catch (error: any) {
-    console.error(
-      "error:",
-      error.response ? error.response.data : error.message
-    );
+  
     throw error;
   }
 };
