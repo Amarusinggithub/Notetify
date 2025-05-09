@@ -5,7 +5,7 @@ FROM python:${PYTHON_VERSION}-slim AS builder
 
 WORKDIR /src
 
-COPY ../nginx/nginx.conf /etc/nginx/conf.d/default.conf
+COPY ./nginx/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Install build dependencies with cache mount for faster rebuilds
 RUN --mount=type=cache,target=/var/cache/apt \
@@ -31,13 +31,16 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     # Remove PyJWT wheel to avoid version conflict with djangorestframework-simplejwt
     rm -f PyJWT-*.whl
 
+
+
+    
 # development stage
 FROM python:${PYTHON_VERSION}-slim AS development
 
 # Create a non-root user and application directory
-RUN useradd -m -r appuser && \
-    mkdir /app && \
-    chown -R appuser:appuser /app
+#RUN useradd -m -r appuser && \
+ #   mkdir /app && \
+  #  chown -R appuser:appuser /app
 
 WORKDIR /app
 
@@ -48,13 +51,16 @@ RUN pip install --no-cache-dir /app/*.whl && \
   
 COPY entrypoint.dev.sh .
 
-RUN chmod +x . entrypoint.dev.sh
+RUN chmod +x entrypoint.dev.sh
 
 # Copy application source code
-COPY --chown=appuser:appuser . .
+#COPY --chown=appuser:appuser . .
+
+COPY  . .
+
 
 # Switch to non-root user
-USER appuser
+#USER appuser
 
 # Environment settings
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -70,9 +76,9 @@ CMD  ["sh", "entrypoint.dev.sh"]
 FROM python:${PYTHON_VERSION}-slim AS production
 
 # Create a non-root user and application directory
-RUN useradd -m -r appuser && \
-    mkdir /app && \
-    chown -R appuser:appuser /app
+#RUN useradd -m -r appuser && \
+   # mkdir /app && \
+   # chown -R appuser:appuser /app
 
 WORKDIR /app
 
@@ -83,14 +89,15 @@ RUN pip install --no-cache-dir /app/*.whl && \
 
 COPY entrypoint.prod.sh .
 
-RUN chmod +x . entrypoint.prod.sh
+RUN chmod +x entrypoint.prod.sh
 
 # Copy application source code
-COPY --chown=appuser:appuser . .
+#COPY --chown=appuser:appuser . .
+COPY  . .
 
 
 # Switch to non-root user
-USER appuser
+#USER appuser
 
 # Environment settings
 ENV PYTHONDONTWRITEBYTECODE=1 \

@@ -5,7 +5,7 @@ services:
     image: mysql:latest
     container_name: notetify_db
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u","root", "${MYSQL_SERVER_NAME}","-p${MYSQL_ROOT_PASSWORD}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
       timeout: 10s
       retries: 10
     restart: always
@@ -48,7 +48,7 @@ services:
       DATABASE_NAME: ${DATABASE_NAME}
       DATABASE_USERNAME: ${DATABASE_USERNAME}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
-      DATABASE_HOST: ${DATABASE_HOST}
+      DATABASE_HOST: notetify_db_dev # ${DATABASE_HOST}
       DATABASE_PORT: ${DATABASE_PORT}
     env_file:
       - .env.development
@@ -76,7 +76,7 @@ services:
       target: development
     container_name: notetify-frontend
     ports:
-      - "3000:3000"
+      - "5173:5173"
       - "1234:1234"
     depends_on:
       backend:
@@ -92,7 +92,7 @@ services:
 
     stdin_open: true
     tty: true
-    command: ["npm", "run", "dev:docker"] 
+    command: ["sh", "entrypoint.sh"]
     env_file:
       - .env.development
 

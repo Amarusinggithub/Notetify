@@ -5,7 +5,7 @@ set -e
 
 python manage.py makemigrations
 # Run Django migrations
-python3 manage.py migrate --noinput
+python manage.py migrate --noinput
 
 
 exec gunicorn backend.wsgi:application \

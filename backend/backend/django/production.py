@@ -38,7 +38,7 @@ SIMPLE_JWT = {
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env.bool("DEBUG", default=False)
+DEBUG = os.environ.get("DEBUG", default=False)
 
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True

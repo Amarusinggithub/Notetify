@@ -7,7 +7,7 @@ services:
     image: mysql:latest
     container_name: notetify-db-prod
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u","root", "${MYSQL_SERVER_NAME}","-p${MYSQL_ROOT_PASSWORD}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
       timeout: 10s
       retries: 10
     restart: always
@@ -98,5 +98,5 @@ volumes:
   db-data-prod:
   node_modules_frontend:
   static_volume:
- # django_static:
+  # django_static:
   #media_volume:

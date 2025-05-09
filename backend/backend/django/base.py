@@ -46,7 +46,7 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 
 
 ALLOWED_HOSTS = [
-    "localhost",
+    "localhost","0.0.0.0"
 ]
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG", default=True)
@@ -83,7 +83,7 @@ SIMPLE_JWT = {
     # custom
     "AUTH_COOKIE": "access_token",  # Cookie name. Enables cookies if value is set.
     "AUTH_COOKIE_REFRESH": "refresh_token",
-    "AUTH_COOKIE_DOMAIN": "localhost",  # A string like "example.com", or None for standard domain cookie.
+    "AUTH_COOKIE_DOMAIN":None,  # A string like "example.com", or None for standard domain cookie.
     "AUTH_COOKIE_SECURE": False,  # Whether the auth cookies should be secure (https:// only).
     "AUTH_COOKIE_HTTP_ONLY": True,  # Http only cookie flag.It's not fetch by javascript.
     "AUTH_COOKIE_PATH": "/",  # The path of the auth cookie.
@@ -132,10 +132,10 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
-    "http://127.0.0.1:5173",
+    "http://0.0.0.0:5173",
     "http://localhost:8000",
     "http://127.0.0.1:8000",
-    "http://localhost:4173",
+    "http://0.0.0.0:3000",
     "http://localhost:3000",
 ]
 
@@ -143,10 +143,10 @@ CORS_ALLOW_CREDENTIALS = True
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
-    "http://127.0.0.1:5173",
+    "http://0.0.0.0:5173",
     "http://localhost:8000",
     "http://127.0.0.1:8000",
-    "http://localhost:4173",
+    "http://0.0.0.0:3000",
     "http://localhost:3000",
 ]
 

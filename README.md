@@ -97,12 +97,12 @@ Copy the `.env.example` file and create a new `.env` file in both the `backend` 
 docker compose up --build
 ```
 
+```bash
+docker-compose -f docker-compose.dev.yaml up --build
+```
+
+```bash
+docker-compose -f docker-compose.prod.yaml up --build
+```
+
 ---
-
-
-
-
-
-
-
-

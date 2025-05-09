@@ -11,10 +11,10 @@ set -e
 # echo "Database is up."
 python manage.py makemigrations
 # Run Django migrations
-python3 manage.py migrate --noinput
+python manage.py migrate --noinput
 
 # Collect static files (only for production if needed)
 # python3 manage.py collectstatic --noinput
 
 # Start Django dev server
-exec python3 manage.py runserver 0.0.0.0:8000
+exec python manage.py runserver 0.0.0.0:8000

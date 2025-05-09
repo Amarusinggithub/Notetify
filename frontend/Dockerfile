@@ -6,7 +6,7 @@ FROM node:${NODE_VERSION}-alpine AS build
 # Working directory for your app
 WORKDIR /usr/src/app
 
-COPY ../nginx/nginx.conf /etc/nginx/conf.d/default.conf
+COPY ./nginx/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Install dependencies separately to leverage caching
 COPY package.json package-lock.json ./
@@ -19,11 +19,13 @@ RUN --mount=type=cache,target=/root/.npm \
 # Copy your app's source code into the container
 COPY . .
 
+#RUN useradd -m -r node
+
 # Ensure the non-root user owns the files
-RUN chown -R node:node /usr/src/app
+#RUN chown -R node:node /usr/src/app
 
 # Switch to non-root user for security
-USER node
+#USER node
 
 RUN npm run build
 
@@ -39,24 +41,26 @@ WORKDIR /usr/src/app
 COPY package.json package-lock.json ./
 
 RUN --mount=type=cache,target=/root/.npm \
-    npm ci
+   npm ci
+
+# grab node_modules + package files from the “build” stage
+#COPY --from=build --chown=node:node /usr/src/app/node_modules ./node_modules
+#COPY --from=build --chown=node:node /usr/src/app/package*.json ./
+
+# now overlay your source (also owned by node)
+#COPY --from=build --chown=node:node /usr/src/app ./
 
 COPY entrypoint.sh .
 
 RUN chmod +x ./entrypoint.sh
 
-# Copy the full source code
-COPY . .
-
-
-# Ensure the non-root user owns the files
-RUN chown -R node:node /usr/src/app
+#RUN chown -R node:node /usr/src/app
 
 # Switch to non-root user for security
-USER node
+#USER node
 
 # Expose port for the development server
-EXPOSE 3000 1234
+EXPOSE 5173 1234
 
 CMD ["sh", "entrypoint.sh"]
 
