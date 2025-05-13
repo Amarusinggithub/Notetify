@@ -141,6 +141,7 @@ services:
     environment:
       NODE_ENV: ${NODE_ENV}
       VITE_BASE_URL: ${VITE_BASE_URL}
+      VITE_WS_URL:  ${VITE_WS_URL}
 
     stdin_open: true
     tty: true

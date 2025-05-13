@@ -1,9 +1,8 @@
 version: "3.9"
 
-x-app-defaults:
-  &app_defaults
+x-app-defaults: &app_defaults
   build:
-      context: ./backend
+    context: ./backend
   init: true
   links:
     - broker
@@ -22,7 +21,16 @@ services:
     image: mysql:latest
     container_name: notetify-db-prod
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-uroot",
+          "-p${MYSQL_ROOT_PASSWORD}",
+        ]
       timeout: 10s
       retries: 10
     restart: always
@@ -55,9 +63,9 @@ services:
     depends_on:
       db_prod:
         condition: service_healthy
-   # volumes:
-     # - django_static:/app/staticfiles
-      #- media_volume:/app/media
+    # volumes:
+    # - django_static:/app/staticfiles
+    #- media_volume:/app/media
     environment:
       UVICORN_RELOAD: true
       DJANGO_ENV: ${DJANGO_ENV}
@@ -76,7 +84,6 @@ services:
       REDIS_BACKEND: ${REDIS_BACKEND}
     env_file:
       - .env.production
-
 
   broker:
     networks:
@@ -110,6 +117,8 @@ services:
     environment:
       NODE_ENV: ${NODE_ENV}
       VITE_BASE_URL: ${VITE_BASE_URL}
+      VITE_WS_URL: ${VITE_WS_URL}
+
     env_file:
       - .env.production
 
