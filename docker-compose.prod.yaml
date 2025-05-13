@@ -1,5 +1,20 @@
 version: "3.9"
 
+x-app-defaults:
+  &app_defaults
+  build:
+      context: ./backend
+  init: true
+  links:
+    - broker
+    - db
+  environment:
+    - REDIS_HOST=broker
+    - DJANGO_DEBUG=0
+  depends_on:
+    - broker
+    - db
+
 services:
   db_prod:
     networks:
@@ -56,6 +71,28 @@ services:
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
       DATABASE_HOST: db
       DATABASE_PORT: ${DATABASE_PORT}
+      REDIS_HOST: broker #${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_BACKEND: ${REDIS_BACKEND}
+    env_file:
+      - .env.production
+
+
+  broker:
+    networks:
+      - notetify-net
+    image: redis:latest
+    container_name: notetify_redis
+    volumes:
+      - "redis-data:/data"
+    environment:
+      REDIS_HOST: broker #${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_BACKEND: ${REDIS_BACKEND}
+    expose:
+      - 6379
+    ports:
+      - "6379:6379"
     env_file:
       - .env.production
 
@@ -75,6 +112,12 @@ services:
       VITE_BASE_URL: ${VITE_BASE_URL}
     env_file:
       - .env.production
+
+  worker:
+    networks:
+      - notetify-net
+    <<: *app_defaults
+    command: "python manage.py yroom"
 
   nginx:
     image: nginx:stable-alpine
@@ -98,6 +141,7 @@ networks:
 volumes:
   db-data-prod:
   node_modules_frontend:
+  redis-data:
   static_volume:
   # django_static:
   #media_volume:

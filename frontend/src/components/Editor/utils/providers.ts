@@ -1,47 +1,8 @@
-
-
 import {Provider} from '@lexical/yjs';
-import {WebrtcProvider} from 'y-webrtc';
 import {WebsocketProvider} from 'y-websocket';
 import * as Y from 'yjs';
 
-//let idSuffix = 0; // In React Strict mode "new WebrtcProvider" may be called twice
-
-/**
- * Allows browser windows/tabs to communicate with each other w/o a server (if origin is the same)
- * using BroadcastChannel API. Useful for demo purposes.
- * 
- *  WebRTC (within browser communication via BroadcastChannel fallback, unless run locally)
-  * 'Websockets (cross-browser communication)
- */
-/*export function createWebRTCProvider(
-  id: string,
-  yjsDocMap: Map<string, Y.Doc>,
-): Provider {
-  const doc = getDocFromMap(id, yjsDocMap);
-
-  localStorage.log = 'true' //in browser console to enable logging
-  const provider = new WebrtcProvider(`${id}/${idSuffix++}`, doc, {
-    peerOpts: {
-      reconnectTimer: 100,
-    },
-    signaling:
-      window.location.hostname === 'localhost' ? ['ws://localhost:1235'] : [],
-  });
-
-  // @ts-expect-error TODO: FIXME
-  return provider;
-}
-*/
-
-const wsUrl = `ws${window.location.protocol === "https:" ? "s" : ""}://${
-  window.location.host
-}/ws/tiptap/`;
-
-
-//const wsUrlPre='ws://localhost:1234';
-
-
+const wsUrl = `${import.meta.env.VITE_WS_URL}`;
 
 export function createWebsocketProvider(
   id: string,

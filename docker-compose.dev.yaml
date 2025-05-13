@@ -1,3 +1,21 @@
+version: "3.9"
+
+
+x-app-defaults:
+  &app_defaults
+  build:
+      context: ./backend
+  init: true
+  links:
+    - broker
+    - db
+  environment:
+    - REDIS_HOST=broker
+    - DJANGO_DEBUG=0
+  depends_on:
+    - broker
+    - db
+
 services:
   db_dev:
     networks:
@@ -27,6 +45,30 @@ services:
       MYSQL_ROOT_HOST: '%'   #${DATABASE_HOST} 
     ports:
       - "3307:3306"
+    env_file:
+      - .env.development
+
+  worker:
+    networks:
+      - notetify-net
+    <<: *app_defaults
+    command: "python manage.py yroom"
+
+  broker:
+    networks:
+      - notetify-net
+    image: redis:latest
+    container_name: notetify_redis
+    volumes:
+      - "redis-data:/data"
+    environment:
+      REDIS_HOST: broker #${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_BACKEND: ${REDIS_BACKEND}
+    expose:
+      - 6379
+    ports:
+      - "6379:6379"
     env_file:
       - .env.development
 
@@ -124,5 +166,6 @@ networks:
     driver: bridge
 
 volumes:
+  redis-data:
   db-data-dev:
   node_modules_frontend:
