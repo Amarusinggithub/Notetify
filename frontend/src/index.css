@@ -1,10 +1,13 @@
+
+/*@import "tailwindcss";*/
+
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
   color-scheme: light dark;
-  color: rgb(232, 234, 237);
+  color: white;
   background-color: rgb(32, 33, 36);
 
   font-synthesis: none;

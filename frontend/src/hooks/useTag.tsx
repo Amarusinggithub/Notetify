@@ -49,19 +49,15 @@ const TagProvider = ({ children }: TagProviderProps) => {
   });
 
   const makeTag = async (tagName: string) => {
-    if (tagName == null || tagName.length <= 0) {
-      console.error(
-        "tag was not saved because it was either null or a empty string"
-      );
-      return;
-    }
-
-    if (
-      data.some((tag: Tag) => tag.name.toLowerCase() === tagName.toLowerCase())
-    ) {
-      alert("Tag already exists!");
-      return;
-    }
+    if (tagName!.trim().length > 0)
+      if (
+        data.some(
+          (tag: Tag) => tag.name.toLowerCase() === tagName.toLowerCase()
+        )
+      ) {
+        alert("Tag already exists!");
+        return;
+      }
 
     createTagMutation.mutate(tagName);
   };
@@ -74,7 +70,7 @@ const TagProvider = ({ children }: TagProviderProps) => {
   });
 
   const editTag = async (tag: Tag) => {
-    editTagMutation.mutate(tag);
+    if (tag.name!.trim().length > 0) editTagMutation.mutate(tag);
   };
 
   const deleteTagMutation = useMutation({

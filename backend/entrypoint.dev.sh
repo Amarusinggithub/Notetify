@@ -17,4 +17,5 @@ python manage.py migrate --noinput
 # python3 manage.py collectstatic --noinput
 
 # Start Django dev server
-exec python manage.py runserver 0.0.0.0:8000
+exec uvicorn backend.asgi:application --reload --host 0.0.0.0 --port 8000
+

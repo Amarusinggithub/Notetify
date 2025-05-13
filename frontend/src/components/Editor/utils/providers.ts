@@ -5,7 +5,7 @@ import {WebrtcProvider} from 'y-webrtc';
 import {WebsocketProvider} from 'y-websocket';
 import * as Y from 'yjs';
 
-let idSuffix = 0; // In React Strict mode "new WebrtcProvider" may be called twice
+//let idSuffix = 0; // In React Strict mode "new WebrtcProvider" may be called twice
 
 /**
  * Allows browser windows/tabs to communicate with each other w/o a server (if origin is the same)
@@ -14,7 +14,7 @@ let idSuffix = 0; // In React Strict mode "new WebrtcProvider" may be called twi
  *  WebRTC (within browser communication via BroadcastChannel fallback, unless run locally)
   * 'Websockets (cross-browser communication)
  */
-export function createWebRTCProvider(
+/*export function createWebRTCProvider(
   id: string,
   yjsDocMap: Map<string, Y.Doc>,
 ): Provider {
@@ -32,6 +32,14 @@ export function createWebRTCProvider(
   // @ts-expect-error TODO: FIXME
   return provider;
 }
+*/
+
+const wsUrl = `ws${window.location.protocol === "https:" ? "s" : ""}://${
+  window.location.host
+}/ws/tiptap/`;
+
+
+//const wsUrlPre='ws://localhost:1234';
 
 
 
@@ -42,7 +50,7 @@ export function createWebsocketProvider(
   const doc = getDocFromMap(id, yjsDocMap);
 
   // @ts-expect-error TODO: FIXME
-  return new WebsocketProvider('ws://localhost:1234', id, doc, {
+  return new WebsocketProvider(wsUrl, id, doc, {
     connect: true,
   });
 }

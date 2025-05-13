@@ -14,14 +14,14 @@ const Archive = () => {
 
   if (archived.length < 1) {
     return (
-      <>
+      <div className="flex flex-row min-h-screen justify-center items-center ">
         <img
           src={noArchivedNotes}
           style={{ width: "100%", height: "auto" }}
           className="no-notes"
           alt="No archived notes"
         />
-      </>
+      </div>
     );
   }
 

@@ -3,7 +3,7 @@ import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 
-import ToolbarPlugin from "./plugins/ToolbarPlugin";
+import ToolbarPlugin from "../plugins/ToolbarPlugin";
 import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { LinkPlugin } from "@lexical/react/LexicalLinkPlugin";
 import { TablePlugin } from "@lexical/react/LexicalTablePlugin";
@@ -19,7 +19,10 @@ export default function Editor() {
       <ToolbarPlugin />
       <div className="editor-inner">
         <RichTextPlugin
-          contentEditable={<ContentEditable className="editor-input" />}
+          contentEditable={<ContentEditable className="editor-input"   onKeyDown={(e) => {
+          e.stopPropagation()
+          }}
+          onClick={(e) => e.stopPropagation()}/>}
           placeholder={<Placeholder />}
           ErrorBoundary={LexicalErrorBoundary}
         />

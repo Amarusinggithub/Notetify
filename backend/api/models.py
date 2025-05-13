@@ -41,7 +41,7 @@ class User(AbstractUser, PermissionsMixin):
     
 class Tag(models.Model):
     id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=50, unique=True)
+    name = models.CharField(max_length=50, unique=False)
     users = models.ManyToManyField(settings.AUTH_USER_MODEL,related_name="tags")
     def __str__(self):
         return self.name

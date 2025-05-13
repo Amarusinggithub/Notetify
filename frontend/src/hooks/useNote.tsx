@@ -185,7 +185,11 @@ const NoteProvider = ({ children }: NoteProviderProps) => {
   });
 
   const addNote = async (note: UserNoteData) => {
-    addNoteMutation.mutate(note);
+    if (
+      note.note_data.content!.trim().length != 0 &&
+      note.note_data.title!.trim().length != 0
+    )
+      addNoteMutation.mutate(note);
   };
 
   const editNoteMutation = useMutation({
@@ -196,7 +200,11 @@ const NoteProvider = ({ children }: NoteProviderProps) => {
   });
 
   const editNote = async (note: UserNote) => {
-    editNoteMutation.mutate(note);
+    if (
+      note.note.content!.trim().length != 0 &&
+      note.note.title!.trim().length != 0
+    )
+      editNoteMutation.mutate(note);
   };
 
   const removeNoteMutation = useMutation({

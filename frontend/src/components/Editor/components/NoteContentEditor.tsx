@@ -10,13 +10,14 @@ import { LinkNode } from "@lexical/link";
 import { TableNode, TableCellNode, TableRowNode } from "@lexical/table";
 import { HeadingNode } from "@lexical/rich-text";
 import { ListNode, ListItemNode } from "@lexical/list";
-import EditorTheme from "./EditorTheme.ts";
-import { getRandomUserProfile, UserProfile } from "./getRandomUserProfile.ts";
+import EditorTheme from "../style/EditorTheme.ts";
+import { getRandomUserProfile, UserProfile } from "../utils/getRandomUserProfile.ts";
 
-import "../../styles/NoteContentEditor.module.css";
-import parseOrDefault from "./helpers.ts";
-import {  createWebsocketProvider } from "./providers.ts";
-import Editor from "./Editor.tsx";
+import "../../../styles/NoteContentEditor.module.css";
+import parseOrDefault from "../utils/helpers.ts";
+import { createWebsocketProvider } from "../utils/providers.ts";
+import Editor from "../components/Editor.tsx";
+import StopPropagationPlugin from "../plugins/StopPropagationPlugin.tsx";
 
 type NoteContentEditorProps = {
   handleContentInput: any;
@@ -37,7 +38,7 @@ const NoteContentEditor = ({
 }: NoteContentEditorProps) => {
   const editorRef = useRef(null);
   const validContent = parseOrDefault(content);
-  //const providerName =new URLSearchParams(window.location.search).get("provider") ?? "webrtc";
+  const providerName =new URLSearchParams(window.location.search).get("provider") ?? "webrtc";
   const [userProfile, setUserProfile] = useState(() =>
     getRandomUserProfile("")
   );
@@ -91,8 +92,7 @@ const NoteContentEditor = ({
 
   const providerFactory = useCallback(
     (id: string, yjsDocMap: Map<string, Y.Doc>) => {
-      const provider =
-        createWebsocketProvider(id, yjsDocMap);
+      const provider = createWebsocketProvider(id, yjsDocMap);
       provider.on("status", (event: any) => {
         setConnected(
           // Websocket provider
@@ -121,7 +121,7 @@ const NoteContentEditor = ({
     }
   };
 
-  function handleOnEditorChange(editorState:any) {
+  function handleOnEditorChange(editorState: any) {
     editorRef.current = editorState;
     const editorStateJSON = editorState.toJSON();
     handleContentInput(JSON.stringify(editorStateJSON));
@@ -145,7 +145,6 @@ const NoteContentEditor = ({
       >
         {/* With CollaborationPlugin - we MUST NOT use @lexical/react/LexicalHistoryPlugin */}
 
-      
         <CollaborationPlugin
           id={`note-${note.id}`}
           providerFactory={providerFactory}
@@ -162,6 +161,8 @@ const NoteContentEditor = ({
           cursorColor={userProfile.color}
           cursorsContainerRef={containerRef}
         />
+        <StopPropagationPlugin />
+
         <OnChangePlugin onChange={handleOnEditorChange} />
         <EditorRefPlugin editorRef={editorRef} />
         <Editor />

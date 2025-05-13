@@ -35,3 +35,6 @@ django-ckeditor
 dotenv
 environ
 yroom
+uvicorn
+websockets
+uvicorn-worker

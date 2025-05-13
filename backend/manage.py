@@ -3,6 +3,11 @@
 import os
 import sys
 
+import signal, platform
+
+if platform.system() == "Windows" and not hasattr(signal, "SIGHUP"):
+    signal.SIGHUP = signal.SIGTERM
+
 
 def main():
     """Run administrative tasks."""

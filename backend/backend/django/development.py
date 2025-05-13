@@ -34,7 +34,7 @@ DATABASES = {
         "NAME": os.environ.get("DATABASE_NAME", default="notetify_db"),
         "USER": os.environ.get("DATABASE_USERNAME", default="root"),
         "PASSWORD": os.environ.get("DATABASE_PASSWORD", default=""),
-        "HOST": os.environ.get("DATABASE_HOST", default="0.0.0.0"),
+        "HOST": os.environ.get("DATABASE_HOST", default="db_dev "),
         "PORT": os.environ.get("DATABASE_PORT", default="3306"),
     }
 }

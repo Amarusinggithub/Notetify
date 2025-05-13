@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import useNote from "../hooks/useNote";
 import "../styles/AddNoteCard.css";
-import NoteContentEditor from "./Editor/NoteContentEditor";
+import NoteContentEditor from "./Editor/components/NoteContentEditor";
 import { UserNoteData } from "types";
 
 const AddNoteCard = () => {
@@ -33,7 +33,7 @@ const AddNoteCard = () => {
 
   useEffect(() => {
     setIsEdited(false);
-    console.log(isSelected)
+    console.log(isSelected);
   }, [isSelected]);
 
   const handleSelect = async (

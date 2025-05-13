@@ -45,9 +45,7 @@ if ENV_FILE.exists():
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 
 
-ALLOWED_HOSTS = [
-    "localhost","0.0.0.0"
-]
+ALLOWED_HOSTS = ["localhost", "0.0.0.0"]
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG", default=True)
 
@@ -83,7 +81,7 @@ SIMPLE_JWT = {
     # custom
     "AUTH_COOKIE": "access_token",  # Cookie name. Enables cookies if value is set.
     "AUTH_COOKIE_REFRESH": "refresh_token",
-    "AUTH_COOKIE_DOMAIN":None,  # A string like "example.com", or None for standard domain cookie.
+    "AUTH_COOKIE_DOMAIN": None,  # A string like "example.com", or None for standard domain cookie.
     "AUTH_COOKIE_SECURE": False,  # Whether the auth cookies should be secure (https:// only).
     "AUTH_COOKIE_HTTP_ONLY": True,  # Http only cookie flag.It's not fetch by javascript.
     "AUTH_COOKIE_PATH": "/",  # The path of the auth cookie.
@@ -132,6 +130,7 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
+    "http://localhost:5174",
     "http://0.0.0.0:5173",
     "http://localhost:8000",
     "http://127.0.0.1:8000",
@@ -143,6 +142,7 @@ CORS_ALLOW_CREDENTIALS = True
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
+    "http://localhost:5174",
     "http://0.0.0.0:5173",
     "http://localhost:8000",
     "http://127.0.0.1:8000",
@@ -182,6 +182,19 @@ DATABASES = {
         "PASSWORD": os.environ.get("DATABASE_PASSWORD", default=""),
         "HOST": os.environ.get("DATABASE_HOST", default="127.0.0.1"),
         "PORT": os.environ.get("DATABASE_PORT", default="3306"),
+    }
+}
+
+YROOM_SETTINGS = {
+    "tiptap-editor": {
+        # HocuspocusProvider adds and expects a name prefix
+        "PROTOCOL_NAME_PREFIX": True,
+        # Since the server doesn't know the name on connect,
+        # it has to wait for communication from client
+        "SERVER_START_SYNC": False,
+        # HocuspocusProvider can only read one message per WS frame
+        "PROTOCOL_DISABLE_PIPELINING": True,
+        "REMOVE_ROOM_DELAY": 120,
     }
 }
 
@@ -246,12 +259,20 @@ JAZZMIN_SETTINGS = {
 
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "BACKEND": os.environ.get(
+            "REDIS_BACKEND", default="channels_redis.core.RedisChannelLayer"
+        ),
         "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
+            "hosts": [
+                (
+                    os.environ.get("REDIS_HOST", default="127.0.0.1"),
+                    os.environ.get("REDIS_PORT", default=6379),
+                )
+            ],
         },
     },
 }
+
 
 STATIC_URL = "static/"
 MEDIA_URL = "/media/"

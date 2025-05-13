@@ -8,7 +8,7 @@ python manage.py makemigrations
 python manage.py migrate --noinput
 
 
-exec gunicorn backend.wsgi:application \
+exec gunicorn  backend.asgi:application \
     --bind 0.0.0.0:8000 \
-    --workers 3 \
+    --workers 4 \
     --worker-class uvicorn.workers.UvicornWorker

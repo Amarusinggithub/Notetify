@@ -9,7 +9,7 @@ import {
   faStar,
   faTrashCan,
 } from "@fortawesome/free-solid-svg-icons";
-import NoteContentEditor from "./Editor/NoteContentEditor.tsx";
+import NoteContentEditor from "./Editor/components/NoteContentEditor.tsx";
 import { UserNote, UserNoteData } from "types/index.ts";
 import { isUserNote } from "./../utils/helpers.ts";
 import { useNavigate } from "react-router";
@@ -60,6 +60,9 @@ const NoteCard = ({ note, route }: NoteCardProps) => {
   };
 
   const handleTitleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+
+    e.preventDefault();
+    e.stopPropagation();
     const newTitle = e.target.value;
     setNoteState((prev) => {
       if (isUserNote(prev)) {
@@ -88,6 +91,7 @@ const NoteCard = ({ note, route }: NoteCardProps) => {
   };
 
   const handleContentInput = (newContent: string) => {
+   
     setNoteState((prev) => {
       if (isUserNote(prev)) {
         return {

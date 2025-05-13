@@ -5,7 +5,16 @@ services:
     image: mysql:latest
     container_name: notetify_db_dev
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-uroot",
+          "-p${MYSQL_ROOT_PASSWORD}",
+        ]
       timeout: 10s
       retries: 10
     restart: always
@@ -13,9 +22,9 @@ services:
       - db-data-dev:/var/lib/mysql
     environment:
       MYSQL_DATABASE: ${DATABASE_NAME}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_ROOT_USER: ${DATABASE_USERNAME}
-      MYSQL_ROOT_HOST:   '%'  # ${DATABASE_HOST}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD} 
+      MYSQL_ROOT_USER: ${DATABASE_USERNAME}    
+      MYSQL_ROOT_HOST: '%'   #${DATABASE_HOST} 
     ports:
       - "3307:3306"
     env_file:
@@ -33,12 +42,20 @@ services:
     command: sh ./entrypoint.dev.sh
     container_name: notetify-backend_dev
     restart: always
+    develop:
+      watch:
+        - action: rebuild
+          path: ./backend/Dockerfile
     ports:
       - "8000:8000"
     depends_on:
       db_dev:
         condition: service_healthy
+    volumes:
+      - ./backend:/app
     environment:
+      UVICORN_RELOAD: true
+
       DJANGO_ENV: ${DJANGO_ENV}
       DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
       DEBUG: ${DEBUG}
@@ -64,10 +81,9 @@ services:
         - REQUIREMENTS_FILE=requirements_dev.txt
     command: ["pytest"]
     depends_on:
-    - db_dev
+      - db_dev
     env_file:
-    - .env.development
-
+      - .env.development
 
   frontend_dev:
     networks:
@@ -77,6 +93,12 @@ services:
       dockerfile: Dockerfile
       target: development
     container_name: notetify-frontend_dev
+    develop:
+      watch:
+        - action: rebuild
+          path: package.json
+        - path: ./Dockerfile
+          action: rebuild
     ports:
       - "5173:5173"
       - "1234:1234"
@@ -104,4 +126,3 @@ networks:
 volumes:
   db-data-dev:
   node_modules_frontend:
-

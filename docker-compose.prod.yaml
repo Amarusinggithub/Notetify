@@ -44,6 +44,7 @@ services:
      # - django_static:/app/staticfiles
       #- media_volume:/app/media
     environment:
+      UVICORN_RELOAD: true
       DJANGO_ENV: ${DJANGO_ENV}
       DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
       DEBUG: ${DEBUG}
