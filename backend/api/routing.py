@@ -3,7 +3,7 @@ from . import consumers
 
 ws_urlpatterns = [
     re_path(
-        r"ws/Note/(?P<room_name>\w+)$", consumers.TextCollaborationConsumer.as_asgi()
+        r"ws/Note/(?P<room_name>[\w-]+)$", consumers.TextCollaborationConsumer.as_asgi()
     ),
-    re_path(r"ws/tiptap/(?P<room_name>\w+)$", consumers.TipTapConsumer.as_asgi()),
+    re_path(r"ws/lexical/(?P<room_name>[\w-]+)$", consumers.LexicalConsumer.as_asgi()),
 ]

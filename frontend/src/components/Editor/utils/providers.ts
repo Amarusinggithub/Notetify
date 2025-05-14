@@ -1,27 +1,29 @@
-import {Provider} from '@lexical/yjs';
-import {WebsocketProvider} from 'y-websocket';
-import * as Y from 'yjs';
+import { Provider as LexicalProvider } from "@lexical/yjs";
+import { WebsocketProvider } from "y-websocket";
+import * as Y from "yjs";
 
-const wsUrl = `${import.meta.env.VITE_WS_URL}`;
+const wsUrl = `${import.meta.env.VITE_WS_ORIGIN}/ws/lexical`;
 
 export function createWebsocketProvider(
-  id: string,
-  yjsDocMap: Map<string, Y.Doc>,
-): Provider {
-  const doc = getDocFromMap(id, yjsDocMap);
+  room: string,
+  yjsDocMap: Map<string, Y.Doc>,connection:boolean
+): LexicalProvider {
+  const doc = getDocFromMap(room, yjsDocMap);
+  const wsProvider = new WebsocketProvider(wsUrl, room, doc, {
+    connect: connection,
+    params: { readonly: "false" },
+  });
 
   // @ts-expect-error TODO: FIXME
-  return new WebsocketProvider(wsUrl, id, doc, {
-    connect: true,
-  });
+  return wsProvider;
 }
 
-function getDocFromMap(id: string, yjsDocMap: Map<string, Y.Doc>): Y.Doc {
-  let doc = yjsDocMap.get(id);
+function getDocFromMap(room: string, yjsDocMap: Map<string, Y.Doc>): Y.Doc {
+  let doc = yjsDocMap.get(room);
 
   if (doc === undefined) {
     doc = new Y.Doc();
-    yjsDocMap.set(id, doc);
+    yjsDocMap.set(room, doc);
   } else {
     doc.load();
   }

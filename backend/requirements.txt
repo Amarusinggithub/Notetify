@@ -9,6 +9,7 @@ djangorestframework-simplejwt
 psycopg2-binary
 django-quill-editor
 PyJWT
+django-redis
 PyMySQL
 pymysql
 django-storages

@@ -48,7 +48,7 @@ RUN --mount=type=cache,target=/root/.npm \
 #COPY --from=build --chown=node:node /usr/src/app/package*.json ./
 
 # now overlay your source (also owned by node)
-#COPY --from=build --chown=node:node /usr/src/app ./
+COPY --from=build /usr/src/app/dist ./dist
 
 COPY entrypoint.sh .
 

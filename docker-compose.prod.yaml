@@ -117,7 +117,7 @@ services:
     environment:
       NODE_ENV: ${NODE_ENV}
       VITE_BASE_URL: ${VITE_BASE_URL}
-      VITE_WS_URL: ${VITE_WS_URL}
+      VITE_WS_ORIGIN: ${VITE_WS_ORIGIN}
 
     env_file:
       - .env.production

@@ -128,8 +128,7 @@ services:
       target: development
     container_name: notetify-frontend
     ports:
-      - "5173:5173"
-      - "1234:1234"
+      - "3000:3000"
     depends_on:
       backend:
         condition: service_started
@@ -141,7 +140,7 @@ services:
     environment:
       NODE_ENV: ${NODE_ENV}
       VITE_BASE_URL: ${VITE_BASE_URL}
-      VITE_WS_URL:  ${VITE_WS_URL}
+      VITE_WS_ORIGIN:  ${VITE_WS_ORIGIN}
 
     stdin_open: true
     tty: true

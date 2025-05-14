@@ -136,6 +136,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:8000",
     "http://0.0.0.0:3000",
     "http://localhost:3000",
+    "http://localhost:4173",
+    "http://0.0.0.0:4173",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -148,6 +150,8 @@ CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:8000",
     "http://0.0.0.0:3000",
     "http://localhost:3000",
+    "http://localhost:4173",
+    "http://0.0.0.0:4173",
 ]
 
 
@@ -182,6 +186,22 @@ DATABASES = {
         "PASSWORD": os.environ.get("DATABASE_PASSWORD", default=""),
         "HOST": os.environ.get("DATABASE_HOST", default="127.0.0.1"),
         "PORT": os.environ.get("DATABASE_PORT", default="3306"),
+    }
+}
+
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_CACHE_ALIAS = "default"
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://{host}:{port}/1".format(
+            host=os.environ.get("REDIS_HOST", default="127.0.0.1"),
+            port=os.environ.get("REDIS_PORT", default=6379),
+        ),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
     }
 }
 

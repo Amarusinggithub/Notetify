@@ -15,7 +15,7 @@ python manage.py migrate --noinput
 
 # Collect static files (only for production if needed)
 # python3 manage.py collectstatic --noinput
-
+docker run -p 6379:6379 redis:latest
 # Start Django dev server
 exec uvicorn backend.asgi:application --reload --host 0.0.0.0 --port 8000
 

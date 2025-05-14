@@ -2,7 +2,7 @@ import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { CollaborationPlugin } from "@lexical/react/LexicalCollaborationPlugin";
 import * as Y from "yjs";
 import { Provider } from "@lexical/yjs";
-import {  useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { EditorRefPlugin } from "@lexical/react/LexicalEditorRefPlugin";
 import { LinkNode } from "@lexical/link";
@@ -10,13 +10,17 @@ import { TableNode, TableCellNode, TableRowNode } from "@lexical/table";
 import { HeadingNode } from "@lexical/rich-text";
 import { ListNode, ListItemNode } from "@lexical/list";
 import EditorTheme from "../style/EditorTheme.ts";
-import { getRandomUserProfile, UserProfile } from "../utils/getRandomUserProfile.ts";
+import {
+  getRandomUserProfile,
+  UserProfile,
+} from "../utils/getRandomUserProfile.ts";
 
 import "../../../styles/NoteContentEditor.module.css";
 import parseOrDefault from "../utils/helpers.ts";
 import { createWebsocketProvider } from "../utils/providers.ts";
 import Editor from "../components/Editor.tsx";
 import StopPropagationPlugin from "../plugins/StopPropagationPlugin.tsx";
+import { WebsocketProvider } from "y-websocket";
 
 type NoteContentEditorProps = {
   handleContentInput: any;
@@ -37,7 +41,6 @@ const NoteContentEditor = ({
 }: NoteContentEditorProps) => {
   const editorRef = useRef(null);
   const validContent = parseOrDefault(content);
-  const providerName =new URLSearchParams(window.location.search).get("provider") ?? "webrtc";
   const [userProfile, setUserProfile] = useState(() =>
     getRandomUserProfile("")
   );
@@ -80,6 +83,12 @@ const NoteContentEditor = ({
   }, [yjsProvider]);
 
   useEffect(() => {
+    return () => {
+      (yjsProvider as WebsocketProvider | null)?.destroy();
+    };
+  }, [yjsProvider]);
+
+  useEffect(() => {
     if (yjsProvider == null) {
       return;
     }
@@ -90,8 +99,8 @@ const NoteContentEditor = ({
   }, [yjsProvider, handleAwarenessUpdate]);
 
   const providerFactory = useCallback(
-    (id: string, yjsDocMap: Map<string, Y.Doc>) => {
-      const provider = createWebsocketProvider(id, yjsDocMap);
+    (room: string, yjsDocMap: Map<string, Y.Doc>) => {
+      const provider = createWebsocketProvider(room, yjsDocMap,isSelected);
       provider.on("status", (event: any) => {
         setConnected(
           // Websocket provider

@@ -42,7 +42,7 @@ const NoteCard = ({ note, route }: NoteCardProps) => {
 
   const handleSave = async () => {
     if (isEdited) {
-    //  console.log("sent edited content to server");
+      //  console.log("sent edited content to server");
       if (isUserNote(noteState)) await editNote(noteState);
     }
     setIsEdited(false);
@@ -56,11 +56,10 @@ const NoteCard = ({ note, route }: NoteCardProps) => {
     e.preventDefault();
     await handleSave();
     if (isUserNote(note)) setSelectedNote(isSelected ? null : note);
-    if (isSelected && route!=="") navigate(route);
+    if (isSelected && route !== "") navigate(route);
   };
 
   const handleTitleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-
     e.preventDefault();
     e.stopPropagation();
     const newTitle = e.target.value;
@@ -91,7 +90,6 @@ const NoteCard = ({ note, route }: NoteCardProps) => {
   };
 
   const handleContentInput = (newContent: string) => {
-   
     setNoteState((prev) => {
       if (isUserNote(prev)) {
         return {
@@ -226,16 +224,26 @@ const NoteCard = ({ note, route }: NoteCardProps) => {
               disabled={isLoading}
             />
           )}
-          <NoteContentEditor
-            content={
-              isUserNote(noteState)
+
+          {!isSelected && (
+            <div className="note-content">
+              {isUserNote(noteState)
                 ? noteState.note?.content
-                : noteState.note_data?.content
-            }
-            handleContentInput={handleContentInput}
-            isSelected={isSelected!}
-            note={noteState}
-          />
+                : noteState.note_data?.content}
+            </div>
+          )}
+          {isSelected && (
+            <NoteContentEditor
+              content={
+                isUserNote(noteState)
+                  ? noteState.note?.content
+                  : noteState.note_data?.content
+              }
+              handleContentInput={handleContentInput}
+              isSelected={isSelected!}
+              note={noteState}
+            />
+          )}
         </div>
 
         {isSelected && (
