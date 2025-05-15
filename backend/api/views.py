@@ -9,6 +9,10 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from api.models import User, Tag, UserNote
 from api.serializers import UserSerializer, TagSerializer, UserNoteSerializer
 from django.conf import settings
+from django.views.decorators.vary import vary_on_cookie
+
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
@@ -152,6 +156,7 @@ class LogoutView(APIView):
 class TagView(APIView):
     permission_classes = [IsAuthenticated]
 
+    #@method_decorator(cache_page(60 * 60 * 2, key_prefix="tags"))
     def get(self, request):
         tags = Tag.objects.filter(users=request.user)
         serializer = TagSerializer(tags, many=True)
@@ -183,6 +188,7 @@ class TagView(APIView):
 class NoteView(APIView):
     permission_classes = [IsAuthenticated]
 
+    #@method_decorator(cache_page(60 * 60 * 2, key_prefix="notes"))
     def get(self, request):
         notes = UserNote.objects.filter(user=request.user)
         serializer = UserNoteSerializer(notes, many=True, context={"request": request})

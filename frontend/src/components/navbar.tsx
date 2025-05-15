@@ -11,9 +11,11 @@ import { useSideNav } from "../hooks/useSideNav.tsx";
 import useNote from "../hooks/useNote.tsx";
 import React from "react";
 
+import logo from "./../../assets/notetify-logo.png";
+
 const Navbar = () => {
   const { isSideNavOpen, setIsSideNavOpen } = useSideNav();
-  const { handleSearch, search, setSearch, title ,refetch} = useNote();
+  const { handleSearch, search, setSearch, title, refetch } = useNote();
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
@@ -46,7 +48,7 @@ const Navbar = () => {
         {(title.length <= 0 || title === "Notes") && (
           <div className="logo-container">
             <img
-              src="assets/notetify-logo.png"
+              src={logo}
               alt="A sample image"
               width="40"
               height="40"
@@ -86,7 +88,7 @@ const Navbar = () => {
       <div className="icons-container">
         <button
           onClick={() => {
-          refetch();
+            refetch();
           }}
         >
           <FontAwesomeIcon icon={faRotateRight} className="icon" />

@@ -113,12 +113,22 @@ const AddNoteCard = () => {
             />
           )}
 
-          <NoteContentEditor
-            content={noteState.note_data.content}
-            handleContentInput={handleContentInput}
-            isSelected={isSelected}
-            note={{ ...noteState }}
-          />
+          {!isSelected && (
+            <input
+              className="note-title"
+              placeholder="Add note here"
+              disabled={true}
+            />
+          )}
+
+          {isSelected && (
+            <NoteContentEditor
+              content={noteState.note_data.content}
+              handleContentInput={handleContentInput}
+              isSelected={isSelected}
+              note={{ ...noteState }}
+            />
+          )}
         </div>
 
         {isSelected && (

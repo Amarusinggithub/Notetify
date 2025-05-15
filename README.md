@@ -91,6 +91,33 @@ Copy the `.env.example` file and create a new `.env` file in both the `backend` 
 
 ---
 
+## Run Redis In Docker
+
+```bash
+docker run -d --name redis-notetify  -p 6379:6379 --rm redis:latest
+```
+
+## copy redis docker id
+
+```bash
+docker ps
+```
+
+Here is how to copy id:
+
+![Copy Redis Id](./screenshots/redis_container_id.png)
+
+Then enter redis container terminal by:
+
+```bash
+docker exec -ti <yourRedisContainerId> bash
+```
+
+![Enter container terminal](./screenshots/enter_redis_container_terminal.png)
+
+
+---
+
 ## Optional: Run with Docker Compose
 
 ```bash

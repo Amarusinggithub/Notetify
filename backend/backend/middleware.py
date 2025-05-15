@@ -1,57 +1,64 @@
-import logging
 from channels.middleware import BaseMiddleware
 from channels.auth import AuthMiddlewareStack
 from channels.db import database_sync_to_async
-from urllib.parse import parse_qsl
 from django.db import close_old_connections
-from django.contrib.auth import get_user_model
-from django.core.cache import cache
 from django.middleware.csrf import CsrfViewMiddleware
 
 
+from django.db import close_old_connections
+from django.contrib.auth.models import AnonymousUser
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
+from channels.middleware import BaseMiddleware
+from channels.db import database_sync_to_async
 
-logger = logging.getLogger(__name__)
-User=get_user_model()
 
 @database_sync_to_async
-def get_user(self,user_id):
-    try:
-        return User.objects.get(user_id)
-    except:
-        raise Exception(" 'user not found, you may forgot to request a uuid from the server, try auth_for_ws_connection ")
-    
-class JwtAuthMiddleware(BaseMiddleware):
-    def __init__(self,inner):
-        self.inner=inner
-        
-        
-    async def auth(self, query_string):
-        query_params = dict(parse_qsl(query_string))
-        uuid = query_params.get('uuid')
-        user_id = cache.get(uuid)
-        # I destroyed uuid for performance and security purposes
-        if not cache.delete(uuid):
-            raise Exception('uuid not found')
-        return await get_user(user_id)
+def get_user_for_token(token_str):
+ 
+    jwt_auth = JWTAuthentication()
+    validated_token = jwt_auth.get_validated_token(token_str)
+    return jwt_auth.get_user(validated_token)
+
+
+class CookieJWTAuthMiddleware(BaseMiddleware):
+    """
+    Custom Channels middleware that:
+    1. Reads the 'access' cookie from scope['headers']
+    2. Validates it using SimpleJWT
+    3. Sets scope['user'] to our Django user or AnonymousUser
+    """
 
     async def __call__(self, scope, receive, send):
-    # Close old database connections to prevent usage of timed out connections
+        # Close old DB connections to avoid timeout errors
         close_old_connections()
-        
-        try:
-            query_string = scope['query_string'].decode('utf-8')
-            scope['user'] = await self.auth(query_string)
-        except Exception as e:
-            logger.warning(e)
-            return None
-        
+
+        # Default to Anonymous
+        scope["user"] = AnonymousUser()
+
+        # Grab 'cookie' header (bytes) and parse it
+        headers = dict(scope["headers"])
+        raw_cookie = headers.get(b"cookie", b"").decode("utf-8")
+        cookies = {
+            k: v
+            for k, v in (
+                pair.split("=", 1) for pair in raw_cookie.split("; ") if "=" in pair
+            )
+        }
+
+        access_token = cookies.get("access_token") 
+        if access_token:
+            try:
+                user = await get_user_for_token(access_token)
+                scope["user"] = user
+            except (InvalidToken, TokenError):
+                pass
+
         return await super().__call__(scope, receive, send)
 
 
 def JwtAuthMiddlewareStack(inner):
-    return JwtAuthMiddleware(AuthMiddlewareStack(inner))  
-
-
+    return CookieJWTAuthMiddleware(AuthMiddlewareStack(inner))
 
 
 class CustomCsrfMiddleware(CsrfViewMiddleware):

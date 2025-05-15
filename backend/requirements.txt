@@ -39,3 +39,4 @@ yroom
 uvicorn
 websockets
 uvicorn-worker
+"redis[hiredis]"

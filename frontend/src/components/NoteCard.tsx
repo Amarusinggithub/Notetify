@@ -232,6 +232,20 @@ const NoteCard = ({ note, route }: NoteCardProps) => {
                 : noteState.note_data?.content}
             </div>
           )}
+
+          {/*!isSelected && (
+            <NoteContentEditor
+              content={
+                isUserNote(noteState)
+                  ? noteState.note?.content
+                  : noteState.note_data?.content
+              }
+              handleContentInput={handleContentInput}
+              isSelected={false}
+              note={noteState}
+            />
+          )*/}
+
           {isSelected && (
             <NoteContentEditor
               content={

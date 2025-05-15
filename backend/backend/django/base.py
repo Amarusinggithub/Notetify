@@ -52,7 +52,10 @@ DEBUG = os.environ.get("DEBUG", default=True)
 
 # REST FRAMEWORK
 REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": ("api.authenticate.CustomAuthentication",)
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "api.authenticate.CustomAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+    )
 }
 
 
@@ -195,9 +198,10 @@ SESSION_CACHE_ALIAS = "default"
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://{host}:{port}/1".format(
+        "LOCATION": "redis://{host}:{port}/{REDIS_DB}".format(
             host=os.environ.get("REDIS_HOST", default="127.0.0.1"),
             port=os.environ.get("REDIS_PORT", default=6379),
+            REDIS_DB=os.environ.get("REDIS_DB", 1),
         ),
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
@@ -206,7 +210,7 @@ CACHES = {
 }
 
 YROOM_SETTINGS = {
-    "tiptap-editor": {
+    "lexical-editor": {
         # HocuspocusProvider adds and expects a name prefix
         "PROTOCOL_NAME_PREFIX": True,
         # Since the server doesn't know the name on connect,
@@ -287,6 +291,7 @@ CHANNEL_LAYERS = {
                 (
                     os.environ.get("REDIS_HOST", default="127.0.0.1"),
                     os.environ.get("REDIS_PORT", default=6379),
+                    os.environ.get("REDIS_DB", 1),
                 )
             ],
         },
