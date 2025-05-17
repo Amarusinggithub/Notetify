@@ -1,0 +1,88 @@
+# Exclude IDE and OS generated files
+**/.classpath
+**/.project
+**/.settings
+**/.toolstarget
+**/.vs
+**/.vscode
+**/.DS_Store
+
+# Exclude version control and environment files
+**/.git
+**/.gitignore
+**/.dockerignore
+**/.env
+
+# Exclude temporary, build, and cache directories
+**/.next
+**/.cache
+**/.venv
+**/__pycache__
+**/bin
+**/obj
+**/dist
+**/build
+
+# Exclude local development files
+**/*.*proj.user
+**/*.dbmdl
+**/*.jfm
+**/npm-debug.log
+**/node_modules
+**/vendor
+
+# Exclude Docker-related files
+**/charts
+**/docker-compose*
+**/compose.y*ml
+**/Dockerfile*
+
+# Exclude Kubernetes and secrets files
+**/secrets.dev.yaml
+**/values.dev.yaml
+
+# Exclude documentation and license files
+LICENSE
+README.md
+**/screenshots
+
+# Include specific PHP dependencies
+!**/composer.json
+!**/composer.lock
+
+
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+.env.local
+.env.production
+.env.development
+.env.example
+.git/
+.vscode/
+node_modules/
+dist/
+build/
+*.sqlite3
+
+
+node_modules
+
+# Ignore local editor settings
+.vscode
+
+# Ignore Git repository files
+.git
+
+# Ignore build folder
+dist
+build
+
+# Ignore ESLint, Prettier, and other configuration files that aren't needed in the final image
+.eslint*
+.prettier*
+.editorconfig
+.DS_Store
+
