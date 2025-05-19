@@ -181,36 +181,22 @@ WSGI_APPLICATION = "backend.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-# DATABASES = {
-#      "ENGINE": os.environ.get("DATABASE_ENGINE", default="django.db.backends.mysql"),
-#      "NAME": os.environ.get("DATABASE_NAME", default="notetify_db"),
-#     "USER": os.environ.get("DATABASE_USERNAME", default="root"),
-#    "PASSWORD": os.environ.get("DATABASE_PASSWORD", default=""),
-#   "HOST": os.environ.get("DATABASE_HOST", default="127.0.0.1"),
-#  "PORT": os.environ.get("DATABASE_PORT", default="3306"),
-# }
-# }
-
-
 DATABASES = {
     "default": {
-        "ENGINE": os.environ["DATABASE_ENGINE"],
-        "NAME": os.environ["DATABASE_NAME"],
-        "USER": os.environ["DATABASE_USERNAME"],
-        "PASSWORD": os.environ["DATABASE_PASSWORD"],
-        "HOST": os.environ["DATABASE_HOST"],
-        "PORT": os.environ["DATABASE_PORT"],
+        "ENGINE": os.environ.get("DATABASE_ENGINE", default="django.db.backends.mysql"),
+        "NAME": os.environ.get("DATABASE_NAME", default="notetify_db"),
+        "USER": os.environ.get("DATABASE_USERNAME", default="root"),
+        "PASSWORD": os.environ.get("DATABASE_PASSWORD", default=""),
+        "HOST": os.environ.get("DATABASE_HOST", default="127.0.0.1"),
+        "PORT": os.environ.get("DATABASE_PORT", default="3306"),
     }
 }
 
 
-# REDIS_HOST = os.environ.get("REDIS_HOST", "127.0.0.1")
-# REDIS_PORT = os.environ.get("REDIS_PORT", "6379")
-# REDIS_DB = os.environ.get("REDIS_DB", "1")
+REDIS_HOST = os.environ.get("REDIS_HOST", "127.0.0.1")
+REDIS_PORT = os.environ.get("REDIS_PORT", "6379")
+REDIS_DB = os.environ.get("REDIS_DB", "1")
 
-REDIS_HOST = os.environ.get("REDIS_HOST")
-REDIS_PORT = os.environ.get("REDIS_PORT")
-REDIS_DB = os.environ.get("REDIS_DB")
 
 REDIS_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}"
 
