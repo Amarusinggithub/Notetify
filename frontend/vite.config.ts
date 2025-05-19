@@ -8,4 +8,7 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   envDir: path.resolve(__dirname, "../"),
   envPrefix: "VITE_",
+   preview: {
+    port: 3000
+  }
 });

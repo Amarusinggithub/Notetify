@@ -1,4 +1,4 @@
-const entries= [
+const entries = [
   "#7d0000",
   "#640000",
   "#990000",

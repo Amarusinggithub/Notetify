@@ -36,79 +36,50 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     
 # development stage
 FROM python:${PYTHON_VERSION}-slim AS development
-
-# Create a non-root user and application directory
-#RUN useradd -m -r appuser && \
- #   mkdir /app && \
-  #  chown -R appuser:appuser /app
-
 WORKDIR /app
 
-# Install only the wheels built in the previous stage (PyJWT will be fetched at install time)
-COPY --from=builder /src/*.whl /app/
-RUN pip install --no-cache-dir /app/*.whl && \
-    rm -rf /app/*.whl
-  
-COPY entrypoint.dev.sh .
+RUN apt-get update \
+&& apt-get install -y --no-install-recommends netcat-openbsd \
+&& rm -rf /var/lib/apt/lists/*
 
+COPY --from=builder /src/*.whl /app/
+RUN pip install --no-cache-dir /app/*.whl \
+ && rm -rf /app/*.whl
+
+COPY entrypoint.dev.sh /app/
 RUN chmod +x entrypoint.dev.sh
 
-# Copy application source code
-#COPY --chown=appuser:appuser . .
-
-COPY  . .
-
-
-# Switch to non-root user
-#USER appuser
-
-# Environment settings
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
-
 EXPOSE 8000
-
-CMD  ["sh", "entrypoint.dev.sh"]
+COPY . .
+ENTRYPOINT ["sh", "./entrypoint.dev.sh"]
 
 
 
 # production stage
 FROM python:${PYTHON_VERSION}-slim AS production
-
-# Create a non-root user and application directory
-#RUN useradd -m -r appuser && \
-   # mkdir /app && \
-   # chown -R appuser:appuser /app
-
 WORKDIR /app
 
-# Install only the wheels built in the previous stage (PyJWT will be fetched at install time)
+RUN apt-get update \
+&& apt-get install -y --no-install-recommends netcat-openbsd \
+&& rm -rf /var/lib/apt/lists/*
+
+
 COPY --from=builder /src/*.whl /app/
-RUN pip install --no-cache-dir /app/*.whl && \
-    rm -rf /app/*.whl
+RUN pip install --no-cache-dir /app/*.whl \
+ && rm -rf /app/*.whl
 
-COPY entrypoint.prod.sh .
-
+COPY entrypoint.prod.sh /app/
+COPY . /app/
 RUN chmod +x entrypoint.prod.sh
 
-# Copy application source code
-#COPY --chown=appuser:appuser . .
-COPY  . .
+RUN useradd -m appuser \
+ && chown -R appuser /app
+USER appuser
 
-
-# Switch to non-root user
-#USER appuser
-
-# Environment settings
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
-
-# Expose application port
 EXPOSE 8000
-
-# Healthcheck
 HEALTHCHECK --interval=30s --timeout=3s \
-    CMD curl --fail http://localhost:8000/healthz || exit 1
+  CMD curl --fail http://localhost:8000/healthz || exit 1
 
-CMD ["sh", "entrypoint.prod.sh"]
+ENTRYPOINT ["sh", "entrypoint.prod.sh"]
+
 

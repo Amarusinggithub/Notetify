@@ -59,10 +59,9 @@ RUN chmod +x ./entrypoint.sh
 # Switch to non-root user for security
 #USER node
 
-# Expose port for the development server
-EXPOSE 5173 1234
+EXPOSE 3000
 
-CMD ["sh", "entrypoint.sh"]
+ENTRYPOINT ["sh", "entrypoint.sh"]
 
 
 

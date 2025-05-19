@@ -68,11 +68,18 @@ build/
 *.sqlite3
 
 
-node_modules
+node_modules/
 
 # Ignore local editor settings
 .vscode
 
+**/__pycache__/
+*.sock
+*.lock
+.vscode/
+.venv/
+docker-data/
+.git/
 # Ignore Git repository files
 .git
 
@@ -86,3 +93,10 @@ build
 .editorconfig
 .DS_Store
 
+.git
+node_modules
+npm-debug.log
+Dockerfile*
+docker-compose*
+.dockerignore
+README.md

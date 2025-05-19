@@ -1,22 +1,8 @@
 
-x-app-defaults: &app_defaults
-  build:
-    context: ./backend
-  init: true
-  links:
-    - broker
-    - db_prod
-  environment:
-    - REDIS_HOST=broker
-    - DJANGO_DEBUG=0
-  depends_on:
-    - broker
-    - db_prod
-
 services:
   db_prod:
     networks:
-      - notetify-net
+      - notetify-net-prod
     image: mysql:latest
     container_name: notetify-db-prod
     healthcheck:
@@ -35,11 +21,6 @@ services:
     restart: always
     volumes:
       - db-data-prod:/var/lib/mysql
-    environment:
-      MYSQL_DATABASE: ${DATABASE_NAME}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_ROOT_USER: ${DATABASE_USERNAME}
-      MYSQL_ROOT_HOST: ${DATABASE_HOST}
     ports:
       - "3307:3306"
     env_file:
@@ -47,7 +28,7 @@ services:
 
   backend_prod:
     networks:
-      - notetify-net
+      - notetify-net-prod
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -63,38 +44,18 @@ services:
       db_prod:
         condition: service_healthy
     # volumes:
-    # - django_static:/app/staticfiles
-    #- media_volume:/app/media
-    environment:
-      UVICORN_RELOAD: true
-      DJANGO_ENV: ${DJANGO_ENV}
-      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
-      DEBUG: ${DEBUG}
-      DJANGO_LOGLEVEL: ${DJANGO_LOGLEVEL}
-      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS}
-      DATABASE_ENGINE: ${DATABASE_ENGINE}
-      DATABASE_NAME: ${DATABASE_NAME}
-      DATABASE_USERNAME: ${DATABASE_USERNAME}
-      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
-      DATABASE_HOST: db
-      DATABASE_PORT: ${DATABASE_PORT}
-      REDIS_HOST: broker #${REDIS_HOST}
-      REDIS_PORT: ${REDIS_PORT}
-      REDIS_BACKEND: ${REDIS_BACKEND}
+    # - django_static-prod:/app/staticfiles
+    #- media_volume-prod:/app/media
     env_file:
       - .env.production
 
-  broker:
+  redis_prod:
     networks:
-      - notetify-net
+      - notetify-net-prod
     image: redis:latest
-    container_name: notetify_redis
+    container_name: notetify_redis-prod
     volumes:
-      - "redis-data:/data"
-    environment:
-      REDIS_HOST: broker #${REDIS_HOST}
-      REDIS_PORT: ${REDIS_PORT}
-      REDIS_BACKEND: ${REDIS_BACKEND}
+      - "redis-data-prod:/data"          
     expose:
       - 6379
     ports:
@@ -104,7 +65,7 @@ services:
 
   frontend_prod:
     networks:
-      - notetify-net
+      - notetify-net-prod
     build:
       context: ./frontend
       dockerfile: Dockerfile
@@ -112,22 +73,29 @@ services:
     container_name: notetify-frontend-prod
     command: ["true"]
     volumes:
-      - static_volume:/usr/src/app/dist
-    environment:
-      NODE_ENV: ${NODE_ENV}
-      VITE_BASE_URL: ${VITE_BASE_URL}
-      VITE_WS_ORIGIN: ${VITE_WS_ORIGIN}
-
+      - static_volume-prod:/usr/src/app/dist
     env_file:
       - .env.production
 
-  worker:
+  yroom_worker_prod:
     networks:
-      - notetify-net
-    <<: *app_defaults
+      - notetify-net-prod
+    build:
+      context: ./backend
+    init: true
+    links:
+    - redis_prod
+    - db_prod
+    depends_on:
+      redis_prod:
+        condition: service_started
+      db_prod:
+        condition: service_healthy
     command: "python manage.py yroom"
 
   nginx:
+    networks:
+      - notetify-net-prod
     image: nginx:stable-alpine
     container_name: notetify-nginx
     restart: always
@@ -135,21 +103,22 @@ services:
       - "80:80"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - static_volume:/usr/share/nginx/html:ro
-      #- django_static:/usr/share/nginx/static:ro
-      #- media_volume:/usr/share/nginx/media:ro
+      - static_volume-prod:/usr/share/nginx/html:ro
+      #- django_static-prod:/usr/share/nginx/static:ro
+      #- media_volume-prod:/usr/share/nginx/media:ro
     depends_on:
-      - backend_prod
-      - frontend_prod
+      backend_prod:
+          condition: service_started
+      frontend_prod:
+          condition: service_started
 
 networks:
-  notetify-net:
+  notetify-net-prod:
     driver: bridge
 
 volumes:
-  db-data-prod:
-  node_modules_frontend:
-  redis-data:
-  static_volume:
-  # django_static:
-  #media_volume:
+  db-data-prod: {}
+  redis-data-prod: {}
+  static_volume-prod: {}
+  # django_static-prod: {}
+  #media_volume-prod:

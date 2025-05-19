@@ -1,22 +1,4 @@
 
-
-x-app-defaults:
-  &app_defaults
-  build:
-      context: ./backend
-  init: true
-  links:
-    - broker
-    - db_dev
-  environment:
-    - REDIS_HOST=broker
-    - DJANGO_DEBUG=0
-  depends_on:
-    - broker
-    - bd_dev
-
-
-
 services:
   db:
     networks:
@@ -41,7 +23,7 @@ services:
       - .env.development
 
 
-  broker:
+  redis:
     networks:
       - notetify-net
     image: redis:latest
@@ -49,8 +31,22 @@ services:
     volumes:
       - "redis-data:/data"
     environment:
-      REDIS_HOST: broker #${REDIS_HOST}
+      UVICORN_RELOAD: true
+      DJANGO_SETTINGS_MODULE: ${DJANGO_SETTINGS_MODULE}
+      DJANGO_ENV: ${DJANGO_ENV}
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
+      DJANGO_DEBUG: ${DJANGO_DEBUG}
+      DJANGO_LOGLEVEL: ${DJANGO_LOGLEVEL}
+      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS}
+      DATABASE_ENGINE: ${DATABASE_ENGINE}
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_USERNAME: ${DATABASE_USERNAME}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_HOST: ${DATABASE_HOST}
+      DATABASE_PORT: ${DATABASE_PORT}
+      REDIS_HOST: ${REDIS_HOST}
       REDIS_PORT: ${REDIS_PORT}
+      REDIS_DB: ${REDIS_DB}             
       REDIS_BACKEND: ${REDIS_BACKEND}
     expose:
       - 6379
@@ -60,10 +56,20 @@ services:
       - .env.development
 
 
-  worker:
+  yroom_worker:
     networks:
       - notetify-net
-    <<: *app_defaults
+    build:
+      context: ./backend
+    init: true
+    links:
+    - redis
+    - db
+    depends_on:
+      redi:
+        condition: service_started
+      db:
+        condition: service_healthy
     command: "python manage.py yroom"
 
   backend:
@@ -83,24 +89,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
-      broker:
+      redis:
         condition: service_healthy
-    environment:
-      UVICORN_RELOAD: true
-      DJANGO_ENV: ${DJANGO_ENV}
-      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
-      DEBUG: ${DEBUG}
-      DJANGO_LOGLEVEL: ${DJANGO_LOGLEVEL}
-      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS}
-      DATABASE_ENGINE: ${DATABASE_ENGINE}
-      DATABASE_NAME: ${DATABASE_NAME}
-      DATABASE_USERNAME: ${DATABASE_USERNAME}
-      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
-      DATABASE_HOST: notetify_db_dev # ${DATABASE_HOST}
-      DATABASE_PORT: ${DATABASE_PORT}
-      REDIS_HOST: broker #${REDIS_HOST}
-      REDIS_PORT: ${REDIS_PORT}
-      REDIS_BACKEND: ${REDIS_BACKEND}
     env_file:
       - .env.development
       
@@ -114,7 +104,10 @@ services:
       target: development
     command: ["pytest"]
     depends_on:
-    - db_dev
+      redis:
+        condition: service_started
+      db:
+        condition: service_healthy
     env_file:
     - .env.development
 
@@ -136,11 +129,6 @@ services:
     volumes:
       - ./frontend:/usr/src/app
       - node_modules_frontend:/usr/src/app/node_modules
-    environment:
-      NODE_ENV: ${NODE_ENV}
-      VITE_BASE_URL: ${VITE_BASE_URL}
-      VITE_WS_ORIGIN:  ${VITE_WS_ORIGIN}
-
     stdin_open: true
     tty: true
     command: ["sh", "entrypoint.sh"]
@@ -153,7 +141,7 @@ networks:
     driver: bridge
 
 volumes:
-  redis-data:
-  db-data:
-  node_modules_frontend:
+  redis-data: {}
+  db-data: {}
+  node_modules_frontend: {}
 

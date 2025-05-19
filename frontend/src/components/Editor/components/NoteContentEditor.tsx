@@ -100,7 +100,7 @@ const NoteContentEditor = ({
 
   const providerFactory = useCallback(
     (room: string, yjsDocMap: Map<string, Y.Doc>) => {
-      const provider = createWebsocketProvider(room, yjsDocMap,isSelected);
+      const provider = createWebsocketProvider(room, yjsDocMap, isSelected);
       provider.on("status", (event: any) => {
         setConnected(
           // Websocket provider

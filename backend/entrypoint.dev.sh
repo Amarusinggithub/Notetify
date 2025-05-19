@@ -1,21 +1,24 @@
 #!/bin/sh
-
-# Fail on any error
 set -e
 
-# Optional: wait for the DB to be ready (for local dev only)
-# echo "Waiting for database..."
-# while ! nc -z $DATABASE_HOST $DATABASE_PORT; do
-#   sleep 0.1
-# done
-# echo "Database is up."
+echo "Waiting for database at $DATABASE_HOST:$DATABASE_PORT…"
+while ! nc -z "$DATABASE_HOST" "$DATABASE_PORT"; do
+  sleep 0.5
+done
+echo "Database is up!"
+
+
+echo "Waiting for redis at $REDIS_HOST:$REDIS_PORT…"
+while ! nc -z "$REDIS_HOST" "$REDIS_PORT"; do
+  sleep 0.5
+done
+echo "redis is up!"
+
+
 python manage.py makemigrations
-# Run Django migrations
-python manage.py migrate --noinput
+python manage.py migrate --no-input
 
-# Collect static files (only for production if needed)
-# python3 manage.py collectstatic --noinput
-docker run -p 6379:6379 redis:latest
-# Start Django dev server
-exec uvicorn backend.asgi:application --reload --host 0.0.0.0 --port 8000
-
+exec uvicorn backend.asgi:application \
+     --reload \
+     --host 0.0.0.0 \
+     --port 8000

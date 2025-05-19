@@ -1,187 +1,115 @@
-
-
-x-app-defaults:
-  &app_defaults
-  build:
-      context: ./backend
-      dockerfile: Dockerfile
-      target: development
-      args:
-        - REQUIREMENTS_FILE=requirements_dev.txt
-  init: true
-  links:
-    - cache
-    - db_dev
-  environment:
-    REDIS_PORT: ${REDIS_PORT}
-    REDIS_DB: ${REDIS_DB}             
-    REDIS_BACKEND: ${REDIS_BACKEND}
-    DEBUG: ${DEBUG}
-  depends_on:
-    - cache
-    - db_dev
-
 services:
   db_dev:
-    networks:
-      - notetify-net
     image: mysql:latest
     container_name: notetify_db_dev
+    networks:
+      notetify-net-dev:
     healthcheck:
-      test:
-        [
-          "CMD",
-          "mysqladmin",
-          "ping",
-          "-h",
-          "localhost",
-          "-uroot",
-          "-p${MYSQL_ROOT_PASSWORD}",
-        ]
-      timeout: 10s
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
       retries: 10
     restart: always
     volumes:
       - db-data-dev:/var/lib/mysql
-    environment:
-      MYSQL_DATABASE: ${DATABASE_NAME}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD} 
-      MYSQL_ROOT_USER: ${DATABASE_USERNAME}    
-      MYSQL_ROOT_HOST: '%'   #${DATABASE_HOST} 
     ports:
       - "3307:3306"
     env_file:
       - .env.development
+    environment:
+      MYSQL_ROOT_PASSWORD: mysql
+      MYSQL_ROOT_HOST: "%"
+      MYSQL_DATABASE: notetify_db
 
-  worker:
-    networks:
-      - notetify-net
-    <<: *app_defaults
-    command: "python manage.py yroom"
-
-  cache:
-    networks:
-      - notetify-net
+  redis_dev:
     image: redis:latest
     container_name: notetify_redis
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-      target: development
-      args:
-        - REQUIREMENTS_FILE=requirements_dev.txt
+    networks:
+      notetify-net-dev:
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      retries: 10
+    restart: always
+    depends_on:
+      db_dev:
+        condition: service_healthy
     volumes:
-      - "redis-data:/data"
-    environment:
-      REDIS_HOST: broker #${REDIS_HOST}
-      REDIS_PORT: ${REDIS_PORT}
-      REDIS_BACKEND: ${REDIS_BACKEND}
-    expose:
-      - 6379
+      - redis-data-dev:/data
     ports:
       - "6379:6379"
     env_file:
       - .env.development
 
-  backend_dev:
-    networks:
-      - notetify-net
+  yroom_worker_dev:
     build:
       context: ./backend
       dockerfile: Dockerfile
       target: development
       args:
         - REQUIREMENTS_FILE=requirements_dev.txt
-    command: sh ./entrypoint.dev.sh
+    container_name: yroom_worker_dev
+    networks:
+      - notetify-net-dev
+    depends_on:
+      redis_dev:
+        condition: service_healthy
+      db_dev:
+        condition: service_started
+    env_file:
+      - .env.development
+    entrypoint: []
+    command: "python manage.py yroom"
+
+  backend_dev:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: development
+      args:
+        - REQUIREMENTS_FILE=requirements_dev.txt
     container_name: notetify-backend_dev
-    restart: always
-    develop:
-      watch:
-        - action: rebuild
-          path: ./backend/Dockerfile
-    ports:
-      - "8000:8000"
+    networks:
+      - notetify-net-dev
     depends_on:
       db_dev:
         condition: service_healthy
+      redis_dev:
+        condition: service_healthy
     volumes:
       - ./backend:/app
-    environment:
-      UVICORN_RELOAD: true
-
-      DJANGO_ENV: ${DJANGO_ENV}
-      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
-      DEBUG: ${DEBUG}
-      DJANGO_LOGLEVEL: ${DJANGO_LOGLEVEL}
-      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS}
-      DATABASE_ENGINE: ${DATABASE_ENGINE}
-      DATABASE_NAME: ${DATABASE_NAME}
-      DATABASE_USERNAME: ${DATABASE_USERNAME}
-      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
-      DATABASE_HOST: ${DATABASE_HOST}
-      DATABASE_PORT: ${DATABASE_PORT}
-      REDIS_HOST: ${REDIS_HOST}
-      REDIS_PORT: ${REDIS_PORT}
-      REDIS_DB: ${REDIS_DB}             
-      REDIS_BACKEND: ${REDIS_BACKEND}
+    ports:
+      - "8000:8000"
     env_file:
       - .env.development
-
-  test:
-    networks:
-      - notetify-net
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-      target: development
-      args:
-        - REQUIREMENTS_FILE=requirements_dev.txt
-    command: ["pytest"]
-    depends_on:
-      - db_dev
-      - cache
-    env_file:
-      - .env.development
+    command: sh ./entrypoint.dev.sh
 
   frontend_dev:
-    networks:
-      - notetify-net
     build:
       context: ./frontend
       dockerfile: Dockerfile
       target: development
     container_name: notetify-frontend_dev
-    develop:
-      watch:
-        - action: rebuild
-          path: package.json
-        - path: ./Dockerfile
-          action: rebuild
-    ports:
-      - "3000:3000"
+    networks:
+      - notetify-net-dev
     depends_on:
       backend_dev:
         condition: service_started
-      db_dev:
-        condition: service_healthy
     volumes:
       - ./frontend:/usr/src/app
-      - node_modules_frontend:/usr/src/app/node_modules
-    environment:
-      NODE_ENV: ${NODE_ENV}
-      VITE_BASE_URL: ${VITE_BASE_URL}
-      VITE_WS_ORIGIN:  ${VITE_WS_ORIGIN}
+      - node_modules_frontend-dev:/usr/src/app/node_modules
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.development
     stdin_open: true
     tty: true
     command: ["sh", "entrypoint.sh"]
-    env_file:
-      - .env.development
 
 networks:
-  notetify-net:
+  notetify-net-dev:
     driver: bridge
 
 volumes:
-  redis-data:
-  db-data-dev:
-  node_modules_frontend:
+  redis-data-dev: {}
+  db-data-dev: {}
+  node_modules_frontend-dev: {}

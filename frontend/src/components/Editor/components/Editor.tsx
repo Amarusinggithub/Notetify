@@ -13,16 +13,21 @@ function Placeholder() {
   return <div className="editor-placeholder">Type your note...</div>;
 }
 
-export default function Editor() {
+ const  Editor=()=> {
   return (
     <div className="editor-container">
       <ToolbarPlugin />
       <div className="editor-inner">
         <RichTextPlugin
-          contentEditable={<ContentEditable className="editor-input"   onKeyDown={(e) => {
-          e.stopPropagation()
-          }}
-          onClick={(e) => e.stopPropagation()}/>}
+          contentEditable={
+            <ContentEditable
+              className="editor-input"
+              onKeyDown={(e) => {
+                e.stopPropagation();
+              }}
+              onClick={(e) => e.stopPropagation()}
+            />
+          }
           placeholder={<Placeholder />}
           ErrorBoundary={LexicalErrorBoundary}
         />
@@ -35,3 +40,6 @@ export default function Editor() {
     </div>
   );
 }
+
+
+export default Editor;

@@ -47,7 +47,7 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 
 ALLOWED_HOSTS = ["localhost", "0.0.0.0"]
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("DEBUG", default=True)
+DEBUG = os.environ.get("DJANGO_DEBUG", default=True)
 
 
 # REST FRAMEWORK
@@ -181,33 +181,63 @@ WSGI_APPLICATION = "backend.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
+# DATABASES = {
+#      "ENGINE": os.environ.get("DATABASE_ENGINE", default="django.db.backends.mysql"),
+#      "NAME": os.environ.get("DATABASE_NAME", default="notetify_db"),
+#     "USER": os.environ.get("DATABASE_USERNAME", default="root"),
+#    "PASSWORD": os.environ.get("DATABASE_PASSWORD", default=""),
+#   "HOST": os.environ.get("DATABASE_HOST", default="127.0.0.1"),
+#  "PORT": os.environ.get("DATABASE_PORT", default="3306"),
+# }
+# }
+
+
 DATABASES = {
     "default": {
-        "ENGINE": os.environ.get("DATABASE_ENGINE", default="django.db.backends.mysql"),
-        "NAME": os.environ.get("DATABASE_NAME", default="notetify_db"),
-        "USER": os.environ.get("DATABASE_USERNAME", default="root"),
-        "PASSWORD": os.environ.get("DATABASE_PASSWORD", default=""),
-        "HOST": os.environ.get("DATABASE_HOST", default="127.0.0.1"),
-        "PORT": os.environ.get("DATABASE_PORT", default="3306"),
+        "ENGINE": os.environ["DATABASE_ENGINE"],
+        "NAME": os.environ["DATABASE_NAME"],
+        "USER": os.environ["DATABASE_USERNAME"],
+        "PASSWORD": os.environ["DATABASE_PASSWORD"],
+        "HOST": os.environ["DATABASE_HOST"],
+        "PORT": os.environ["DATABASE_PORT"],
     }
 }
+
+
+# REDIS_HOST = os.environ.get("REDIS_HOST", "127.0.0.1")
+# REDIS_PORT = os.environ.get("REDIS_PORT", "6379")
+# REDIS_DB = os.environ.get("REDIS_DB", "1")
+
+REDIS_HOST = os.environ.get("REDIS_HOST")
+REDIS_PORT = os.environ.get("REDIS_PORT")
+REDIS_DB = os.environ.get("REDIS_DB")
+
+REDIS_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}"
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "default"
 
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": os.environ.get(
+            "REDIS_BACKEND", "channels_redis.core.RedisChannelLayer"
+        ),
+        "CONFIG": {
+            "hosts": [("{host}".format(host=os.environ.get("REDIS_HOST")), 6379)],
+        },
+    },
+}
+
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://{host}:{port}/{REDIS_DB}".format(
-            host=os.environ.get("REDIS_HOST", default="127.0.0.1"),
-            port=os.environ.get("REDIS_PORT", default=6379),
-            REDIS_DB=os.environ.get("REDIS_DB", 1),
-        ),
+        "LOCATION": REDIS_URL,
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         },
     }
 }
+
 
 YROOM_SETTINGS = {
     "lexical-editor": {
@@ -278,24 +308,6 @@ JAZZMIN_SETTINGS = {
     "show_ui_builder": True,  # Show UI builder button
     "show_sidebar": True,  # Show sidebar in the admin interface
     "hide_apps": [],  # Hide specific apps from the admin sidebar
-}
-
-
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": os.environ.get(
-            "REDIS_BACKEND", default="channels_redis.core.RedisChannelLayer"
-        ),
-        "CONFIG": {
-            "hosts": [
-                (
-                    os.environ.get("REDIS_HOST", default="127.0.0.1"),
-                    os.environ.get("REDIS_PORT", default=6379),
-                    os.environ.get("REDIS_DB", 1),
-                )
-            ],
-        },
-    },
 }
 
 

@@ -6,7 +6,8 @@ const wsUrl = `${import.meta.env.VITE_WS_ORIGIN}/ws/lexical`;
 
 export function createWebsocketProvider(
   room: string,
-  yjsDocMap: Map<string, Y.Doc>,connection:boolean
+  yjsDocMap: Map<string, Y.Doc>,
+  connection: boolean
 ): LexicalProvider {
   const doc = getDocFromMap(room, yjsDocMap);
   const wsProvider = new WebsocketProvider(wsUrl, room, doc, {

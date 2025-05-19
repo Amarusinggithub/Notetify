@@ -2,5 +2,4 @@
 set -eu
 #chown -R node:node /usr/src/app/
 
-npm run preview
-``
+exec npm run preview  
