@@ -22,7 +22,7 @@ services:
 
   redis_dev:
     image: redis:latest
-    container_name: notetify_redis
+    container_name: notetify_redis_dev
     networks:
       notetify-net-dev:
     healthcheck:
@@ -54,7 +54,7 @@ services:
       redis_dev:
         condition: service_healthy
       db_dev:
-        condition: service_started
+        condition: service_healthy
     env_file:
       - .env.development
     entrypoint: []

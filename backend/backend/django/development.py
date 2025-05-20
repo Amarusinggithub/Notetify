@@ -1,13 +1,16 @@
 from .base import *
 
 
-ALLOWED_HOSTS = ["0.0.0.0"]
+ALLOWED_HOSTS = ["0.0.0.0","localhost"]
 
 
 CORS_ALLOWED_ORIGINS = [
     "http://0.0.0.0:5173",
     "http://0.0.0.0:4173",
     "http://0.0.0.0:3000",
+    "http://localhost:5173",
+    "http://localhost:4173",
+    "http://localhost:3000",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -16,6 +19,9 @@ CSRF_TRUSTED_ORIGINS = [
     "http://0.0.0.0:5173",
     "http://0.0.0.0:4173",
     "http://0.0.0.0:3000",
+    "http://localhost:5173",
+    "http://localhost:4173",
+    "http://localhost:3000",
 ]
 
 

@@ -15,8 +15,6 @@ COPY package.json package-lock.json ./
 RUN --mount=type=cache,target=/root/.npm \
     npm ci
 
-
-# Copy your app's source code into the container
 COPY . .
 
 #RUN useradd -m -r node
@@ -37,17 +35,17 @@ ENV NODE_ENV=development
 
 WORKDIR /usr/src/app
 
-# Install dependencies separately to leverage caching
-COPY package.json package-lock.json ./
+#COPY package.json package-lock.json ./
 
-RUN --mount=type=cache,target=/root/.npm \
-   npm ci
+#RUN --mount=type=cache,target=/root/.npm \
+ #  npm ci
 
 # grab node_modules + package files from the “build” stage
 #COPY --from=build --chown=node:node /usr/src/app/node_modules ./node_modules
 #COPY --from=build --chown=node:node /usr/src/app/package*.json ./
 
-# now overlay your source (also owned by node)
+COPY --from=build  /usr/src/app/node_modules ./node_modules
+COPY --from=build  /usr/src/app/package*.json ./
 COPY --from=build /usr/src/app/dist ./dist
 
 COPY entrypoint.sh .

@@ -5,8 +5,6 @@ FROM python:${PYTHON_VERSION}-slim AS builder
 
 WORKDIR /src
 
-COPY ./nginx/nginx.conf /etc/nginx/conf.d/default.conf
-
 # Install build dependencies with cache mount for faster rebuilds
 RUN --mount=type=cache,target=/var/cache/apt \
     apt-get update && \
@@ -80,6 +78,6 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=3s \
   CMD curl --fail http://localhost:8000/healthz || exit 1
 
-ENTRYPOINT ["sh", "entrypoint.prod.sh"]
+ENTRYPOINT ["sh", "./entrypoint.prod.sh"]
 
 

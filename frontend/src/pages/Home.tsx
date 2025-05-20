@@ -12,7 +12,6 @@ const Home = () => {
   const { pinned, other, isLoading, isError } = useNote();
   const { isSideNavOpen } = useSideNav();
   useEffect(() => {
-    //console.log("this is the pinned notes", pinned);
   }, [pinned]);
 
   if (isLoading) {
@@ -25,14 +24,16 @@ const Home = () => {
 
   if (pinned.length < 1 && other.length < 1) {
     return (
-      <>
+      <div>
+        <AddNoteCard />
+
         <img
           src={noNotes}
           style={{ width: "100%", height: "auto" }}
           className="no-notes"
           alt="No notes"
         />
-      </>
+      </div>
     );
   }
   return (

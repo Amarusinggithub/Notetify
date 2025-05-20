@@ -12,11 +12,6 @@ services:
     restart: always
     volumes:
       - db-data:/var/lib/mysql
-    environment:
-      MYSQL_DATABASE: ${DATABASE_NAME}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_ROOT_USER: ${DATABASE_USERNAME}
-      MYSQL_ROOT_HOST: ${DATABASE_HOST}
     ports:
       - "3307:3306"
     env_file:
@@ -28,26 +23,16 @@ services:
       - notetify-net
     image: redis:latest
     container_name: notetify_redis
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      retries: 10
+    restart: always
+    depends_on:
+      db_dev:
+        condition: service_healthy
     volumes:
       - "redis-data:/data"
-    environment:
-      UVICORN_RELOAD: true
-      DJANGO_SETTINGS_MODULE: ${DJANGO_SETTINGS_MODULE}
-      DJANGO_ENV: ${DJANGO_ENV}
-      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
-      DJANGO_DEBUG: ${DJANGO_DEBUG}
-      DJANGO_LOGLEVEL: ${DJANGO_LOGLEVEL}
-      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS}
-      DATABASE_ENGINE: ${DATABASE_ENGINE}
-      DATABASE_NAME: ${DATABASE_NAME}
-      DATABASE_USERNAME: ${DATABASE_USERNAME}
-      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
-      DATABASE_HOST: ${DATABASE_HOST}
-      DATABASE_PORT: ${DATABASE_PORT}
-      REDIS_HOST: ${REDIS_HOST}
-      REDIS_PORT: ${REDIS_PORT}
-      REDIS_DB: ${REDIS_DB}             
-      REDIS_BACKEND: ${REDIS_BACKEND}
     expose:
       - 6379
     ports:
@@ -61,7 +46,6 @@ services:
       - notetify-net
     build:
       context: ./backend
-    init: true
     links:
     - redis
     - db
@@ -70,6 +54,7 @@ services:
         condition: service_started
       db:
         condition: service_healthy
+    entrypoint: []
     command: "python manage.py yroom"
 
   backend:
@@ -93,23 +78,6 @@ services:
         condition: service_healthy
     env_file:
       - .env.development
-      
-
-  test:
-    networks:
-      - notetify-net
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-      target: development
-    command: ["pytest"]
-    depends_on:
-      redis:
-        condition: service_started
-      db:
-        condition: service_healthy
-    env_file:
-    - .env.development
 
   frontend:
     networks:
