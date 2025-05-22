@@ -40,9 +40,6 @@ services:
         condition: service_healthy
       redis_prod:
         condition: service_healthy
-    # volumes:
-    # - django_static-prod:/app/staticfiles
-    #- media_volume-prod:/app/media
     env_file:
       - .env.production
 
@@ -65,8 +62,6 @@ services:
       - "6379:6379"
     env_file:
       - .env.production
-
-
 
   yroom_worker_prod:
     networks:
@@ -112,5 +107,4 @@ networks:
 volumes:
   db-data-prod: {}
   redis-data-prod: {}
-  # django_static-prod: {}
-  #media_volume-prod:
+
