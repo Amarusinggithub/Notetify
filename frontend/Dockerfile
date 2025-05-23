@@ -6,7 +6,7 @@ FROM node:${NODE_VERSION}-alpine AS build
 # Working directory for your app
 WORKDIR /usr/src/app
 
-COPY ./nginx/nginx.conf /etc/nginx/conf.d/default.conf
+COPY ./nginx/nginx.conf /usr/src/app/nginx.conf
 
 # Install dependencies separately to leverage caching
 COPY package.json package-lock.json ./
@@ -68,8 +68,8 @@ FROM nginx:stable-alpine AS production
 ENV NODE_ENV=production
 COPY --from=build /usr/src/app/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /usr/src/app/dist /usr/share/nginx/html
-RUN chown -R nginx:nginx /usr/share/nginx/html
-USER nginx
+#RUN chown -R nginx:nginx /usr/share/nginx/html
+#USER nginx
 EXPOSE 80
 ENTRYPOINT  ["nginx", "-g", "daemon off;"]
 

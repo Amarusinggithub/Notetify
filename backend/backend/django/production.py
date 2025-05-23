@@ -56,10 +56,23 @@ X_FRAME_OPTIONS = "DENY"
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "%(levelname)s|%(asctime)s|%(name)s>> %(message)s",
+        },
+    },
     "handlers": {
         "console": {
+            "level": "DEBUG",
             "class": "logging.StreamHandler",
-        },
+            "formatter": "verbose",
+        }
+    },
+    "loggers": {
+        "apps": {
+            "handlers": ["console"],
+            "level": "DEBUG",
+        }
     },
     "root": {
         "handlers": ["console"],
@@ -72,9 +85,7 @@ MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 
-
-
-#ALLOWED_HOSTS = ["0.0.0.0", "localhost"]
+# ALLOWED_HOSTS = ["0.0.0.0", "localhost"]
 
 
 CORS_ALLOWED_ORIGINS = [

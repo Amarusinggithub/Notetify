@@ -70,9 +70,9 @@ COPY entrypoint.prod.sh /app/
 COPY . /app/
 RUN chmod +x entrypoint.prod.sh
 
-RUN useradd -m appuser \
- && chown -R appuser /app
-USER appuser
+#RUN useradd -m appuser \
+# && chown -R appuser /app
+#USER appuser
 
 EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=3s \
