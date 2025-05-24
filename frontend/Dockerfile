@@ -3,19 +3,27 @@
 ARG NODE_VERSION=22.13.0
 FROM node:${NODE_VERSION}-alpine AS build
 
-# Working directory for your app
 WORKDIR /usr/src/app
 
 COPY ./nginx/nginx.conf /usr/src/app/nginx.conf
-
-# Install dependencies separately to leverage caching
 COPY package.json package-lock.json ./
-
 
 RUN --mount=type=cache,target=/root/.npm \
     npm ci
 
 COPY . .
+
+ARG VITE_BASE_URL
+ARG VITE_WS_ORIGIN
+ARG VITE_APP_NAME
+ARG VITE_FRONTEND_URL
+
+
+ENV VITE_FRONTEND_URL=${VITE_BASE_URL}
+ENV VITE_BASE_URL=${VITE_BASE_URL}
+ENV VITE_WS_ORIGIN=${VITE_WS_ORIGIN}
+ENV VITE_APP_NAME=${VITE_APP_NAME}
+
 
 #RUN useradd -m -r node
 
@@ -67,7 +75,7 @@ ENTRYPOINT ["sh", "entrypoint.sh"]
 FROM nginx:stable-alpine AS production
 ENV NODE_ENV=production
 COPY --from=build /usr/src/app/nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=build /usr/src/app/dist /usr/share/nginx/html
+COPY --from=build /usr/src/app/dist /etc/nginx/html
 #RUN chown -R nginx:nginx /usr/share/nginx/html
 #USER nginx
 EXPOSE 80

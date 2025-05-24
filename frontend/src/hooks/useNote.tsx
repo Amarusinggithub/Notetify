@@ -69,24 +69,26 @@ const categorizedNotes = (notesArray: (UserNote | UserNoteData)[]) => {
   const filtered: (UserNote | UserNoteData)[] = [];
   const other: (UserNote | UserNoteData)[] = [];
 
-  notesArray.forEach((note: UserNote | UserNoteData) => {
-    if (note.is_pinned && !note.is_trashed && !note.is_archived) {
-      pinned.push(note);
+    for(let i=0;i<notesArray.length;i++){
+      let note=notesArray[i];
+      if (note.is_pinned && !note.is_trashed && !note.is_archived) {
+        pinned.push(note);
+      }
+      if (note.is_favorited && !note.is_trashed && !note.is_archived) {
+        favorites.push(note);
+      }
+      if (note.is_archived && !note.is_trashed) {
+        archived.push(note);
+      }
+      if (note.is_trashed && !note.is_archived) {
+        trashed.push(note);
+      }
+      if (!note.is_trashed && !note.is_archived && !note.is_pinned) {
+        filtered.push(note);
+        other.push(note);
+      }
     }
-    if (note.is_favorited && !note.is_trashed && !note.is_archived) {
-      favorites.push(note);
-    }
-    if (note.is_archived && !note.is_trashed) {
-      archived.push(note);
-    }
-    if (note.is_trashed && !note.is_archived) {
-      trashed.push(note);
-    }
-    if (!note.is_trashed && !note.is_archived && !note.is_pinned) {
-      filtered.push(note);
-      other.push(note);
-    }
-  });
+
 
   return { pinned, favorites, archived, trashed, filtered, other };
 };
