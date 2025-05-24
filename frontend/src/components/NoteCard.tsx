@@ -36,13 +36,11 @@ const NoteCard = ({ note, route }: NoteCardProps) => {
 
   useEffect(() => {
     setNoteState(note);
-    //console.log("this is the user note", note);
     setIsEdited(false);
   }, [note]);
 
   const handleSave = async () => {
     if (isEdited) {
-      //  console.log("sent edited content to server");
       if (isUserNote(noteState)) await editNote(noteState);
     }
     setIsEdited(false);
@@ -202,62 +200,30 @@ const NoteCard = ({ note, route }: NoteCardProps) => {
                 </div>
               )}
           </div>
-          {!isSelected && (
-            <div className="note-title">
-              {isUserNote(noteState)
+
+          <input
+            className="note-title"
+            onChange={(e) => {
+              isSelected ? handleTitleInput(e) : null;
+            }}
+            value={
+              isUserNote(noteState)
                 ? noteState.note?.title
-                : noteState.note_data?.title}
-            </div>
-          )}
+                : noteState.note_data?.title
+            }
+            disabled={!isSelected}
+          />
 
-          {isSelected && (
-            <input
-              className="note-title"
-              onChange={(e) => {
-                handleTitleInput(e);
-              }}
-              value={
-                isUserNote(noteState)
-                  ? noteState.note?.title
-                  : noteState.note_data?.title
-              }
-              disabled={isLoading}
-            />
-          )}
-
-          {!isSelected && (
-            <div className="note-content">
-              {isUserNote(noteState)
+          <NoteContentEditor
+            content={
+              isUserNote(noteState)
                 ? noteState.note?.content
-                : noteState.note_data?.content}
-            </div>
-          )}
-
-          {/*!isSelected && (
-            <NoteContentEditor
-              content={
-                isUserNote(noteState)
-                  ? noteState.note?.content
-                  : noteState.note_data?.content
-              }
-              handleContentInput={handleContentInput}
-              isSelected={false}
-              note={noteState}
-            />
-          )*/}
-
-          {isSelected && (
-            <NoteContentEditor
-              content={
-                isUserNote(noteState)
-                  ? noteState.note?.content
-                  : noteState.note_data?.content
-              }
-              handleContentInput={handleContentInput}
-              isSelected={isSelected!}
-              note={noteState}
-            />
-          )}
+                : noteState.note_data?.content
+            }
+            handleContentInput={handleContentInput}
+            isSelected={isSelected!}
+            note={noteState}
+          />
         </div>
 
         {isSelected && (

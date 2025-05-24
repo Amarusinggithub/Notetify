@@ -3,7 +3,6 @@ import { useSideNav } from "../hooks/useSideNav.tsx";
 import NoteCard from "../components/NoteCard.tsx";
 import useNote from "../hooks/useNote.tsx";
 import noTaggedNotes from "./../../assets/No_tagged_Notes.png";
-import { Link } from "react-router";
 
 const Tag = () => {
   const { tagNotes, isLoading, isError } = useNote();
@@ -38,9 +37,7 @@ const Tag = () => {
       >
         {tagNotes?.map((note: UserNote | UserNoteData) => (
           <div key={note.id} className="note-div">
-            <Link key={note.id} to={`/tag/${note.id}`}>
               <NoteCard note={note} route={"/tag"} />
-            </Link>{" "}
           </div>
         ))}
       </div>

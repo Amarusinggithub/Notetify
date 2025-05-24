@@ -52,6 +52,7 @@ const NoteContentEditor = ({
   const initialConfig = {
     namespace: "MyEditor",
     theme: EditorTheme,
+    content:isSelected?null:validContent,
 
     onError: (error: Error) => {
       throw error;
@@ -153,7 +154,7 @@ const NoteContentEditor = ({
       >
         {/* With CollaborationPlugin - we MUST NOT use @lexical/react/LexicalHistoryPlugin */}
 
-        <CollaborationPlugin
+        {isSelected &&(<CollaborationPlugin
           id={`note-${note.id}`}
           providerFactory={providerFactory}
           // Optional initial editor state in case collaborative Y.Doc won't
@@ -168,7 +169,7 @@ const NoteContentEditor = ({
           username={userProfile.name}
           cursorColor={userProfile.color}
           cursorsContainerRef={containerRef}
-        />
+        />)}
         <StopPropagationPlugin />
 
         <OnChangePlugin onChange={handleOnEditorChange} />

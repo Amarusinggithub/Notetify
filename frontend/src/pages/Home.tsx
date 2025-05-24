@@ -6,7 +6,6 @@ import { useSideNav } from "../hooks/useSideNav.tsx";
 import AddNoteCard from "../components/AddNoteCard.tsx";
 import { UserNote, UserNoteData } from "types/index.ts";
 import noNotes from "./../../assets/No_Note.png";
-import { Link } from "react-router";
 
 const Home = () => {
   const { pinned, other, isLoading, isError } = useNote();
@@ -52,9 +51,8 @@ const Home = () => {
           >
             {pinned.map((note: UserNote | UserNoteData) => (
               <div key={note.id} className="note-div">
-                <Link key={note.id} to={`/${note.id}`}>
                   <NoteCard note={note} route={"/"} />
-                </Link>{" "}
+              
               </div>
             ))}
           </div>
@@ -70,11 +68,7 @@ const Home = () => {
         style={{ maxWidth: isSideNavOpen ? "1200px" : "1400px" }}
       >
         {other?.map((note: UserNote | UserNoteData) => (
-          <div key={note.id} className="note-div">
-            <Link key={note.id} to={`/${note.id}`}>
               <NoteCard note={note} route={"/"} />
-            </Link>
-          </div>
         ))}
       </div>
     </div>

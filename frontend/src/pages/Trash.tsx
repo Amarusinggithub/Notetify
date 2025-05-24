@@ -3,7 +3,6 @@ import NoteCard from "../components/NoteCard.tsx";
 import { useSideNav } from "../hooks/useSideNav.tsx";
 import { UserNote, UserNoteData } from "types/index.ts";
 import noTrashedNotes from "./../../assets/No_trashed_notes.png";
-import { Link } from "react-router";
 
 const Trash = () => {
   const { isSideNavOpen } = useSideNav();
@@ -40,9 +39,7 @@ const Trash = () => {
         {trashed &&
           trashed.map((note: UserNote | UserNoteData) => (
             <div key={note.id} className="note-div">
-              <Link key={note.id} to={`/trash/${note.id}`}>
                 <NoteCard note={note} route={"/trash"} />
-              </Link>{" "}
             </div>
           ))}
       </div>

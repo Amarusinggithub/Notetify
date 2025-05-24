@@ -104,6 +104,7 @@
   max-width: 600px;
   color: #e0e0e0;
   position: relative;
+  border: none;
   line-height: 20px;
   font-weight: 400;
   text-align: left;
@@ -114,11 +115,13 @@
 .editor-inner {
   background: rgb(32, 33, 36);
   position: relative;
+  border: none;
 }
 
 .editor-input {
   min-height: 150px;
   resize: none;
+  border: none;
   font-size: 15px;
   caret-color: rgb(5, 5, 5);
   position: relative;

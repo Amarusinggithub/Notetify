@@ -1,7 +1,6 @@
 import { UserNote, UserNoteData } from "types";
 import NoteCard from "../components/NoteCard";
 import useNote from "../hooks/useNote";
-import { Link } from "react-router";
 
 import noArchivedNotes from "./../../assets/No_Archive_notes.png";
 
@@ -34,9 +33,7 @@ const Archive = () => {
         {archived &&
           archived.map((note: UserNote | UserNoteData) => (
             <div key={note.id} className="note-div">
-              <Link key={note.id} to={`/archive/${note.id}`}>
                 <NoteCard note={note} route={"/archive"} />
-              </Link>{" "}
             </div>
           ))}
       </div>

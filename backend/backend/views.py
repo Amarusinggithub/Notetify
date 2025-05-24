@@ -9,6 +9,8 @@ from rest_framework_simplejwt.exceptions import (
     ExpiredTokenError,
     TokenError,
     InvalidToken, AuthenticationFailed
+    
+    
 )
 
 from rest_framework.decorators import api_view
@@ -20,6 +22,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.decorators import api_view, renderer_classes
 
 
 load_dotenv()
@@ -85,6 +88,7 @@ class AsgiTokenValidatorView(APIView):
 
 
 @require_GET
+@api_view(["GET"])
 @ensure_csrf_cookie
 def get_csrf_token(request):
     return Response( status=status.HTTP_204_NO_CONTENT)
