@@ -9,6 +9,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from api.models import User, Tag, UserNote
 from api.serializers import UserSerializer, TagSerializer, UserNoteSerializer
 from django.conf import settings
+from rest_framework.decorators import api_view
+
 from django.views.decorators.vary import vary_on_cookie
 
 from django.utils.decorators import method_decorator
@@ -185,10 +187,102 @@ class TagView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+CATEGORY_FIELD_MAP = {
+        "favorite":  "is_favorited",
+        "pinned":    "is_pinned",
+        "trashed":   "is_trashed",
+        "archived":  "is_archived",
+        }
+
+
+@api_view(["GET"])
+# @method_decorator(cache_page(60 * 60 * 2, key_prefix="notes"))
+
+def get_archive(request):
+    if request.method == "GET":
+        notes = UserNote.objects.filter(user=request.user)
+        category = request.query_params.get("category")
+
+        if category:
+            key=category.lower()
+            field = CATEGORY_FIELD_MAP.get(key)
+            if not field:
+                return Response(
+                    {"detail": f"Unknown category '{category}'."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            notes = notes.filter(**{field: True})
+        serializer = UserNoteSerializer(notes, many=True,context={"request": request})  
+        return Response(serializer.data) 
+
+
+@api_view(["GET"])
+# @method_decorator(cache_page(60 * 60 * 2, key_prefix="notes"))
+
+def get_favorite(request):
+    if request.method == "GET":
+        notes = UserNote.objects.filter(user=request.user)
+        category = request.query_params.get("category")
+
+        if category:
+            key = category.lower()
+            field = CATEGORY_FIELD_MAP.get(key)
+            if not field:
+                return Response(
+                    {"detail": f"Unknown category '{category}'."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            notes = notes.filter(**{field: True})
+        serializer = UserNoteSerializer(notes, many=True, context={"request": request})
+        return Response(serializer.data)
+
+
+@api_view(["GET"])
+# @method_decorator(cache_page(60 * 60 * 2, key_prefix="notes"))
+
+def get_trashed(request):
+    if request.method == "GET":
+        notes = UserNote.objects.filter(user=request.user)
+        category = request.query_params.get("category")
+
+        if category:
+            key = category.lower()
+            field = CATEGORY_FIELD_MAP.get(key)
+            if not field:
+                return Response(
+                    {"detail": f"Unknown category '{category}'."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            notes = notes.filter(**{field: True})
+        serializer = UserNoteSerializer(notes, many=True, context={"request": request})
+        return Response(serializer.data)
+
+
+@api_view(["GET"])
+# @method_decorator(cache_page(60 * 60 * 2, key_prefix="notes"))
+
+def get_pinned(request):
+    if request.method == "GET":
+        notes = UserNote.objects.filter(user=request.user)
+        category = request.query_params.get("category")
+
+        if category:
+            key = category.lower()
+            field = CATEGORY_FIELD_MAP.get(key)
+            if not field:
+                return Response(
+                    {"detail": f"Unknown category '{category}'."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            notes = notes.filter(**{field: True})
+        serializer = UserNoteSerializer(notes, many=True, context={"request": request})
+        return Response(serializer.data)
+
+
 class NoteView(APIView):
     permission_classes = [IsAuthenticated]
 
-    #@method_decorator(cache_page(60 * 60 * 2, key_prefix="notes"))
+    # @method_decorator(cache_page(60 * 60 * 2, key_prefix="notes"))
     def get(self, request):
         notes = UserNote.objects.filter(user=request.user)
         serializer = UserNoteSerializer(notes, many=True, context={"request": request})

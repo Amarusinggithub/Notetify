@@ -1,15 +1,62 @@
 import axiosInstance from "./AxiosService.ts";
-import { UserNote, UserNoteData } from "types/index.ts";
-
+import { UserNote, UserNoteData, CATEGORY_FIELD_MAP } from "types/index.ts";
+ 
 export const getNotes = async () => {
   try {
-    const response = await axiosInstance.get("notes/");
+    
+      const response = await axiosInstance.get(`notes/`);
+      console.log(response.data);
+      return response.data;
+    
+  
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+
+export const getArchive = async () => {
+  try {
+  
+      const response = await axiosInstance.get(`notes/${CATEGORY_FIELD_MAP[3]}`);
+      console.log(response.data);
+      return response.data;
+    
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+export const getFavorite = async () => {
+  try {
+    const response = await axiosInstance.get(`notes/${CATEGORY_FIELD_MAP[0]}`);
     console.log(response.data);
     return response.data;
   } catch (e) {
     console.error(e);
   }
 };
+
+export const getPinned = async () => {
+  try {
+    const response = await axiosInstance.get(`notes/${CATEGORY_FIELD_MAP[1]}`);
+    console.log(response.data);
+    return response.data;
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+export const getTrashed = async () => {
+  try {
+    const response = await axiosInstance.get(`notes/${CATEGORY_FIELD_MAP[2]}`);
+    console.log(response.data);
+    return response.data;
+  } catch (e) {
+    console.error(e);
+  }
+};
+
 export const createNote = async (note: UserNoteData) => {
   try {
     const response = await axiosInstance.post("notes/create_note/", {
@@ -27,7 +74,6 @@ export const createNote = async (note: UserNoteData) => {
 };
 
 export const updateNote = async (note: UserNote) => {
-  console.log("this");
   try {
     const response = await axiosInstance.put(
       `notes/edit_note/${note.id}/`,

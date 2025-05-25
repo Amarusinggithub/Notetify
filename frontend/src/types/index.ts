@@ -6,7 +6,7 @@ declare module "axios" {
   }
 }
 
-
+export const CATEGORY_FIELD_MAP = ["favorite", "pinned", "trashed", "archived"];
 export const CSRF_TOKEN_COOKIE_NAME = "csrftoken";
 export const USERDATA_STORAGE_KEY = "userData";
 export interface UserNote {
