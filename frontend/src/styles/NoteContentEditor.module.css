@@ -99,11 +99,12 @@
 }
 
 .editor-container {
-  margin: 20px auto 20px auto;
+  margin: 10px auto 10px auto;
   border-radius: 2px;
-  max-width: 600px;
+  max-width: 100%;
   color: #e0e0e0;
   position: relative;
+  outline: none;
   border: none;
   line-height: 20px;
   font-weight: 400;
@@ -116,12 +117,15 @@
   background: rgb(32, 33, 36);
   position: relative;
   border: none;
+  outline: none;
+
 }
 
 .editor-input {
   min-height: 150px;
   resize: none;
   border: none;
+  outline: none;
   font-size: 15px;
   caret-color: rgb(5, 5, 5);
   position: relative;

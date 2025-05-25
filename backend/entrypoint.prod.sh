@@ -17,7 +17,7 @@ done
 echo "redis is up!"
 
 
-
+python manage.py collectstatic --noinput
 python manage.py makemigrations
 python manage.py migrate --noinput
 

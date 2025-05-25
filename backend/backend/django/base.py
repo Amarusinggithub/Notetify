@@ -21,15 +21,10 @@ pymysql.install_as_MySQLdb()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# base.py sits at …/backend/backend/django/base.py
 PROJECT_MODULE = Path(__file__).resolve().parents[2]
-# → …/Notetify/backend/backend
 
-# Outer backend folder (manage.py lives here)
 PROJECT_ROOT = PROJECT_MODULE.parent
-# → …/Notetify/backend
 
-#  this Loads .env (for  dev) or .env.production (for prod)
 ENV_FILE = PROJECT_ROOT / (
     ".env.production" if os.getenv("DJANGO_ENV") == "production" else ".env"
 )
@@ -37,20 +32,14 @@ if ENV_FILE.exists():
     load_dotenv(ENV_FILE)
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
-
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 
 
-ALLOWED_HOSTS = ["localhost", "0.0.0.0"]
-# SECURITY WARNING: don't run with debug turned on in production!
+ALLOWED_HOSTS = ["localhost","127.0.0.1", "0.0.0.0"]
 DEBUG = os.environ.get("DJANGO_DEBUG", default=True)
 
 
-# REST FRAMEWORK
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "api.authenticate.CustomAuthentication",
@@ -121,6 +110,7 @@ ASGI_APPLICATION = "backend.asgi.application"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware", 
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -297,9 +287,12 @@ JAZZMIN_SETTINGS = {
 }
 
 
-STATIC_URL = "static/"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "static"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 
 # Default primary key field type

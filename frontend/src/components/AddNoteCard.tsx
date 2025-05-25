@@ -96,39 +96,27 @@ const AddNoteCard = () => {
       <div
         className={`add-note-card ${isSelected ? "selected-note" : ""}`}
         onClick={(e) => {
-          e.stopPropagation();
           if (!isSelected) {
+            e.stopPropagation();
             handleSelect(e);
           }
         }}
       >
         <div className="note">
-          {isSelected && (
-            <input
-              className="note-title"
-              placeholder="Enter title here"
-              onChange={handleTitle}
-              value={noteState.note_data.title}
-              disabled={isLoading}
-            />
-          )}
+          <input
+            className="note-title"
+            placeholder={isSelected ? "Enter title here" : "Add note here"}
+            onChange={handleTitle}
+            value={noteState.note_data.title}
+            disabled={!isSelected}
+          />
 
-          {!isSelected && (
-            <input
-              className="note-title"
-              placeholder="Add note here"
-              disabled={true}
-            />
-          )}
-
-          {isSelected && (
-            <NoteContentEditor
+            {isSelected&&(<NoteContentEditor
               content={noteState.note_data.content}
               handleContentInput={handleContentInput}
               isSelected={isSelected}
               note={{ ...noteState }}
-            />
-          )}
+            />)}
         </div>
 
         {isSelected && (

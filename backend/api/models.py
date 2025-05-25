@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, UserManager, PermissionsMixin
 from django.db import models
+from channels_yroom.models import YDocUpdate
 
 
 class MyUserManager(UserManager):
@@ -37,8 +38,8 @@ class User(AbstractUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
-    
-    
+
+
 class Tag(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50, unique=False)
@@ -51,10 +52,13 @@ class Note(models.Model):
     users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="notes")
     title = models.CharField(max_length=500)
     content = models.TextField()
+    #ydoc = models.OneToOneField(
+    #    YDocUpdate, on_delete=models.CASCADE, related_name="note"
+    #)
     def __str__(self):
         return self.title
-    
-    
+
+
 class UserNote(models.Model):
     class Roles(models.TextChoices):
         OWNER = "OWNER", "Owner"
@@ -72,4 +76,3 @@ class UserNote(models.Model):
     is_favorited = models.BooleanField(default=False)
     is_trashed = models.BooleanField(default=False)
     is_archived = models.BooleanField(default=False)
-    

@@ -26,16 +26,17 @@ pytest-django
 cryptography
 daphne
 channels
-channels_yroom
+channels-yroom
 django-jazzmin
 Pillow
 django_quill
 redis
 channels_redis
 django-ckeditor
+ whitenoise
+yroom
 dotenv
 environ
-yroom
 uvicorn
 websockets
 uvicorn-worker

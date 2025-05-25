@@ -4,7 +4,8 @@ docker-compose.test.yml
 
 !Dockerfile
 !docker-compose.yml
-
+static
+media
 logs/
 *.log
 npm-debug.log*

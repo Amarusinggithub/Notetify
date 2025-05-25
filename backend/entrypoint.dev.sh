@@ -14,7 +14,7 @@ while ! nc -z "$REDIS_HOST" "$REDIS_PORT"; do
 done
 echo "redis is up!"
 
-
+python manage.py collectstatic  --noinput
 python manage.py makemigrations
 python manage.py migrate --no-input
 

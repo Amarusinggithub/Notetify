@@ -33,6 +33,10 @@ services:
     command: sh ./entrypoint.prod.sh
     container_name: notetify-backend-prod
     restart: always
+    volumes:
+      - ./backend:/app
+      - static_data-prod:/app/static
+      - media_data-prod:/app/media
     ports:
       - "8000:8000"
     depends_on:
@@ -114,6 +118,8 @@ networks:
     driver: bridge
 
 volumes:
+  media_data-prod: {}
+  static_data-prod: {}
   db-data-prod: {}
   redis-data-prod: {}
 

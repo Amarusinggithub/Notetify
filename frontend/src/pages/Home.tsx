@@ -10,8 +10,7 @@ import noNotes from "./../../assets/No_Note.png";
 const Home = () => {
   const { pinned, other, isLoading, isError } = useNote();
   const { isSideNavOpen } = useSideNav();
-  useEffect(() => {
-  }, [pinned]);
+  useEffect(() => {}, [pinned]);
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -51,8 +50,7 @@ const Home = () => {
           >
             {pinned.map((note: UserNote | UserNoteData) => (
               <div key={note.id} className="note-div">
-                  <NoteCard note={note} route={"/"} />
-              
+                <NoteCard note={note} route={"/"} />
               </div>
             ))}
           </div>
@@ -68,7 +66,9 @@ const Home = () => {
         style={{ maxWidth: isSideNavOpen ? "1200px" : "1400px" }}
       >
         {other?.map((note: UserNote | UserNoteData) => (
-              <NoteCard note={note} route={"/"} />
+          <div key={note.id} className="note-div">
+            <NoteCard note={note} route={"/"} />
+          </div>
         ))}
       </div>
     </div>
