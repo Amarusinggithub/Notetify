@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import useNote from "../hooks/useNote";
 import "../styles/AddNoteCard.css";
 import NoteContentEditor from "./Editor/components/NoteContentEditor";
@@ -6,6 +6,7 @@ import { UserNoteData } from "types";
 
 const AddNoteCard = () => {
   const { addNote, isLoading, data } = useNote();
+  const cardRef = useRef<HTMLDivElement>(null);
   let noteId;
   if (data.length > 0) {
     noteId = data[data.length - 1].id + 1;
@@ -30,6 +31,20 @@ const AddNoteCard = () => {
 
   const [isEdited, setIsEdited] = useState(false);
   const [isSelected, setSelected] = useState(false);
+
+  useEffect(() => {
+    function onDocClick(e: MouseEvent) {
+      if (
+        isSelected &&
+        cardRef.current &&
+        !cardRef.current.contains(e.target as Node)
+      ) {
+        handleSelect(e as any);
+      }
+    }
+    document.addEventListener("click", onDocClick);
+    return () => document.removeEventListener("click", onDocClick);
+  }, [isSelected]);
 
   useEffect(() => {
     setIsEdited(false);
@@ -92,12 +107,12 @@ const AddNoteCard = () => {
   };
 
   return (
-    <div className={isSelected ? "notecard-bg" : ""} onClick={handleSelect}>
+    <div className={isSelected ? "notecard-bg" : ""}>
       <div
+        ref={cardRef}
         className={`add-note-card ${isSelected ? "selected-note" : ""}`}
         onClick={(e) => {
           if (!isSelected) {
-            e.stopPropagation();
             handleSelect(e);
           }
         }}
@@ -111,12 +126,14 @@ const AddNoteCard = () => {
             disabled={!isSelected}
           />
 
-            {isSelected&&(<NoteContentEditor
+          {isSelected && (
+            <NoteContentEditor
               content={noteState.note_data.content}
               handleContentInput={handleContentInput}
               isSelected={isSelected}
               note={{ ...noteState }}
-            />)}
+            />
+          )}
         </div>
 
         {isSelected && (

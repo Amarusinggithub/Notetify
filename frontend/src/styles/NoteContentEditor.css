@@ -1,3 +1,54 @@
+.editor-container {
+  margin: 10px auto 10px auto;
+  border-radius: 2px;
+  max-width: 100%;
+  color: #e0e0e0;
+  position: relative;
+  outline: none;
+  border: none;
+  line-height: 20px;
+  font-weight: 400;
+  text-align: left;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+.editor-inner {
+  background: rgb(32, 33, 36);
+  position: relative;
+  border: none;
+  outline: none;
+}
+
+.editor-input {
+  min-height: 150px;
+  top: 0;
+  resize: none;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  caret-color: rgb(5, 5, 5);
+  position: relative;
+  tab-size: 1;
+  outline: 0;
+  padding: 15px 10px;
+  caret-color: #444;
+}
+
+.editor-placeholder {
+  color: #999;
+  overflow: hidden;
+  position: relative;
+  text-overflow: ellipsis;
+  top: 15px;
+  left: 10px;
+  font-size: 15px;
+  user-select: none;
+  display: inline-block;
+  pointer-events: none;
+}
+
+
 .content-editable {
   font-size: 16px;
   line-height: 1.5;
@@ -5,6 +56,7 @@
   background-color: rgb(32, 33, 36);
   color: #e0e0e0;
   border: none;
+  outline: none;
 }
 
 .editor-placeholder {
@@ -98,55 +150,6 @@
   text-align: right;
 }
 
-.editor-container {
-  margin: 10px auto 10px auto;
-  border-radius: 2px;
-  max-width: 100%;
-  color: #e0e0e0;
-  position: relative;
-  outline: none;
-  border: none;
-  line-height: 20px;
-  font-weight: 400;
-  text-align: left;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
-}
-
-.editor-inner {
-  background: rgb(32, 33, 36);
-  position: relative;
-  border: none;
-  outline: none;
-
-}
-
-.editor-input {
-  min-height: 150px;
-  resize: none;
-  border: none;
-  outline: none;
-  font-size: 15px;
-  caret-color: rgb(5, 5, 5);
-  position: relative;
-  tab-size: 1;
-  outline: 0;
-  padding: 15px 10px;
-  caret-color: #444;
-}
-
-.editor-placeholder {
-  color: #999;
-  overflow: hidden;
-  position: absolute;
-  text-overflow: ellipsis;
-  top: 15px;
-  left: 10px;
-  font-size: 15px;
-  user-select: none;
-  display: inline-block;
-  pointer-events: none;
-}
 
 .editor-text-bold {
   font-weight: bold;

@@ -15,7 +15,7 @@ import {
   UserProfile,
 } from "../utils/getRandomUserProfile.ts";
 
-import "../../../styles/NoteContentEditor.module.css";
+import "../../../styles/NoteContentEditor.css";
 import parseOrDefault from "../utils/helpers.ts";
 import { createWebsocketProvider } from "../utils/providers.ts";
 import Editor from "../components/Editor.tsx";
@@ -104,7 +104,6 @@ const NoteContentEditor = ({
       const provider = createWebsocketProvider(room, yjsDocMap, isSelected);
       provider.on("status", (event: any) => {
         setConnected(
-          // Websocket provider
           event.status === "connected"
         );
       });
@@ -154,27 +153,29 @@ const NoteContentEditor = ({
       >
         {/* With CollaborationPlugin - we MUST NOT use @lexical/react/LexicalHistoryPlugin */}
 
-        {isSelected &&(<CollaborationPlugin
-          id={`note-${note.id}`}
-          providerFactory={providerFactory}
-          // Optional initial editor state in case collaborative Y.Doc won't
-          // have any existing data on server. Then it'll user this value to populate editor.
-          // It accepts same type of values as LexicalComposer editorState
-          // prop (json string, state object, or a function)
+        {isSelected && (
+          <CollaborationPlugin
+            id={`note-${note.id}`}
+            providerFactory={providerFactory}
+            // Optional initial editor state in case collaborative Y.Doc won't
+            // have any existing data on server. Then it'll user this value to populate editor.
+            // It accepts same type of values as LexicalComposer editorState
+            // prop (json string, state object, or a function)
 
-          // Unless you have a way to avoid race condition between 2+ users trying to do bootstrap simultaneously
-          // you should never try to bootstrap on client. It's better to perform bootstrap within Yjs server.
-          initialEditorState={validContent}
-          shouldBootstrap={true}
-          username={userProfile.name}
-          cursorColor={userProfile.color}
-          cursorsContainerRef={containerRef}
-        />)}
+            // Unless you have a way to avoid race condition between 2+ users trying to do bootstrap simultaneously
+            // you should never try to bootstrap on client. It's better to perform bootstrap within Yjs server.
+            initialEditorState={validContent}
+            shouldBootstrap={true}
+            username={userProfile.name}
+            cursorColor={userProfile.color}
+            cursorsContainerRef={containerRef}
+          />
+        )}
         <StopPropagationPlugin />
 
         <OnChangePlugin onChange={handleOnEditorChange} />
         <EditorRefPlugin editorRef={editorRef} />
-        <Editor />
+        <Editor isSelected={isSelected} />
       </LexicalComposer>
     </div>
   );

@@ -5,8 +5,7 @@
   top: 82px;
   height: 100vh;
   background-color: rgb(32, 33, 36);
-  overflow-x: hidden;
-  overflow-y: auto;
+
   transition: width 0.5s ease;
   display: flex;
   flex-direction: column;
@@ -17,6 +16,9 @@
   margin: 0;
   padding: 0;
   list-style: none;
+  overflow-y: hidden;
+  overflow-x: hidden;
+
 }
 
 

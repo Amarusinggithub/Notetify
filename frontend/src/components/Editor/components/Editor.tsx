@@ -13,19 +13,21 @@ function Placeholder() {
   return <div className="editor-placeholder">Type your note...</div>;
 }
 
- const  Editor=()=> {
+type EditorProps = {
+  isSelected: boolean;
+};
+//      {isSelected && <ToolbarPlugin />}
+
+
+const Editor = (isSelected: EditorProps) => {
   return (
     <div className="editor-container">
-      <ToolbarPlugin />
       <div className="editor-inner">
         <RichTextPlugin
           contentEditable={
             <ContentEditable
               className="editor-input"
-              onKeyDown={(e) => {
-                e.stopPropagation();
-              }}
-              onClick={(e) => e.stopPropagation()}
+              
             />
           }
           placeholder={<Placeholder />}
@@ -39,7 +41,6 @@ function Placeholder() {
       </div>
     </div>
   );
-}
-
+};
 
 export default Editor;

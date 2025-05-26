@@ -1,7 +1,7 @@
 import "../styles/NoteCard.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import useNote from "../hooks/useNote.tsx";
 import {
   faXmark,
@@ -18,6 +18,7 @@ type NoteCardProps = { note: UserNote | UserNoteData; route: string };
 
 const NoteCard = ({ note, route }: NoteCardProps) => {
   const navigate = useNavigate();
+  const cardRef = useRef<HTMLDivElement>(null);
 
   const {
     selectedNote,
@@ -33,6 +34,20 @@ const NoteCard = ({ note, route }: NoteCardProps) => {
   const isSelected = selectedNote && selectedNote.id === note.id;
 
   const [isEdited, setIsEdited] = useState<boolean>(false);
+
+  useEffect(() => {
+    function onDocClick(e: MouseEvent) {
+      if (
+        isSelected &&
+        cardRef.current &&
+        !cardRef.current.contains(e.target as Node)
+      ) {
+        handleSelect(e as any);
+      }
+    }
+    document.addEventListener("click", onDocClick);
+    return () => document.removeEventListener("click", onDocClick);
+  }, [isSelected]);
 
   useEffect(() => {
     setNoteState(note);
@@ -107,7 +122,6 @@ const NoteCard = ({ note, route }: NoteCardProps) => {
         };
       }
     });
-    //console.log("is edited maybe set to true");
     setIsEdited(
       isUserNote(noteState)
         ? newContent !== noteState.note?.content
@@ -124,16 +138,11 @@ const NoteCard = ({ note, route }: NoteCardProps) => {
   };
 
   return (
-    <div
-      className={isSelected ? "notecard-bg" : ""}
-      onClick={(e) => {
-        handleSelect(e);
-      }}
-    >
+    <div className={isSelected ? "notecard-bg" : ""}>
       <div
+        ref={cardRef}
         className={`note-card ${isSelected ? "selected-note" : ""}`}
         onClick={(e) => {
-          e.stopPropagation();
           if (!isSelected) {
             handleSelect(e);
           }
@@ -182,7 +191,6 @@ const NoteCard = ({ note, route }: NoteCardProps) => {
                       if (isUserNote(note)) handlePin(note);
                     }}
                     className="note-pin-btn"
-                    style={{ display: isSelected ? "flex" : "" }}
                   >
                     <FontAwesomeIcon icon={faThumbTack} className="pin-icon" />
                   </button>
@@ -193,7 +201,7 @@ const NoteCard = ({ note, route }: NoteCardProps) => {
                       if (isUserNote(note)) handleFavorite(note);
                     }}
                     className="note-favorite-btn"
-                    style={{ display: isSelected ? "flex" : "" }}
+                  
                   >
                     <FontAwesomeIcon icon={faStar} className="favorite-icon" />
                   </button>
@@ -236,7 +244,7 @@ const NoteCard = ({ note, route }: NoteCardProps) => {
               type="button"
               disabled={isLoading}
             >
-              {"Close"}
+              Close
             </button>
           </div>
         )}
