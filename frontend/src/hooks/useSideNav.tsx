@@ -1,4 +1,4 @@
-import{createContext, PropsWithChildren, useContext, useState} from "react";
+import { createContext, PropsWithChildren, useContext, useState } from 'react';
 
 type SideNavContextType = {
   isSideNavOpen: boolean;
@@ -9,18 +9,18 @@ type SideNavContextType = {
   setAddTagPopupOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-type SideNavProviderProps=PropsWithChildren;
+type SideNavProviderProps = PropsWithChildren;
 
-export const SideNavContext = createContext<SideNavContextType|undefined>(undefined);
+export const SideNavContext = createContext<SideNavContextType | undefined>(undefined);
 
-export const useSideNav=()=>{
+export const useSideNav = () => {
   const context = useContext(SideNavContext);
-  if(!context){
-    throw new Error(" useSideNav must be used within a SideNavProvider");
+  if (!context) {
+    throw new Error(' useSideNav must be used within a SideNavProvider');
   }
 
   return context;
-}
+};
 
 export const SideNavProvider = ({ children }: SideNavProviderProps) => {
   const [isSideNavOpen, setIsSideNavOpen] = useState<boolean>(true);

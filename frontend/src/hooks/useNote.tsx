@@ -1,26 +1,9 @@
-import {
-  createContext,
-  PropsWithChildren,
-  useContext,
-  useMemo,
-  useState,
-} from "react";
-import {
-  createNote,
-  deleteNote,
-  getNotes,
-  updateNote,
-} from "../lib/NoteService.ts";
-import { Tag, UserNote, UserNoteData } from "../types/index.ts";
-import { isUserNote } from "./../utils/helpers";
-import {
-  useQuery,
-  useMutation,
-  useQueryClient,
-  RefetchOptions,
-  QueryObserverResult,
-} from "@tanstack/react-query";
-import { useAuth } from "./useAuth.tsx";
+import { QueryObserverResult, RefetchOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { createContext, PropsWithChildren, useContext, useMemo, useState } from 'react';
+import { createNote, deleteNote, getNotes, updateNote } from '../lib/NoteService.ts';
+import { Tag, UserNote, UserNoteData } from '../types/index.ts';
+import { isUserNote } from './../utils/helpers';
+import { useAuth } from './useAuth.tsx';
 
 interface NoteContextType {
   search: string;
@@ -37,12 +20,8 @@ interface NoteContextType {
   filtered: (UserNote | UserNoteData)[];
   other: (UserNote | UserNoteData)[];
   data: (UserNote | UserNoteData)[];
-  setTagNotes: React.Dispatch<
-    React.SetStateAction<(UserNote | UserNoteData)[]>
-  >;
-  refetch: (
-    options?: RefetchOptions
-  ) => Promise<QueryObserverResult<any, Error>>;
+  setTagNotes: React.Dispatch<React.SetStateAction<(UserNote | UserNoteData)[]>>;
+  refetch: (options?: RefetchOptions) => Promise<QueryObserverResult<any, Error>>;
   setTitle: React.Dispatch<React.SetStateAction<string>>;
   handleSearch: () => void;
   addNote: (note: UserNoteData) => Promise<void>;
@@ -69,26 +48,25 @@ const categorizedNotes = (notesArray: (UserNote | UserNoteData)[]) => {
   const filtered: (UserNote | UserNoteData)[] = [];
   const other: (UserNote | UserNoteData)[] = [];
 
-    for(let i=0;i<notesArray.length;i++){
-      let note=notesArray[i];
-      if (note.is_pinned && !note.is_trashed && !note.is_archived) {
-        pinned.push(note);
-      }
-      if (note.is_favorited && !note.is_trashed && !note.is_archived) {
-        favorites.push(note);
-      }
-      if (note.is_archived && !note.is_trashed) {
-        archived.push(note);
-      }
-      if (note.is_trashed && !note.is_archived) {
-        trashed.push(note);
-      }
-      if (!note.is_trashed && !note.is_archived && !note.is_pinned) {
-        filtered.push(note);
-        other.push(note);
-      }
+  for (let i = 0; i < notesArray.length; i++) {
+    let note = notesArray[i];
+    if (note.is_pinned && !note.is_trashed && !note.is_archived) {
+      pinned.push(note);
     }
-
+    if (note.is_favorited && !note.is_trashed && !note.is_archived) {
+      favorites.push(note);
+    }
+    if (note.is_archived && !note.is_trashed) {
+      archived.push(note);
+    }
+    if (note.is_trashed && !note.is_archived) {
+      trashed.push(note);
+    }
+    if (!note.is_trashed && !note.is_archived && !note.is_pinned) {
+      filtered.push(note);
+      other.push(note);
+    }
+  }
 
   return { pinned, favorites, archived, trashed, filtered, other };
 };
@@ -103,38 +81,35 @@ const NoteProvider = ({ children }: NoteProviderProps) => {
     isLoading,
     refetch,
   } = useQuery({
-    queryKey: ["notes"],
+    queryKey: ['notes'],
     queryFn: getNotes,
     enabled: isAuthenticated,
   });
 
-  const { pinned, favorites, archived, trashed, filtered, other } =
-    useMemo(() => {
-      return categorizedNotes(data);
-    }, [data]);
+  const { pinned, favorites, archived, trashed, filtered, other } = useMemo(() => {
+    return categorizedNotes(data);
+  }, [data]);
 
-  const [search, setSearch] = useState("");
-  const [title, setTitle] = useState("Notes");
+  const [search, setSearch] = useState('');
+  const [title, setTitle] = useState('Notes');
   const [tagNotes, setTagNotes] = useState<(UserNote | UserNoteData)[]>([]);
-  const [searchNotes, setSearchNotes] = useState<(UserNote | UserNoteData)[]>(
-    []
-  );
+  const [searchNotes, setSearchNotes] = useState<(UserNote | UserNoteData)[]>([]);
   const [selectedNote, setSelectedNote] = useState<UserNote | null>(null);
 
   const handleSearch = () => {
     const query = search.trim().toLowerCase();
     let sourcedNotes: (UserNote | UserNoteData)[] = [];
     switch (title) {
-      case "Notes":
+      case 'Notes':
         sourcedNotes = [...other, ...pinned];
         break;
-      case "Favorites":
+      case 'Favorites':
         sourcedNotes = favorites;
         break;
-      case "Archive":
+      case 'Archive':
         sourcedNotes = archived;
         break;
-      case "Trash":
+      case 'Trash':
         sourcedNotes = trashed;
         break;
       default:
@@ -143,20 +118,13 @@ const NoteProvider = ({ children }: NoteProviderProps) => {
     }
 
     const filteredNotes = sourcedNotes.filter((note) =>
-      isUserNote(note)
-        ? note.note.title.toLowerCase().includes(query)
-        : note.note_data.title.toLowerCase().includes(query)
+      isUserNote(note) ? note.note.title.toLowerCase().includes(query) : note.note_data.title.toLowerCase().includes(query),
     );
     setSearchNotes(filteredNotes);
   };
 
   const handleTagClick = (tag: Tag) => {
-    setTagNotes(
-      data.filter(
-        (note: UserNote | UserNoteData) =>
-          note.tags.includes(tag.id!) && !note.is_trashed && !note.is_archived
-      )
-    );
+    setTagNotes(data.filter((note: UserNote | UserNoteData) => note.tags.includes(tag.id!) && !note.is_trashed && !note.is_archived));
   };
 
   const handleFavorite = (note: UserNote) => {
@@ -182,37 +150,29 @@ const NoteProvider = ({ children }: NoteProviderProps) => {
   const addNoteMutation = useMutation({
     mutationFn: createNote,
     onSuccess() {
-      queryClient.invalidateQueries({ queryKey: ["notes"] });
+      queryClient.invalidateQueries({ queryKey: ['notes'] });
     },
   });
 
   const addNote = async (note: UserNoteData) => {
-    if (
-      note.note_data.content!.trim().length != 0 &&
-      note.note_data.title!.trim().length != 0
-    )
-      addNoteMutation.mutate(note);
+    if (note.note_data.content!.trim().length != 0 && note.note_data.title!.trim().length != 0) addNoteMutation.mutate(note);
   };
 
   const editNoteMutation = useMutation({
     mutationFn: updateNote,
     onSuccess() {
-      queryClient.invalidateQueries({ queryKey: ["notes"] });
+      queryClient.invalidateQueries({ queryKey: ['notes'] });
     },
   });
 
   const editNote = async (note: UserNote) => {
-    if (
-      note.note.content!.trim().length != 0 &&
-      note.note.title!.trim().length != 0
-    )
-      editNoteMutation.mutate(note);
+    if (note.note.content!.trim().length != 0 && note.note.title!.trim().length != 0) editNoteMutation.mutate(note);
   };
 
   const removeNoteMutation = useMutation({
     mutationFn: deleteNote,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notes"] });
+      queryClient.invalidateQueries({ queryKey: ['notes'] });
     },
   });
 
@@ -261,7 +221,7 @@ const NoteProvider = ({ children }: NoteProviderProps) => {
 const useNote = () => {
   const context = useContext(NoteContext);
   if (!context) {
-    throw new Error("useNote must be used within a NoteProvider");
+    throw new Error('useNote must be used within a NoteProvider');
   }
   return context;
 };

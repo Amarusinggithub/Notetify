@@ -11,17 +11,13 @@
   flex-direction: column;
 }
 
-
 .sidenav ul {
   margin: 0;
   padding: 0;
   list-style: none;
   overflow-y: hidden;
   overflow-x: hidden;
-
 }
-
-
 
 .sidenav-item,
 .sidenav-item-add-tag {
@@ -65,9 +61,8 @@
   cursor: pointer;
 }
 
-
 .sidenav-item:hover,
-.sidenav-item-add-tag:hover ,
+.sidenav-item-add-tag:hover,
 .sidenav-item-tags:hover {
   background-color: rgb(40, 41, 44);
 }

@@ -1,35 +1,33 @@
-import { useState } from "react";
-import "../styles/SignUpForm.css";
-import { useAuth } from "../hooks/useAuth.tsx";
-import { Link ,useNavigate} from "react-router";
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router';
+import { useAuth } from '../hooks/useAuth.tsx';
+import '../styles/SignUpForm.css';
 
 const Register = () => {
-  const navigate=useNavigate();
+  const navigate = useNavigate();
   const [state, setState] = useState({
-    email: "",
-    password: "",
-    confirmPassword: "",
-    username: "",
+    email: '',
+    password: '',
+    confirmPassword: '',
+    username: '',
   });
 
-  const { handleSignup ,isAuthenticated} = useAuth();
+  const { handleSignup, isAuthenticated } = useAuth();
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setState({ ...state, [e.target.name]: e.target.value });
   }
 
-  async function handleSubmit(
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) {
+  async function handleSubmit(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     e.preventDefault();
 
     if (state.password !== state.confirmPassword) {
-      console.log("Passwords do not match");
+      console.log('Passwords do not match');
       return;
     }
 
     await handleSignup(state.username, state.email, state.password);
-       if (isAuthenticated) navigate("/");
+    if (isAuthenticated) navigate('/');
   }
 
   return (
@@ -99,7 +97,7 @@ const Register = () => {
           </div>
 
           <button
-            className={"form-btn"}
+            className={'form-btn'}
             onClick={(e) => {
               handleSubmit(e);
             }}

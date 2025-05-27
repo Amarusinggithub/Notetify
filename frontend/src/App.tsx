@@ -1,13 +1,13 @@
-import "./App.css";
-import { useEffect } from "react";
-import { ErrorBoundary } from "react-error-boundary";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ensureCSRFToken } from "./lib/AxiosService.ts";
-import AppRoutes from "./routes/AppRoutes.tsx";
-import AuthProvider from "./hooks/useAuth.tsx";
-import { NoteProvider } from "./hooks/useNote.tsx";
-import { TagProvider } from "./hooks/useTag.tsx";
-import { SideNavProvider } from "./hooks/useSideNav.tsx";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
+import './App.css';
+import AuthProvider from './hooks/useAuth.tsx';
+import { NoteProvider } from './hooks/useNote.tsx';
+import { SideNavProvider } from './hooks/useSideNav.tsx';
+import { TagProvider } from './hooks/useTag.tsx';
+import { ensureCSRFToken } from './lib/AxiosService.ts';
+import AppRoutes from './routes/AppRoutes.tsx';
 
 export default function App() {
   useEffect(() => {

@@ -1,63 +1,54 @@
 .container {
-    height: 100%;
-     max-width: 100vw; 
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: flex-start;
-    margin-top:30px; 
-    background-color: rgb(32, 33, 36);
-    padding: 20px;
-      overflow-x: hidden;
-    overflow-y: auto;
+  height: 100%;
+  max-width: 100vw;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  margin-top: 30px;
+  background-color: rgb(32, 33, 36);
+  padding: 20px;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
-.flex-column{
-    display: flex;
-    flex-direction: column;
-gap: 20px;             
-   
+.flex-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .all-notes,
 .pinned-notes {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;  
-    justify-content: end; 
-    align-items: start;
-    width: 100%;
-    transition: max-with ease 0.5s;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  justify-content: end;
+  align-items: start;
+  width: 100%;
+  transition: max-with ease 0.5s;
 }
 
 .note-div {
   height: auto;
-    width: 100%;
-    min-height: 150px;  
-    padding: 15px;
-    background-color: rgb(32, 33, 36);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    box-sizing: border-box;
+  width: 100%;
+  min-height: 150px;
+  padding: 15px;
+  background-color: rgb(32, 33, 36);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  box-sizing: border-box;
 }
-
-
 
 @media (max-width: 768px) {
-    .all-notes,
-    .pinned-notes {
-        grid-template-columns: repeat(auto-fit, minmax(3, 1fr));
-        gap: 15px;
-    }
+  .all-notes,
+  .pinned-notes {
+    grid-template-columns: repeat(auto-fit, minmax(3, 1fr));
+    gap: 15px;
+  }
 
-    .note-card {
-        max-width: 100%;  
-    }
+  .note-card {
+    max-width: 100%;
+  }
 }
-
-
-
-
-
-

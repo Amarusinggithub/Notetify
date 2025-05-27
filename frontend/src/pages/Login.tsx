@@ -1,14 +1,14 @@
 // LoginPage.tsx
-import React, { useState } from "react";
-import "../styles/LoginForm.css";
-import { useAuth } from "../hooks/useAuth.tsx";
-import { Link, useNavigate } from "react-router";
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router';
+import { useAuth } from '../hooks/useAuth.tsx';
+import '../styles/LoginForm.css';
 
 const Login = () => {
   const navigate = useNavigate();
   const [state, setState] = useState({
-    email: "",
-    password: "",
+    email: '',
+    password: '',
   });
   const { handleLogin, isAuthenticated } = useAuth();
 
@@ -19,16 +19,12 @@ const Login = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     await handleLogin(state.email, state.password);
-    if (isAuthenticated) navigate("/");
+    if (isAuthenticated) navigate('/');
   };
 
   return (
     <div className="login-container">
-      <form
-        className="login-form"
-        data-testid="cypress-Login-form"
-        onSubmit={handleSubmit}
-      >
+      <form className="login-form" data-testid="cypress-Login-form" onSubmit={handleSubmit}>
         <h1 data-testid="cypress-Login-title">Login</h1>
         <div className="form-ui">
           <div className="fields">
@@ -57,11 +53,7 @@ const Login = () => {
             />
           </div>
 
-          <button
-            data-testid="cypress-Login-btn"
-            className="form-btn"
-            type="submit"
-          >
+          <button data-testid="cypress-Login-btn" className="form-btn" type="submit">
             Login
           </button>
 

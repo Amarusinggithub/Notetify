@@ -1,29 +1,24 @@
-
-import {faArchive, faLightbulb, faStar, faTrash} from "@fortawesome/free-solid-svg-icons";
+import { faArchive, faLightbulb, faStar, faTrash } from '@fortawesome/free-solid-svg-icons';
 
 export const sidebarData = [
   {
-    title: "Notes",
+    title: 'Notes',
     icon: faLightbulb,
-    path: "/",
+    path: '/',
   },
   {
-    title: "Favorites",
+    title: 'Favorites',
     icon: faStar,
-    path: "/favorite",
+    path: '/favorite',
   },
   {
-    title: "Archive",
+    title: 'Archive',
     icon: faArchive,
-    path: "/archive",
+    path: '/archive',
   },
   {
-    title: "Trash",
+    title: 'Trash',
     icon: faTrash,
-    path: "/trash",
+    path: '/trash',
   },
-
 ];
-
-
-

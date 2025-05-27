@@ -32,7 +32,6 @@
   margin-top: 10px;
 }
 
-
 .form-btn {
   border-radius: 12px;
   border: none;
@@ -45,7 +44,9 @@
   padding: 10px 20px;
   width: 260px;
   background-color: rgb(65, 51, 28);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
@@ -54,15 +55,11 @@
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
 }
 
-.no-account{
-    font-size: 13px;
-
+.no-account {
+  font-size: 13px;
 }
 
-.signup-span{
-        font-size: 14px;
-        color: #2563eb ;
-
+.signup-span {
+  font-size: 14px;
+  color: #2563eb;
 }
-
-

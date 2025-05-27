@@ -1,8 +1,8 @@
-import { UserNote, UserNoteData } from "types";
-import NoteCard from "../components/NoteCard";
-import useNote from "../hooks/useNote";
+import { UserNote, UserNoteData } from 'types';
+import NoteCard from '../components/NoteCard';
+import useNote from '../hooks/useNote';
 
-import noArchivedNotes from "./../../assets/No_Archive_notes.png";
+import noArchivedNotes from './../../assets/No_Archive_notes.png';
 
 const Archive = () => {
   const { archived, isLoading, isError } = useNote();
@@ -13,13 +13,8 @@ const Archive = () => {
 
   if (archived.length < 1) {
     return (
-      <div className="flex flex-row min-h-screen justify-center items-center ">
-        <img
-          src={noArchivedNotes}
-          style={{ width: "100%", height: "auto" }}
-          className="no-notes"
-          alt="No archived notes"
-        />
+      <div className="flex min-h-screen flex-row items-center justify-center">
+        <img src={noArchivedNotes} style={{ width: '100%', height: 'auto' }} className="no-notes" alt="No archived notes" />
       </div>
     );
   }
@@ -33,7 +28,7 @@ const Archive = () => {
         {archived &&
           archived.map((note: UserNote | UserNoteData) => (
             <div key={note.id} className="note-div">
-              <NoteCard note={note} route={"/archive"} />
+              <NoteCard note={note} route={'/archive'} />
             </div>
           ))}
       </div>

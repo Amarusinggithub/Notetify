@@ -1,21 +1,10 @@
-import { login, logout, signUp, verifyAuth } from "../lib/AuthService.ts";
-import {
-  createContext,
-  PropsWithChildren,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
-import { USERDATA_STORAGE_KEY } from "./../types/index.ts";
+import { createContext, PropsWithChildren, useCallback, useContext, useEffect, useState } from 'react';
+import { login, logout, signUp, verifyAuth } from '../lib/AuthService.ts';
+import { USERDATA_STORAGE_KEY } from './../types/index.ts';
 
 type AuthProviderProps = PropsWithChildren;
 interface AuthContextType {
-  handleSignup: (
-    email: string,
-    username: string,
-    password: string
-  ) => Promise<void>;
+  handleSignup: (email: string, username: string, password: string) => Promise<void>;
   handleLogin: (username: string, password: string) => Promise<void>;
   handleLogout: () => Promise<void>;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
@@ -50,23 +39,19 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     localStorage.removeItem(USERDATA_STORAGE_KEY);
   };
 
-  const handleSignup = async (
-    email: string,
-    username: string,
-    password: string
-  ) => {
+  const handleSignup = async (email: string, username: string, password: string) => {
     try {
       setLoading(true);
       setError(null);
       const response = await signUp(email, username, password);
       if (response.status >= 200 && response.status < 300) {
-        console.log("Signup successful");
+        console.log('Signup successful');
         setAuth(response.data);
       } else {
-        console.error("Signup failed");
+        console.error('Signup failed');
       }
     } catch (error: any) {
-      console.error("Error during signup:", error);
+      console.error('Error during signup:', error);
       setError(error);
     } finally {
       setLoading(false);
@@ -79,13 +64,13 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
       setError(null);
       const response = await login(email.trim(), password.trim());
       if (response.status >= 200 && response.status < 300) {
-        console.log("Login successful");
+        console.log('Login successful');
         setAuth(response.data);
       } else {
-        console.error("Login failed");
+        console.error('Login failed');
       }
     } catch (error: any) {
-      console.error("Error during login:", error);
+      console.error('Error during login:', error);
       setError(error);
     } finally {
       setLoading(false);
@@ -98,7 +83,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
       setError(null);
       await logout();
     } catch (error: any) {
-      console.error("Error during logout:", error);
+      console.error('Error during logout:', error);
       setError(error);
     } finally {
       setNotAuth();
@@ -155,7 +140,7 @@ export default AuthProvider;
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error("useAuth must be used within AuthProvider");
+    throw new Error('useAuth must be used within AuthProvider');
   }
   return context;
 };

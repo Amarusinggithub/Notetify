@@ -1,8 +1,8 @@
-import useNote from "../hooks/useNote.tsx";
-import NoteCard from "../components/NoteCard.tsx";
-import { useSideNav } from "../hooks/useSideNav.tsx";
-import { UserNote, UserNoteData } from "types/index.ts";
-import noTrashedNotes from "./../../assets/No_trashed_notes.png";
+import { UserNote, UserNoteData } from 'types/index.ts';
+import NoteCard from '../components/NoteCard.tsx';
+import useNote from '../hooks/useNote.tsx';
+import { useSideNav } from '../hooks/useSideNav.tsx';
+import noTrashedNotes from './../../assets/No_trashed_notes.png';
 
 const Trash = () => {
   const { isSideNavOpen } = useSideNav();
@@ -20,26 +20,18 @@ const Trash = () => {
   if (trashed.length < 1) {
     return (
       <>
-        <img
-          src={noTrashedNotes}
-          style={{ width: "100%", height: "auto" }}
-          className="no-notes"
-          alt="No tagged notes"
-        />
+        <img src={noTrashedNotes} style={{ width: '100%', height: 'auto' }} className="no-notes" alt="No tagged notes" />
       </>
     );
   }
 
   return (
     <div className="container">
-      <div
-        className="all-notes"
-        style={{ maxWidth: isSideNavOpen ? "1200px" : "1400px" }}
-      >
+      <div className="all-notes" style={{ maxWidth: isSideNavOpen ? '1200px' : '1400px' }}>
         {trashed &&
           trashed.map((note: UserNote | UserNoteData) => (
             <div key={note.id} className="note-div">
-                <NoteCard note={note} route={"/trash"} />
+              <NoteCard note={note} route={'/trash'} />
             </div>
           ))}
       </div>

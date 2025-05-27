@@ -1,44 +1,37 @@
-import Login from "../pages/Login.tsx";
-import Register from "../pages/Register.tsx";
-import Archive from "../pages/Archive.tsx";
-import Favorite from "../pages/Favorites.tsx";
-import Home from "../pages/Home.tsx";
-import Tag from "../pages/Tag.tsx";
-import Trash from "../pages/Trash.tsx";
-import MainLayout from "../pages/layout.tsx";
-import { createBrowserRouter, RouterProvider, Navigate } from "react-router";
-import Landing from "../pages/Landing.tsx";
-import { useAuth } from "./../hooks/useAuth.tsx";
+import { createBrowserRouter, Navigate, RouterProvider } from 'react-router';
+import Archive from '../pages/Archive.tsx';
+import Favorite from '../pages/Favorites.tsx';
+import Home from '../pages/Home.tsx';
+import Landing from '../pages/Landing.tsx';
+import Login from '../pages/Login.tsx';
+import Register from '../pages/Register.tsx';
+import Tag from '../pages/Tag.tsx';
+import Trash from '../pages/Trash.tsx';
+import MainLayout from '../pages/layout.tsx';
+import { useAuth } from './../hooks/useAuth.tsx';
 
 const AppRoutes = () => {
   const { isAuthenticated, checkingAuth } = useAuth();
   if (checkingAuth) return null;
 
-  return (
-    <RouterProvider
-      router={createBrowserRouter(
-        isAuthenticated ? privateRoutes : publicRoutes
-      )}
-      key={isAuthenticated ? "auth" : "guest"}
-    />
-  );
+  return <RouterProvider router={createBrowserRouter(isAuthenticated ? privateRoutes : publicRoutes)} key={isAuthenticated ? 'auth' : 'guest'} />;
 };
 
 export default AppRoutes;
 
 const publicRoutes = [
   {
-    path: "/",
+    path: '/',
     Component: Landing,
   },
-  { path: "/login", Component: Login },
-  { path: "/register", Component: Register },
-  { path: "*", Component: () => <Navigate to="/" replace /> },
+  { path: '/login', Component: Login },
+  { path: '/register', Component: Register },
+  { path: '*', Component: () => <Navigate to="/" replace /> },
 ];
 
 const privateRoutes = [
   {
-    path: "/",
+    path: '/',
     Component: MainLayout,
     children: [
       {
@@ -46,55 +39,55 @@ const privateRoutes = [
         Component: Home,
       },
       {
-        path: ":noteid",
+        path: ':noteid',
         Component: Home,
       },
       {
-        path: "favorite",
+        path: 'favorite',
         Component: Favorite,
         children: [
           {
-            path: ":noteid",
+            path: ':noteid',
           },
         ],
       },
       {
-        path: "archive",
+        path: 'archive',
         Component: Archive,
         children: [
           {
-            path: ":noteid",
+            path: ':noteid',
           },
         ],
       },
       {
-        path: "tag",
+        path: 'tag',
         Component: Tag,
         children: [
           {
-            path: ":noteid",
+            path: ':noteid',
           },
         ],
       },
       {
-        path: "trash",
+        path: 'trash',
         Component: Trash,
         children: [
           {
-            path: ":noteid",
+            path: ':noteid',
           },
         ],
       },
 
       {
-        path: "/login",
+        path: '/login',
         Component: () => <Navigate to="/" replace />,
       },
       {
-        path: "/register",
+        path: '/register',
         Component: () => <Navigate to="/" replace />,
       },
-      { path: "*", Component: () => <Navigate to="/" replace /> },
+      { path: '*', Component: () => <Navigate to="/" replace /> },
     ],
   },
 ];

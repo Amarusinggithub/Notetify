@@ -87,7 +87,6 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 30px;
-
 }
 
 .pin-favorite-actions {
@@ -116,8 +115,7 @@
   color: white;
 }
 
-
-.content-editable{
+.content-editable {
   outline: none;
 }
 .note {

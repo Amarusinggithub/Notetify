@@ -1,12 +1,12 @@
-import { faXmark, faLightbulb } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useEffect, useRef, useState } from "react";
-import { useSideNav } from "../hooks/useSideNav";
-import useTag from "../hooks/useTag";
-import "../styles/AddTagPopUp.css";
+import { faLightbulb, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useEffect, useRef, useState } from 'react';
+import { useSideNav } from '../hooks/useSideNav';
+import useTag from '../hooks/useTag';
+import '../styles/AddTagPopUp.css';
 
 const AddTagPopup = () => {
-  const [TagName, setTagName] = useState("");
+  const [TagName, setTagName] = useState('');
 
   const { setAddTagPopupOpen } = useSideNav();
   const { makeTag } = useTag();
@@ -26,19 +26,16 @@ const AddTagPopup = () => {
   };
 
   const handleAddTagName = () => {
-    if (TagName.trim() !== "") {
+    if (TagName.trim() !== '') {
       makeTag(TagName.trim().charAt(0).toUpperCase() + TagName.trim().slice(1));
-      setTagName("");
+      setTagName('');
     }
     handleClose();
   };
 
   return (
     <div className="add-tag-popup-bg" onClick={handleClose}>
-      <div
-        className="add-tag-popup-container"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="add-tag-popup-container" onClick={(e) => e.stopPropagation()}>
         <div className="add-tag-header">
           <h1 className="add-tag-title">Create Tag</h1>
           <button onClick={handleClose} className="close-btn">
@@ -62,8 +59,7 @@ const AddTagPopup = () => {
           <div className="tag-info-text">
             <h3 className="tag-info-title">What is a Tag?</h3>
             <p className="tag-info-description">
-              Tags help you categorize and quickly find your notes by linking
-              related content under a common label.
+              Tags help you categorize and quickly find your notes by linking related content under a common label.
             </p>
           </div>
         </div>

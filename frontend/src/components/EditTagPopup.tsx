@@ -1,11 +1,11 @@
-import { faXmark } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useState, useRef, useEffect } from "react";
-import useTag from "../hooks/useTag";
-import "../styles/EditTagPopup.css";
+import { faXmark } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React, { useEffect, useRef, useState } from 'react';
+import useTag from '../hooks/useTag';
+import '../styles/EditTagPopup.css';
 
 const EditTagPopup = () => {
-  const [TagName, setTagName] = useState("");
+  const [TagName, setTagName] = useState('');
 
   const { editTag, selectedTag, setWantToEditTag } = useTag();
   const editInputRef = useRef<HTMLInputElement>(null);
@@ -27,20 +27,17 @@ const EditTagPopup = () => {
   };
 
   const handleEditTagName = () => {
-    if (TagName.trim() !== "") {
+    if (TagName.trim() !== '') {
       const updatedTag = { ...selectedTag, name: TagName };
       editTag(updatedTag);
-      setTagName("");
+      setTagName('');
     }
     handleClose();
   };
 
   return (
     <div className="edit-tag-popup-bg" onClick={handleClose}>
-      <div
-        className="edit-tag-popup-container"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="edit-tag-popup-container" onClick={(e) => e.stopPropagation()}>
         <div className="edit-tag-header">
           <h1 className="edit-tag-title">Edit Tag</h1>
           <button onClick={handleClose} className="close-btn">

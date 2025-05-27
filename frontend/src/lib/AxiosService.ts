@@ -1,6 +1,6 @@
-import axios from "axios";
-import Cookies from "js-cookie";
-import { CSRF_TOKEN_COOKIE_NAME } from "./../types/index.ts";
+import axios from 'axios';
+import Cookies from 'js-cookie';
+import { CSRF_TOKEN_COOKIE_NAME } from './../types/index.ts';
 
 let isRefreshing = false;
 let failedQueue: {
@@ -18,11 +18,11 @@ const processQueue = (error?: any) => {
 const axiosInstance = axios.create({
   baseURL: `${import.meta.env.VITE_BASE_URL}`,
   headers: {
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
   },
   withCredentials: true,
   xsrfCookieName: CSRF_TOKEN_COOKIE_NAME,
-  xsrfHeaderName: "X-CSRFToken",
+  xsrfHeaderName: 'X-CSRFToken',
 });
 
 // Response interceptor to handle token refresh on 401 errors.
@@ -30,14 +30,10 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    if (originalRequest.url?.includes("token/refresh")) {
+    if (originalRequest.url?.includes('token/refresh')) {
       return Promise.reject(error);
     }
-    if (
-      error.response &&
-      error.response.status === 401 &&
-      !originalRequest._retry
-    ) {
+    if (error.response && error.response.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
         // If a refresh is already in progress, queue the request
         return new Promise((resolve, reject) => {
@@ -52,7 +48,7 @@ axiosInstance.interceptors.response.use(
       originalRequest._retry = true;
       isRefreshing = true;
       try {
-        await axiosInstance.post("token/refresh/");
+        await axiosInstance.post('token/refresh/');
         processQueue();
 
         return axiosInstance(originalRequest);
@@ -64,7 +60,7 @@ axiosInstance.interceptors.response.use(
       }
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export async function ensureCSRFToken() {

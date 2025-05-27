@@ -1,8 +1,8 @@
-import { faXmark, faLightbulb } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faLightbulb, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import useTag from "../hooks/useTag";
-import "../styles/DeleteTagPopup.css";
+import useTag from '../hooks/useTag';
+import '../styles/DeleteTagPopup.css';
 
 const DeleteTagPopup = () => {
   const { removeTag, selectedTag, setWantToDeleteTag } = useTag();
@@ -16,10 +16,7 @@ const DeleteTagPopup = () => {
 
   return (
     <div className="delete-tag-popup-bg" onClick={handleClose}>
-      <div
-        className="delete-tag-popup-container"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="delete-tag-popup-container" onClick={(e) => e.stopPropagation()}>
         <div className="delete-tag-header">
           <h1 className="delete-tag-title">Delete Tag</h1>
           <button onClick={handleClose} className="close-btn">
@@ -32,9 +29,8 @@ const DeleteTagPopup = () => {
 
           <div className="tag-info-text">
             <p className="delete-tag-info">
-              Deleting this tag will permanently remove it from all associated
-              notes. The notes themselves will remain, but they will no longer
-              be linked to this tag.
+              Deleting this tag will permanently remove it from all associated notes. The notes themselves will remain, but they will no longer be
+              linked to this tag.
             </p>
           </div>
         </div>

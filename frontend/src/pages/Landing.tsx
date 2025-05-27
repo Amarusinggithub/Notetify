@@ -1,15 +1,15 @@
-import { useNavigate } from "react-router";
+import { useNavigate } from 'react-router';
 
 const Landing = () => {
   const navigate = useNavigate();
 
   return (
     <>
-      <div className="flex flex-row min-h-screen justify-center items-center">
+      <div className="flex min-h-screen flex-row items-center justify-center">
         <button
-          className="text-center text-white "
+          className="text-center text-white"
           onClick={() => {
-            navigate("/login");
+            navigate('/login');
           }}
         >
           Login

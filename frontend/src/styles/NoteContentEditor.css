@@ -48,7 +48,6 @@
   pointer-events: none;
 }
 
-
 .content-editable {
   font-size: 16px;
   line-height: 1.5;
@@ -140,8 +139,6 @@
   font-weight: bold;
 }
 
-
-
 .ltr {
   text-align: left;
 }
@@ -149,7 +146,6 @@
 .rtl {
   text-align: right;
 }
-
 
 .editor-text-bold {
   font-weight: bold;
@@ -304,8 +300,8 @@
   margin: 0;
   margin-left: 20px;
   font-size: 15px;
-  color:  #e0e0e0;
-  border-left-color: rgb(101, 103, 107) ;
+  color: #e0e0e0;
+  border-left-color: rgb(101, 103, 107);
   border-left-width: 4px;
   border-left-style: solid;
   padding-left: 16px;
@@ -504,4 +500,3 @@ i.right-align {
 i.justify-align {
   background-image: url(/icons/justify.svg);
 }
-

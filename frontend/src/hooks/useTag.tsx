@@ -1,9 +1,9 @@
-import { createContext, PropsWithChildren, useContext, useState } from "react";
+import { createContext, PropsWithChildren, useContext, useState } from 'react';
 
-import { createTag, deleteTag, getTags, updateTag } from "../lib/TagService.ts";
-import { Tag } from "types/index.ts";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "./useAuth.tsx";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Tag } from 'types/index.ts';
+import { createTag, deleteTag, getTags, updateTag } from '../lib/TagService.ts';
+import { useAuth } from './useAuth.tsx';
 
 interface TagContextType {
   selectedTag: Tag | null;
@@ -32,7 +32,7 @@ const TagProvider = ({ children }: TagProviderProps) => {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["tags"],
+    queryKey: ['tags'],
     queryFn: getTags,
     enabled: isAuthenticated,
   });
@@ -44,18 +44,14 @@ const TagProvider = ({ children }: TagProviderProps) => {
   const createTagMutation = useMutation({
     mutationFn: createTag,
     onSuccess() {
-      queryClient.invalidateQueries({ queryKey: ["tags"] });
+      queryClient.invalidateQueries({ queryKey: ['tags'] });
     },
   });
 
   const makeTag = async (tagName: string) => {
     if (tagName!.trim().length > 0)
-      if (
-        data.some(
-          (tag: Tag) => tag.name.toLowerCase() === tagName.toLowerCase()
-        )
-      ) {
-        alert("Tag already exists!");
+      if (data.some((tag: Tag) => tag.name.toLowerCase() === tagName.toLowerCase())) {
+        alert('Tag already exists!');
         return;
       }
 
@@ -65,7 +61,7 @@ const TagProvider = ({ children }: TagProviderProps) => {
   const editTagMutation = useMutation({
     mutationFn: updateTag,
     onSuccess() {
-      queryClient.invalidateQueries({ queryKey: ["tags"] });
+      queryClient.invalidateQueries({ queryKey: ['tags'] });
     },
   });
 
@@ -76,7 +72,7 @@ const TagProvider = ({ children }: TagProviderProps) => {
   const deleteTagMutation = useMutation({
     mutationFn: deleteTag,
     onSuccess() {
-      queryClient.invalidateQueries({ queryKey: ["tags"] });
+      queryClient.invalidateQueries({ queryKey: ['tags'] });
     },
   });
 
@@ -109,7 +105,7 @@ const TagProvider = ({ children }: TagProviderProps) => {
 const useTag = () => {
   const context = useContext(TagContext);
   if (!context) {
-    throw new Error("useTag  must be use within a TagProvider");
+    throw new Error('useTag  must be use within a TagProvider');
   }
   return context;
 };

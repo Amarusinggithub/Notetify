@@ -1,17 +1,11 @@
-import "../styles/navbar.css";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faBars,
-  faGear,
-  faList,
-  faMagnifyingGlass,
-  faRotateRight,
-} from "@fortawesome/free-solid-svg-icons";
-import { useSideNav } from "../hooks/useSideNav.tsx";
-import useNote from "../hooks/useNote.tsx";
-import React from "react";
+import { faBars, faGear, faList, faMagnifyingGlass, faRotateRight } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React from 'react';
+import useNote from '../hooks/useNote.tsx';
+import { useSideNav } from '../hooks/useSideNav.tsx';
+import '../styles/navbar.css';
 
-import logo from "./../../assets/notetify-logo.png";
+import logo from './../../assets/notetify-logo.png';
 
 const Navbar = () => {
   const { isSideNavOpen, setIsSideNavOpen } = useSideNav();
@@ -31,7 +25,7 @@ const Navbar = () => {
   const handleSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     handleSearch();
-    console.log("Search submitted:", search);
+    console.log('Search submitted:', search);
   };
 
   return (
@@ -45,24 +39,14 @@ const Navbar = () => {
         >
           <FontAwesomeIcon icon={faBars} className="menu-icon" />
         </button>
-        {(title.length <= 0 || title === "Notes") && (
+        {(title.length <= 0 || title === 'Notes') && (
           <div className="logo-container">
-            <img
-              src={logo}
-              alt="A sample image"
-              width="40"
-              height="40"
-              className={"noteify-logo"}
-            ></img>
+            <img src={logo} alt="A sample image" width="40" height="40" className={'noteify-logo'}></img>
           </div>
         )}
 
-        {(title.length <= 0 || title === "Notes") && (
-          <h1 className="title-header">Notetify</h1>
-        )}
-        {title.length > 0 && title !== "Notes" && (
-          <h1 className="title-header">{title}</h1>
-        )}
+        {(title.length <= 0 || title === 'Notes') && <h1 className="title-header">Notetify</h1>}
+        {title.length > 0 && title !== 'Notes' && <h1 className="title-header">{title}</h1>}
       </div>
 
       <form

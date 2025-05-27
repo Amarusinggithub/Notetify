@@ -1,8 +1,8 @@
-import { UserNote, UserNoteData } from "types/index.ts";
-import { useSideNav } from "../hooks/useSideNav.tsx";
-import NoteCard from "../components/NoteCard.tsx";
-import useNote from "../hooks/useNote.tsx";
-import noTaggedNotes from "./../../assets/No_tagged_Notes.png";
+import { UserNote, UserNoteData } from 'types/index.ts';
+import NoteCard from '../components/NoteCard.tsx';
+import useNote from '../hooks/useNote.tsx';
+import { useSideNav } from '../hooks/useSideNav.tsx';
+import noTaggedNotes from './../../assets/No_tagged_Notes.png';
 
 const Tag = () => {
   const { tagNotes, isLoading, isError } = useNote();
@@ -19,25 +19,17 @@ const Tag = () => {
   if (tagNotes.length < 1) {
     return (
       <>
-        <img
-          src={noTaggedNotes}
-          style={{ width: "100%", height: "auto" }}
-          className="no-notes"
-          alt="No Tagged notes"
-        />
+        <img src={noTaggedNotes} style={{ width: '100%', height: 'auto' }} className="no-notes" alt="No Tagged notes" />
       </>
     );
   }
 
   return (
     <div className="container">
-      <div
-        className="all-notes"
-        style={{ maxWidth: isSideNavOpen ? "1200px" : "1400px" }}
-      >
+      <div className="all-notes" style={{ maxWidth: isSideNavOpen ? '1200px' : '1400px' }}>
         {tagNotes?.map((note: UserNote | UserNoteData) => (
           <div key={note.id} className="note-div">
-              <NoteCard note={note} route={"/tag"} />
+            <NoteCard note={note} route={'/tag'} />
           </div>
         ))}
       </div>

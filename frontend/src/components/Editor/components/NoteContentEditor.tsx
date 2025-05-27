@@ -1,26 +1,23 @@
-import { LexicalComposer } from "@lexical/react/LexicalComposer";
-import { CollaborationPlugin } from "@lexical/react/LexicalCollaborationPlugin";
-import * as Y from "yjs";
-import { Provider } from "@lexical/yjs";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
-import { EditorRefPlugin } from "@lexical/react/LexicalEditorRefPlugin";
-import { LinkNode } from "@lexical/link";
-import { TableNode, TableCellNode, TableRowNode } from "@lexical/table";
-import { HeadingNode } from "@lexical/rich-text";
-import { ListNode, ListItemNode } from "@lexical/list";
-import EditorTheme from "../style/EditorTheme.ts";
-import {
-  getRandomUserProfile,
-  UserProfile,
-} from "../utils/getRandomUserProfile.ts";
+import { LinkNode } from '@lexical/link';
+import { ListItemNode, ListNode } from '@lexical/list';
+import { CollaborationPlugin } from '@lexical/react/LexicalCollaborationPlugin';
+import { LexicalComposer } from '@lexical/react/LexicalComposer';
+import { EditorRefPlugin } from '@lexical/react/LexicalEditorRefPlugin';
+import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
+import { HeadingNode } from '@lexical/rich-text';
+import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
+import { Provider } from '@lexical/yjs';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import * as Y from 'yjs';
+import EditorTheme from '../style/EditorTheme.ts';
+import { getRandomUserProfile, UserProfile } from '../utils/getRandomUserProfile.ts';
 
-import "../../../styles/NoteContentEditor.css";
-import parseOrDefault from "../utils/helpers.ts";
-import { createWebsocketProvider } from "../utils/providers.ts";
-import Editor from "../components/Editor.tsx";
-import StopPropagationPlugin from "../plugins/StopPropagationPlugin.tsx";
-import { WebsocketProvider } from "y-websocket";
+import { WebsocketProvider } from 'y-websocket';
+import '../../../styles/NoteContentEditor.css';
+import Editor from '../components/Editor.tsx';
+import StopPropagationPlugin from '../plugins/StopPropagationPlugin.tsx';
+import parseOrDefault from '../utils/helpers.ts';
+import { createWebsocketProvider } from '../utils/providers.ts';
 
 type NoteContentEditorProps = {
   handleContentInput: any;
@@ -33,39 +30,24 @@ interface ActiveUserProfile extends UserProfile {
   userId: number;
 }
 
-const NoteContentEditor = ({
-  handleContentInput,
-  content,
-  isSelected,
-  note,
-}: NoteContentEditorProps) => {
+const NoteContentEditor = ({ handleContentInput, content, isSelected, note }: NoteContentEditorProps) => {
   const editorRef = useRef(null);
   const validContent = parseOrDefault(content);
-  const [userProfile, setUserProfile] = useState(() =>
-    getRandomUserProfile("")
-  );
+  const [userProfile, setUserProfile] = useState(() => getRandomUserProfile(''));
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [yjsProvider, setYjsProvider] = useState<null | Provider>(null);
   const [connected, setConnected] = useState(false);
   const [activeUsers, setActiveUsers] = useState<ActiveUserProfile[]>([]);
 
   const initialConfig = {
-    namespace: "MyEditor",
+    namespace: 'MyEditor',
     theme: EditorTheme,
-    content:isSelected?null:validContent,
+    content: isSelected ? null : validContent,
 
     onError: (error: Error) => {
       throw error;
     },
-    nodes: [
-      HeadingNode,
-      ListNode,
-      ListItemNode,
-      LinkNode,
-      TableNode,
-      TableCellNode,
-      TableRowNode,
-    ],
+    nodes: [HeadingNode, ListNode, ListItemNode, LinkNode, TableNode, TableCellNode, TableRowNode],
     editable: isSelected,
     editorState: validContent,
   };
@@ -73,13 +55,11 @@ const NoteContentEditor = ({
   const handleAwarenessUpdate = useCallback(() => {
     const awareness = yjsProvider!.awareness!;
     setActiveUsers(
-      Array.from(awareness.getStates().entries()).map(
-        ([userId, { color, name }]) => ({
-          color,
-          name,
-          userId,
-        })
-      )
+      Array.from(awareness.getStates().entries()).map(([userId, { color, name }]) => ({
+        color,
+        name,
+        userId,
+      })),
     );
   }, [yjsProvider]);
 
@@ -94,18 +74,16 @@ const NoteContentEditor = ({
       return;
     }
 
-    yjsProvider.awareness.on("update", handleAwarenessUpdate);
+    yjsProvider.awareness.on('update', handleAwarenessUpdate);
 
-    return () => yjsProvider.awareness.off("update", handleAwarenessUpdate);
+    return () => yjsProvider.awareness.off('update', handleAwarenessUpdate);
   }, [yjsProvider, handleAwarenessUpdate]);
 
   const providerFactory = useCallback(
     (room: string, yjsDocMap: Map<string, Y.Doc>) => {
       const provider = createWebsocketProvider(room, yjsDocMap, isSelected);
-      provider.on("status", (event: any) => {
-        setConnected(
-          event.status === "connected"
-        );
+      provider.on('status', (event: any) => {
+        setConnected(event.status === 'connected');
       });
 
       // This is a hack to get reference to provider with standard CollaborationPlugin.
@@ -115,7 +93,7 @@ const NoteContentEditor = ({
       return provider;
     },
 
-    []
+    [],
   );
 
   const handleConnectionToggle = () => {
@@ -147,10 +125,7 @@ const NoteContentEditor = ({
 
   return (
     <div ref={containerRef}>
-      <LexicalComposer
-        initialConfig={initialConfig}
-        key={`${note.id}-${isSelected}`}
-      >
+      <LexicalComposer initialConfig={initialConfig} key={`${note.id}-${isSelected}`}>
         {/* With CollaborationPlugin - we MUST NOT use @lexical/react/LexicalHistoryPlugin */}
 
         {isSelected && (

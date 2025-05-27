@@ -21,7 +21,7 @@ services:
       MYSQL_DATABASE: notetify_db
 
   redis_dev:
-    image: redis:latest
+    image: redis:8.0.1-alpine
     container_name: notetify_redis_dev
     networks:
       notetify-net-dev:
