@@ -11,83 +11,88 @@ import MainLayout from '../pages/layout.tsx';
 import { useAuth } from './../hooks/useAuth.tsx';
 
 const AppRoutes = () => {
-  const { isAuthenticated, checkingAuth } = useAuth();
-  if (checkingAuth) return null;
+	const { isAuthenticated, checkingAuth } = useAuth();
+	if (checkingAuth) return null;
 
-  return <RouterProvider router={createBrowserRouter(isAuthenticated ? privateRoutes : publicRoutes)} key={isAuthenticated ? 'auth' : 'guest'} />;
+	return (
+		<RouterProvider
+			router={createBrowserRouter(isAuthenticated ? privateRoutes : publicRoutes)}
+			key={isAuthenticated ? 'auth' : 'guest'}
+		/>
+	);
 };
 
 export default AppRoutes;
 
 const publicRoutes = [
-  {
-    path: '/',
-    Component: Landing,
-  },
-  { path: '/login', Component: Login },
-  { path: '/register', Component: Register },
-  { path: '*', Component: () => <Navigate to="/" replace /> },
+	{
+		path: '/',
+		Component: Landing,
+	},
+	{ path: '/login', Component: Login },
+	{ path: '/register', Component: Register },
+	{ path: '*', Component: () => <Navigate to="/" replace /> },
 ];
 
 const privateRoutes = [
-  {
-    path: '/',
-    Component: MainLayout,
-    children: [
-      {
-        index: true,
-        Component: Home,
-      },
-      {
-        path: ':noteid',
-        Component: Home,
-      },
-      {
-        path: 'favorite',
-        Component: Favorite,
-        children: [
-          {
-            path: ':noteid',
-          },
-        ],
-      },
-      {
-        path: 'archive',
-        Component: Archive,
-        children: [
-          {
-            path: ':noteid',
-          },
-        ],
-      },
-      {
-        path: 'tag',
-        Component: Tag,
-        children: [
-          {
-            path: ':noteid',
-          },
-        ],
-      },
-      {
-        path: 'trash',
-        Component: Trash,
-        children: [
-          {
-            path: ':noteid',
-          },
-        ],
-      },
+	{
+		path: '/',
+		Component: MainLayout,
+		children: [
+			{
+				index: true,
+				Component: Home,
+			},
+			{
+				path: ':noteid',
+				Component: Home,
+			},
+			{
+				path: 'favorite',
+				Component: Favorite,
+				children: [
+					{
+						path: ':noteid',
+					},
+				],
+			},
+			{
+				path: 'archive',
+				Component: Archive,
+				children: [
+					{
+						path: ':noteid',
+					},
+				],
+			},
+			{
+				path: 'tag',
+				Component: Tag,
+				children: [
+					{
+						path: ':noteid',
+					},
+				],
+			},
+			{
+				path: 'trash',
+				Component: Trash,
+				children: [
+					{
+						path: ':noteid',
+					},
+				],
+			},
 
-      {
-        path: '/login',
-        Component: () => <Navigate to="/" replace />,
-      },
-      {
-        path: '/register',
-        Component: () => <Navigate to="/" replace />,
-      },
-      { path: '*', Component: () => <Navigate to="/" replace /> },
-    ],
-  },
+			{
+				path: '/login',
+				Component: () => <Navigate to="/" replace />,
+			},
+			{
+				path: '/register',
+				Component: () => <Navigate to="/" replace />,
+			},
+			{ path: '*', Component: () => <Navigate to="/" replace /> },
+		],
+	},
 ];

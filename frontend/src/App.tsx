@@ -10,28 +10,28 @@ import { ensureCSRFToken } from './lib/AxiosService.ts';
 import AppRoutes from './routes/AppRoutes.tsx';
 
 export default function App() {
-  useEffect(() => {
-    const initialize = async () => {
-      await ensureCSRFToken();
-    };
-    initialize();
-  }, []);
+	useEffect(() => {
+		const initialize = async () => {
+			await ensureCSRFToken();
+		};
+		initialize();
+	}, []);
 
-  const queryClient = new QueryClient();
+	const queryClient = new QueryClient();
 
-  return (
-    <ErrorBoundary fallback={<div>Something went wrong</div>}>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <NoteProvider>
-            <TagProvider>
-              <SideNavProvider>
-                <AppRoutes />
-              </SideNavProvider>
-            </TagProvider>
-          </NoteProvider>
-        </AuthProvider>
-      </QueryClientProvider>
-    </ErrorBoundary>
-  );
+	return (
+		<ErrorBoundary fallback={<div>Something went wrong</div>}>
+			<QueryClientProvider client={queryClient}>
+				<AuthProvider>
+					<NoteProvider>
+						<TagProvider>
+							<SideNavProvider>
+								<AppRoutes />
+							</SideNavProvider>
+						</TagProvider>
+					</NoteProvider>
+				</AuthProvider>
+			</QueryClientProvider>
+		</ErrorBoundary>
+	);
 }

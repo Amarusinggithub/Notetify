@@ -5,10 +5,10 @@ import { defineConfig } from 'vite';
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
-  envDir: path.resolve(__dirname, '../'),
-  envPrefix: 'VITE_',
-  preview: {
-    port: 3000,
-  },
+	plugins: [react(), tailwindcss()],
+	envDir: path.resolve(__dirname, '../'),
+	envPrefix: 'VITE_',
+	preview: {
+		port: 3000,
+	},
 });

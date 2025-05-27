@@ -9,31 +9,31 @@ import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin
 import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
 
 function Placeholder() {
-  return <div className="editor-placeholder">Type your note...</div>;
+	return <div className="editor-placeholder">Type your note...</div>;
 }
 
 type EditorProps = {
-  isSelected: boolean;
+	isSelected: boolean;
 };
 //      {isSelected && <ToolbarPlugin />}
 
 const Editor = (isSelected: EditorProps) => {
-  return (
-    <div className="editor-container">
-      <div className="editor-inner">
-        <RichTextPlugin
-          contentEditable={<ContentEditable className="editor-input" />}
-          placeholder={<Placeholder />}
-          ErrorBoundary={LexicalErrorBoundary}
-        />
-        <ListPlugin />
-        <LinkPlugin />
-        <AutoFocusPlugin />
-        <TablePlugin />
-        <TabIndentationPlugin />
-      </div>
-    </div>
-  );
+	return (
+		<div className="editor-container">
+			<div className="editor-inner">
+				<RichTextPlugin
+					contentEditable={<ContentEditable className="editor-input" />}
+					placeholder={<Placeholder />}
+					ErrorBoundary={LexicalErrorBoundary}
+				/>
+				<ListPlugin />
+				<LinkPlugin />
+				<AutoFocusPlugin />
+				<TablePlugin />
+				<TabIndentationPlugin />
+			</div>
+		</div>
+	);
 };
 
 export default Editor;

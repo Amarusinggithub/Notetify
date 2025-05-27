@@ -10,6 +10,9 @@
 # Exclude version control and environment files
 **/.git
 **/.gitignore
+**/.gitattributes
+**/.editorconfig
+
 **/.dockerignore
 **/.env
 
@@ -90,6 +93,7 @@ build
 # Ignore ESLint, Prettier, and other configuration files that aren't needed in the final image
 .eslint*
 .prettier*
+.prettierignore*
 .editorconfig
 .DS_Store
 

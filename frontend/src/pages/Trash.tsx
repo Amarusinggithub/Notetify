@@ -5,37 +5,42 @@ import { useSideNav } from '../hooks/useSideNav.tsx';
 import noTrashedNotes from './../../assets/No_trashed_notes.png';
 
 const Trash = () => {
-  const { isSideNavOpen } = useSideNav();
+	const { isSideNavOpen } = useSideNav();
 
-  const { trashed, isLoading, isError } = useNote();
+	const { trashed, isLoading, isError } = useNote();
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+	if (isLoading) {
+		return <div>Loading...</div>;
+	}
 
-  if (isError) {
-    return <div>Error: {isError.message}</div>;
-  }
+	if (isError) {
+		return <div>Error: {isError.message}</div>;
+	}
 
-  if (trashed.length < 1) {
-    return (
-      <>
-        <img src={noTrashedNotes} style={{ width: '100%', height: 'auto' }} className="no-notes" alt="No tagged notes" />
-      </>
-    );
-  }
+	if (trashed.length < 1) {
+		return (
+			<>
+				<img
+					src={noTrashedNotes}
+					style={{ width: '100%', height: 'auto' }}
+					className="no-notes"
+					alt="No tagged notes"
+				/>
+			</>
+		);
+	}
 
-  return (
-    <div className="container">
-      <div className="all-notes" style={{ maxWidth: isSideNavOpen ? '1200px' : '1400px' }}>
-        {trashed &&
-          trashed.map((note: UserNote | UserNoteData) => (
-            <div key={note.id} className="note-div">
-              <NoteCard note={note} route={'/trash'} />
-            </div>
-          ))}
-      </div>
-    </div>
-  );
+	return (
+		<div className="container">
+			<div className="all-notes" style={{ maxWidth: isSideNavOpen ? '1200px' : '1400px' }}>
+				{trashed &&
+					trashed.map((note: UserNote | UserNoteData) => (
+						<div key={note.id} className="note-div">
+							<NoteCard note={note} route={'/trash'} />
+						</div>
+					))}
+			</div>
+		</div>
+	);
 };
 export default Trash;
