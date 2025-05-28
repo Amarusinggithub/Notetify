@@ -1,4 +1,3 @@
-
 services:
   db:
     networks:
@@ -6,7 +5,16 @@ services:
     image: mysql:latest
     container_name: notetify_db
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-uroot",
+          "-p${MYSQL_ROOT_PASSWORD}",
+        ]
       timeout: 10s
       retries: 10
     restart: always
@@ -16,7 +24,6 @@ services:
       - "3307:3306"
     env_file:
       - .env.development
-
 
   redis:
     networks:
@@ -29,7 +36,7 @@ services:
       retries: 10
     restart: always
     depends_on:
-      db_dev:
+      db:
         condition: service_healthy
     volumes:
       - "redis-data:/data"
@@ -40,22 +47,24 @@ services:
     env_file:
       - .env.development
 
-
   yroom_worker:
-    networks:
-      - notetify-net
+    #networks:
+     # - notetify-net
     build:
       context: ./backend
-    links:
-    - redis
-    - db
-    depends_on:
-      redi:
-        condition: service_started
-      db:
-        condition: service_healthy
+      dockerfile: Dockerfile
+      target: development
+      args:
+        - REQUIREMENTS_FILE=requirements_dev.txt
+    # depends_on:
+    #  redis:
+    # condition: service_started
+    #db:
+    #  condition: service_healthy
     entrypoint: []
     command: "python manage.py yroom"
+    env_file:
+      - .env
 
   backend:
     networks:
@@ -103,7 +112,6 @@ services:
     env_file:
       - .env.development
 
-
 networks:
   notetify-net:
     driver: bridge
@@ -112,4 +120,3 @@ volumes:
   redis-data: {}
   db-data: {}
   node_modules_frontend: {}
-

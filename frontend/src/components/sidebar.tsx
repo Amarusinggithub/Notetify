@@ -56,6 +56,7 @@ const SideNav = () => {
 	const handleCreateTag = () => {
 		setTemp(true);
 		setAddTagPopupOpen(true);
+        console.log("setAddTagPopupOpen(true)")
 	};
 
 	return (

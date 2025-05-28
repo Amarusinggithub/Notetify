@@ -95,7 +95,7 @@ Copy the `.env.example` file and create a new `.env` file in both the `backend` 
 ## Run Redis In Docker
 
 ```bash
-docker run -d --name redis-notetify  -p 6379:6379 --rm redis:latest
+docker run -d --name redis-notetify  -p 6379:6379 --rm redis:8.0.1-alpine
 ```
 
 ## copy redis docker id

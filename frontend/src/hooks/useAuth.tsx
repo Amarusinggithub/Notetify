@@ -38,7 +38,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 	const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 	const [checkingAuth, setCheckingAuth] = useState<boolean>(true);
 	const [userData, setUserData] = useState<any>(null);
-	const [error, setError] = useState(null);
+	const [isError, setError] = useState(null);
 
 	const setAuth = (userData: any) => {
 		setIsAuthenticated(true);
@@ -147,7 +147,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 				setUserData,
 				checkingAuth,
 				userData,
-				error,
+				error: isError,
 				isLoading,
 				isAuthenticated,
 			}}

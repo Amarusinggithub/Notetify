@@ -40,7 +40,7 @@ const NoteCard = ({ note, route }: NoteCardProps) => {
 			if (isUserNote(noteState)) await editNote(noteState);
 		}
 		setIsEdited(false);
-	}, [noteState]);
+	}, [editNote, isEdited, noteState]);
 
 	const handleSelect = useCallback(
 		async (
@@ -53,7 +53,7 @@ const NoteCard = ({ note, route }: NoteCardProps) => {
 			if (isUserNote(note)) setSelectedNote(isSelected ? null : note);
 			if (isSelected && route !== '') navigate(route);
 		},
-		[note],
+		[handleSave, isSelected, navigate, note, route, setSelectedNote],
 	);
 
 	useEffect(() => {
@@ -236,20 +236,7 @@ const NoteCard = ({ note, route }: NoteCardProps) => {
 					/>
 				</div>
 
-				{isSelected && (
-					<div className="function-bar">
-						<button
-							onClick={(e) => {
-								handleSelect(e);
-							}}
-							className="note-save-btn"
-							type="button"
-							disabled={isLoading}
-						>
-							Close
-						</button>
-					</div>
-				)}
+				{isSelected && <div className="function-bar"></div>}
 			</div>
 		</div>
 	);

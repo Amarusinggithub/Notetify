@@ -5,7 +5,7 @@ import '../styles/AddNoteCard.css';
 import NoteContentEditor from './Editor/components/NoteContentEditor';
 
 const AddNoteCard = () => {
-	const { addNote, isLoading, data } = useNote();
+	const { addNote,  data } = useNote();
 	const cardRef = useRef<HTMLDivElement>(null);
 	let noteId;
 	if (data.length > 0) {
@@ -138,24 +138,7 @@ const AddNoteCard = () => {
 						/>
 					)}
 				</div>
-
-				{isSelected && (
-					<div className="function-bar">
-						<button
-							onClick={(e) => {
-								e.stopPropagation();
-								if (!isSelected) {
-									handleSelect(e);
-								}
-							}}
-							className="close-btn"
-							type="button"
-							disabled={isLoading}
-						>
-							Close
-						</button>
-					</div>
-				)}
+				{isSelected && <div className="function-bar"></div>}
 			</div>
 		</div>
 	);

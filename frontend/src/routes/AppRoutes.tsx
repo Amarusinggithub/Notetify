@@ -1,14 +1,16 @@
+import { lazy } from 'react';
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router';
-import AppLayout from '../layouts/AppLayout.tsx';
-import Archive from '../pages/Archive.tsx';
-import Favorite from '../pages/Favorites.tsx';
-import Home from '../pages/Home.tsx';
-import Landing from '../pages/Landing.tsx';
-import Login from '../pages/Login.tsx';
-import Register from '../pages/Register.tsx';
-import Tag from '../pages/Tag.tsx';
-import Trash from '../pages/Trash.tsx';
 import { useAuth } from './../hooks/useAuth.tsx';
+
+const AppLayout = lazy(() => import('../layouts/AppLayout.tsx'));
+const Home = lazy(() => import('../pages/Home.tsx'));
+const Archive = lazy(() => import('../pages/Archive.tsx'));
+const Favorite = lazy(() => import('../pages/Favorites.tsx'));
+const Tag = lazy(() => import('../pages/Tag.tsx'));
+const Trash = lazy(() => import('../pages/Trash.tsx'));
+const Landing = lazy(() => import('../pages/Landing.tsx'));
+const Login = lazy(() => import('../pages/Login.tsx'));
+const Register = lazy(() => import('../pages/Register.tsx'));
 
 const AppRoutes = () => {
 	const { isAuthenticated, checkingAuth } = useAuth();

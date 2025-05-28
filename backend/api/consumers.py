@@ -26,12 +26,9 @@ class LexicalConsumer(YroomConsumer):
         return get_client_options(self.scope)
 
     async def connect(self) -> None:
-        """
-        Optional: perform some sort of authentication
-        """
+
+        self.conn_id = self.channel_name
+
         user = self.scope["user"]
-        if not user.is_staff:
-            await self.close()
-            return
 
         await super().connect()

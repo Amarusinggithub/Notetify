@@ -2,7 +2,6 @@ import {
 	faBars,
 	faGear,
 	faList,
-	faMagnifyingGlass,
 	faRotateRight,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -13,11 +12,12 @@ import '../styles/navbar.css';
 
 import useDebounce from '../hooks/useDebounce.ts';
 import logo from './../../assets/notetify-logo.png';
+import SearchBar from './ui/SearchBar.tsx';
 
 const Navbar = () => {
 	const { isSideNavOpen, setIsSideNavOpen } = useSideNav();
 	const { handleSearch, title, refetch, search, setSearch } = useNote();
-	const debouncedQuery = useDebounce(search, 150);
+	const debouncedQuery = useDebounce(search, 300);
 
 	useEffect(() => {
 		if (debouncedQuery != undefined && debouncedQuery !== '') {
@@ -70,25 +70,13 @@ const Navbar = () => {
 				)}
 			</div>
 
-			<form
-				onSubmit={(e) => {
-					handleSearchSubmit(e);
-				}}
-				className="search-container"
-			>
-				<button type="submit">
-					<FontAwesomeIcon icon={faMagnifyingGlass} className="search-icon" />
-				</button>
-				<input
-					name="search"
-					placeholder="Search"
-					value={search}
-					onChange={(e) => {
-						handleSearchChange(e);
-					}}
-					type="text"
-				/>
-			</form>
+			<SearchBar
+				onchange={handleSearchChange}
+				onSubmit={handleSearchSubmit}
+				search={search}
+				placeholder={` Search ${title}`}
+				classname={'search-container'}
+			/>
 
 			<div className="icons-container">
 				<button

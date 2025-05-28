@@ -25,7 +25,7 @@ const AppLayout = () => {
 					style={{ marginLeft: isSideNavOpen ? '250px' : '50px' }}
 				>
 					{search && search.trim().length >= 1 ? <Search /> : <Outlet />}
-					{isAddTagPopupOpen && <AddTagPopup />}
+					{isAddTagPopupOpen && <AddTagPopup/>}
 					{wantToDeleteTag && <DeleteTagPopup />}
 					{wantToEditTag && <EditTagPopup />}
 				</div>

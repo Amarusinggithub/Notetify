@@ -2,8 +2,8 @@ import {
 	QueryObserverResult,
 	RefetchOptions,
 	useMutation,
-	useQuery,
 	useQueryClient,
+	useSuspenseQuery,
 } from '@tanstack/react-query';
 import React, {
 	createContext,
@@ -21,7 +21,6 @@ import {
 } from '../lib/NoteService.ts';
 import { CreateNote, Note, Tag } from '../types/index.ts';
 import { isUserNote } from './../utils/helpers';
-import { useAuth } from './useAuth.tsx';
 
 interface NoteContextType {
 	search: string;
@@ -92,17 +91,15 @@ const categorizedNotes = (notesArray: (Note | CreateNote)[]) => {
 };
 
 const NoteProvider = ({ children }: NoteProviderProps) => {
-	const { isAuthenticated } = useAuth();
 	const queryClient = useQueryClient();
 	const {
 		data = [],
 		isError,
 		isLoading,
 		refetch,
-	} = useQuery({
+	} = useSuspenseQuery({
 		queryKey: ['notes'],
 		queryFn: getNotes,
-		enabled: isAuthenticated,
 	});
 
 	const { pinned, favorites, archived, trashed, filtered, other } =

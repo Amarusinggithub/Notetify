@@ -27,20 +27,20 @@ const Search = () => {
 
 	return (
 		<ErrorBoundary FallbackComponent={ErrorFallback}>
-			<Suspense fallback={<Loading />}>
-				<div>
-					<div
-						className="all-notes"
-						style={{ maxWidth: isSideNavOpen ? '1200px' : '1400px' }}
-					>
-						{searchNotes?.map((note: Note | CreateNote) => (
+			<div>
+				<div
+					className="all-notes"
+					style={{ maxWidth: isSideNavOpen ? '1200px' : '1400px' }}
+				>
+					{searchNotes?.map((note: Note | CreateNote) => (
+						<Suspense key={note.id} fallback={<Loading />}>
 							<div key={note.id} className="note-div">
 								<NoteCard note={note} route={''} />
 							</div>
-						))}
-					</div>
+						</Suspense>
+					))}
 				</div>
-			</Suspense>
+			</div>
 		</ErrorBoundary>
 	);
 };

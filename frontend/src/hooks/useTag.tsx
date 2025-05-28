@@ -5,10 +5,13 @@ import React, {
 	useState,
 } from 'react';
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+	useMutation,
+	useQueryClient,
+	useSuspenseQuery,
+} from '@tanstack/react-query';
 import { Tag } from 'types/index.ts';
 import { createTag, deleteTag, getTags, updateTag } from '../lib/TagService.ts';
-import { useAuth } from './useAuth.tsx';
 
 interface TagContextType {
 	selectedTag: Tag | null;
@@ -30,16 +33,14 @@ type TagProviderProps = PropsWithChildren;
 const TagContext = createContext<TagContextType | undefined>(undefined);
 
 const TagProvider = ({ children }: TagProviderProps) => {
-	const { isAuthenticated } = useAuth();
 	const queryClient = useQueryClient();
 	const {
 		data = [],
 		isLoading,
 		isError,
-	} = useQuery({
+	} = useSuspenseQuery({
 		queryKey: ['tags'],
 		queryFn: getTags,
-		enabled: isAuthenticated,
 	});
 
 	const [selectedTag, setSelectedTag] = useState<Tag | null>(null);
@@ -88,6 +89,7 @@ const TagProvider = ({ children }: TagProviderProps) => {
 	const removeTag = async (tag: Tag) => {
 		deleteTagMutation.mutate(tag);
 	};
+	
 
 	return (
 		<TagContext.Provider

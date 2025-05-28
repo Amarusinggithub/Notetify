@@ -1,14 +1,14 @@
-import { Suspense } from 'react';
+import { Suspense, lazy } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { CreateNote, Note } from 'types/index.ts';
 import AddNoteCard from '../components/AddNoteCard.tsx';
-import NoteCard from '../components/NoteCard.tsx';
 import useNote from '../hooks/useNote.tsx';
 import { useSideNav } from '../hooks/useSideNav.tsx';
 import '../styles/Homepage.css';
 import noNotes from './../../assets/No_Note.png';
 import ErrorFallback from './Error.tsx';
 import Loading from './Loading.tsx';
+import NoteCard from '../components/NoteCard.tsx'
 
 const Home = () => {
 	const { pinned, other, data } = useNote();
@@ -32,7 +32,6 @@ const Home = () => {
 	}
 	return (
 		<ErrorBoundary FallbackComponent={ErrorFallback}>
-			<Suspense fallback={<Loading />}>
 				<div className="container">
 					<div className="add-note-card-cantainer">
 						<AddNoteCard />
@@ -47,9 +46,11 @@ const Home = () => {
 								style={{ maxWidth: isSideNavOpen ? '1200px' : '1360px' }}
 							>
 								{pinned.map((note: Note | CreateNote) => (
-									<div key={note.id} className="note-div">
-										<NoteCard note={note} route={'/'} />
-									</div>
+									<Suspense key={note.id} fallback={<Loading />}>
+										<div key={note.id} className="note-div">
+											<NoteCard note={note} route={'/'} />
+										</div>
+									</Suspense>
 								))}
 							</div>
 						</>
@@ -65,15 +66,16 @@ const Home = () => {
 								style={{ maxWidth: isSideNavOpen ? '1200px' : '1400px' }}
 							>
 								{other?.map((note: Note | CreateNote) => (
-									<div key={note.id} className="note-div">
-										<NoteCard note={note} route={'/'} />
-									</div>
+									<Suspense key={note.id} fallback={<Loading />}>
+										<div key={note.id} className="note-div">
+											<NoteCard note={note} route={'/'} />
+										</div>
+									</Suspense>
 								))}
 							</div>
 						</>
 					)}
 				</div>
-			</Suspense>
 		</ErrorBoundary>
 	);
 };
