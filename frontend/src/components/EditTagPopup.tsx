@@ -37,7 +37,10 @@ const EditTagPopup = () => {
 
 	return (
 		<div className="edit-tag-popup-bg" onClick={handleClose}>
-			<div className="edit-tag-popup-container" onClick={(e) => e.stopPropagation()}>
+			<div
+				className="edit-tag-popup-container"
+				onClick={(e) => e.stopPropagation()}
+			>
 				<div className="edit-tag-header">
 					<h1 className="edit-tag-title">Edit Tag</h1>
 					<button onClick={handleClose} className="close-btn">

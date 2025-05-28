@@ -62,8 +62,12 @@ const Navbar = () => {
 					</div>
 				)}
 
-				{(title.length <= 0 || title === 'Notes') && <h1 className="title-header">Notetify</h1>}
-				{title.length > 0 && title !== 'Notes' && <h1 className="title-header">{title}</h1>}
+				{(title.length <= 0 || title === 'Notes') && (
+					<h1 className="title-header">Notetify</h1>
+				)}
+				{title.length > 0 && title !== 'Notes' && (
+					<h1 className="title-header">{title}</h1>
+				)}
 			</div>
 
 			<form

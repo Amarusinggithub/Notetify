@@ -33,7 +33,11 @@ axiosInstance.interceptors.response.use(
 		if (originalRequest.url?.includes('token/refresh')) {
 			return Promise.reject(error);
 		}
-		if (error.response && error.response.status === 401 && !originalRequest._retry) {
+		if (
+			error.response &&
+			error.response.status === 401 &&
+			!originalRequest._retry
+		) {
 			if (isRefreshing) {
 				// If a refresh is already in progress, queue the request
 				return new Promise((resolve, reject) => {

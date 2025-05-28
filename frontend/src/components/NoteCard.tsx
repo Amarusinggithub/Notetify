@@ -1,7 +1,12 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import '../styles/NoteCard.css';
 
-import { faStar, faThumbTack, faTrashCan, faXmark } from '@fortawesome/free-solid-svg-icons';
+import {
+	faStar,
+	faThumbTack,
+	faTrashCan,
+	faXmark,
+} from '@fortawesome/free-solid-svg-icons';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { CreateNote, Note } from 'types/index.ts';
@@ -53,7 +58,11 @@ const NoteCard = ({ note, route }: NoteCardProps) => {
 
 	useEffect(() => {
 		function onDocClick(e: MouseEvent) {
-			if (isSelected && cardRef.current && !cardRef.current.contains(e.target as Node)) {
+			if (
+				isSelected &&
+				cardRef.current &&
+				!cardRef.current.contains(e.target as Node)
+			) {
 				handleSelect(e as any);
 			}
 		}
@@ -123,7 +132,9 @@ const NoteCard = ({ note, route }: NoteCardProps) => {
 		);
 	};
 
-	const handleDeleteNote = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+	const handleDeleteNote = async (
+		e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+	) => {
 		e.preventDefault();
 		e.stopPropagation();
 		if (isUserNote(note)) await removeNote(note);
@@ -167,33 +178,37 @@ const NoteCard = ({ note, route }: NoteCardProps) => {
 								}}
 								className="delete-note-btn"
 							>
-								<FontAwesomeIcon icon={faTrashCan} className="note-trash-icon" />
+								<FontAwesomeIcon
+									icon={faTrashCan}
+									className="note-trash-icon"
+								/>
 							</button>
 						)}
 
-						{noteState.is_archived == false && noteState.is_trashed == false && (
-							<div className="pin-favorite-actions">
-								<button
-									onClick={(e) => {
-										e.stopPropagation();
-										if (isUserNote(note)) handlePin(note);
-									}}
-									className="note-pin-btn"
-								>
-									<FontAwesomeIcon icon={faThumbTack} className="pin-icon" />
-								</button>
+						{noteState.is_archived == false &&
+							noteState.is_trashed == false && (
+								<div className="pin-favorite-actions">
+									<button
+										onClick={(e) => {
+											e.stopPropagation();
+											if (isUserNote(note)) handlePin(note);
+										}}
+										className="note-pin-btn"
+									>
+										<FontAwesomeIcon icon={faThumbTack} className="pin-icon" />
+									</button>
 
-								<button
-									onClick={(e) => {
-										e.stopPropagation();
-										if (isUserNote(note)) handleFavorite(note);
-									}}
-									className="note-favorite-btn"
-								>
-									<FontAwesomeIcon icon={faStar} className="favorite-icon" />
-								</button>
-							</div>
-						)}
+									<button
+										onClick={(e) => {
+											e.stopPropagation();
+											if (isUserNote(note)) handleFavorite(note);
+										}}
+										className="note-favorite-btn"
+									>
+										<FontAwesomeIcon icon={faStar} className="favorite-icon" />
+									</button>
+								</div>
+							)}
 					</div>
 
 					<input
@@ -201,12 +216,20 @@ const NoteCard = ({ note, route }: NoteCardProps) => {
 						onChange={(e) => {
 							isSelected ? handleTitleInput(e) : null;
 						}}
-						value={isUserNote(noteState) ? noteState.note?.title : noteState.note_data?.title}
+						value={
+							isUserNote(noteState)
+								? noteState.note?.title
+								: noteState.note_data?.title
+						}
 						disabled={!isSelected}
 					/>
 
 					<NoteContentEditor
-						content={isUserNote(noteState) ? noteState.note?.content : noteState.note_data?.content}
+						content={
+							isUserNote(noteState)
+								? noteState.note?.content
+								: noteState.note_data?.content
+						}
 						handleContentInput={handleContentInput}
 						isSelected={isSelected!}
 						note={noteState}

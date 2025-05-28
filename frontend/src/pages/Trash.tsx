@@ -29,7 +29,10 @@ const Trash = () => {
 	return (
 		<ErrorBoundary FallbackComponent={ErrorFallback}>
 			<div className="container">
-				<div className="all-notes" style={{ maxWidth: isSideNavOpen ? '1200px' : '1400px' }}>
+				<div
+					className="all-notes"
+					style={{ maxWidth: isSideNavOpen ? '1200px' : '1400px' }}
+				>
 					{trashed &&
 						trashed.map((note: Note | CreateNote) => (
 							<Suspense key={note.id} fallback={<Loading />}>

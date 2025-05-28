@@ -55,7 +55,9 @@ export const updateNote = async (note: Note) => {
 
 export const deleteNote = async (note: Note) => {
 	try {
-		const response = await axiosInstance.delete(`notes/delete_note/${note.id}/`);
+		const response = await axiosInstance.delete(
+			`notes/delete_note/${note.id}/`,
+		);
 		return response.status;
 	} catch (e) {
 		console.error(e);

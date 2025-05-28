@@ -13,7 +13,8 @@ const SideNav = () => {
 	const navigate = useNavigate();
 	const { isSideNavOpen, setAddTagPopupOpen, sidebarMenuItems } = useSideNav();
 	const { handleTagClick, setPage } = useNote();
-	const { data, setWantToDeleteTag, setSelectedTag, setWantToEditTag } = useTag();
+	const { data, setWantToDeleteTag, setSelectedTag, setWantToEditTag } =
+		useTag();
 
 	const [temp, setTemp] = useState<any>(sidebarMenuItems[0]);
 	const [tempId, setTempId] = useState<any>(null);
@@ -76,7 +77,8 @@ const SideNav = () => {
 							borderBottomLeftRadius: isSideNavOpen ? '0px' : '360px',
 							borderBottomRightRadius: isSideNavOpen ? '50px' : '360px',
 							justifyContent: isSideNavOpen ? 'start' : 'start',
-							backgroundColor: sidebarMenuItems[index] === temp ? ' rgb(65, 51, 28)' : '',
+							backgroundColor:
+								sidebarMenuItems[index] === temp ? ' rgb(65, 51, 28)' : '',
 						}}
 						className="sidenav-item"
 					>
@@ -107,7 +109,9 @@ const SideNav = () => {
 						{isSideNavOpen && <h3>{'Add Tag'}</h3>}
 					</div>
 				</li>
-				{isSideNavOpen && data?.length > 0 && <h3 className="title-tags">Tags</h3>}
+				{isSideNavOpen && data?.length > 0 && (
+					<h3 className="title-tags">Tags</h3>
+				)}
 				{data?.length > 0 && (
 					<ul className="tags">
 						{data.map((tag: Tag, index: number) => (

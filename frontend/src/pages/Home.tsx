@@ -60,7 +60,10 @@ const Home = () => {
 							<div className="flex-column">
 								<h1>Others</h1>
 							</div>
-							<div className="all-notes" style={{ maxWidth: isSideNavOpen ? '1200px' : '1400px' }}>
+							<div
+								className="all-notes"
+								style={{ maxWidth: isSideNavOpen ? '1200px' : '1400px' }}
+							>
 								{other?.map((note: Note | CreateNote) => (
 									<div key={note.id} className="note-div">
 										<NoteCard note={note} route={'/'} />

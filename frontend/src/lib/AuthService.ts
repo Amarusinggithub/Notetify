@@ -10,12 +10,19 @@ export const login = async (email: string, password: string) => {
 		console.log('Login successful. Tokens stored.');
 		return response;
 	} catch (error: any) {
-		console.error('Login error:', error.response ? error.response.data : error.message);
+		console.error(
+			'Login error:',
+			error.response ? error.response.data : error.message,
+		);
 		throw error;
 	}
 };
 
-export const signUp = async (email: string, username: string, password: string) => {
+export const signUp = async (
+	email: string,
+	username: string,
+	password: string,
+) => {
 	try {
 		const response = await axiosInstance.post('register/', {
 			email: email,
@@ -26,7 +33,10 @@ export const signUp = async (email: string, username: string, password: string) 
 		console.log('Signup successful. Tokens stored.');
 		return response;
 	} catch (error: any) {
-		console.error('Signup error:', error.response ? error.response.data : error.message);
+		console.error(
+			'Signup error:',
+			error.response ? error.response.data : error.message,
+		);
 		throw error;
 	}
 };
@@ -36,7 +46,10 @@ export const logout = async () => {
 		const response = await axiosInstance.post('logout/');
 		return response;
 	} catch (error: any) {
-		console.error('Logout error:', error.response ? error.response.data : error.message);
+		console.error(
+			'Logout error:',
+			error.response ? error.response.data : error.message,
+		);
 		throw error;
 	}
 };

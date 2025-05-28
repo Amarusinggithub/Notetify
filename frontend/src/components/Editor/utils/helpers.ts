@@ -48,7 +48,10 @@ export default function parseOrDefault(input: string): string {
 }
 
 function sanitize(node: LexicalJSONNode) {
-	if (node.type === 'listitem' && (!Number.isInteger(node.indent) || node.indent! < 0)) {
+	if (
+		node.type === 'listitem' &&
+		(!Number.isInteger(node.indent) || node.indent! < 0)
+	) {
 		node.indent = 0;
 	}
 	node.children?.forEach(sanitize);

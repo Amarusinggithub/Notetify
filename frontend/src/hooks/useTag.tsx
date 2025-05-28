@@ -1,4 +1,9 @@
-import React, { createContext, PropsWithChildren, useContext, useState } from 'react';
+import React, {
+	createContext,
+	PropsWithChildren,
+	useContext,
+	useState,
+} from 'react';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Tag } from 'types/index.ts';
@@ -50,7 +55,11 @@ const TagProvider = ({ children }: TagProviderProps) => {
 
 	const makeTag = async (tagName: string) => {
 		if (tagName!.trim().length > 0)
-			if (data.some((tag: Tag) => tag.name.toLowerCase() === tagName.toLowerCase())) {
+			if (
+				data.some(
+					(tag: Tag) => tag.name.toLowerCase() === tagName.toLowerCase(),
+				)
+			) {
 				alert('Tag already exists!');
 				return;
 			}

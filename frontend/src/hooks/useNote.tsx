@@ -13,7 +13,12 @@ import React, {
 	useMemo,
 	useState,
 } from 'react';
-import { createNote, deleteNote, getNotes, updateNote } from '../lib/NoteService.ts';
+import {
+	createNote,
+	deleteNote,
+	getNotes,
+	updateNote,
+} from '../lib/NoteService.ts';
 import { CreateNote, Note, Tag } from '../types/index.ts';
 import { isUserNote } from './../utils/helpers';
 import { useAuth } from './useAuth.tsx';
@@ -34,7 +39,9 @@ interface NoteContextType {
 	other: (Note | CreateNote)[];
 	data: (Note | CreateNote)[];
 	setTagNotes: React.Dispatch<React.SetStateAction<(Note | CreateNote)[]>>;
-	refetch: (options?: RefetchOptions) => Promise<QueryObserverResult<any, Error>>;
+	refetch: (
+		options?: RefetchOptions,
+	) => Promise<QueryObserverResult<any, Error>>;
 	setPage: React.Dispatch<React.SetStateAction<string>>;
 	handleSearch: (search: string | undefined) => void;
 	addNote: (note: CreateNote) => Promise<void>;
@@ -98,9 +105,10 @@ const NoteProvider = ({ children }: NoteProviderProps) => {
 		enabled: isAuthenticated,
 	});
 
-	const { pinned, favorites, archived, trashed, filtered, other } = useMemo(() => {
-		return categorizedNotes(data);
-	}, [data]);
+	const { pinned, favorites, archived, trashed, filtered, other } =
+		useMemo(() => {
+			return categorizedNotes(data);
+		}, [data]);
 
 	const [page, setPage] = useState('Notes');
 	const [search, setSearch] = useState('');
@@ -137,7 +145,16 @@ const NoteProvider = ({ children }: NoteProviderProps) => {
 			);
 			setSearchNotes(filteredNotes);
 		},
-		[page, other, pinned, favorites, archived, trashed, tagNotes, setSearchNotes],
+		[
+			page,
+			other,
+			pinned,
+			favorites,
+			archived,
+			trashed,
+			tagNotes,
+			setSearchNotes,
+		],
 	);
 
 	const handleTagClick = (tag: Tag) => {
@@ -177,7 +194,10 @@ const NoteProvider = ({ children }: NoteProviderProps) => {
 	});
 
 	const addNote = async (note: CreateNote) => {
-		if (note.note_data.content!.trim().length != 0 && note.note_data.title!.trim().length != 0)
+		if (
+			note.note_data.content!.trim().length != 0 &&
+			note.note_data.title!.trim().length != 0
+		)
 			addNoteMutation.mutate(note);
 	};
 
@@ -189,7 +209,10 @@ const NoteProvider = ({ children }: NoteProviderProps) => {
 	});
 
 	const editNote = async (note: Note) => {
-		if (note.note.content!.trim().length != 0 && note.note.title!.trim().length != 0)
+		if (
+			note.note.content!.trim().length != 0 &&
+			note.note.title!.trim().length != 0
+		)
 			editNoteMutation.mutate(note);
 	};
 

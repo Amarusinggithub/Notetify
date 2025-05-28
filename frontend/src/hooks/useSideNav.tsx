@@ -1,5 +1,15 @@
-import { faArchive, faLightbulb, faStar, faTrash } from '@fortawesome/free-solid-svg-icons';
-import React, { createContext, PropsWithChildren, useContext, useState } from 'react';
+import {
+	faArchive,
+	faLightbulb,
+	faStar,
+	faTrash,
+} from '@fortawesome/free-solid-svg-icons';
+import React, {
+	createContext,
+	PropsWithChildren,
+	useContext,
+	useState,
+} from 'react';
 import { SideMenuItem } from 'types';
 
 type SideNavContextType = {
@@ -15,7 +25,9 @@ type SideNavContextType = {
 
 type SideNavProviderProps = PropsWithChildren;
 
-export const SideNavContext = createContext<SideNavContextType | undefined>(undefined);
+export const SideNavContext = createContext<SideNavContextType | undefined>(
+	undefined,
+);
 
 export const useSideNav = () => {
 	const context = useContext(SideNavContext);

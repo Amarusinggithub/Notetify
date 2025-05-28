@@ -12,7 +12,11 @@ import { USERDATA_STORAGE_KEY } from './../types/index.ts';
 
 type AuthProviderProps = PropsWithChildren;
 interface AuthContextType {
-	handleSignup: (email: string, username: string, password: string) => Promise<void>;
+	handleSignup: (
+		email: string,
+		username: string,
+		password: string,
+	) => Promise<void>;
 	handleLogin: (username: string, password: string) => Promise<void>;
 	handleLogout: () => Promise<void>;
 	setLoading: React.Dispatch<React.SetStateAction<boolean>>;
@@ -48,7 +52,11 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 		localStorage.removeItem(USERDATA_STORAGE_KEY);
 	};
 
-	const handleSignup = async (email: string, username: string, password: string) => {
+	const handleSignup = async (
+		email: string,
+		username: string,
+		password: string,
+	) => {
 		try {
 			setLoading(true);
 			setError(null);

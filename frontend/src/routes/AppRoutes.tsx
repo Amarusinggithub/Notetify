@@ -16,7 +16,9 @@ const AppRoutes = () => {
 
 	return (
 		<RouterProvider
-			router={createBrowserRouter(isAuthenticated ? privateRoutes : publicRoutes)}
+			router={createBrowserRouter(
+				isAuthenticated ? privateRoutes : publicRoutes,
+			)}
 			key={isAuthenticated ? 'auth' : 'guest'}
 		/>
 	);

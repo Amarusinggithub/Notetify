@@ -75,7 +75,11 @@ const AddNoteCard = () => {
 
 	useEffect(() => {
 		function onDocClick(e: MouseEvent) {
-			if (isSelected && cardRef.current && !cardRef.current.contains(e.target as Node)) {
+			if (
+				isSelected &&
+				cardRef.current &&
+				!cardRef.current.contains(e.target as Node)
+			) {
 				handleSelect(e as any);
 			}
 		}

@@ -29,7 +29,10 @@ const Tag = () => {
 		<ErrorBoundary FallbackComponent={ErrorFallback}>
 			<Suspense fallback={<Loading />}>
 				<div className="container">
-					<div className="all-notes" style={{ maxWidth: isSideNavOpen ? '1200px' : '1400px' }}>
+					<div
+						className="all-notes"
+						style={{ maxWidth: isSideNavOpen ? '1200px' : '1400px' }}
+					>
 						{tagNotes?.map((note: Note | CreateNote) => (
 							<div key={note.id} className="note-div">
 								<NoteCard note={note} route={'/tag'} />

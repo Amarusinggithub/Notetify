@@ -10,7 +10,10 @@ import { Provider } from '@lexical/yjs';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import * as Y from 'yjs';
 import EditorTheme from '../style/EditorTheme.ts';
-import { getRandomUserProfile, UserProfile } from '../utils/getRandomUserProfile.ts';
+import {
+	getRandomUserProfile,
+	UserProfile,
+} from '../utils/getRandomUserProfile.ts';
 
 import { WebsocketProvider } from 'y-websocket';
 import '../../../styles/NoteContentEditor.css';
@@ -38,7 +41,9 @@ const NoteContentEditor = ({
 }: NoteContentEditorProps) => {
 	const editorRef = useRef(null);
 	const validContent = parseOrDefault(content);
-	const [userProfile, setUserProfile] = useState(() => getRandomUserProfile(''));
+	const [userProfile, setUserProfile] = useState(() =>
+		getRandomUserProfile(''),
+	);
 	const containerRef = useRef<HTMLDivElement | null>(null);
 	const [yjsProvider, setYjsProvider] = useState<null | Provider>(null);
 	const [connected, setConnected] = useState(false);
@@ -52,7 +57,15 @@ const NoteContentEditor = ({
 		onError: (error: Error) => {
 			throw error;
 		},
-		nodes: [HeadingNode, ListNode, ListItemNode, LinkNode, TableNode, TableCellNode, TableRowNode],
+		nodes: [
+			HeadingNode,
+			ListNode,
+			ListItemNode,
+			LinkNode,
+			TableNode,
+			TableCellNode,
+			TableRowNode,
+		],
 		editable: isSelected,
 		editorState: validContent,
 	};
@@ -60,11 +73,13 @@ const NoteContentEditor = ({
 	const handleAwarenessUpdate = useCallback(() => {
 		const awareness = yjsProvider!.awareness!;
 		setActiveUsers(
-			Array.from(awareness.getStates().entries()).map(([userId, { color, name }]) => ({
-				color,
-				name,
-				userId,
-			})),
+			Array.from(awareness.getStates().entries()).map(
+				([userId, { color, name }]) => ({
+					color,
+					name,
+					userId,
+				}),
+			),
 		);
 	}, [yjsProvider]);
 
@@ -130,7 +145,10 @@ const NoteContentEditor = ({
 
 	return (
 		<div ref={containerRef}>
-			<LexicalComposer initialConfig={initialConfig} key={`${note.id}-${isSelected}`}>
+			<LexicalComposer
+				initialConfig={initialConfig}
+				key={`${note.id}-${isSelected}`}
+			>
 				{/* With CollaborationPlugin - we MUST NOT use @lexical/react/LexicalHistoryPlugin */}
 
 				{isSelected && (

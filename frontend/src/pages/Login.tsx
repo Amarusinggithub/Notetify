@@ -24,7 +24,11 @@ const Login = () => {
 
 	return (
 		<div className="login-container">
-			<form className="login-form" data-testid="cypress-Login-form" onSubmit={handleSubmit}>
+			<form
+				className="login-form"
+				data-testid="cypress-Login-form"
+				onSubmit={handleSubmit}
+			>
 				<h1 data-testid="cypress-Login-title">Login</h1>
 				<div className="form-ui">
 					<div className="fields">

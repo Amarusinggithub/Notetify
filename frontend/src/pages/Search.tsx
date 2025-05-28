@@ -29,7 +29,10 @@ const Search = () => {
 		<ErrorBoundary FallbackComponent={ErrorFallback}>
 			<Suspense fallback={<Loading />}>
 				<div>
-					<div className="all-notes" style={{ maxWidth: isSideNavOpen ? '1200px' : '1400px' }}>
+					<div
+						className="all-notes"
+						style={{ maxWidth: isSideNavOpen ? '1200px' : '1400px' }}
+					>
 						{searchNotes?.map((note: Note | CreateNote) => (
 							<div key={note.id} className="note-div">
 								<NoteCard note={note} route={''} />

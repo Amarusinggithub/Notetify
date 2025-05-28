@@ -35,7 +35,10 @@ const AddTagPopup = () => {
 
 	return (
 		<div className="add-tag-popup-bg" onClick={handleClose}>
-			<div className="add-tag-popup-container" onClick={(e) => e.stopPropagation()}>
+			<div
+				className="add-tag-popup-container"
+				onClick={(e) => e.stopPropagation()}
+			>
 				<div className="add-tag-header">
 					<h1 className="add-tag-title">Create Tag</h1>
 					<button onClick={handleClose} className="close-btn">
@@ -59,8 +62,8 @@ const AddTagPopup = () => {
 					<div className="tag-info-text">
 						<h3 className="tag-info-title">What is a Tag?</h3>
 						<p className="tag-info-description">
-							Tags help you categorize and quickly find your notes by linking related content under
-							a common label.
+							Tags help you categorize and quickly find your notes by linking
+							related content under a common label.
 						</p>
 					</div>
 				</div>

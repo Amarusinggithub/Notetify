@@ -30,7 +30,10 @@ const Favorite = () => {
 		<ErrorBoundary FallbackComponent={ErrorFallback}>
 			<Suspense fallback={<Loading />}>
 				<div className="container">
-					<div className="all-notes" style={{ maxWidth: isSideNavOpen ? '1200px' : '1400px' }}>
+					<div
+						className="all-notes"
+						style={{ maxWidth: isSideNavOpen ? '1200px' : '1400px' }}
+					>
 						{favorites &&
 							favorites.map((note: Note | CreateNote) => (
 								<div key={note.id} className="note-div">

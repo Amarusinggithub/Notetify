@@ -18,7 +18,9 @@ const Register = () => {
 		setState({ ...state, [e.target.name]: e.target.value });
 	}
 
-	async function handleSubmit(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+	async function handleSubmit(
+		e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+	) {
 		e.preventDefault();
 
 		if (state.password !== state.confirmPassword) {
