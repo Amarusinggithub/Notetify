@@ -1,22 +1,18 @@
-import { UserNote, UserNoteData } from 'types/index.ts';
+import { Suspense } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
+import { CreateNote, Note } from 'types/index.ts';
 import NoteCard from '../components/NoteCard.tsx';
 import useNote from '../hooks/useNote.tsx';
 import { useSideNav } from '../hooks/useSideNav.tsx';
 import noTaggedNotes from './../../assets/No_tagged_Notes.png';
+import ErrorFallback from './Error.tsx';
+import Loading from './Loading.tsx';
 
 const Tag = () => {
-	const { tagNotes, isLoading, isError } = useNote();
+	const { tagNotes, data } = useNote();
 	const { isSideNavOpen } = useSideNav();
 
-	if (isLoading) {
-		return <div>Loading...</div>;
-	}
-
-	if (isError) {
-		return <div>Error: {isError.message}</div>;
-	}
-
-	if (tagNotes.length < 1) {
+	if (data!.length! > 0 && tagNotes.length == 0) {
 		return (
 			<>
 				<img
@@ -30,15 +26,19 @@ const Tag = () => {
 	}
 
 	return (
-		<div className="container">
-			<div className="all-notes" style={{ maxWidth: isSideNavOpen ? '1200px' : '1400px' }}>
-				{tagNotes?.map((note: UserNote | UserNoteData) => (
-					<div key={note.id} className="note-div">
-						<NoteCard note={note} route={'/tag'} />
+		<ErrorBoundary FallbackComponent={ErrorFallback}>
+			<Suspense fallback={<Loading />}>
+				<div className="container">
+					<div className="all-notes" style={{ maxWidth: isSideNavOpen ? '1200px' : '1400px' }}>
+						{tagNotes?.map((note: Note | CreateNote) => (
+							<div key={note.id} className="note-div">
+								<NoteCard note={note} route={'/tag'} />
+							</div>
+						))}
 					</div>
-				))}
-			</div>
-		</div>
+				</div>
+			</Suspense>
+		</ErrorBoundary>
 	);
 };
 

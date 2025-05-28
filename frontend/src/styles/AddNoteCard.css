@@ -1,10 +1,13 @@
 .add-note-card {
+	position: relative;
 	display: flex;
-	padding: 20px;
+	padding: 5px;
 	flex-direction: column;
 	align-items: center;
 	gap: 1rem;
+	width: 700px;
 	justify-content: center;
+	text-align: center;
 	max-width: 3500px;
 	height: auto;
 	border-radius: 12px;

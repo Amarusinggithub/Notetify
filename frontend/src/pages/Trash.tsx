@@ -1,23 +1,19 @@
-import { UserNote, UserNoteData } from 'types/index.ts';
+import { Suspense } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
+import { CreateNote, Note } from 'types/index.ts';
 import NoteCard from '../components/NoteCard.tsx';
 import useNote from '../hooks/useNote.tsx';
 import { useSideNav } from '../hooks/useSideNav.tsx';
 import noTrashedNotes from './../../assets/No_trashed_notes.png';
+import ErrorFallback from './Error.tsx';
+import Loading from './Loading.tsx';
 
 const Trash = () => {
 	const { isSideNavOpen } = useSideNav();
 
-	const { trashed, isLoading, isError } = useNote();
+	const { trashed, data } = useNote();
 
-	if (isLoading) {
-		return <div>Loading...</div>;
-	}
-
-	if (isError) {
-		return <div>Error: {isError.message}</div>;
-	}
-
-	if (trashed.length < 1) {
+	if (data!.length! > 0 && trashed.length == 0) {
 		return (
 			<>
 				<img
@@ -31,16 +27,20 @@ const Trash = () => {
 	}
 
 	return (
-		<div className="container">
-			<div className="all-notes" style={{ maxWidth: isSideNavOpen ? '1200px' : '1400px' }}>
-				{trashed &&
-					trashed.map((note: UserNote | UserNoteData) => (
-						<div key={note.id} className="note-div">
-							<NoteCard note={note} route={'/trash'} />
-						</div>
-					))}
+		<ErrorBoundary FallbackComponent={ErrorFallback}>
+			<div className="container">
+				<div className="all-notes" style={{ maxWidth: isSideNavOpen ? '1200px' : '1400px' }}>
+					{trashed &&
+						trashed.map((note: Note | CreateNote) => (
+							<Suspense key={note.id} fallback={<Loading />}>
+								<div key={note.id} className="note-div">
+									<NoteCard note={note} route={'/trash'} />
+								</div>
+							</Suspense>
+						))}
+				</div>
 			</div>
-		</div>
+		</ErrorBoundary>
 	);
 };
 export default Trash;

@@ -7,50 +7,49 @@ import useNote from '../hooks/useNote.tsx';
 import { useSideNav } from '../hooks/useSideNav.tsx';
 import useTag from '../hooks/useTag.tsx';
 import '../styles/sidebar.css';
-import { sidebarData } from '../utils/sidebarData.ts';
 
 const SideNav = () => {
 	const location = useLocation();
 	const navigate = useNavigate();
-	const { isSideNavOpen, setAddTagPopupOpen } = useSideNav();
-	const { handleTagClick, setTitle } = useNote();
+	const { isSideNavOpen, setAddTagPopupOpen, sidebarMenuItems } = useSideNav();
+	const { handleTagClick, setPage } = useNote();
 	const { data, setWantToDeleteTag, setSelectedTag, setWantToEditTag } = useTag();
 
-	const [temp, setTemp] = useState<any>(sidebarData[0]);
+	const [temp, setTemp] = useState<any>(sidebarMenuItems[0]);
 	const [tempId, setTempId] = useState<any>(null);
 
 	let path = location.pathname;
 	useEffect(() => {
-		for (let i = 0; i < sidebarData.length; i++) {
-			if (path === sidebarData[i].path) {
-				setTemp(sidebarData[i]);
-				setTitle(sidebarData[i].title);
-				navigate(sidebarData[i].path);
+		for (let i = 0; i < sidebarMenuItems.length; i++) {
+			if (path === sidebarMenuItems[i].href) {
+				setTemp(sidebarMenuItems[i]);
+				setPage(sidebarMenuItems[i].title);
+				navigate(sidebarMenuItems[i].href);
 			}
 		}
 
 		for (let j = 0; j < data.length; j++) {
 			if (path === '/tag/' + data[j].id) {
 				setTemp(data[j].id);
-				setTitle(data[j].name);
+				setPage(data[j].name);
 				handleTagClick(data[j]);
 			}
 		}
-	}, [path]);
+	}, [data]);
 
 	const handleOnClick = (index: number) => {
 		return () => {
-			setTemp(sidebarData[index]);
-			setTitle(sidebarData[index].title);
-			navigate(sidebarData[index].path);
+			setTemp(sidebarMenuItems[index]);
+			setPage(sidebarMenuItems[index].title);
+			navigate(sidebarMenuItems[index].href);
 		};
 	};
 
 	const handleTagClicked = (tag: Tag) => {
 		setTemp(tag.id);
-		setTitle(tag.name);
+		setPage(tag.name);
 		handleTagClick(tag);
-		navigate('/tag/' + tag.id);
+		navigate('/tag/' + tag.name);
 	};
 
 	const handleCreateTag = () => {
@@ -66,7 +65,7 @@ const SideNav = () => {
 			}}
 		>
 			<ul>
-				{sidebarData.map((item, index) => (
+				{sidebarMenuItems.map((item, index) => (
 					<li
 						onClick={handleOnClick(index)}
 						key={index}
@@ -77,12 +76,12 @@ const SideNav = () => {
 							borderBottomLeftRadius: isSideNavOpen ? '0px' : '360px',
 							borderBottomRightRadius: isSideNavOpen ? '50px' : '360px',
 							justifyContent: isSideNavOpen ? 'start' : 'start',
-							backgroundColor: sidebarData[index] === temp ? ' rgb(65, 51, 28)' : '',
+							backgroundColor: sidebarMenuItems[index] === temp ? ' rgb(65, 51, 28)' : '',
 						}}
 						className="sidenav-item"
 					>
 						<div className="icon-and-name">
-							<FontAwesomeIcon icon={item.icon} className="icon" />
+							<FontAwesomeIcon icon={item.icon!} className="icon" />
 							{isSideNavOpen && <h3>{item.title}</h3>}
 						</div>
 					</li>
@@ -94,7 +93,6 @@ const SideNav = () => {
 					onClick={handleCreateTag}
 					style={{
 						width: isSideNavOpen ? '210px' : '14px',
-
 						borderTopRightRadius: isSideNavOpen ? '50px' : '360px',
 						borderTopLeftRadius: isSideNavOpen ? '0px' : '360px',
 						borderBottomLeftRadius: isSideNavOpen ? '0px' : '360px',
@@ -122,7 +120,6 @@ const SideNav = () => {
 								className="sidenav-item-tags"
 								style={{
 									width: isSideNavOpen ? '210px' : '14px',
-
 									borderTopRightRadius: isSideNavOpen ? '50px' : '360px',
 									borderTopLeftRadius: isSideNavOpen ? '0px' : '360px',
 									borderBottomLeftRadius: isSideNavOpen ? '0px' : '360px',
@@ -164,7 +161,6 @@ const SideNav = () => {
 												>
 													Edit
 												</button>
-
 												<button
 													style={{ display: 'flex' }}
 													className="delete-sidenav-btn"

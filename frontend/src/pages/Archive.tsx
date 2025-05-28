@@ -1,17 +1,17 @@
-import { UserNote, UserNoteData } from 'types';
+import { CreateNote, Note } from 'types';
 import NoteCard from '../components/NoteCard';
 import useNote from '../hooks/useNote';
 
+import { Suspense } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
 import noArchivedNotes from './../../assets/No_Archive_notes.png';
+import ErrorFallback from './Error';
+import Loading from './Loading';
 
 const Archive = () => {
-	const { archived, isLoading, isError } = useNote();
+	const { archived, data } = useNote();
 
-	if (isLoading) {
-		return <div>Loading...</div>;
-	}
-
-	if (archived.length < 1) {
+	if (data!.length! > 0 && archived.length == 0) {
 		return (
 			<div className="flex min-h-screen flex-row items-center justify-center">
 				<img
@@ -24,20 +24,21 @@ const Archive = () => {
 		);
 	}
 
-	if (isError) {
-		return <div>Error: {isError.message}</div>;
-	}
 	return (
-		<div className="container">
-			<div className="all-notes">
-				{archived &&
-					archived.map((note: UserNote | UserNoteData) => (
-						<div key={note.id} className="note-div">
-							<NoteCard note={note} route={'/archive'} />
-						</div>
-					))}
+		<ErrorBoundary FallbackComponent={ErrorFallback}>
+			<div className="container">
+				<div className="all-notes">
+					{archived &&
+						archived.map((note: Note | CreateNote) => (
+							<Suspense key={note.id} fallback={<Loading />}>
+								<div key={note.id} className="note-div">
+									<NoteCard note={note} route={'/archive'} />
+								</div>{' '}
+							</Suspense>
+						))}
+				</div>
 			</div>
-		</div>
+		</ErrorBoundary>
 	);
 };
 

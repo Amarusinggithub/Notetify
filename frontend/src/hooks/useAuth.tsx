@@ -1,4 +1,4 @@
-import {
+import React, {
 	createContext,
 	PropsWithChildren,
 	useCallback,
@@ -6,6 +6,7 @@ import {
 	useEffect,
 	useState,
 } from 'react';
+import { useErrorBoundary } from 'react-error-boundary';
 import { login, logout, signUp, verifyAuth } from '../lib/AuthService.ts';
 import { USERDATA_STORAGE_KEY } from './../types/index.ts';
 
@@ -28,6 +29,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const AuthProvider = ({ children }: AuthProviderProps) => {
+	const { showBoundary } = useErrorBoundary();
 	const [isLoading, setLoading] = useState<boolean>(false);
 	const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 	const [checkingAuth, setCheckingAuth] = useState<boolean>(true);
@@ -60,6 +62,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 		} catch (error: any) {
 			console.error('Error during signup:', error);
 			setError(error);
+			showBoundary(error);
 		} finally {
 			setLoading(false);
 		}
@@ -79,6 +82,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 		} catch (error: any) {
 			console.error('Error during login:', error);
 			setError(error);
+			showBoundary(error);
 		} finally {
 			setLoading(false);
 		}
@@ -92,6 +96,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 		} catch (error: any) {
 			console.error('Error during logout:', error);
 			setError(error);
+			showBoundary(error);
 		} finally {
 			setNotAuth();
 			setLoading(false);
@@ -107,6 +112,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 				setNotAuth();
 			}
 		} catch (e: any) {
+			setError(e);
 			console.error(e);
 			setNotAuth();
 		} finally {

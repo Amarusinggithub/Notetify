@@ -1,4 +1,5 @@
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router';
+import AppLayout from '../layouts/AppLayout.tsx';
 import Archive from '../pages/Archive.tsx';
 import Favorite from '../pages/Favorites.tsx';
 import Home from '../pages/Home.tsx';
@@ -7,7 +8,6 @@ import Login from '../pages/Login.tsx';
 import Register from '../pages/Register.tsx';
 import Tag from '../pages/Tag.tsx';
 import Trash from '../pages/Trash.tsx';
-import MainLayout from '../pages/layout.tsx';
 import { useAuth } from './../hooks/useAuth.tsx';
 
 const AppRoutes = () => {
@@ -37,7 +37,7 @@ const publicRoutes = [
 const privateRoutes = [
 	{
 		path: '/',
-		Component: MainLayout,
+		Component: AppLayout,
 		children: [
 			{
 				index: true,

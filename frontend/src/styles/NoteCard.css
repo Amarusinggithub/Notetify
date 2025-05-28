@@ -5,9 +5,10 @@
 	align-items: center;
 	gap: 1rem;
 	justify-content: center;
-	max-width: 600px;
+	max-width: 280px;
 	width: 100%;
-	height: auto;
+	max-height: 480px;
+	height: 100%;
 	border-radius: 12px;
 	background-color: rgb(32, 33, 36);
 	transition: all 300ms ease 0ms;

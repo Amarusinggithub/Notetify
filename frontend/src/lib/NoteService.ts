@@ -1,4 +1,4 @@
-import { UserNote, UserNoteData } from 'types/index.ts';
+import { CreateNote, Note } from 'types/index.ts';
 import axiosInstance from './AxiosService.ts';
 
 export const getNotes = async () => {
@@ -10,7 +10,7 @@ export const getNotes = async () => {
 		console.error(e);
 	}
 };
-export const createNote = async (note: UserNoteData) => {
+export const createNote = async (note: CreateNote) => {
 	try {
 		const response = await axiosInstance.post('notes/create_note/', {
 			note_data: note.note_data,
@@ -26,7 +26,7 @@ export const createNote = async (note: UserNoteData) => {
 	}
 };
 
-export const updateNote = async (note: UserNote) => {
+export const updateNote = async (note: Note) => {
 	console.log('this');
 	try {
 		const response = await axiosInstance.put(`notes/edit_note/${note.id}/`, {
@@ -53,7 +53,7 @@ export const updateNote = async (note: UserNote) => {
 	}
 };
 
-export const deleteNote = async (note: UserNote) => {
+export const deleteNote = async (note: Note) => {
 	try {
 		const response = await axiosInstance.delete(`notes/delete_note/${note.id}/`);
 		return response.status;

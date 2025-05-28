@@ -1,3 +1,4 @@
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import 'axios';
 
 declare module 'axios' {
@@ -6,10 +7,13 @@ declare module 'axios' {
 	}
 }
 
+//Constants
 export const CSRF_TOKEN_COOKIE_NAME = 'csrftoken';
 export const USERDATA_STORAGE_KEY = 'userData';
+
 type roles = 'admin' | 'editor' | 'member';
 
+//Models
 export type User = {
 	id: string;
 	username: string;
@@ -20,15 +24,14 @@ export type User = {
 	createdAt: Date;
 	updatedAt: Date;
 };
-export type UserNote = {
+export type CreateNote = {
 	id: number;
-	note: {
-		id: number;
+	note_data: {
 		title: string;
 		content: string;
 		users: number[];
 	};
-	user: number;
+
 	tags: number[];
 	is_pinned: boolean;
 	is_trashed: boolean;
@@ -37,12 +40,16 @@ export type UserNote = {
 	role: string;
 };
 
-export interface UserNoteData extends Omit<UserNote, 'note'> {
-	note_data: {
+export interface Note extends Omit<CreateNote, 'note_data'> {
+	note: {
+		id: number;
 		title: string;
 		content: string;
 		users: number[];
 	};
+	user: number;
+	createdAt: Date;
+	updatedAt: Date;
 }
 
 export interface Tag {
@@ -56,9 +63,9 @@ export interface BreadcrumbItem {
 	href: string;
 }
 
-export interface NavItem {
+export interface SideMenuItem {
 	title: string;
 	href: string;
-	icon?: string;
+	icon?: IconProp;
 	isActive?: boolean;
 }

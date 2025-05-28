@@ -60,6 +60,7 @@ source .venv/bin/activate  # On Windows use `.venv\Scripts\activate`
 pip install -r requirements.txt
 python manage.py migrate
 python manage.py runserver
+ uvicorn backend.asgi:application  
 ```
 
 The backend server will run at: `http://localhost:8000`

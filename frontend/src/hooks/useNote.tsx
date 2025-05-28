@@ -5,54 +5,61 @@ import {
 	useQuery,
 	useQueryClient,
 } from '@tanstack/react-query';
-import { createContext, PropsWithChildren, useContext, useMemo, useState } from 'react';
+import React, {
+	createContext,
+	PropsWithChildren,
+	useCallback,
+	useContext,
+	useMemo,
+	useState,
+} from 'react';
 import { createNote, deleteNote, getNotes, updateNote } from '../lib/NoteService.ts';
-import { Tag, UserNote, UserNoteData } from '../types/index.ts';
+import { CreateNote, Note, Tag } from '../types/index.ts';
 import { isUserNote } from './../utils/helpers';
 import { useAuth } from './useAuth.tsx';
 
 interface NoteContextType {
 	search: string;
 	title: string;
-	searchNotes: (UserNote | UserNoteData)[];
-	selectedNote: UserNote | null;
+	searchNotes: (Note | CreateNote)[];
+	selectedNote: Note | null;
 	isLoading: boolean;
-	tagNotes: (UserNote | UserNoteData)[];
+	tagNotes: (Note | CreateNote)[];
 	isError: any;
-	pinned: (UserNote | UserNoteData)[];
-	favorites: (UserNote | UserNoteData)[];
-	archived: (UserNote | UserNoteData)[];
-	trashed: (UserNote | UserNoteData)[];
-	filtered: (UserNote | UserNoteData)[];
-	other: (UserNote | UserNoteData)[];
-	data: (UserNote | UserNoteData)[];
-	setTagNotes: React.Dispatch<React.SetStateAction<(UserNote | UserNoteData)[]>>;
+	pinned: (Note | CreateNote)[];
+	favorites: (Note | CreateNote)[];
+	archived: (Note | CreateNote)[];
+	trashed: (Note | CreateNote)[];
+	filtered: (Note | CreateNote)[];
+	other: (Note | CreateNote)[];
+	data: (Note | CreateNote)[];
+	setTagNotes: React.Dispatch<React.SetStateAction<(Note | CreateNote)[]>>;
 	refetch: (options?: RefetchOptions) => Promise<QueryObserverResult<any, Error>>;
-	setTitle: React.Dispatch<React.SetStateAction<string>>;
-	handleSearch: () => void;
-	addNote: (note: UserNoteData) => Promise<void>;
-	editNote: (newNote: UserNote) => Promise<void>;
-	removeNote: (note: UserNote) => Promise<void>;
-	handleArchive: (note: UserNote) => void;
-	handleFavorite: (note: UserNote) => void;
-	handleTrash: (note: UserNote) => void;
-	handlePin: (note: UserNote) => void;
-	setSelectedNote: React.Dispatch<React.SetStateAction<UserNote | null>>;
-	setSearch: React.Dispatch<React.SetStateAction<string>>;
+	setPage: React.Dispatch<React.SetStateAction<string>>;
+	handleSearch: (search: string | undefined) => void;
+	addNote: (note: CreateNote) => Promise<void>;
+	editNote: (newNote: Note) => Promise<void>;
+	removeNote: (note: Note) => Promise<void>;
+	handleArchive: (note: Note) => void;
+	handleFavorite: (note: Note) => void;
+	handleTrash: (note: Note) => void;
+	handlePin: (note: Note) => void;
+	setSelectedNote: React.Dispatch<React.SetStateAction<Note | null>>;
 	handleTagClick: (tag: Tag) => void;
+	setSearch: React.Dispatch<React.SetStateAction<string>>;
 }
 
 type NoteProviderProps = PropsWithChildren;
 
 const NoteContext = createContext<NoteContextType | undefined>(undefined);
 
-const categorizedNotes = (notesArray: (UserNote | UserNoteData)[]) => {
-	const pinned: (UserNote | UserNoteData)[] = [];
-	const favorites: (UserNote | UserNoteData)[] = [];
-	const archived: (UserNote | UserNoteData)[] = [];
-	const trashed: (UserNote | UserNoteData)[] = [];
-	const filtered: (UserNote | UserNoteData)[] = [];
-	const other: (UserNote | UserNoteData)[] = [];
+const categorizedNotes = (notesArray: (Note | CreateNote)[]) => {
+	const pinned: (Note | CreateNote)[] = [];
+	const favorites: (Note | CreateNote)[] = [];
+	const archived: (Note | CreateNote)[] = [];
+	const trashed: (Note | CreateNote)[] = [];
+	const filtered: (Note | CreateNote)[] = [];
+	const other: (Note | CreateNote)[] = [];
 
 	for (let i = 0; i < notesArray.length; i++) {
 		let note = notesArray[i];
@@ -79,7 +86,6 @@ const categorizedNotes = (notesArray: (UserNote | UserNoteData)[]) => {
 
 const NoteProvider = ({ children }: NoteProviderProps) => {
 	const { isAuthenticated } = useAuth();
-
 	const queryClient = useQueryClient();
 	const {
 		data = [],
@@ -96,66 +102,69 @@ const NoteProvider = ({ children }: NoteProviderProps) => {
 		return categorizedNotes(data);
 	}, [data]);
 
+	const [page, setPage] = useState('Notes');
 	const [search, setSearch] = useState('');
-	const [title, setTitle] = useState('Notes');
-	const [tagNotes, setTagNotes] = useState<(UserNote | UserNoteData)[]>([]);
-	const [searchNotes, setSearchNotes] = useState<(UserNote | UserNoteData)[]>([]);
-	const [selectedNote, setSelectedNote] = useState<UserNote | null>(null);
+	const [tagNotes, setTagNotes] = useState<(Note | CreateNote)[]>([]);
+	const [searchNotes, setSearchNotes] = useState<(Note | CreateNote)[]>([]);
+	const [selectedNote, setSelectedNote] = useState<Note | null>(null);
 
-	const handleSearch = () => {
-		const query = search.trim().toLowerCase();
-		let sourcedNotes: (UserNote | UserNoteData)[] = [];
-		switch (title) {
-			case 'Notes':
-				sourcedNotes = [...other, ...pinned];
-				break;
-			case 'Favorites':
-				sourcedNotes = favorites;
-				break;
-			case 'Archive':
-				sourcedNotes = archived;
-				break;
-			case 'Trash':
-				sourcedNotes = trashed;
-				break;
-			default:
-				sourcedNotes = tagNotes;
-				break;
-		}
+	const handleSearch = useCallback(
+		async (search: string | undefined) => {
+			const query = search!.trim().toLowerCase();
+			let sourcedNotes: (Note | CreateNote)[] = [];
+			switch (page) {
+				case 'Notes':
+					sourcedNotes = [...other, ...pinned];
+					break;
+				case 'Favorites':
+					sourcedNotes = favorites;
+					break;
+				case 'Archive':
+					sourcedNotes = archived;
+					break;
+				case 'Trash':
+					sourcedNotes = trashed;
+					break;
+				default:
+					sourcedNotes = tagNotes;
+					break;
+			}
 
-		const filteredNotes = sourcedNotes.filter((note) =>
-			isUserNote(note)
-				? note.note.title.toLowerCase().includes(query)
-				: note.note_data.title.toLowerCase().includes(query),
-		);
-		setSearchNotes(filteredNotes);
-	};
+			const filteredNotes = sourcedNotes.filter((note) =>
+				isUserNote(note)
+					? note.note.title.trim().toLowerCase().includes(query)
+					: note.note_data.title.trim().toLowerCase().includes(query),
+			);
+			setSearchNotes(filteredNotes);
+		},
+		[page, other, pinned, favorites, archived, trashed, tagNotes, setSearchNotes],
+	);
 
 	const handleTagClick = (tag: Tag) => {
 		setTagNotes(
 			data.filter(
-				(note: UserNote | UserNoteData) =>
+				(note: Note | CreateNote) =>
 					note.tags.includes(tag.id!) && !note.is_trashed && !note.is_archived,
 			),
 		);
 	};
 
-	const handleFavorite = (note: UserNote) => {
+	const handleFavorite = (note: Note) => {
 		const updatedNote = { ...note, is_favorited: !note.is_favorited };
 		editNote(updatedNote);
 	};
 
-	const handleTrash = (note: UserNote) => {
+	const handleTrash = (note: Note) => {
 		const updatedNote = { ...note, is_trashed: !note.is_trashed };
 		editNote(updatedNote);
 	};
 
-	const handleArchive = (note: UserNote) => {
+	const handleArchive = (note: Note) => {
 		const updatedNote = { ...note, is_archived: !note.is_archived };
 		editNote(updatedNote);
 	};
 
-	const handlePin = (note: UserNote) => {
+	const handlePin = (note: Note) => {
 		const updatedNote = { ...note, is_pinned: !note.is_pinned };
 		editNote(updatedNote);
 	};
@@ -167,7 +176,7 @@ const NoteProvider = ({ children }: NoteProviderProps) => {
 		},
 	});
 
-	const addNote = async (note: UserNoteData) => {
+	const addNote = async (note: CreateNote) => {
 		if (note.note_data.content!.trim().length != 0 && note.note_data.title!.trim().length != 0)
 			addNoteMutation.mutate(note);
 	};
@@ -179,7 +188,7 @@ const NoteProvider = ({ children }: NoteProviderProps) => {
 		},
 	});
 
-	const editNote = async (note: UserNote) => {
+	const editNote = async (note: Note) => {
 		if (note.note.content!.trim().length != 0 && note.note.title!.trim().length != 0)
 			editNoteMutation.mutate(note);
 	};
@@ -191,7 +200,7 @@ const NoteProvider = ({ children }: NoteProviderProps) => {
 		},
 	});
 
-	const removeNote = async (note: UserNote) => {
+	const removeNote = async (note: Note) => {
 		removeNoteMutation.mutate(note);
 	};
 
@@ -205,7 +214,7 @@ const NoteProvider = ({ children }: NoteProviderProps) => {
 				trashed,
 				filtered,
 				other,
-				title,
+				title: page,
 				searchNotes,
 				selectedNote,
 				isLoading,
@@ -213,7 +222,7 @@ const NoteProvider = ({ children }: NoteProviderProps) => {
 				isError,
 				data,
 				setTagNotes,
-				setTitle,
+				setPage,
 				handleSearch,
 				addNote,
 				editNote,
@@ -223,9 +232,9 @@ const NoteProvider = ({ children }: NoteProviderProps) => {
 				handleTrash,
 				handlePin,
 				setSelectedNote,
-				setSearch,
 				handleTagClick,
 				refetch,
+				setSearch,
 			}}
 		>
 			{children}

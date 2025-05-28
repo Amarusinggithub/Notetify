@@ -7,6 +7,7 @@ import { NoteProvider } from './hooks/useNote.tsx';
 import { SideNavProvider } from './hooks/useSideNav.tsx';
 import { TagProvider } from './hooks/useTag.tsx';
 import { ensureCSRFToken } from './lib/AxiosService.ts';
+import ErrorFallback from './pages/Error';
 import AppRoutes from './routes/AppRoutes.tsx';
 
 export default function App() {
@@ -20,7 +21,7 @@ export default function App() {
 	const queryClient = new QueryClient();
 
 	return (
-		<ErrorBoundary fallback={<div>Something went wrong</div>}>
+		<ErrorBoundary FallbackComponent={ErrorFallback}>
 			<QueryClientProvider client={queryClient}>
 				<AuthProvider>
 					<NoteProvider>

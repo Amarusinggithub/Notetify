@@ -1,22 +1,18 @@
-import { UserNote, UserNoteData } from 'types';
+import { Suspense } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
+import { CreateNote, Note } from 'types';
 import NoteCard from '../components/NoteCard';
 import useNote from '../hooks/useNote';
 import { useSideNav } from '../hooks/useSideNav';
 import noSearchNotes from './../../assets/No_Search.png';
+import ErrorFallback from './Error';
+import Loading from './Loading';
 
 const Search = () => {
-	const { searchNotes, isLoading, isError } = useNote();
+	const { searchNotes, data } = useNote();
 	const { isSideNavOpen } = useSideNav();
 
-	if (isLoading) {
-		return <div>Loading...</div>;
-	}
-
-	if (isError) {
-		return <div>Error: {isError.message}</div>;
-	}
-
-	if (searchNotes.length < 1) {
+	if (data!.length! > 0 && searchNotes.length == 0) {
 		return (
 			<>
 				<img
@@ -30,15 +26,19 @@ const Search = () => {
 	}
 
 	return (
-		<div>
-			<div className="all-notes" style={{ maxWidth: isSideNavOpen ? '1200px' : '1400px' }}>
-				{searchNotes?.map((note: UserNote | UserNoteData) => (
-					<div key={note.id} className="note-div">
-						<NoteCard note={note} route={''} />
+		<ErrorBoundary FallbackComponent={ErrorFallback}>
+			<Suspense fallback={<Loading />}>
+				<div>
+					<div className="all-notes" style={{ maxWidth: isSideNavOpen ? '1200px' : '1400px' }}>
+						{searchNotes?.map((note: Note | CreateNote) => (
+							<div key={note.id} className="note-div">
+								<NoteCard note={note} route={''} />
+							</div>
+						))}
 					</div>
-				))}
-			</div>
-		</div>
+				</div>
+			</Suspense>
+		</ErrorBoundary>
 	);
 };
 

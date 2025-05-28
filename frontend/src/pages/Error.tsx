@@ -1,16 +1,20 @@
-import { useRouteError } from 'react-router';
+type FallBackProps = {
+	error: Error;
+	resetErrorBoundary: () => void;
+};
 
-export default function Error() {
-	const error: any = useRouteError();
-	console.error(error);
-
+function ErrorFallback({ error, resetErrorBoundary }: FallBackProps) {
 	return (
 		<div id="error-page">
 			<h1>Oops!</h1>
-			<p>Sorry, an unexpected error has occurred.</p>
-			<p>
-				<i>{error.statusText || error.message}</i>
-			</p>
+			<p>SomeThing went Wrong</p>
+			<pre>
+				<i>{error.message}</i>
+			</pre>
+
+			<button onClick={resetErrorBoundary}>Try again</button>
 		</div>
 	);
 }
+
+export default ErrorFallback;

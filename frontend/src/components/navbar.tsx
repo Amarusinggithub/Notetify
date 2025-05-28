@@ -6,21 +6,27 @@ import {
 	faRotateRight,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React from 'react';
+import React, { useEffect } from 'react';
 import useNote from '../hooks/useNote.tsx';
 import { useSideNav } from '../hooks/useSideNav.tsx';
 import '../styles/navbar.css';
 
+import useDebounce from '../hooks/useDebounce.ts';
 import logo from './../../assets/notetify-logo.png';
 
 const Navbar = () => {
 	const { isSideNavOpen, setIsSideNavOpen } = useSideNav();
-	const { handleSearch, search, setSearch, title, refetch } = useNote();
+	const { handleSearch, title, refetch, search, setSearch } = useNote();
+	const debouncedQuery = useDebounce(search, 150);
+
+	useEffect(() => {
+		if (debouncedQuery != undefined && debouncedQuery !== '') {
+			handleSearch(debouncedQuery);
+		}
+	}, [handleSearch, debouncedQuery]);
 
 	const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const query = e.target.value;
-		setSearch(query);
-		handleSearch();
+		setSearch(e.target.value);
 	};
 
 	const handleSideMenuChange = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -30,8 +36,7 @@ const Navbar = () => {
 
 	const handleSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		handleSearch();
-		console.log('Search submitted:', search);
+		handleSearch(debouncedQuery);
 	};
 
 	return (

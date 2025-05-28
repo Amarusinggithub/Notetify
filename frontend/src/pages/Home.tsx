@@ -1,29 +1,25 @@
-import { useEffect } from 'react';
-import { UserNote, UserNoteData } from 'types/index.ts';
+import { Suspense } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
+import { CreateNote, Note } from 'types/index.ts';
 import AddNoteCard from '../components/AddNoteCard.tsx';
 import NoteCard from '../components/NoteCard.tsx';
 import useNote from '../hooks/useNote.tsx';
 import { useSideNav } from '../hooks/useSideNav.tsx';
-import '../styles/Notespage.css';
+import '../styles/Homepage.css';
 import noNotes from './../../assets/No_Note.png';
+import ErrorFallback from './Error.tsx';
+import Loading from './Loading.tsx';
 
 const Home = () => {
-	const { pinned, other, isLoading, isError } = useNote();
+	const { pinned, other, data } = useNote();
 	const { isSideNavOpen } = useSideNav();
-	useEffect(() => {}, [pinned]);
 
-	if (isLoading) {
-		return <div>Loading...</div>;
-	}
-
-	if (isError) {
-		return <div>Error: {isError.message}</div>;
-	}
-
-	if (pinned.length < 1 && other.length < 1) {
+	if (data!.length! > 0 && pinned.length == 0 && other.length == 0) {
 		return (
 			<div>
-				<AddNoteCard />
+				<div className="add-note-card-cantainer">
+					<AddNoteCard />
+				</div>
 
 				<img
 					src={noNotes}
@@ -35,37 +31,47 @@ const Home = () => {
 		);
 	}
 	return (
-		<div className="container">
-			<AddNoteCard />
-
-			{pinned?.length > 0 && (
-				<>
-					<div className="flex-column">
-						<h1 data-testid="cypress-pinnedNotes-title">Pinned Notes</h1>
+		<ErrorBoundary FallbackComponent={ErrorFallback}>
+			<Suspense fallback={<Loading />}>
+				<div className="container">
+					<div className="add-note-card-cantainer">
+						<AddNoteCard />
 					</div>
-
-					<div className="pinned-notes" style={{ maxWidth: isSideNavOpen ? '1200px' : '1360px' }}>
-						{pinned.map((note: UserNote | UserNoteData) => (
-							<div key={note.id} className="note-div">
-								<NoteCard note={note} route={'/'} />
+					{pinned?.length > 0 && (
+						<>
+							<div className="flex-column">
+								<h1 data-testid="cypress-pinnedNotes-title">Pinned Notes</h1>
 							</div>
-						))}
-					</div>
-				</>
-			)}
-
-			<div className="flex-column">
-				<h1>Others</h1>
-			</div>
-
-			<div className="all-notes" style={{ maxWidth: isSideNavOpen ? '1200px' : '1400px' }}>
-				{other?.map((note: UserNote | UserNoteData) => (
-					<div key={note.id} className="note-div">
-						<NoteCard note={note} route={'/'} />
-					</div>
-				))}
-			</div>
-		</div>
+							<div
+								className="pinned-notes"
+								style={{ maxWidth: isSideNavOpen ? '1200px' : '1360px' }}
+							>
+								{pinned.map((note: Note | CreateNote) => (
+									<div key={note.id} className="note-div">
+										<NoteCard note={note} route={'/'} />
+									</div>
+								))}
+							</div>
+						</>
+					)}
+					{other?.length > 0 && (
+						<>
+							{' '}
+							<div className="flex-column">
+								<h1>Others</h1>
+							</div>
+							<div className="all-notes" style={{ maxWidth: isSideNavOpen ? '1200px' : '1400px' }}>
+								{other?.map((note: Note | CreateNote) => (
+									<div key={note.id} className="note-div">
+										<NoteCard note={note} route={'/'} />
+									</div>
+								))}
+							</div>
+						</>
+					)}
+				</div>
+			</Suspense>
+		</ErrorBoundary>
 	);
 };
 

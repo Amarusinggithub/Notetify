@@ -14,6 +14,14 @@
 	overflow-y: auto;
 }
 
+.add-note-card-cantainer {
+	width: 100%;
+	height: auto;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
 .flex-column {
 	display: flex;
 	flex-direction: column;
