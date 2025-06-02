@@ -1,18 +1,21 @@
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { CreateNote, Note } from 'types/index.ts';
+import { Note } from 'types/index.ts';
 import NoteCard from '../components/NoteCard.tsx';
-import useNote from '../hooks/useNote.tsx';
+import useFetchNotes from '../hooks/useFetchNotes.ts';
 import { useSideNav } from '../hooks/useSideNav.tsx';
 import noTaggedNotes from './../../assets/No_tagged_Notes.png';
 import ErrorFallback from './Error.tsx';
 import Loading from './Loading.tsx';
 
 const Tag = () => {
-	const { tagNotes, data } = useNote();
 	const { isSideNavOpen } = useSideNav();
+	const { temp } = useSideNav();
 
-	if (data!.length! > 0 && tagNotes.length == 0) {
+	const params = `tags__id=${temp.id}&is_archived=False&is_trashed=False`;
+	const tagNotes = useFetchNotes('tag-notes', params);
+
+	if (tagNotes.length == 0) {
 		return (
 			<>
 				<img
@@ -32,7 +35,7 @@ const Tag = () => {
 					className="all-notes"
 					style={{ maxWidth: isSideNavOpen ? '1200px' : '1400px' }}
 				>
-					{tagNotes?.map((note: Note | CreateNote) => (
+					{tagNotes?.map((note: Note) => (
 						<Suspense key={note.id} fallback={<Loading />}>
 							<div key={note.id} className="note-div">
 								<NoteCard note={note} route={'/tag'} />

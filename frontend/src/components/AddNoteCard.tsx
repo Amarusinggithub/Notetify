@@ -1,21 +1,14 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { CreateNote } from 'types';
-import useNote from '../hooks/useNote';
+import useMutateNote from '../hooks/useMutateNote';
 import '../styles/AddNoteCard.css';
 import NoteContentEditor from './Editor/components/NoteContentEditor';
 
 const AddNoteCard = () => {
-	const { addNote,  data } = useNote();
+	const { addNote } = useMutateNote();
 	const cardRef = useRef<HTMLDivElement>(null);
-	let noteId;
-	if (data.length > 0) {
-		noteId = data[data.length - 1].id + 1;
-	} else {
-		noteId = 1;
-	}
 
 	const [noteState, setNoteState] = useState<CreateNote>({
-		id: noteId,
 		note_data: {
 			title: '',
 			content: '',
@@ -54,7 +47,6 @@ const AddNoteCard = () => {
 				setSelected(false);
 			} else {
 				setNoteState({
-					id: noteId,
 					note_data: {
 						title: '',
 						content: '',
@@ -70,7 +62,7 @@ const AddNoteCard = () => {
 				setSelected(true);
 			}
 		},
-		[handleSave, isEdited, isSelected, noteId],
+		[handleSave, isEdited, isSelected],
 	);
 
 	useEffect(() => {

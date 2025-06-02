@@ -3,7 +3,9 @@ import axiosInstance from './AxiosService.ts';
 
 export const getNotes = async () => {
 	try {
-		const response = await axiosInstance.get('notes/');
+		const response = await axiosInstance.get(
+			'notes/?is_pinned=True&is_favorited=True',
+		);
 		console.log(response.data);
 		return response.data;
 	} catch (e) {
@@ -12,7 +14,7 @@ export const getNotes = async () => {
 };
 export const createNote = async (note: CreateNote) => {
 	try {
-		const response = await axiosInstance.post('notes/create_note/', {
+		const response = await axiosInstance.post('notes/', {
 			note_data: note.note_data,
 			tags: note.tags,
 			is_pinned: note.is_pinned,
@@ -29,7 +31,7 @@ export const createNote = async (note: CreateNote) => {
 export const updateNote = async (note: Note) => {
 	console.log('this');
 	try {
-		const response = await axiosInstance.put(`notes/edit_note/${note.id}/`, {
+		const response = await axiosInstance.put(`notes/${note.id}/`, {
 			id: note.id,
 			note: note.note.id,
 
@@ -55,9 +57,7 @@ export const updateNote = async (note: Note) => {
 
 export const deleteNote = async (note: Note) => {
 	try {
-		const response = await axiosInstance.delete(
-			`notes/delete_note/${note.id}/`,
-		);
+		const response = await axiosInstance.delete(`notes/${note.id}/`);
 		return response.status;
 	} catch (e) {
 		console.error(e);

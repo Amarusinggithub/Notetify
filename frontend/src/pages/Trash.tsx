@@ -1,8 +1,8 @@
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { CreateNote, Note } from 'types/index.ts';
+import { Note } from 'types/index.ts';
 import NoteCard from '../components/NoteCard.tsx';
-import useNote from '../hooks/useNote.tsx';
+import useFetchNotes from '../hooks/useFetchNotes.ts';
 import { useSideNav } from '../hooks/useSideNav.tsx';
 import noTrashedNotes from './../../assets/No_trashed_notes.png';
 import ErrorFallback from './Error.tsx';
@@ -11,9 +11,9 @@ import Loading from './Loading.tsx';
 const Trash = () => {
 	const { isSideNavOpen } = useSideNav();
 
-	const { trashed, data } = useNote();
+	const trashed = useFetchNotes('trashed', 'is_trashed=True');
 
-	if (data!.length! > 0 && trashed.length == 0) {
+	if (trashed.length == 0) {
 		return (
 			<>
 				<img
@@ -34,7 +34,7 @@ const Trash = () => {
 					style={{ maxWidth: isSideNavOpen ? '1200px' : '1400px' }}
 				>
 					{trashed &&
-						trashed.map((note: Note | CreateNote) => (
+						trashed.map((note: Note) => (
 							<Suspense key={note.id} fallback={<Loading />}>
 								<div key={note.id} className="note-div">
 									<NoteCard note={note} route={'/trash'} />

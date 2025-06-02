@@ -30,18 +30,7 @@ class UserNoteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserNote
-        fields = [
-            "id",
-            "user",
-            "note",
-            "note_data",
-            "is_pinned",
-            "is_favorited",
-            "is_trashed",
-            "is_archived",
-            "role",
-            "tags",
-        ]
+        fields = "__all__"
 
     def create(self, validated_data):
         note_data = validated_data.pop("note_data", {})
@@ -109,10 +98,8 @@ class UserNoteSerializer(serializers.ModelSerializer):
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
-        fields = [
-            "id",
-            "name",
-        ]
+        fields = "__all__"
+
 
     def create(self, validated_data):
         tag = Tag.objects.create(**validated_data)

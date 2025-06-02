@@ -3,60 +3,63 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { Tag } from 'types/index.ts';
-import useNote from '../hooks/useNote.tsx';
+import useFetchTags from '../hooks/useFetchTags.ts';
+import useMutateTag from '../hooks/useMutateTag.tsx';
+import useSearchState from '../hooks/useSearchState.ts';
 import { useSideNav } from '../hooks/useSideNav.tsx';
-import useTag from '../hooks/useTag.tsx';
 import '../styles/sidebar.css';
 
 const SideNav = () => {
 	const location = useLocation();
 	const navigate = useNavigate();
-	const { isSideNavOpen, setAddTagPopupOpen, sidebarMenuItems } = useSideNav();
-	const { handleTagClick, setPage } = useNote();
-	const { data, setWantToDeleteTag, setSelectedTag, setWantToEditTag } =
-		useTag();
+	const { isSideNavOpen, setAddTagPopupOpen, sidebarMenuItems, temp, setTemp } =
+		useSideNav();
+	const { setParams } = useSearchState();
 
-	const [temp, setTemp] = useState<any>(sidebarMenuItems[0]);
+	const { setWantToDeleteTag, setSelectedTag, setWantToEditTag } =
+		useMutateTag();
+	const tags = useFetchTags();
+
 	const [tempId, setTempId] = useState<any>(null);
 
 	let path = location.pathname;
+
 	useEffect(() => {
 		for (let i = 0; i < sidebarMenuItems.length; i++) {
 			if (path === sidebarMenuItems[i].href) {
 				setTemp(sidebarMenuItems[i]);
-				setPage(sidebarMenuItems[i].title);
 				navigate(sidebarMenuItems[i].href);
+				setParams(sidebarMenuItems[i].params);
 			}
 		}
 
-		for (let j = 0; j < data.length; j++) {
-			if (path === '/tag/' + data[j].id) {
-				setTemp(data[j].id);
-				setPage(data[j].name);
-				handleTagClick(data[j]);
+		for (let j = 0; j < tags.length; j++) {
+			if (path === '/tag/' + tags[j].name) {
+				setTemp(tags[j]);
+				setParams(
+					`tags__name=${tags[j].name}&is_archived=False&is_trashed=False`,
+				);
 			}
 		}
-	}, [data]);
+	}, [tags]);
 
 	const handleOnClick = (index: number) => {
 		return () => {
 			setTemp(sidebarMenuItems[index]);
-			setPage(sidebarMenuItems[index].title);
 			navigate(sidebarMenuItems[index].href);
+			setParams(sidebarMenuItems[index].params);
 		};
 	};
 
 	const handleTagClicked = (tag: Tag) => {
-		setTemp(tag.id);
-		setPage(tag.name);
-		handleTagClick(tag);
+		setTemp(tag);
 		navigate('/tag/' + tag.name);
+		setParams(tag.name);
 	};
 
 	const handleCreateTag = () => {
 		setTemp(true);
 		setAddTagPopupOpen(true);
-        console.log("setAddTagPopupOpen(true)")
 	};
 
 	return (
@@ -85,7 +88,7 @@ const SideNav = () => {
 					>
 						<div className="icon-and-name">
 							<FontAwesomeIcon icon={item.icon!} className="icon" />
-							{isSideNavOpen && <h3>{item.title}</h3>}
+							{isSideNavOpen && <h3>{item.name}</h3>}
 						</div>
 					</li>
 				))}
@@ -101,7 +104,6 @@ const SideNav = () => {
 						borderBottomLeftRadius: isSideNavOpen ? '0px' : '360px',
 						borderBottomRightRadius: isSideNavOpen ? '50px' : '360px',
 						justifyContent: isSideNavOpen ? 'start' : 'center',
-						backgroundColor: temp === true ? ' rgb(65, 51, 28)' : '',
 					}}
 					className="sidenav-item-add-tag"
 				>
@@ -110,12 +112,12 @@ const SideNav = () => {
 						{isSideNavOpen && <h3>{'Add Tag'}</h3>}
 					</div>
 				</li>
-				{isSideNavOpen && data?.length > 0 && (
+				{isSideNavOpen && tags?.length > 0 && (
 					<h3 className="title-tags">Tags</h3>
 				)}
-				{data?.length > 0 && (
+				{tags?.length > 0 && (
 					<ul className="tags">
-						{data.map((tag: Tag, index: number) => (
+						{tags.map((tag: Tag, index: number) => (
 							<li
 								onClick={(e) => {
 									e.stopPropagation();
@@ -130,7 +132,7 @@ const SideNav = () => {
 									borderBottomLeftRadius: isSideNavOpen ? '0px' : '360px',
 									borderBottomRightRadius: isSideNavOpen ? '50px' : '360px',
 									justifyContent: isSideNavOpen ? 'start' : 'center',
-									backgroundColor: tag.id === temp ? ' rgb(65, 51, 28)' : '',
+									backgroundColor: tag === temp ? ' rgb(65, 51, 28)' : '',
 								}}
 							>
 								<div className="icon-and-name">

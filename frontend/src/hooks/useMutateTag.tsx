@@ -5,19 +5,12 @@ import React, {
 	useState,
 } from 'react';
 
-import {
-	useMutation,
-	useQueryClient,
-	useSuspenseQuery,
-} from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Tag } from 'types/index.ts';
-import { createTag, deleteTag, getTags, updateTag } from '../lib/TagService.ts';
+import { createTag, deleteTag, updateTag } from '../lib/TagService.ts';
 
 interface TagContextType {
 	selectedTag: Tag | null;
-	isLoading: boolean;
-	isError: any;
-	data: Tag[];
 	wantToDeleteTag: boolean;
 	wantToEditTag: boolean;
 	setSelectedTag: React.Dispatch<React.SetStateAction<Tag | null>>;
@@ -34,14 +27,6 @@ const TagContext = createContext<TagContextType | undefined>(undefined);
 
 const TagProvider = ({ children }: TagProviderProps) => {
 	const queryClient = useQueryClient();
-	const {
-		data = [],
-		isLoading,
-		isError,
-	} = useSuspenseQuery({
-		queryKey: ['tags'],
-		queryFn: getTags,
-	});
 
 	const [selectedTag, setSelectedTag] = useState<Tag | null>(null);
 	const [wantToDeleteTag, setWantToDeleteTag] = useState<boolean>(false);
@@ -55,7 +40,7 @@ const TagProvider = ({ children }: TagProviderProps) => {
 	});
 
 	const makeTag = async (tagName: string) => {
-		if (tagName!.trim().length > 0)
+		/*if (tagName!.trim().length > 0)
 			if (
 				data.some(
 					(tag: Tag) => tag.name.toLowerCase() === tagName.toLowerCase(),
@@ -63,7 +48,7 @@ const TagProvider = ({ children }: TagProviderProps) => {
 			) {
 				alert('Tag already exists!');
 				return;
-			}
+			}*/
 
 		createTagMutation.mutate(tagName);
 	};
@@ -89,17 +74,13 @@ const TagProvider = ({ children }: TagProviderProps) => {
 	const removeTag = async (tag: Tag) => {
 		deleteTagMutation.mutate(tag);
 	};
-	
 
 	return (
 		<TagContext.Provider
 			value={{
-				isError,
 				selectedTag,
-				isLoading,
 				wantToDeleteTag,
 				wantToEditTag,
-				data,
 				setSelectedTag,
 				setWantToDeleteTag,
 				setWantToEditTag,
@@ -113,13 +94,13 @@ const TagProvider = ({ children }: TagProviderProps) => {
 	);
 };
 
-const useTag = () => {
+const useMutateTag = () => {
 	const context = useContext(TagContext);
 	if (!context) {
-		throw new Error('useTag  must be use within a TagProvider');
+		throw new Error('useMutateTag  must be use within a TagProvider');
 	}
 	return context;
 };
 
-export default useTag;
+export default useMutateTag;
 export { TagContext, TagProvider };

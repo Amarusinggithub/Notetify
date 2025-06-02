@@ -17,6 +17,7 @@ urlpatterns = [
     path("api/csrf/", get_csrf_token, name="csrf-token"),
     path("api/auth/me/", verify_token, name="verify-token"),
     path("", include("api.urls")),
+    path('api/silk/', include('silk.urls', namespace='silk'))
 ]
 
 

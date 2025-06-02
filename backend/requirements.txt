@@ -1,5 +1,6 @@
 ﻿asgiref
 Django
+django-filter
 django-cors-headers
 django-otp
 django-braces
@@ -41,3 +42,4 @@ uvicorn
 websockets
 uvicorn-worker
 redis[hiredis]
+django-silk

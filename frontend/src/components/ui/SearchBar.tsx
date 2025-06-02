@@ -5,8 +5,8 @@ type SearchBarProps = {
 	onchange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 	onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
 	search: string;
-    placeholder: string;
-    classname:string;
+	placeholder: string;
+	classname: string;
 };
 
 const SearchBar = ({

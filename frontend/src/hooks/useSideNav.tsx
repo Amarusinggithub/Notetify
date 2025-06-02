@@ -17,6 +17,8 @@ type SideNavContextType = {
 	isSideNavOpen: boolean;
 	page: number;
 	isAddTagPopupOpen: boolean;
+	temp: any;
+	setTemp: React.Dispatch<React.SetStateAction<any>>;
 	setIsSideNavOpen: React.Dispatch<React.SetStateAction<boolean>>;
 	setPage: React.Dispatch<React.SetStateAction<number>>;
 	setAddTagPopupOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -43,34 +45,41 @@ export const SideNavProvider = ({ children }: SideNavProviderProps) => {
 	const [isAddTagPopupOpen, setAddTagPopupOpen] = useState<boolean>(false);
 	const [sidebarMenuItems, setSidebarMenuItems] = useState<SideMenuItem[]>([
 		{
-			title: 'Notes',
+			name: 'Notes',
 			icon: faLightbulb,
 			href: '/',
 			isActive: true,
+			params: 'is_trashed=False&is_archived=False',
 		},
 		{
-			title: 'Favorites',
+			name: 'Favorites',
 			icon: faStar,
 			href: '/favorite',
 			isActive: false,
+			params: 'is_favorited=True&is_trashed=False&is_archived=False',
 		},
 		{
-			title: 'Archive',
+			name: 'Archive',
 			icon: faArchive,
 			href: '/archive',
 			isActive: false,
+			params: 'is_archived=True&is_trashed=False',
 		},
 		{
-			title: 'Trash',
+			name: 'Trash',
 			icon: faTrash,
 			href: '/trash',
 			isActive: false,
+			params: 'is_trashed=True',
 		},
 	]);
+
+	const [temp, setTemp] = useState<any>(sidebarMenuItems[0]);
 
 	return (
 		<SideNavContext.Provider
 			value={{
+				temp,
 				sidebarMenuItems,
 				isSideNavOpen,
 				page,
@@ -79,6 +88,7 @@ export const SideNavProvider = ({ children }: SideNavProviderProps) => {
 				setPage,
 				setAddTagPopupOpen,
 				setSidebarMenuItems,
+				setTemp,
 			}}
 		>
 			{children}

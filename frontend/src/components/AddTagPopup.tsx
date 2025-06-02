@@ -1,15 +1,15 @@
 import { faLightbulb, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect, useRef, useState } from 'react';
+import useMutateTag from '../hooks/useMutateTag';
 import { useSideNav } from '../hooks/useSideNav';
-import useTag from '../hooks/useTag';
 import '../styles/AddTagPopUp.css';
 
 const AddTagPopup = () => {
 	const [TagName, setTagName] = useState('');
 
 	const { setAddTagPopupOpen } = useSideNav();
-	const { makeTag } = useTag();
+	const { makeTag } = useMutateTag();
 
 	const addInputRef = useRef<HTMLInputElement>(null);
 

@@ -1,23 +1,20 @@
 from django.urls import path
-
-from . import views
+from .views import (
+    NoteListCreateView,
+    NoteDetailView,
+    TagListCreateView,
+    TagDetailView,
+    LoginView,
+    RegisterView,
+    LogoutView,
+)
 
 urlpatterns = [
-    path("api/tags/", views.TagView.as_view(), name="tags"),
-    path("api/tags/delete_tag/<int:pk>/", views.TagView.as_view(), name="delete-tag"),
-    path("api/tags/edit_tag/<int:pk>/", views.TagView.as_view(), name="edit-tag"),
-    path("api/tags/create_tag/", views.TagView.as_view(), name="create-tag"),
-
-    path("api/notes/", views.NoteView.as_view(), name="notes"),
-    path("api/notes/create_note/", views.NoteView.as_view(), name="create-note"),
-    path("api/notes/edit_note/<int:pk>/", views.NoteView.as_view(), name="edit-note"),
-    path("api/notes/delete_note/<int:pk>/", views.NoteView.as_view(), name="delete-note"),
-
-    path("api/login/", views.LoginView.as_view(), name="api-login"),
-    path("api/register/", views.RegisterView.as_view(), name="api-register"),
-    path("api/logout/", views.LogoutView.as_view(), name="api-logout"),
-    
-    
-
+    path("api/notes/", NoteListCreateView.as_view(), name="notes-list-create"),
+    path("api/notes/<int:pk>/", NoteDetailView.as_view(), name="notes-detail"),
+    path("api/tags/", TagListCreateView.as_view(), name="tags-list-create"),
+    path("api/tags/<int:pk>/", TagDetailView.as_view(), name="tags-detail"),
+    path("api/login/", LoginView.as_view(), name="api-login"),
+    path("api/register/", RegisterView.as_view(), name="api-register"),
+    path("api/logout/", LogoutView.as_view(), name="api-logout"),
 ]
-

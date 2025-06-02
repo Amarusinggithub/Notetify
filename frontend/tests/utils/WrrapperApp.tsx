@@ -1,8 +1,8 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import AuthProvider from '../../src/hooks/useAuth.tsx';
-import { NoteProvider } from '../../src/hooks/useNote.tsx';
+import { NoteProvider } from '../../src/hooks/useMutateNote.tsx';
+import { TagProvider } from '../../src/hooks/useMutateTag.tsx';
 import { SideNavProvider } from '../../src/hooks/useSideNav.tsx';
-import { TagProvider } from '../../src/hooks/useTag.tsx';
 
 type WrapperProps = {
 	component: React.ReactElement;

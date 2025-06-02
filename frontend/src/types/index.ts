@@ -11,7 +11,7 @@ declare module 'axios' {
 export const CSRF_TOKEN_COOKIE_NAME = 'csrftoken';
 export const USERDATA_STORAGE_KEY = 'userData';
 
-type roles = 'admin' | 'editor' | 'member';
+type roles = 'owner' | 'editor' | 'member';
 
 //Models
 export type User = {
@@ -21,11 +21,10 @@ export type User = {
 	avatar?: string;
 	role: roles;
 	email_verified_at: string | null;
-	createdAt: Date;
-	updatedAt: Date;
+	created_at: Date;
+	updated_at: Date;
 };
 export type CreateNote = {
-	id: number;
 	note_data: {
 		title: string;
 		content: string;
@@ -41,21 +40,24 @@ export type CreateNote = {
 };
 
 export interface Note extends Omit<CreateNote, 'note_data'> {
+	id: number;
 	note: {
 		id: number;
 		title: string;
 		content: string;
 		users: number[];
+		created_at: Date;
+		updated_at: Date;
 	};
 	user: number;
-	createdAt: Date;
-	updatedAt: Date;
 }
 
 export interface Tag {
 	id?: number;
 	name: string;
 	users?: number[];
+	created_at?: Date;
+	updated_at?: Date;
 }
 
 export interface BreadcrumbItem {
@@ -64,8 +66,16 @@ export interface BreadcrumbItem {
 }
 
 export interface SideMenuItem {
-	title: string;
+	name: string;
 	href: string;
 	icon?: IconProp;
 	isActive?: boolean;
+	params: string;
 }
+
+export const noteQueryKeys = {
+	all: ['notes'] as const,
+	lists: () => [...noteQueryKeys.all, 'lists'] as const,
+	list: (category: string, params: string) =>
+		[...noteQueryKeys.lists(), category, params] as const,
+};

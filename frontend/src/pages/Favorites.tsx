@@ -1,8 +1,8 @@
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { CreateNote, Note } from 'types/index.ts';
+import { Note } from 'types/index.ts';
 import NoteCard from '../components/NoteCard.tsx';
-import useNote from '../hooks/useNote.tsx';
+import useFetchNotes from '../hooks/useFetchNotes.ts';
 import { useSideNav } from '../hooks/useSideNav.tsx';
 import noFavoriteNotes from './../../assets/No_favorited_notes.png';
 import ErrorFallback from './Error.tsx';
@@ -11,9 +11,12 @@ import Loading from './Loading.tsx';
 const Favorite = () => {
 	const { isSideNavOpen } = useSideNav();
 
-	const { favorites, data } = useNote();
+	const favorites = useFetchNotes(
+		'favorites',
+		'is_favorited=True&is_trashed=False&is_archived=False',
+	);
 
-	if (data!.length! > 0 && favorites.length == 0) {
+	if (favorites.length == 0) {
 		return (
 			<div>
 				<img
@@ -34,7 +37,7 @@ const Favorite = () => {
 					style={{ maxWidth: isSideNavOpen ? '1200px' : '1400px' }}
 				>
 					{favorites &&
-						favorites.map((note: Note | CreateNote) => (
+						favorites.map((note: Note) => (
 							<Suspense key={note.id} fallback={<Loading />}>
 								<div key={note.id} className="note-div">
 									<NoteCard note={note} route={'/favorite'} />

@@ -1,18 +1,20 @@
+import useSearchState from '../hooks/useSearchState.ts';
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { CreateNote, Note } from 'types';
+import { Note } from 'types';
 import NoteCard from '../components/NoteCard';
-import useNote from '../hooks/useNote';
+import useSearchNotes from '../hooks/useSearchNotes';
 import { useSideNav } from '../hooks/useSideNav';
 import noSearchNotes from './../../assets/No_Search.png';
 import ErrorFallback from './Error';
 import Loading from './Loading';
 
 const Search = () => {
-	const { searchNotes, data } = useNote();
+	const { params, query } = useSearchState();
+	const searchNotes = useSearchNotes(query, params);
 	const { isSideNavOpen } = useSideNav();
 
-	if (data!.length! > 0 && searchNotes.length == 0) {
+	if (searchNotes.length == 0) {
 		return (
 			<>
 				<img
@@ -32,7 +34,7 @@ const Search = () => {
 					className="all-notes"
 					style={{ maxWidth: isSideNavOpen ? '1200px' : '1400px' }}
 				>
-					{searchNotes?.map((note: Note | CreateNote) => (
+					{searchNotes?.map((note: Note) => (
 						<Suspense key={note.id} fallback={<Loading />}>
 							<div key={note.id} className="note-div">
 								<NoteCard note={note} route={''} />

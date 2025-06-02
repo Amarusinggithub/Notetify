@@ -16,9 +16,9 @@
 .search-container {
 	position: fixed;
 	left: 50%;
-    transform: translate(-50%, -50%);
-    top: 6%;
-    display: flex;
+	transform: translate(-50%, -50%);
+	top: 6%;
+	display: flex;
 	flex-direction: row;
 	align-items: center;
 	height: 35px;

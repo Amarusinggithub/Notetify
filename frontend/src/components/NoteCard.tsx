@@ -10,7 +10,7 @@ import {
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { CreateNote, Note } from 'types/index.ts';
-import useNote from '../hooks/useNote.tsx';
+import useMutateNote from '../hooks/useMutateNote.tsx';
 import { isUserNote } from './../utils/helpers.ts';
 import NoteContentEditor from './Editor/components/NoteContentEditor.tsx';
 
@@ -28,7 +28,7 @@ const NoteCard = ({ note, route }: NoteCardProps) => {
 		isLoading,
 		handleFavorite,
 		handlePin,
-	} = useNote();
+	} = useMutateNote();
 	const [noteState, setNoteState] = useState<Note | CreateNote>(note);
 
 	const isSelected = selectedNote && selectedNote.id === note.id;

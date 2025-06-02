@@ -1,11 +1,7 @@
-type ButtonProps={
-    
-}
+type ButtonProps = {};
 
-const Button =({}:ButtonProps)=>{
-    return(
-        <button></button>
-    )
-}
+const Button = ({}: ButtonProps) => {
+	return <button></button>;
+};
 
 export default Button;

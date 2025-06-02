@@ -1,6 +1,7 @@
 from django.contrib.auth import authenticate
 from django.shortcuts import get_object_or_404
 from rest_framework import status
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
@@ -9,10 +10,12 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from api.models import User, Tag, UserNote
 from api.serializers import UserSerializer, TagSerializer, UserNoteSerializer
 from django.conf import settings
-from django.views.decorators.vary import vary_on_cookie
-
+from rest_framework import generics
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters
+
 
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
@@ -97,7 +100,7 @@ class LoginView(APIView):
             if user.is_active:
                 serializer = UserSerializer(user, context={"request": request})
                 data = get_tokens_for_user(user)
-                
+
                 response.set_cookie(
                     key=settings.SIMPLE_JWT["AUTH_COOKIE"],
                     value=data["access"],
@@ -153,67 +156,79 @@ class LogoutView(APIView):
             )
 
 
-class TagView(APIView):
+CACHE_TTL = 60 * 60 * 2  # 2 hours
+
+
+class TagListCreateView(generics.ListCreateAPIView):
+
     permission_classes = [IsAuthenticated]
+    serializer_class = TagSerializer
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_fields = ["name", "id"]
+    search_fields = ["name"]
+    pagination_class = LimitOffsetPagination
 
-    #@method_decorator(cache_page(60 * 60 * 2, key_prefix="tags"))
-    def get(self, request):
-        tags = Tag.objects.filter(users=request.user)
-        serializer = TagSerializer(tags, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+    def get_queryset(self):
+        return Tag.objects.filter(users=self.request.user)
 
-    def post(self, request):
-        serializer = TagSerializer(data=request.data, context={"request": request})
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    @method_decorator(
+        cache_page(CACHE_TTL, key_prefix=lambda req: f"tags_user_{req.user.pk}")
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
-    def delete(self, request, pk):
-        tag = get_object_or_404(Tag, pk=pk, users=request.user)
-        tag.delete()
-        return Response(
-            {"message": "Tag deleted successfully"}, status=status.HTTP_204_NO_CONTENT
-        )
-
-    def put(self, request, pk):
-        tag = get_object_or_404(Tag, pk=pk, users=request.user)
-        serializer = TagSerializer(tag, data=request.data, context={"request": request})
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def perform_create(self, serializer):
+        serializer.save()
 
 
-class NoteView(APIView):
+class TagDetailView(generics.RetrieveUpdateDestroyAPIView):
+
     permission_classes = [IsAuthenticated]
+    serializer_class = TagSerializer
 
-    #@method_decorator(cache_page(60 * 60 * 2, key_prefix="notes"))
-    def get(self, request):
-        notes = UserNote.objects.filter(user=request.user)
-        serializer = UserNoteSerializer(notes, many=True, context={"request": request})
-        return Response(serializer.data, status=status.HTTP_200_OK)
+    def get_object(self):
+        return get_object_or_404(Tag, users=self.request.user, pk=self.kwargs["pk"])
 
-    def post(self, request):
-        serializer = UserNoteSerializer(data=request.data, context={"request": request})
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def perform_update(self, serializer):
+        serializer.save()
 
-    def delete(self, request, pk):
-        note = get_object_or_404(UserNote, user=request.user, pk=pk)
-        note.delete()
-        return Response(
-            {"message": "Note deleted successfully"}, status=status.HTTP_204_NO_CONTENT
-        )
 
-    def put(self, request, pk):
-        note = get_object_or_404(UserNote, user=request.user, pk=pk)
-        serializer = UserNoteSerializer(
-            note, data=request.data, context={"request": request}
-        )
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class NoteListCreateView(generics.ListCreateAPIView):
+
+    permission_classes = [IsAuthenticated]
+    serializer_class = UserNoteSerializer
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_fields = [
+        "is_pinned",
+        "is_favorited",
+        "is_trashed",
+        "is_archived",
+        "tags__id",
+    ]
+    search_fields = ["note__title"]
+    pagination_class = LimitOffsetPagination
+
+    def get_queryset(self):
+        return UserNote.objects.filter(user=self.request.user)
+
+    @method_decorator(
+        cache_page(CACHE_TTL, key_prefix=lambda req: f"notes_user_{req.user.pk}")
+    )
+    def list(self, request, *args, **kwargs):
+
+        return super().list(request, *args, **kwargs)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+class NoteDetailView(generics.RetrieveUpdateDestroyAPIView):
+
+    permission_classes = [IsAuthenticated]
+    serializer_class = UserNoteSerializer
+
+    def get_object(self):
+        return get_object_or_404(UserNote, user=self.request.user, pk=self.kwargs["pk"])
+
+    def perform_update(self, serializer):
+        serializer.save()
