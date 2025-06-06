@@ -1,3 +1,6 @@
+
+
+
 services:
   db_dev:
     image: mysql:latest
@@ -104,7 +107,7 @@ services:
       backend_dev:
         condition: service_started
     volumes:
-      - ./frontend:/usr/src/app   
+      - ./frontend:/usr/src/app
       - node_modules_frontend-dev:/usr/src/app/node_modules
     ports:
       - "3000:3000"

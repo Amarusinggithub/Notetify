@@ -1,8 +1,6 @@
-from turtle import update
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, UserManager, PermissionsMixin
 from django.db import models
-from channels_yroom.models import YDocUpdate
 
 
 class Roles(models.TextChoices):
@@ -34,10 +32,10 @@ class MyUserManager(UserManager):
 class User(AbstractUser, PermissionsMixin):
     id = models.AutoField(primary_key=True)
     username = models.CharField(max_length=150)
+    password = models.CharField(max_length=128, null=True)
     avatar = models.TextField(null=True, blank=True)
-
     email = models.EmailField(unique=True, max_length=254)
-    email_verified_at = models.TextField(null=True, blank=True)
+    email_verified_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(
         auto_now_add=True,
     )
@@ -46,22 +44,68 @@ class User(AbstractUser, PermissionsMixin):
     )
     REQUIRED_FIELDS = []
     USERNAME_FIELD = "email"
-
     objects = MyUserManager()
-
     def __str__(self):
         return self.email
 
 
-class Tag(models.Model):
+class OAuthAccount(models.Model):
+    class OAuthProviders(models.TextChoices):
+        GOOGLE = "GOOGLE", "google"
+        GITHUB = "GITHUB", "github"
+        FACEBOOK = "FACEBOOK", "facebook"
+
     id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=50)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="OAuth_accounts",
+    )
+    OAuthProvider = models.CharField(
+        max_length=20,
+        choices=OAuthProviders.choices,
+    )
+    access_token = models.CharField(max_length=200, blank=True, null=True)
+    refresh_token = models.CharField(max_length=200, blank=True, null=True)
+    expires_at = models.DateTimeField(auto_now=True, blank=True, null=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
+
+
+class Note(models.Model):
+    id = models.AutoField(primary_key=True)
+    title = models.CharField(max_length=500)
+    content = models.TextField()
+    users = models.ManyToManyField(
+        User, through="UserNote", through_fields=("note", "user")
+    )
+    is_shared = models.BooleanField(default=False)
+
     created_at = models.DateTimeField(
         auto_now_add=True,
     )
     updated_at = models.DateTimeField(
         auto_now=True,
     )
+    schedule_delete_at = models.DateTimeField(auto_now=True, null=True)
+
+    def __str__(self):
+        return self.title
+
+
+class Tag(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=50)
+    notes = models.ManyToManyField(Note, through="NoteTag")
+    users = models.ManyToManyField(User, through="UserTag")
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+    )
+    schedule_delete_at = models.DateTimeField(auto_now=True, null=True)
 
     def __str__(self):
         return self.name
@@ -70,98 +114,131 @@ class Tag(models.Model):
 class NoteBook(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50)
+    users = models.ManyToManyField(
+        User, through="UserNoteBook", through_fields=("note_book", "user")
+    )
+    notes = models.ManyToManyField(Note, through="NoteBooKNote")
     created_at = models.DateTimeField(
         auto_now_add=True,
     )
     updated_at = models.DateTimeField(
         auto_now=True,
     )
+    schedule_delete_at = models.DateTimeField(auto_now=True, null=True)
 
 
-class UserNoteBook(models.Model):
+class NoteBookNote(models.Model):
+    note = models.ForeignKey(Note, on_delete=models.CASCADE)
+    note_book = models.ForeignKey(NoteBook(), on_delete=models.CASCADE)
     id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="User"
-    )
-    note_book = models.ForeignKey(
-        NoteBook,
-        on_delete=models.CASCADE,
-        related_name="Note_Book",
-    )
-
-
-class SharedNoteBook(models.Model):
-    id = models.AutoField(primary_key=True)
-    shared_to = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="shared_to")
-    note_book = models.ForeignKey(NoteBook, on_delete=models.CASCADE)
-    permision = models.CharField(
-        max_length=20, choices=Roles.choices, default=Roles.Editor
-    )
-    shared_from = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="shared_from"
-    )
-    shared_at = models.DateTimeField(
-        auto_now_add=True,
-    )
-
-
-class UserTag(models.Model):
-    id = models.AutoField(primary_key=True)
-    tag = models.ForeignKey(Tag, related_name="tag", blank=True)
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="User"
-    )
-
-
-class Note(models.Model):
-    id = models.AutoField(primary_key=True)
-    users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="notes")
-    title = models.CharField(max_length=500)
-    content = models.TextField()
-    is_shared = models.BooleanField(default=False)
     created_at = models.DateTimeField(
         auto_now_add=True,
     )
-    updated_at = models.DateTimeField(
-        auto_now=True,
+    added_at = models.DateTimeField(
+        auto_now_add=True,
     )
+    removed_at = models.DateTimeField(auto_now=True, null=True)
 
-    # ydoc = models.OneToOneField(
-    #    YDocUpdate, on_delete=models.CASCADE, related_name="note"
-    # )
-    def __str__(self):
-        return self.title
+    class Meta:
+        unique_together = (("note", "note_book"),)
 
 
 class NoteTag(models.Model):
     note = models.ForeignKey(Note, on_delete=models.CASCADE)
-    tag = models.ForeignKey(Tag)
+    tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
     id = models.AutoField(primary_key=True)
+    added_at = models.DateTimeField(
+        auto_now_add=True,
+    )
+    removed_at = models.DateTimeField(auto_now=True, null=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
+
+    class Meta:
+        unique_together = (("note", "tag"),)
+
+
+class UserTag(models.Model):
+    id = models.AutoField(primary_key=True)
+    tag = models.ForeignKey(
+        Tag,
+        related_name="tag",
+        on_delete=models.CASCADE,
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="user_tags",
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
+
+    class Meta:
+        unique_together = (("user", "tag"),)
+
+
+class UserNoteBook(models.Model):
+    id = models.AutoField(primary_key=True)
+    role = models.CharField(max_length=20, choices=Roles.choices, default=Roles.OWNER)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="User_Notebooks",
+    )
+    note_book = models.ForeignKey(
+        NoteBook,
+        on_delete=models.CASCADE,
+    )
+    is_pinned = models.BooleanField(default=False)
+    is_favorited = models.BooleanField(default=False)
+    is_trashed = models.BooleanField(default=False)
+    is_archived = models.BooleanField(default=False)
+    shared_from = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        null=True,
+    )
+    shared_at = models.DateTimeField(auto_now_add=True, null=True)
+    archived_at = models.DateTimeField(auto_now_add=True, null=True)
+    trashed_at = models.DateTimeField(auto_now_add=True, null=True)
+    favorited_at = models.DateTimeField(auto_now_add=True, null=True)
+    removed_at = models.DateTimeField(auto_now_add=True, null=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
+
+    class Meta:
+        unique_together = (("user", "note_book"),)
 
 
 class UserNote(models.Model):
     id = models.AutoField(primary_key=True)
     role = models.CharField(max_length=20, choices=Roles.choices, default=Roles.OWNER)
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="User"
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="user_notes",
     )
     note = models.ForeignKey(Note, on_delete=models.CASCADE)
     is_pinned = models.BooleanField(default=False)
     is_favorited = models.BooleanField(default=False)
     is_trashed = models.BooleanField(default=False)
     is_archived = models.BooleanField(default=False)
-
-
-class SharedNote(models.Model):
-    id = models.AutoField(primary_key=True)
-    shared_to = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="shared_to")
-    note = models.ForeignKey(Note, on_delete=models.CASCADE)
-    permision = models.CharField(
-        max_length=20, choices=Roles.choices, default=Roles.Editor
-    )
     shared_from = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="shared_from"
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        null=True,
     )
-    shared_at = models.DateTimeField(
+    shared_at = models.DateTimeField(auto_now_add=True, null=True)
+    archived_at = models.DateTimeField(auto_now_add=True, null=True)
+    trashed_at = models.DateTimeField(auto_now_add=True, null=True)
+    favorited_at = models.DateTimeField(auto_now_add=True, null=True)
+    removed_at = models.DateTimeField(auto_now_add=True, null=True)
+    created_at = models.DateTimeField(
         auto_now_add=True,
     )
+
+    class Meta:
+        unique_together = (("user", "note"),)
