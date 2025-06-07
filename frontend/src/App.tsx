@@ -5,7 +5,7 @@ import './App.css';
 import AuthProvider from './hooks/useAuth.tsx';
 import { NoteProvider } from './hooks/useMutateNote.tsx';
 import { TagProvider } from './hooks/useMutateTag.tsx';
-import { SearchProvider } from './hooks/useSearchState.ts';
+import { SearchProvider } from './hooks/useSearchState.tsx';
 import { SideNavProvider } from './hooks/useSideNav.tsx';
 import { ensureCSRFToken } from './lib/AxiosService.ts';
 import ErrorFallback from './pages/Error';

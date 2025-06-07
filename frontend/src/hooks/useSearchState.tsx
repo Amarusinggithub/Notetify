@@ -18,7 +18,7 @@ const SearchProvider = ({ children }:SearchProviderProps) => {
 
   return (
 
-    /*<SearchContext.Provider
+    <SearchContext.Provider
     value={{
         query,
         params,
@@ -27,7 +27,7 @@ const SearchProvider = ({ children }:SearchProviderProps) => {
     }}
     >
     {children}
-    </SearchContext.Provider>*/
+    </SearchContext.Provider>
   );
 };
 
