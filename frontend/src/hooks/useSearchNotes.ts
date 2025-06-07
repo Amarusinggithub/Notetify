@@ -1,9 +1,9 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import axiosInstance from '../lib/AxiosService';
-import { Note } from '../types/index.ts';
+import { UserNote } from '../types/index.ts';
 
 const useSearchNotes = (query: string, params: string) => {
-	const { data = [] } = useSuspenseQuery<Note[]>({
+	const { data = [] } = useSuspenseQuery<UserNote[]>({
 		queryKey: [`search`],
 		queryFn: async () =>
 			await axiosInstance

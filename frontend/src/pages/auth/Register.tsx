@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { useAuth } from '../../hooks/useAuth.tsx';
-import { CreateUser } from '../../types/index.ts';
 import '../../styles/SignUpForm.css';
+import { CreateUser } from '../../types/index.ts';
 
 const Register = () => {
 	const navigate = useNavigate();
@@ -15,7 +15,7 @@ const Register = () => {
 
 	const [confirmPassword, setConfirmPassword] = useState<string>('');
 
-	const { handleSignup,  isLoading } = useAuth();
+	const { handleSignup, isLoading } = useAuth();
 
 	function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
 		setState({ ...state, [e.target.name]: e.target.value.trim() });

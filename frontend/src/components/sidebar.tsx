@@ -2,7 +2,7 @@ import { faEllipsis, faPlus, faTag } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
-import { Tag } from 'types/index.ts';
+import { UserTag } from 'types/index.ts';
 import useFetchTags from '../hooks/useFetchTags.ts';
 import useMutateTag from '../hooks/useMutateTag.tsx';
 import useSearchState from '../hooks/useSearchState.tsx';
@@ -34,10 +34,10 @@ const SideNav = () => {
 		}
 
 		for (let j = 0; j < tags.length; j++) {
-			if (path === '/tag/' + tags[j].name) {
-				setTemp(tags[j]);
+			if (path === '/tag/' + tags[j].tag.name) {
+				setTemp(tags[j].tag);
 				setParams(
-					`tags__name=${tags[j].name}&is_archived=False&is_trashed=False`,
+					`tags__name=${tags[j].tag.name}&is_archived=False&is_trashed=False`,
 				);
 			}
 		}
@@ -51,10 +51,10 @@ const SideNav = () => {
 		};
 	};
 
-	const handleTagClicked = (tag: Tag) => {
-		setTemp(tag);
-		navigate('/tag/' + tag.name);
-		setParams(tag.name);
+	const handleTagClicked = (tag: UserTag) => {
+		setTemp(tag.tag);
+		navigate('/tag/' + tag.tag.name);
+		setParams(tag.tag.name);
 	};
 
 	const handleCreateTag = () => {
@@ -117,7 +117,7 @@ const SideNav = () => {
 				)}
 				{tags?.length > 0 && (
 					<ul className="tags">
-						{tags.map((tag: Tag, index: number) => (
+						{tags.map((tag: UserTag, index: number) => (
 							<li
 								onClick={(e) => {
 									e.stopPropagation();
@@ -137,7 +137,7 @@ const SideNav = () => {
 							>
 								<div className="icon-and-name">
 									<FontAwesomeIcon icon={faTag} className="icon" />
-									{isSideNavOpen && <h3>{tag.name}</h3>}
+									{isSideNavOpen && <h3>{tag.tag.name}</h3>}
 								</div>
 								{isSideNavOpen && (
 									<div>

@@ -1,12 +1,12 @@
-import { Note } from 'types';
+import { UserNote } from 'types';
 import NoteCard from '../components/NoteCard';
-
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import useFetchNotes from '../hooks/useFetchNotes';
 import noArchivedNotes from './../../assets/No_Archive_notes.png';
 import ErrorFallback from './Error';
 import Loading from './Loading';
+import CardSkeleton from '../components/CardSkeleton';
 
 const Archive = () => {
 	const archived = useFetchNotes(
@@ -32,8 +32,8 @@ const Archive = () => {
 			<div className="container">
 				<div className="all-notes">
 					{archived &&
-						archived.map((note: Note) => (
-							<Suspense key={note.id} fallback={<Loading />}>
+						archived.map((note: UserNote) => (
+							<Suspense key={note.id} fallback={<CardSkeleton />}>
 								<div key={note.id} className="note-div">
 									<NoteCard note={note} route={'/archive'} />
 								</div>{' '}

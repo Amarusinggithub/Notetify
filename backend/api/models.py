@@ -41,8 +41,12 @@ class User(AbstractUser, PermissionsMixin):
         default=True,
     )
     email_verified_at = models.DateTimeField(null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True, )
-    updated_at = models.DateTimeField(auto_now=True, )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+    )
     REQUIRED_FIELDS = []
     USERNAME_FIELD = "email"
     objects = MyUserManager()
@@ -70,9 +74,13 @@ class OAuthAccount(models.Model):
     access_token = models.CharField(max_length=200, blank=True, null=True)
     refresh_token = models.CharField(max_length=200, blank=True, null=True)
     expires_at = models.DateTimeField(
-        auto_now=True, blank=True, null=True,
+        auto_now=True,
+        blank=True,
+        null=True,
     )
-    created_at = models.DateTimeField(auto_now_add=True, )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
 
 
 class Tag(models.Model):
@@ -103,33 +111,43 @@ class Note(models.Model):
     )
     is_shared = models.BooleanField(default=False)
 
-    created_at = models.DateTimeField(auto_now_add=True, )
-    updated_at = models.DateTimeField(auto_now=True, )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+    )
     schedule_delete_at = models.DateTimeField(
-        auto_now=True, null=True,
+        auto_now=True,
+        null=True,
     )
 
     def __str__(self):
         return self.title
 
 
-class NoteBook(models.Model):
+class Notebook(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50)
     users = models.ManyToManyField(
-        User, through="UserNoteBook", through_fields=("note_book", "user")
+        User, through="UserNotebook", through_fields=("notebook", "user")
     )
-    notes = models.ManyToManyField(Note, through="NoteBooKNote")
-    created_at = models.DateTimeField(auto_now_add=True, )
-    updated_at = models.DateTimeField(auto_now=True, )
+    notes = models.ManyToManyField(Note, through="NotebooKNote")
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+    )
     schedule_delete_at = models.DateTimeField(
-        auto_now=True, null=True,
+        auto_now=True,
+        null=True,
     )
 
 
-class NoteBookNote(models.Model):
+class NotebookNote(models.Model):
     note = models.ForeignKey(Note, on_delete=models.CASCADE)
-    note_book = models.ForeignKey(NoteBook(), on_delete=models.CASCADE)
+    notebook = models.ForeignKey(Notebook(), on_delete=models.CASCADE)
     id = models.AutoField(primary_key=True)
     created_at = models.DateTimeField(
         auto_now_add=True,
@@ -137,10 +155,13 @@ class NoteBookNote(models.Model):
     added_at = models.DateTimeField(
         auto_now_add=True,
     )
-    removed_at = models.DateTimeField(auto_now=True, null=True, )
+    removed_at = models.DateTimeField(
+        auto_now=True,
+        null=True,
+    )
 
     class Meta:
-        unique_together = (("note", "note_book"),)
+        unique_together = (("note", "notebook"),)
 
 
 class UserTag(models.Model):
@@ -155,13 +176,16 @@ class UserTag(models.Model):
         on_delete=models.CASCADE,
         related_name="user_tags",
     )
-    created_at = models.DateTimeField(auto_now_add=True, )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
 
+    # role = models.CharField(max_length=20, choices=Roles.choices, default=Roles.OWNER)
     class Meta:
         unique_together = (("user", "tag"),)
 
 
-class UserNoteBook(models.Model):
+class UserNotebook(models.Model):
     id = models.AutoField(primary_key=True)
     role = models.CharField(max_length=20, choices=Roles.choices, default=Roles.OWNER)
     user = models.ForeignKey(
@@ -169,8 +193,8 @@ class UserNoteBook(models.Model):
         on_delete=models.CASCADE,
         related_name="User_Notebooks",
     )
-    note_book = models.ForeignKey(
-        NoteBook,
+    notebook = models.ForeignKey(
+        Notebook,
         on_delete=models.CASCADE,
     )
     is_pinned = models.BooleanField(default=False)
@@ -182,23 +206,32 @@ class UserNoteBook(models.Model):
         on_delete=models.CASCADE,
         null=True,
     )
-    shared_at = models.DateTimeField(auto_now_add=True, null=True, )
+    shared_at = models.DateTimeField(
+        auto_now_add=True,
+        null=True,
+    )
     archived_at = models.DateTimeField(
-        auto_now_add=True, null=True,
+        auto_now_add=True,
+        null=True,
     )
     trashed_at = models.DateTimeField(
-        auto_now_add=True, null=True,
+        auto_now_add=True,
+        null=True,
     )
     favorited_at = models.DateTimeField(
-        auto_now_add=True, null=True,
+        auto_now_add=True,
+        null=True,
     )
     removed_at = models.DateTimeField(
-        auto_now_add=True, null=True,
+        auto_now_add=True,
+        null=True,
     )
-    created_at = models.DateTimeField(auto_now_add=True, )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
 
     class Meta:
-        unique_together = (("user", "note_book"),)
+        unique_together = (("user", "notebook"),)
 
 
 class UserNote(models.Model):
@@ -221,20 +254,29 @@ class UserNote(models.Model):
         on_delete=models.CASCADE,
         null=True,
     )
-    shared_at = models.DateTimeField(auto_now_add=True, null=True, )
+    shared_at = models.DateTimeField(
+        auto_now_add=True,
+        null=True,
+    )
     archived_at = models.DateTimeField(
-        auto_now_add=True, null=True,
+        auto_now_add=True,
+        null=True,
     )
     trashed_at = models.DateTimeField(
-        auto_now_add=True, null=True,
+        auto_now_add=True,
+        null=True,
     )
     favorited_at = models.DateTimeField(
-        auto_now_add=True, null=True,
+        auto_now_add=True,
+        null=True,
     )
     removed_at = models.DateTimeField(
-        auto_now_add=True, null=True,
+        auto_now_add=True,
+        null=True,
     )
-    created_at = models.DateTimeField(auto_now_add=True, )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
 
     class Meta:
         unique_together = (("user", "note"),)

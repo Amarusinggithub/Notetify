@@ -1,4 +1,3 @@
-import { lazy } from 'react';
 import { Outlet } from 'react-router';
 import AddTagPopup from '../components/AddTagPopup.tsx';
 import DeleteTagPopup from '../components/DeleteTagPopup.tsx';
@@ -8,18 +7,17 @@ import SideNav from '../components/Sidebar.tsx';
 import useMutateTag from '../hooks/useMutateTag.tsx';
 import useSearchState from '../hooks/useSearchState.tsx';
 import { useSideNav } from '../hooks/useSideNav.tsx';
+import Search from '../pages/Search.tsx';
 import '../styles/mainpage.css';
-const Search = lazy(() => import('../pages/Search.tsx'));
 
 const AppLayout = () => {
 	const { isSideNavOpen, isAddTagPopupOpen } = useSideNav();
 	const { wantToDeleteTag, wantToEditTag } = useMutateTag();
-    const { query, setQuery } = useSearchState();
-
+	const { query } = useSearchState();
 
 	return (
 		<div className="container">
-			<Navbar  />
+			<Navbar />
 			<div className="child-container">
 				<SideNav />
 				<div

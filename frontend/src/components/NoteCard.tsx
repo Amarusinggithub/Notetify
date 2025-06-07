@@ -9,12 +9,12 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { CreateNote, Note } from 'types/index.ts';
+import { CreateNote, UserNote } from 'types/index.ts';
 import useMutateNote from '../hooks/useMutateNote.tsx';
 import { isUserNote } from './../utils/helpers.ts';
 import NoteContentEditor from './Editor/components/NoteContentEditor.tsx';
 
-type NoteCardProps = { note: Note | CreateNote; route: string };
+type NoteCardProps = { note: UserNote; route: string };
 
 const NoteCard = ({ note, route }: NoteCardProps) => {
 	const navigate = useNavigate();
@@ -25,11 +25,10 @@ const NoteCard = ({ note, route }: NoteCardProps) => {
 		setSelectedNote,
 		editNote,
 		removeNote,
-		isLoading,
 		handleFavorite,
 		handlePin,
 	} = useMutateNote();
-	const [noteState, setNoteState] = useState<Note | CreateNote>(note);
+	const [noteState, setNoteState] = useState<UserNote | CreateNote>(note);
 
 	const isSelected = selectedNote && selectedNote.id === note.id;
 

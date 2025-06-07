@@ -6,19 +6,19 @@ import React, {
 } from 'react';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Tag } from 'types/index.ts';
+import { CreateTag, UserTag } from 'types/index.ts';
 import { createTag, deleteTag, updateTag } from '../lib/TagService.ts';
 
 interface TagContextType {
-	selectedTag: Tag | null;
+	selectedTag: UserTag | null;
 	wantToDeleteTag: boolean;
 	wantToEditTag: boolean;
-	setSelectedTag: React.Dispatch<React.SetStateAction<Tag | null>>;
+	setSelectedTag: React.Dispatch<React.SetStateAction<UserTag | null>>;
 	setWantToDeleteTag: React.Dispatch<React.SetStateAction<boolean>>;
 	setWantToEditTag: React.Dispatch<React.SetStateAction<boolean>>;
-	makeTag: (tagName: string) => Promise<void>;
-	editTag: (tag: Tag) => Promise<void>;
-	removeTag: (tag: Tag) => Promise<void>;
+	makeTag: (tag: CreateTag) => Promise<void>;
+	editTag: (tag: UserTag) => Promise<void>;
+	removeTag: (tag: UserTag) => Promise<void>;
 }
 
 type TagProviderProps = PropsWithChildren;
@@ -28,7 +28,7 @@ const TagContext = createContext<TagContextType | undefined>(undefined);
 const TagProvider = ({ children }: TagProviderProps) => {
 	const queryClient = useQueryClient();
 
-	const [selectedTag, setSelectedTag] = useState<Tag | null>(null);
+	const [selectedTag, setSelectedTag] = useState<UserTag | null>(null);
 	const [wantToDeleteTag, setWantToDeleteTag] = useState<boolean>(false);
 	const [wantToEditTag, setWantToEditTag] = useState<boolean>(false);
 
@@ -39,7 +39,7 @@ const TagProvider = ({ children }: TagProviderProps) => {
 		},
 	});
 
-	const makeTag = async (tagName: string) => {
+	const makeTag = async (tag: CreateTag) => {
 		/*if (tagName!.trim().length > 0)
 			if (
 				data.some(
@@ -50,7 +50,7 @@ const TagProvider = ({ children }: TagProviderProps) => {
 				return;
 			}*/
 
-		createTagMutation.mutate(tagName);
+		createTagMutation.mutate(tag);
 	};
 
 	const editTagMutation = useMutation({
@@ -60,8 +60,8 @@ const TagProvider = ({ children }: TagProviderProps) => {
 		},
 	});
 
-	const editTag = async (tag: Tag) => {
-		if (tag.name!.trim().length > 0) editTagMutation.mutate(tag);
+	const editTag = async (tag: UserTag) => {
+		if (tag.tag.name!.trim().length > 0) editTagMutation.mutate(tag);
 	};
 
 	const deleteTagMutation = useMutation({
@@ -71,7 +71,7 @@ const TagProvider = ({ children }: TagProviderProps) => {
 		},
 	});
 
-	const removeTag = async (tag: Tag) => {
+	const removeTag = async (tag: UserTag) => {
 		deleteTagMutation.mutate(tag);
 	};
 

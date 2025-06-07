@@ -48,9 +48,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 		localStorage.removeItem(USERDATA_STORAGE_KEY);
 	};
 
-	const handleSignup = async (
-	user :CreateUser
-	) => {
+	const handleSignup = async (user: CreateUser) => {
 		try {
 			setLoading(true);
 			setError(null);
@@ -70,7 +68,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 		}
 	};
 
-	const handleLogin = async (user:CreateUser) => {
+	const handleLogin = async (user: CreateUser) => {
 		try {
 			setLoading(true);
 			setError(null);

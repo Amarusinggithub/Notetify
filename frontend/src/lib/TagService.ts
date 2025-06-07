@@ -1,4 +1,4 @@
-import { Tag } from 'types/index.ts';
+import { CreateTag, UserTag } from '../types/index.ts';
 import axiosInstance from './AxiosService.ts';
 
 export const getTags = async () => {
@@ -11,10 +11,10 @@ export const getTags = async () => {
 	}
 };
 
-export const createTag = async (tagName: string) => {
+export const createTag = async (tag: CreateTag) => {
 	try {
 		const response = await axiosInstance.post('tags/', {
-			title: tagName,
+			...tag,
 		});
 		console.log(response.data);
 		return response.status;
@@ -23,12 +23,10 @@ export const createTag = async (tagName: string) => {
 	}
 };
 
-export const updateTag = async (tag: Tag) => {
+export const updateTag = async (tag: UserTag) => {
 	try {
 		const response = await axiosInstance.put(`tags/${tag.id}/`, {
-			id: tag.id,
-			title: tag.name,
-			users: tag.users,
+			...tag,
 		});
 
 		console.log(response.data);
@@ -38,7 +36,7 @@ export const updateTag = async (tag: Tag) => {
 	}
 };
 
-export const deleteTag = async (tag: Tag) => {
+export const deleteTag = async (tag: UserTag) => {
 	try {
 		const response = await axiosInstance.delete(`tags/${tag.id}/`);
 		console.log(response.status);

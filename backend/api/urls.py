@@ -1,5 +1,7 @@
 from django.urls import path
 from .views import (
+    NotebookDetailView,
+    NotebookListCreateView,
     NoteListCreateView,
     NoteDetailView,
     TagListCreateView,
@@ -10,6 +12,12 @@ from .views import (
 )
 
 urlpatterns = [
+    path(
+        "api/notebooks/", NotebookListCreateView.as_view(), name="notebooks-list-create"
+    ),
+    path(
+        "api/notebooks/<int:pk>/", NotebookDetailView.as_view(), name="notebooks-detail"
+    ),
     path("api/notes/", NoteListCreateView.as_view(), name="notes-list-create"),
     path("api/notes/<int:pk>/", NoteDetailView.as_view(), name="notes-detail"),
     path("api/tags/", TagListCreateView.as_view(), name="tags-list-create"),

@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { Note } from 'types/index.ts';
+import { UserNote } from 'types/index.ts';
 import AddNoteCard from '../components/AddNoteCard.tsx';
 import NoteCard from '../components/NoteCard.tsx';
 import useFetchNotes from '../hooks/useFetchNotes.ts';
@@ -8,7 +8,8 @@ import { useSideNav } from '../hooks/useSideNav.tsx';
 import '../styles/Homepage.css';
 import noNotes from './../../assets/No_Note.png';
 import ErrorFallback from './Error.tsx';
-import Loading from './Loading.tsx';
+import CardSkeleton from '../components/CardSkeleton';
+
 
 const Home = () => {
 	const pinned = useFetchNotes(
@@ -44,7 +45,7 @@ const Home = () => {
 				<div className="add-note-card-cantainer">
 					<AddNoteCard />
 				</div>
-				{pinned && (
+				{pinned && pinned.length != 0 && (
 					<>
 						<div className="flex-column">
 							<h1 data-testid="cypress-pinnedNotes-title">Pinned Notes</h1>
@@ -53,8 +54,8 @@ const Home = () => {
 							className="pinned-notes"
 							style={{ maxWidth: isSideNavOpen ? '1200px' : '1360px' }}
 						>
-							{pinned.map((note: Note) => (
-								<Suspense key={note.id} fallback={<Loading />}>
+							{pinned.map((note: UserNote) => (
+								<Suspense key={note.id} fallback={<CardSkeleton />}>
 									<div key={note.id} className="note-div">
 										<NoteCard note={note} route={'/'} />
 									</div>
@@ -63,17 +64,20 @@ const Home = () => {
 						</div>
 					</>
 				)}
+
 				{other && (
 					<>
-						<div className="flex-column">
-							<h1>Others</h1>
-						</div>
+						{pinned && pinned.length != 0 && (
+							<div className="flex-column">
+								<h1>Others</h1>
+							</div>
+						)}
 						<div
 							className="all-notes"
 							style={{ maxWidth: isSideNavOpen ? '1200px' : '1400px' }}
 						>
-							{other?.map((note: Note) => (
-								<Suspense key={note.id} fallback={<Loading />}>
+							{other?.map((note: UserNote) => (
+								<Suspense key={note.id} fallback={<CardSkeleton/>}>
 									<div key={note.id} className="note-div">
 										<NoteCard note={note} route={'/'} />
 									</div>

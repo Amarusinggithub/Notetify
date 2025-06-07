@@ -1,12 +1,17 @@
 import { faLightbulb, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect, useRef, useState } from 'react';
+import { CreateTag } from 'types';
 import useMutateTag from '../hooks/useMutateTag';
 import { useSideNav } from '../hooks/useSideNav';
 import '../styles/AddTagPopUp.css';
 
 const AddTagPopup = () => {
-	const [TagName, setTagName] = useState('');
+	const [newTag, setNewTag] = useState<CreateTag>({
+		tag_data: {
+			name: '',
+		},
+	});
 
 	const { setAddTagPopupOpen } = useSideNav();
 	const { makeTag } = useMutateTag();
@@ -22,13 +27,24 @@ const AddTagPopup = () => {
 	const handleClose = () => setAddTagPopupOpen(false);
 
 	const handleTagNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setTagName(e.target.value);
+		const name = e.target.value;
+		setNewTag((prev) => ({
+			...prev,
+			tag_data: {
+				...prev.tag_data,
+				name: name.trim().charAt(0).toUpperCase() + name.trim().slice(1),
+			},
+		}));
 	};
 
 	const handleAddTagName = () => {
-		if (TagName.trim() !== '') {
-			makeTag(TagName.trim().charAt(0).toUpperCase() + TagName.trim().slice(1));
-			setTagName('');
+		if (newTag.tag_data.name.trim() !== '') {
+			makeTag(newTag);
+			setNewTag({
+				tag_data: {
+					name: '',
+				},
+			});
 		}
 		handleClose();
 	};
@@ -50,7 +66,7 @@ const AddTagPopup = () => {
 					ref={addInputRef}
 					className="add-tag-input"
 					placeholder="Eg. School or Work"
-					value={TagName}
+					value={newTag.tag_data.name}
 					onChange={(e) => {
 						handleTagNameChange(e);
 					}}

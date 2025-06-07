@@ -6,19 +6,19 @@ import React, {
 	useState,
 } from 'react';
 import { createNote, deleteNote, updateNote } from '../lib/NoteService.ts';
-import { CreateNote, Note, noteQueryKeys } from '../types/index.ts';
+import { CreateNote, noteQueryKeys, UserNote } from '../types/index.ts';
 
 interface NoteContextType {
-	selectedNote: Note | null;
+	selectedNote: UserNote | null;
 
 	addNote: (note: CreateNote) => Promise<void>;
-	editNote: (newNote: Note) => Promise<void>;
-	removeNote: (note: Note) => Promise<void>;
-	handleArchive: (note: Note) => void;
-	handleFavorite: (note: Note) => void;
-	handleTrash: (note: Note) => void;
-	handlePin: (note: Note) => void;
-	setSelectedNote: React.Dispatch<React.SetStateAction<Note | null>>;
+	editNote: (newNote: UserNote) => Promise<void>;
+	removeNote: (note: UserNote) => Promise<void>;
+	handleArchive: (note: UserNote) => void;
+	handleFavorite: (note: UserNote) => void;
+	handleTrash: (note: UserNote) => void;
+	handlePin: (note: UserNote) => void;
+	setSelectedNote: React.Dispatch<React.SetStateAction<UserNote | null>>;
 }
 
 type NoteProviderProps = PropsWithChildren;
@@ -28,7 +28,7 @@ const NoteContext = createContext<NoteContextType | undefined>(undefined);
 const NoteProvider = ({ children }: NoteProviderProps) => {
 	const queryClient = useQueryClient();
 
-	const [selectedNote, setSelectedNote] = useState<Note | null>(null);
+	const [selectedNote, setSelectedNote] = useState<UserNote | null>(null);
 
 	const addNoteMutation = useMutation({
 		mutationFn: createNote,
@@ -56,7 +56,7 @@ const NoteProvider = ({ children }: NoteProviderProps) => {
 		},
 	});
 
-	const editNote = async (note: Note) => {
+	const editNote = async (note: UserNote) => {
 		if (
 			note.note.content!.trim().length != 0 &&
 			note.note.title!.trim().length != 0
@@ -73,14 +73,14 @@ const NoteProvider = ({ children }: NoteProviderProps) => {
 		},
 	});
 
-	const removeNote = async (note: Note) => {
+	const removeNote = async (note: UserNote) => {
 		removeNoteMutation.mutate(note);
 	};
 
 	const handleToggle = (
-		note: Note,
+		note: UserNote,
 		field: keyof Pick<
-			Note,
+			UserNote,
 			'is_favorited' | 'is_archived' | 'is_trashed' | 'is_pinned'
 		>,
 	) => {

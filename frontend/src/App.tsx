@@ -23,7 +23,6 @@ export default function App() {
 
 	return (
 		<ErrorBoundary FallbackComponent={ErrorFallback}>
-			<Suspense fallback={<div>Loading...</div>}>
 				<QueryClientProvider client={queryClient}>
 					<AuthProvider>
 						<SearchProvider>
@@ -37,7 +36,6 @@ export default function App() {
 						</SearchProvider>
 					</AuthProvider>
 				</QueryClientProvider>
-			</Suspense>
 		</ErrorBoundary>
 	);
 }

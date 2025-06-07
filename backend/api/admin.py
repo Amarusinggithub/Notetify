@@ -10,10 +10,10 @@ from .models import (
     UserNote,
     Tag,
     NoteTag,
-    NoteBook,
-    NoteBookNote,
+    Notebook,
+    NotebookNote,
     UserTag,
-    UserNoteBook,
+    UserNotebook,
 )
 
 
@@ -73,7 +73,7 @@ class MyUserAdmin(UserAdmin):
 class OAuthAccountAdmin(admin.ModelAdmin):
 
     list_display = ("OAuthProvider", "user")
-    search_fields = ("OAuthProvider", "user__email", "user__username")
+    search_fields = ("OAuthProvider", "user__email" )
     list_filter = ("OAuthProvider",)
     ordering = ("user__email",)
 
@@ -97,7 +97,7 @@ class OAuthAccountAdmin(admin.ModelAdmin):
 class NoteAdmin(admin.ModelAdmin):
 
     list_display = ("title", "display_users", "is_shared", "updated_at")
-    search_fields = ("title", "content", "users__email", "users__username")
+    search_fields = ("title", "content", "users__email", "users__firstname")
     ordering = ("-updated_at",)
 
     fieldsets = (
@@ -233,7 +233,7 @@ class UserTagAdmin(admin.ModelAdmin):
     readonly_fields = ("created_at",)
 
 
-class NoteBookAdmin(admin.ModelAdmin):
+class NotebookAdmin(admin.ModelAdmin):
 
     list_display = (
         "name",
@@ -261,21 +261,21 @@ class NoteBookAdmin(admin.ModelAdmin):
 
     readonly_fields = ("created_at", "updated_at")
 
-    def display_users(self, obj: NoteBook) -> str:
+    def display_users(self, obj: Notebook) -> str:
         return ", ".join(u.username for u in obj.users.all())
 
     display_users.short_description = "Users"
 
-    def display_notes(self, obj: NoteBook) -> str:
+    def display_notes(self, obj: Notebook) -> str:
         return ", ".join(n.title for n in obj.notes.all())
 
     display_notes.short_description = "Notes"
 
 
-class NoteBookNoteAdmin(admin.ModelAdmin):
+class NotebookNoteAdmin(admin.ModelAdmin):
 
-    list_display = ("note_book", "note", "added_at", "removed_at")
-    search_fields = ("note_book__name", "note__title")
+    list_display = ("notebook", "note", "added_at", "removed_at")
+    search_fields = ("notebook__name", "note__title")
     ordering = ("-added_at",)
 
     fieldsets = (
@@ -283,7 +283,7 @@ class NoteBookNoteAdmin(admin.ModelAdmin):
             None,
             {
                 "fields": (
-                    "note_book",
+                    "notebook",
                     "note",
                     "added_at",
                     "removed_at",
@@ -296,11 +296,10 @@ class NoteBookNoteAdmin(admin.ModelAdmin):
     readonly_fields = ("added_at", "removed_at", "created_at")
 
 
-class UserNoteBookAdmin(admin.ModelAdmin):
+class UserNotebookAdmin(admin.ModelAdmin):
 
-
-    list_display = ("note_book", "user", "role", "shared_from", "shared_at")
-    search_fields = ("note_book__name", "user__email", "shared_from__email")
+    list_display = ("notebook", "user", "role", "shared_from", "shared_at")
+    search_fields = ("notebook__name", "user__email", "shared_from__email")
     ordering = ("-shared_at",)
 
     fieldsets = (
@@ -347,6 +346,6 @@ admin.site.register(Tag, TagAdmin)
 admin.site.register(NoteTag, NoteTagAdmin)
 admin.site.register(UserTag, UserTagAdmin)
 
-admin.site.register(NoteBook, NoteBookAdmin)
-admin.site.register(NoteBookNote, NoteBookNoteAdmin)
-admin.site.register(UserNoteBook, UserNoteBookAdmin)
+admin.site.register(Notebook, NotebookAdmin)
+admin.site.register(NotebookNote, NotebookNoteAdmin)
+admin.site.register(UserNotebook, UserNotebookAdmin)

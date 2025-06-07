@@ -1,6 +1,6 @@
-import { CreateNote, Note } from '../types';
+import { CreateNote, UserNote } from '../types';
 
 // Type guard to distinguish between UserNote and UserNoteData.
-export const isUserNote = (note: Note | CreateNote): note is Note => {
-	return (note as Note).note !== undefined;
+export const isUserNote = (note: UserNote | CreateNote): note is UserNote => {
+	return (note as UserNote).note !== undefined;
 };

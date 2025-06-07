@@ -1,27 +1,31 @@
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import 'axios';
-import { BrotliCompress } from 'zlib';
-
-declare module 'axios' {
-	export interface InternalAxiosRequestConfig {
-		_retry?: boolean;
-	}
-}
 
 //Constants
 export const CSRF_TOKEN_COOKIE_NAME = 'csrftoken';
 export const USERDATA_STORAGE_KEY = 'userData';
 
-type role = 'OWNER' | 'EDITOR' | 'MEMBER';
-type OAuthProvider = 'FACEBOOK' | 'GOOGLE' | 'GITHUB';
+//Enums
+export type Role = 'OWNER' | 'EDITOR' | 'MEMBER';
+export type OAuthProvider = 'GOOGLE' | 'GITHUB' | 'FACEBOOK';
 
-//Models
+//  Models
+export type CreateOAuthAccount = {
+	OAuthProvider: OAuthProvider;
+	access_token?: string;
+	refresh_token?: string;
+	expires_at?: Date;
+};
 
-export type CreateOAuthAccount ={
-
+export interface OAuthAccount {
+	id: number;
+	user: number;
+	OAuthProvider: OAuthProvider;
+	access_token?: string;
+	refresh_token?: string;
+	expires_at?: Date;
+	created_at: Date;
 }
-
-export type OAuthAccount = {};
 
 export type CreateUser = {
 	first_name?: string;
@@ -29,51 +33,143 @@ export type CreateUser = {
 	email: string;
 	password?: string;
 };
-export interface User extends Omit<CreateUser, 'password' | 'confirmPassword'> {
+
+export interface User extends Omit<CreateUser, 'password'> {
 	id: number;
 	avatar?: string;
-	email_verified_at: string | null;
+	email_verified_at?: Date | null;
 	created_at: Date;
 	updated_at: Date;
 	is_active: boolean;
+}
+
+export type CreateTag = {
+	tag_data: {
+		name: string;
+		users?: number[];
+	};
 };
+
+export interface UserTag extends Omit<CreateTag, 'tag_data'> {
+	id: number;
+	tag: Tag;
+}
+
+export interface Tag {
+	name: string;
+	users?: number[];
+	created_at: Date;
+	updated_at: Date;
+	schedule_delete_at?: Date;
+}
+
 export type CreateNote = {
 	note_data: {
 		title: string;
 		content: string;
 		users: number[];
 	};
-};
-
-export interface Note extends Omit<CreateNote, 'note_data'> {
-	id: number;
-	note: {
-		id: number;
-		title: string;
-		content: string;
-		users: number[];
-		created_at: Date;
-		updated_at: Date;
-		is_shared: boolean;
-	};
 	tags: number[];
-	user: number;
 	is_pinned: boolean;
 	is_trashed: boolean;
 	is_archived: boolean;
 	is_favorited: boolean;
-	shared_from: number;
+};
+
+export interface UserNote extends Omit<CreateNote, 'note_data'> {
+	id: number;
+	note: Note;
+	user: number;
+	role: Role;
+	shared_from?: number;
 	shared_at?: Date;
 	removed_at?: Date;
-	role: string;
+	archived_at?: Date;
+	trashed_at?: Date;
+	favorited_at?: Date;
+	created_at: Date;
+	updated_at: Date;
 }
 
-export interface Tag {
-	id?: number;
+export interface Note {
+	id: number;
+	title: string;
+	content: string;
+	users: number[];
+	is_shared: boolean;
+	created_at: Date;
+	updated_at: Date;
+	schedule_delete_at?: Date;
+}
+
+export type CreateNoteBook = {
+	note_book_data: { name: string; users?: number[] };
+};
+
+export interface UserNoteBook {
+	id: number;
+	note_book: NoteBook;
+	notes?: number[];
+	user: number;
+	role: Role;
+	shared_from?: number;
+	shared_at?: Date;
+	removed_at?: Date;
+	archived_at?: Date;
+	trashed_at?: Date;
+	favorited_at?: Date;
+	created_at: Date;
+	updated_at: Date;
+}
+
+export interface NoteBook {
+	id: number;
 	name: string;
-	users?: number[];
-	created_at?: Date;
-	updated_at?: Date;
+	created_at: Date;
+	updated_at: Date;
+	schedule_delete_at?: Date;
+}
+export interface NoteBookNote {
+	id: number;
+	note: UserNote;
+	note_book: NoteBook;
+	created_at: Date;
+	added_at: Date;
+	removed_at?: Date;
+}
+
+export interface UserTag {
+	id: number;
+	tag: Tag;
+	user: User;
+	created_at: Date;
+}
+
+export interface UserNoteBook {
+	id: number;
+	role: Role;
+	user: number;
+	note_book: NoteBook;
+	is_pinned: boolean;
+	is_favorited: boolean;
+	is_trashed: boolean;
+	is_archived: boolean;
+	shared_from?: number;
+	shared_at?: Date;
+	archived_at?: Date;
+	trashed_at?: Date;
+	favorited_at?: Date;
+	removed_at?: Date;
+	created_at: Date;
+}
+
+export interface NoteTag {
+	id: number;
+	note: Note;
+	tag: Tag;
+	added_at: Date;
+	removed_at?: Date;
+	created_at: Date;
 }
 
 export interface BreadcrumbItem {

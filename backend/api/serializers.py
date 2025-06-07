@@ -2,13 +2,13 @@ from rest_framework import serializers
 from api.models import (
     Note,
     NoteTag,
-    NoteBook,
-    NoteBookNote,
+    Notebook,
+    NotebookNote,
     OAuthAccount,
     User,
     Tag,
     UserNote,
-    UserNoteBook,
+    UserNotebook,
     UserTag,
 )
 
@@ -154,7 +154,7 @@ class NoteBookSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        model = NoteBook
+        model = Notebook
         fields = "__all__"
 
     def update(self, instance, validated_data):
@@ -167,14 +167,14 @@ class NoteBookSerializer(serializers.ModelSerializer):
 
 class NoteBookNoteSerializer(serializers.ModelSerializer):
     note = serializers.PrimaryKeyRelatedField(queryset=Note.objects.all())
-    note_book = serializers.PrimaryKeyRelatedField(queryset=NoteBook.objects.all())
+    note_book = serializers.PrimaryKeyRelatedField(queryset=Notebook.objects.all())
 
     class Meta:
-        model = NoteBookNote
+        model = NotebookNote
         fields = "__all__"
 
 
-class UserNoteBookSerializer(serializers.ModelSerializer):
+class UserNotebookSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all(),
         default=serializers.CurrentUserDefault(),
@@ -184,15 +184,15 @@ class UserNoteBookSerializer(serializers.ModelSerializer):
     note_book_data = serializers.JSONField(write_only=True, required=False)
 
     class Meta:
-        model = UserNoteBook
+        model = UserNotebook
         fields = "__all__"
 
     def create(self, validated_data):
         book_data = validated_data.pop("note_book_data", {})
-        note_book = NoteBook.objects.create(name=book_data.get("name", ""))
+        note_book = Notebook.objects.create(name=book_data.get("name", ""))
         note_book.users.add(self.context["request"].user)
         validated_data.setdefault("user", self.context["request"].user)
-        return UserNoteBook.objects.create(note_book=note_book, **validated_data)
+        return UserNotebook.objects.create(note_book=note_book, **validated_data)
 
     def validate(self, data):
         if data.get("is_pinned") and data.get("is_archived"):

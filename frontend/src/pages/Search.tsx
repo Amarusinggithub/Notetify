@@ -1,13 +1,13 @@
-import useSearchState from '../hooks/useSearchState.ts';
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { Note } from 'types';
+import { UserNote } from 'types';
 import NoteCard from '../components/NoteCard';
 import useSearchNotes from '../hooks/useSearchNotes';
+import useSearchState from '../hooks/useSearchState.tsx';
 import { useSideNav } from '../hooks/useSideNav';
 import noSearchNotes from './../../assets/No_Search.png';
 import ErrorFallback from './Error';
-import Loading from './Loading';
+import CardSkeleton from '../components/CardSkeleton';
 
 const Search = () => {
 	const { params, query } = useSearchState();
@@ -34,8 +34,8 @@ const Search = () => {
 					className="all-notes"
 					style={{ maxWidth: isSideNavOpen ? '1200px' : '1400px' }}
 				>
-					{searchNotes?.map((note: Note) => (
-						<Suspense key={note.id} fallback={<Loading />}>
+					{searchNotes?.map((note: UserNote) => (
+						<Suspense key={note.id} fallback={<CardSkeleton />}>
 							<div key={note.id} className="note-div">
 								<NoteCard note={note} route={''} />
 							</div>
