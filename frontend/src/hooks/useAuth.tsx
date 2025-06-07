@@ -8,16 +8,12 @@ import React, {
 } from 'react';
 import { useErrorBoundary } from 'react-error-boundary';
 import { login, logout, signUp, verifyAuth } from '../lib/AuthService.ts';
-import { USERDATA_STORAGE_KEY } from './../types/index.ts';
+import { CreateUser, USERDATA_STORAGE_KEY } from './../types/index.ts';
 
 type AuthProviderProps = PropsWithChildren;
 interface AuthContextType {
-	handleSignup: (
-		email: string,
-		username: string,
-		password: string,
-	) => Promise<void>;
-	handleLogin: (username: string, password: string) => Promise<void>;
+	handleSignup: (user: CreateUser) => Promise<void>;
+	handleLogin: (user: CreateUser) => Promise<void>;
 	handleLogout: () => Promise<void>;
 	setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 	setError: React.Dispatch<React.SetStateAction<any>>;
@@ -53,14 +49,12 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 	};
 
 	const handleSignup = async (
-		email: string,
-		username: string,
-		password: string,
+	user :CreateUser
 	) => {
 		try {
 			setLoading(true);
 			setError(null);
-			const response = await signUp(email, username, password);
+			const response = await signUp(user);
 			if (response.status >= 200 && response.status < 300) {
 				console.log('Signup successful');
 				setAuth(response.data);
@@ -76,11 +70,11 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 		}
 	};
 
-	const handleLogin = async (email: string, password: string) => {
+	const handleLogin = async (user:CreateUser) => {
 		try {
 			setLoading(true);
 			setError(null);
-			const response = await login(email.trim(), password.trim());
+			const response = await login(user);
 			if (response.status >= 200 && response.status < 300) {
 				console.log('Login successful');
 				setAuth(response.data);

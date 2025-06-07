@@ -5,7 +5,7 @@ import { useLocation, useNavigate } from 'react-router';
 import { Tag } from 'types/index.ts';
 import useFetchTags from '../hooks/useFetchTags.ts';
 import useMutateTag from '../hooks/useMutateTag.tsx';
-import useSearchState from '../hooks/useSearchState.ts';
+import useSearchState from '../hooks/useSearchState.tsx';
 import { useSideNav } from '../hooks/useSideNav.tsx';
 import '../styles/sidebar.css';
 

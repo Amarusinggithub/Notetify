@@ -16,11 +16,7 @@ export const createNote = async (note: CreateNote) => {
 	try {
 		const response = await axiosInstance.post('notes/', {
 			note_data: note.note_data,
-			tags: note.tags,
-			is_pinned: note.is_pinned,
-			is_trashed: note.is_trashed,
-			is_archived: note.is_archived,
-			is_favorited: note.is_favorited,
+            
 		});
 		return response.status;
 	} catch (e) {

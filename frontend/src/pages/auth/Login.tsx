@@ -1,25 +1,25 @@
 // LoginPage.tsx
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
-import { useAuth } from '../hooks/useAuth.tsx';
-import '../styles/LoginForm.css';
+import { useAuth } from '../../hooks/useAuth.tsx';
+import '../../styles/LoginForm.css';
+import { CreateUser } from '../../types/index.ts';
 
 const Login = () => {
 	const navigate = useNavigate();
-	const [state, setState] = useState({
+	const [state, setState] = useState<CreateUser>({
 		email: '',
 		password: '',
 	});
 	const { handleLogin, isAuthenticated, isLoading } = useAuth();
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setState({ ...state, [e.target.name]: e.target.value });
+		setState({ ...state, [e.target.name]: e.target.value.trim() });
 	};
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		await handleLogin(state.email, state.password);
-		if (isAuthenticated) navigate('/');
+		await handleLogin(state);
 	};
 
 	return (

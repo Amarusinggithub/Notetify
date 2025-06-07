@@ -1,6 +1,6 @@
 import { faBars, faGear } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import useSearchState from 'hooks/useSearchState.ts';
+import useSearchState from '../hooks/useSearchState.tsx';
 import React, { useEffect, useState } from 'react';
 import useDebounce from '../hooks/useDebounce.ts';
 import { useSideNav } from '../hooks/useSideNav.tsx';

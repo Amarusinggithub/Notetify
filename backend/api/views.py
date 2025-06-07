@@ -30,13 +30,14 @@ class RegisterView(APIView):
 
     def post(self, request):
         email = request.data.get("email")
-        username = request.data.get("username")
+        last_name = request.data.get("last_name")
+        first_name = request.data.get("first_name")
         password = request.data.get("password")
         response = Response()
-        if not email or not username or not password:
+        if not email or not first_name or not last_name or not password:
             raise ValidationError("All fields are required")
         user = User.objects.create_user(
-            username=username, email=email, password=password
+            last_name=last_name, first_name=first_name, email=email, password=password
         )
         serializer = UserSerializer(user, context={"request": request})
         user = authenticate(email=email, password=password)
@@ -157,14 +158,12 @@ class LogoutView(APIView):
 
 
 CACHE_TTL = 60 * 60 * 2  # 2 hours
-
-
 class TagListCreateView(generics.ListCreateAPIView):
 
     permission_classes = [IsAuthenticated]
     serializer_class = TagSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_fields = ["name", "id"]
+    filterset_fields = ["name", "created_at"]
     search_fields = ["name"]
     pagination_class = LimitOffsetPagination
 
@@ -204,6 +203,7 @@ class NoteListCreateView(generics.ListCreateAPIView):
         "is_trashed",
         "is_archived",
         "tags__id",
+        "created_at",
     ]
     search_fields = ["note__title"]
     pagination_class = LimitOffsetPagination

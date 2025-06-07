@@ -9,8 +9,8 @@ const Favorite = lazy(() => import('../pages/Favorites.tsx'));
 const Tag = lazy(() => import('../pages/Tag.tsx'));
 const Trash = lazy(() => import('../pages/Trash.tsx'));
 const Landing = lazy(() => import('../pages/Landing.tsx'));
-const Login = lazy(() => import('../pages/Login.tsx'));
-const Register = lazy(() => import('../pages/Register.tsx'));
+const Login = lazy(() => import('../pages/auth/Login.tsx'));
+const Register = lazy(() => import('../pages/auth/Register.tsx'));
 
 const AppRoutes = () => {
 	const { isAuthenticated, checkingAuth } = useAuth();

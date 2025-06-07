@@ -14,12 +14,6 @@ const AddNoteCard = () => {
 			content: '',
 			users: [],
 		},
-		tags: [],
-		is_pinned: false,
-		is_trashed: false,
-		is_archived: false,
-		is_favorited: false,
-		role: 'admin',
 	});
 
 	const [isEdited, setIsEdited] = useState(false);
@@ -52,12 +46,6 @@ const AddNoteCard = () => {
 						content: '',
 						users: [],
 					},
-					tags: [],
-					is_pinned: false,
-					is_trashed: false,
-					is_archived: false,
-					is_favorited: false,
-					role: 'admin',
 				});
 				setSelected(true);
 			}

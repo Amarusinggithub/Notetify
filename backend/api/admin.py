@@ -87,7 +87,7 @@ class OAuthAccountAdmin(admin.ModelAdmin):
                     "access_token",
                     "refresh_token",
                     "expires_at",
-                    "created_at"
+                    "created_at",
                 )
             },
         ),
@@ -116,7 +116,6 @@ class NoteAdmin(admin.ModelAdmin):
         ),
     )
 
-
     readonly_fields = ("created_at", "updated_at")
 
     def display_users(self, obj: Note) -> str:
@@ -127,8 +126,7 @@ class NoteAdmin(admin.ModelAdmin):
 
 
 class UserNoteAdmin(admin.ModelAdmin):
-
-    list_display = ("note", "user", "role", "shared_from", "shared_at")
+    list_display = ("note", "user", "role", "shared_from", "shared_at", "display_tags")
     search_fields = ("note__title", "user__email", "shared_from__email")
     ordering = ("-shared_at",)
 
@@ -165,10 +163,15 @@ class UserNoteAdmin(admin.ModelAdmin):
         "created_at",
     )
 
+    def display_tags(self, obj: Note) -> str:
+        return ", ".join(n.title for n in obj.tags.all())
+
+    display_tags.short_description = "Tags"
+
 
 class TagAdmin(admin.ModelAdmin):
 
-    list_display = ("name", "display_users", "display_notes")
+    list_display = ("name", "display_users")
     search_fields = ("name", "users__email", "notes__title")
     ordering = ("name",)
 
@@ -176,19 +179,12 @@ class TagAdmin(admin.ModelAdmin):
         (None, {"fields": ("name", "created_at", "updated_at", "schedule_delete_at")}),
     )
 
-
-
     readonly_fields = ("created_at", "updated_at")
 
     def display_users(self, obj: Tag) -> str:
         return ", ".join(u.username for u in obj.users.all())
 
     display_users.short_description = "Users"
-
-    def display_notes(self, obj: Tag) -> str:
-        return ", ".join(n.title for n in obj.notes.all())
-
-    display_notes.short_description = "Notes"
 
 
 class NoteTagAdmin(admin.ModelAdmin):
@@ -263,8 +259,6 @@ class NoteBookAdmin(admin.ModelAdmin):
         ),
     )
 
-
-
     readonly_fields = ("created_at", "updated_at")
 
     def display_users(self, obj: NoteBook) -> str:
@@ -303,9 +297,7 @@ class NoteBookNoteAdmin(admin.ModelAdmin):
 
 
 class UserNoteBookAdmin(admin.ModelAdmin):
-    """
-    Admin for the through-model UserNoteBook (connects User ↔ NoteBook).
-    """
+
 
     list_display = ("note_book", "user", "role", "shared_from", "shared_at")
     search_fields = ("note_book__name", "user__email", "shared_from__email")

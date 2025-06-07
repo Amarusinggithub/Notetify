@@ -6,7 +6,7 @@ import EditTagPopup from '../components/EditTagPopup.tsx';
 import Navbar from '../components/Navbar.tsx';
 import SideNav from '../components/Sidebar.tsx';
 import useMutateTag from '../hooks/useMutateTag.tsx';
-import useSearchState from '../hooks/useSearchState.ts';
+import useSearchState from '../hooks/useSearchState.tsx';
 import { useSideNav } from '../hooks/useSideNav.tsx';
 import '../styles/mainpage.css';
 const Search = lazy(() => import('../pages/Search.tsx'));

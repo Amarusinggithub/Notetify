@@ -1,10 +1,10 @@
+import { CreateUser } from 'types/index.ts';
 import axiosInstance from './AxiosService.ts';
 
-export const login = async (email: string, password: string) => {
+export const login = async (user:CreateUser) => {
 	try {
 		const response = await axiosInstance.post('login/', {
-			email: email,
-			password: password,
+			...user
 		});
 
 		console.log('Login successful. Tokens stored.');
@@ -19,15 +19,11 @@ export const login = async (email: string, password: string) => {
 };
 
 export const signUp = async (
-	email: string,
-	username: string,
-	password: string,
+	user:CreateUser
 ) => {
 	try {
 		const response = await axiosInstance.post('register/', {
-			email: email,
-			username: username,
-			password: password,
+			...user
 		});
 
 		console.log('Signup successful. Tokens stored.');

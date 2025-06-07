@@ -1,21 +1,24 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
-import { useAuth } from '../hooks/useAuth.tsx';
-import '../styles/SignUpForm.css';
+import { useAuth } from '../../hooks/useAuth.tsx';
+import { CreateUser } from '../../types/index.ts';
+import '../../styles/SignUpForm.css';
 
 const Register = () => {
 	const navigate = useNavigate();
-	const [state, setState] = useState({
+	const [state, setState] = useState<CreateUser>({
 		email: '',
 		password: '',
-		confirmPassword: '',
-		username: '',
+		first_name: '',
+		last_name: '',
 	});
 
-	const { handleSignup, isAuthenticated, isLoading } = useAuth();
+	const [confirmPassword, setConfirmPassword] = useState<string>('');
+
+	const { handleSignup,  isLoading } = useAuth();
 
 	function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-		setState({ ...state, [e.target.name]: e.target.value });
+		setState({ ...state, [e.target.name]: e.target.value.trim() });
 	}
 
 	async function handleSubmit(
@@ -23,13 +26,12 @@ const Register = () => {
 	) {
 		e.preventDefault();
 
-		if (state.password !== state.confirmPassword) {
+		if (state.password !== confirmPassword) {
 			console.log('Passwords do not match');
 			return;
 		}
 
-		await handleSignup(state.username, state.email, state.password);
-		if (isAuthenticated) navigate('/');
+		await handleSignup(state);
 	}
 
 	return (
@@ -39,14 +41,28 @@ const Register = () => {
 
 				<div className="form-ui">
 					<div className="fields">
-						<label>Username</label>
+						<label>First Name</label>
 						<input
 							type="text"
 							className="form-control"
-							id="username"
-							name="username"
-							value={state.username}
-							placeholder="Enter a username"
+							id="firstname"
+							name="firstname"
+							value={state.first_name}
+							placeholder="Enter a first name"
+							onChange={(e) => {
+								handleChange(e);
+							}}
+						/>
+					</div>
+					<div className="fields">
+						<label>Last Name</label>
+						<input
+							type="text"
+							className="form-control"
+							id="lastname"
+							name="lasname"
+							value={state.last_name}
+							placeholder="Enter a last name"
 							onChange={(e) => {
 								handleChange(e);
 							}}
@@ -90,10 +106,10 @@ const Register = () => {
 							className="form-control"
 							id="confirmPassword"
 							name="confirmPassword"
-							value={state.confirmPassword}
+							value={confirmPassword}
 							placeholder="Confirm Password"
 							onChange={(e) => {
-								handleChange(e);
+								setConfirmPassword(e.target.value.trim());
 							}}
 						/>
 					</div>
