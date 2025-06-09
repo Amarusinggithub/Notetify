@@ -53,6 +53,8 @@ export type CreateTag = {
 export interface UserTag extends Omit<CreateTag, 'tag_data'> {
 	id: number;
 	tag: Tag;
+	user: number;
+	created_at: Date;
 }
 
 export interface Tag {
@@ -106,9 +108,9 @@ export type CreateNoteBook = {
 	note_book_data: { name: string; users?: number[] };
 };
 
-export interface UserNoteBook {
+export interface UserNotebook {
 	id: number;
-	note_book: NoteBook;
+	notebook: Notebook;
 	notes?: number[];
 	user: number;
 	role: Role;
@@ -120,36 +122,34 @@ export interface UserNoteBook {
 	favorited_at?: Date;
 	created_at: Date;
 	updated_at: Date;
+	is_pinned: boolean;
+	is_trashed: boolean;
+	is_archived: boolean;
+	is_favorited: boolean;
 }
 
-export interface NoteBook {
+export interface Notebook {
 	id: number;
 	name: string;
 	created_at: Date;
 	updated_at: Date;
 	schedule_delete_at?: Date;
+	users?: number[];
 }
 export interface NoteBookNote {
 	id: number;
 	note: UserNote;
-	note_book: NoteBook;
+	note_book: Notebook;
 	created_at: Date;
 	added_at: Date;
 	removed_at?: Date;
-}
-
-export interface UserTag {
-	id: number;
-	tag: Tag;
-	user: User;
-	created_at: Date;
 }
 
 export interface UserNoteBook {
 	id: number;
 	role: Role;
 	user: number;
-	note_book: NoteBook;
+	note_book: Notebook;
 	is_pinned: boolean;
 	is_favorited: boolean;
 	is_trashed: boolean;

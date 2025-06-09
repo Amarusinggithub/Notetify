@@ -14,7 +14,7 @@ export const getTags = async () => {
 export const createTag = async (tag: CreateTag) => {
 	try {
 		const response = await axiosInstance.post('tags/', {
-			...tag,
+			"tag_data":tag.tag_data,
 		});
 		console.log(response.data);
 		return response.status;

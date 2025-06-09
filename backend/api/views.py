@@ -7,11 +7,10 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from api.models import User, Tag, UserNote, UserNotebook, UserTag
+from api.models import User, UserNote, UserNotebook, UserTag
 from api.serializers import (
     UserNotebookSerializer,
     UserSerializer,
-    TagSerializer,
     UserNoteSerializer,
     UserTagSerializer,
 )
@@ -171,12 +170,12 @@ class TagListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = UserTagSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_fields = ["name", "created_at"]
-    search_fields = ["name"]
+    filterset_fields = ["tag__id", "created_at"]
+    search_fields = ["tag__name"]
     pagination_class = LimitOffsetPagination
 
     def get_queryset(self):
-        return UserTag.objects.filter(users=self.request.user)
+        return UserTag.objects.filter(user=self.request.user)
 
     @method_decorator(
         cache_page(CACHE_TTL, key_prefix=lambda req: f"tags_user_{req.user.pk}")
@@ -194,7 +193,7 @@ class TagDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = UserTagSerializer
 
     def get_object(self):
-        return get_object_or_404(UserTag, users=self.request.user, pk=self.kwargs["pk"])
+        return get_object_or_404(UserTag, user=self.request.user, pk=self.kwargs["pk"])
 
     def perform_update(self, serializer):
         serializer.save()
@@ -259,7 +258,7 @@ class NotebookListCreateView(generics.ListCreateAPIView):
     pagination_class = LimitOffsetPagination
 
     def get_queryset(self):
-        return UserNotebook().objects.filter(user=self.request.user)
+        return UserNotebook.objects.filter(user=self.request.user)
 
     @method_decorator(
         cache_page(CACHE_TTL, key_prefix=lambda req: f"notes_user_{req.user.pk}")

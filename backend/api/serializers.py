@@ -119,24 +119,31 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class UserTagSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(),
-        default=serializers.CurrentUserDefault(),
-        required=False,
-    )
     tag = TagSerializer(read_only=True)
-    tag_data = serializers.JSONField(write_only=True, required=False)
+    tag_data = serializers.JSONField(write_only=True)
 
     class Meta:
         model = UserTag
         fields = "__all__"
 
     def create(self, validated_data):
+        user = self.context["request"].user
         tag_data = validated_data.pop("tag_data", {})
-        tag = Tag.objects.create(name=tag_data.get("name", ""))
-        tag.users.add(self.context["request"].user)
-        validated_data.setdefault("user", self.context["request"].user)
-        return UserTag.objects.create(tag=tag, **validated_data)
+        name = tag_data.get("name", "").strip()
+
+        tag = Tag.objects.get_or_create(name=name)
+        tag.users.add(user)
+
+        usertag, created = UserTag.objects.get_or_create(
+            user=user, tag=tag, defaults={}
+        )
+        if not created:
+            return usertag
+
+            # option B: raise a DRF ValidationError so the client gets a 400
+            #raise serializers.ValidationError(f"You already have a tag “{name}”")
+
+        return usertag
 
 
 class NoteTagSerializer(serializers.ModelSerializer):
