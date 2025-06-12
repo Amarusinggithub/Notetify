@@ -1,6 +1,6 @@
 import { faEllipsis, faPlus, faTag } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { UserTag } from 'types/index.ts';
 import useFetchTags from '../hooks/useFetchTags.ts';
@@ -12,6 +12,7 @@ import '../styles/sidebar.css';
 const SideNav = () => {
 	const location = useLocation();
 	const navigate = useNavigate();
+	const [isPending, startTransition] = useTransition();
 	const { isSideNavOpen, setAddTagPopupOpen, sidebarMenuItems, temp, setTemp } =
 		useSideNav();
 	const { setParams } = useSearchState();
@@ -25,36 +26,40 @@ const SideNav = () => {
 	let path = location.pathname;
 
 	useEffect(() => {
-		for (let i = 0; i < sidebarMenuItems.length; i++) {
-			if (path === sidebarMenuItems[i].href) {
-				setTemp(sidebarMenuItems[i]);
-				navigate(sidebarMenuItems[i].href);
-				setParams(sidebarMenuItems[i].params);
+		startTransition(() => {
+			for (let i = 0; i < sidebarMenuItems.length; i++) {
+				if (path === sidebarMenuItems[i].href) {
+					setTemp(sidebarMenuItems[i]);
+					navigate(sidebarMenuItems[i].href);
+					setParams(sidebarMenuItems[i].params);
+				}
 			}
-		}
 
-		for (let j = 0; j < tags.length; j++) {
-			if (path === '/tag/' + tags[j].tag.name) {
-				setTemp(tags[j].tag);
-				setParams(
-					`tags__name=${tags[j].tag.name}&is_archived=False&is_trashed=False`,
-				);
+			for (let j = 0; j < tags.length; j++) {
+				if (path === '/tag/' + tags[j].tag.name) {
+					setTemp(tags[j].tag);
+					setParams(
+						`tag__id=${tags[j].tag.id}&is_archived=False&is_trashed=False`,
+					);
+				}
 			}
-		}
+		});
 	}, [tags]);
 
 	const handleOnClick = (index: number) => {
-		return () => {
+		startTransition(() => {
 			setTemp(sidebarMenuItems[index]);
 			navigate(sidebarMenuItems[index].href);
 			setParams(sidebarMenuItems[index].params);
-		};
+		});
 	};
 
-	const handleTagClicked = (tag: UserTag) => {
-		setTemp(tag.tag);
-		navigate('/tag/' + tag.tag.name);
-		setParams(tag.tag.name);
+	const handleTagClicked = (userTag: UserTag) => {
+		startTransition(() => {
+			setTemp(userTag.tag);
+			navigate('/tag/' + userTag.tag.name);
+			setParams(`tag__id=${userTag.tag.id}&is_archived=False&is_trashed=False`);
+		});
 	};
 
 	const handleCreateTag = () => {
@@ -72,7 +77,9 @@ const SideNav = () => {
 			<ul>
 				{sidebarMenuItems.map((item, index) => (
 					<li
-						onClick={handleOnClick(index)}
+						onClick={() => {
+							handleOnClick(index);
+						}}
 						key={index}
 						style={{
 							width: isSideNavOpen ? '210px' : '14px',
@@ -117,11 +124,11 @@ const SideNav = () => {
 				)}
 				{tags?.length > 0 && (
 					<ul className="tags">
-						{tags.map((tag: UserTag, index: number) => (
+						{tags.map((userTag: UserTag, index: number) => (
 							<li
 								onClick={(e) => {
 									e.stopPropagation();
-									handleTagClicked(tag);
+									handleTagClicked(userTag);
 								}}
 								key={index}
 								className="sidenav-item-tags"
@@ -132,22 +139,23 @@ const SideNav = () => {
 									borderBottomLeftRadius: isSideNavOpen ? '0px' : '360px',
 									borderBottomRightRadius: isSideNavOpen ? '50px' : '360px',
 									justifyContent: isSideNavOpen ? 'start' : 'center',
-									backgroundColor: tag === temp ? ' rgb(65, 51, 28)' : '',
+									backgroundColor:
+										userTag.tag === temp ? ' rgb(65, 51, 28)' : '',
 								}}
 							>
 								<div className="icon-and-name">
 									<FontAwesomeIcon icon={faTag} className="icon" />
-									{isSideNavOpen && <h3>{tag.tag.name}</h3>}
+									{isSideNavOpen && <h3>{userTag.tag.name}</h3>}
 								</div>
 								{isSideNavOpen && (
 									<div>
 										<button
-											style={{ display: tempId == tag.id ? 'flex' : '' }}
+											style={{ display: tempId == userTag.id ? 'flex' : '' }}
 											className="ellipsis-btn"
 											onClick={(e) => {
 												e.stopPropagation();
-												if (tempId !== tag.id) {
-													setTempId(tag.id);
+												if (tempId !== userTag.id) {
+													setTempId(userTag.id);
 												} else {
 													setTempId(null);
 												}
@@ -155,14 +163,14 @@ const SideNav = () => {
 										>
 											<FontAwesomeIcon icon={faEllipsis} className="icon" />
 										</button>
-										{tempId === tag.id && (
+										{tempId === userTag.id && (
 											<div className="tag-actions">
 												<button
 													style={{ display: 'flex' }}
 													className="edit-sidenav-btn"
 													onClick={(e) => {
 														e.stopPropagation();
-														setSelectedTag(tag);
+														setSelectedTag(userTag);
 														setWantToEditTag(true);
 													}}
 												>
@@ -173,7 +181,7 @@ const SideNav = () => {
 													className="delete-sidenav-btn"
 													onClick={(e) => {
 														e.stopPropagation();
-														setSelectedTag(tag);
+														setSelectedTag(userTag);
 														setWantToDeleteTag(true);
 													}}
 												>

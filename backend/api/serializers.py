@@ -65,8 +65,6 @@ class UserNoteSerializer(serializers.ModelSerializer):
             title=note_data.get("title", ""),
             content=note_data.get("content", ""),
         )
-        note.users.add(self.context["request"].user)
-
         validated_data.setdefault("user", self.context["request"].user)
         user_note = UserNote.objects.create(note=note, **validated_data)
         user_note.tags.set(tags)

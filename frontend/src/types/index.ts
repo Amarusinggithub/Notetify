@@ -58,6 +58,7 @@ export interface UserTag extends Omit<CreateTag, 'tag_data'> {
 }
 
 export interface Tag {
+    id:number;
 	name: string;
 	users?: number[];
 	created_at: Date;
@@ -191,3 +192,12 @@ export const noteQueryKeys = {
 	list: (category: string, params: string) =>
 		[...noteQueryKeys.lists(), category, params] as const,
 };
+
+export type NoteAction =
+	| { type: 'SET_TITLE'; payload: string }
+	| { type: 'SET_CONTENT'; payload: string }
+	| { type: 'TOGGLE_ARCHIVED' }
+	| { type: 'TOGGLE_TRASHED' }
+	| { type: 'TOGGLE_FAVORITED' }
+	| { type: 'TOGGLE_PINNED' }
+	| { type: 'RESET' };

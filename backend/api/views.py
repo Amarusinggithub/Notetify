@@ -177,9 +177,9 @@ class TagListCreateView(generics.ListCreateAPIView):
     def get_queryset(self):
         return UserTag.objects.filter(user=self.request.user)
 
-    @method_decorator(
-        cache_page(CACHE_TTL, key_prefix=lambda req: f"tags_user_{req.user.pk}")
-    )
+    # @method_decorator(
+    #     cache_page(CACHE_TTL, key_prefix=lambda req: f"tags_user_{req.user.pk}")
+    # )
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
@@ -218,9 +218,9 @@ class NoteListCreateView(generics.ListCreateAPIView):
     def get_queryset(self):
         return UserNote.objects.filter(user=self.request.user)
 
-    @method_decorator(
-        cache_page(CACHE_TTL, key_prefix=lambda req: f"notes_user_{req.user.pk}")
-    )
+    # @method_decorator(
+    #    cache_page(CACHE_TTL, key_prefix=lambda req: f"notes_user_{req.user.pk}")
+    # )
     def list(self, request, *args, **kwargs):
 
         return super().list(request, *args, **kwargs)
@@ -260,9 +260,9 @@ class NotebookListCreateView(generics.ListCreateAPIView):
     def get_queryset(self):
         return UserNotebook.objects.filter(user=self.request.user)
 
-    @method_decorator(
-        cache_page(CACHE_TTL, key_prefix=lambda req: f"notes_user_{req.user.pk}")
-    )
+    # @method_decorator(
+    #    cache_page(CACHE_TTL, key_prefix=lambda req: f"notes_user_{req.user.pk}")
+    # )
     def list(self, request, *args, **kwargs):
 
         return super().list(request, *args, **kwargs)

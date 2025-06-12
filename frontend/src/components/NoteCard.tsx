@@ -1,25 +1,31 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import '../styles/NoteCard.css';
-
 import {
 	faStar,
 	faThumbTack,
 	faTrashCan,
 	faXmark,
 } from '@fortawesome/free-solid-svg-icons';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React, {
+	useCallback,
+	useEffect,
+	useReducer,
+	useRef,
+	useState,
+} from 'react';
 import { useNavigate } from 'react-router';
-import { CreateNote, UserNote } from 'types/index.ts';
+import { UserNote } from 'types/index.ts';
 import useMutateNote from '../hooks/useMutateNote.tsx';
-import { isUserNote } from './../utils/helpers.ts';
+import '../styles/NoteCard.css';
+import { isUserNote, userNoteReducer } from './../utils/helpers.ts';
 import NoteContentEditor from './Editor/components/NoteContentEditor.tsx';
 
 type NoteCardProps = { note: UserNote; route: string };
 
 const NoteCard = ({ note, route }: NoteCardProps) => {
-	const navigate = useNavigate();
 	const cardRef = useRef<HTMLDivElement>(null);
 
+	const [noteState, dispatch] = useReducer(userNoteReducer, note);
+	const navigate = useNavigate();
 	const {
 		selectedNote,
 		setSelectedNote,
@@ -28,33 +34,28 @@ const NoteCard = ({ note, route }: NoteCardProps) => {
 		handleFavorite,
 		handlePin,
 	} = useMutateNote();
-	const [noteState, setNoteState] = useState<UserNote | CreateNote>(note);
 
 	const isSelected = selectedNote && selectedNote.id === note.id;
 
 	const [isEdited, setIsEdited] = useState<boolean>(false);
 
-	const handleSave = useCallback(async () => {
+	const handleSave = async () => {
 		if (isEdited) {
-			if (isUserNote(noteState)) await editNote(noteState);
+			await editNote({ ...noteState });
 		}
 		setIsEdited(false);
-	}, [editNote, isEdited, noteState]);
+	};
 
-	const handleSelect = useCallback(
-		async (
-			e:
-				| React.MouseEvent<HTMLButtonElement, MouseEvent>
-				| React.MouseEvent<HTMLDivElement, MouseEvent>,
-		) => {
-			e.preventDefault();
-			await handleSave();
-			if (isUserNote(note)) setSelectedNote(isSelected ? null : note);
-			if (isSelected && route !== '') navigate(route);
-		},
-		[handleSave, isSelected, navigate, note, route, setSelectedNote],
-	);
-
+	const handleSelect = async (
+		e:
+			| React.MouseEvent<HTMLButtonElement, MouseEvent>
+			| React.MouseEvent<HTMLDivElement, MouseEvent>,
+	) => {
+		e.preventDefault();
+		await handleSave();
+		setSelectedNote(isSelected ? null : note);
+		if (isSelected && route !== '') navigate(route);
+	};
 	useEffect(() => {
 		function onDocClick(e: MouseEvent) {
 			if (
@@ -68,9 +69,7 @@ const NoteCard = ({ note, route }: NoteCardProps) => {
 		document.addEventListener('click', onDocClick);
 		return () => document.removeEventListener('click', onDocClick);
 	}, [isSelected, handleSelect]);
-
 	useEffect(() => {
-		setNoteState(note);
 		setIsEdited(false);
 	}, [note]);
 
@@ -78,58 +77,17 @@ const NoteCard = ({ note, route }: NoteCardProps) => {
 		e.preventDefault();
 		e.stopPropagation();
 		const newTitle = e.target.value;
-		setNoteState((prev) => {
-			if (isUserNote(prev)) {
-				return {
-					...prev,
-					note: {
-						...prev.note,
-						title: newTitle,
-					},
-				};
-			} else {
-				return {
-					...prev,
-					note_data: {
-						...prev.note_data,
-						title: newTitle,
-					},
-				};
-			}
-		});
-		setIsEdited(
-			isUserNote(noteState)
-				? newTitle !== noteState.note?.title
-				: newTitle !== noteState.note_data?.title,
-		);
+		dispatch({ type: 'SET_TITLE', payload: newTitle });
+		setIsEdited(newTitle !== note.note?.title);
 	};
 
-	const handleContentInput = (newContent: string) => {
-		setNoteState((prev) => {
-			if (isUserNote(prev)) {
-				return {
-					...prev,
-					note: {
-						...prev.note,
-						content: newContent,
-					},
-				};
-			} else {
-				return {
-					...prev,
-					note_data: {
-						...prev.note_data,
-						content: newContent,
-					},
-				};
-			}
-		});
-		setIsEdited(
-			isUserNote(noteState)
-				? newContent !== noteState.note?.content
-				: newContent !== noteState.note_data?.content,
-		);
-	};
+	const handleContentInput = useCallback(
+		(newContent: string) => {
+			dispatch({ type: 'SET_CONTENT', payload: newContent });
+			setIsEdited(newContent !== note.note?.content);
+		},
+		[note],
+	);
 
 	const handleDeleteNote = async (
 		e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -190,7 +148,7 @@ const NoteCard = ({ note, route }: NoteCardProps) => {
 									<button
 										onClick={(e) => {
 											e.stopPropagation();
-											if (isUserNote(note)) handlePin(note);
+											handlePin(note);
 										}}
 										className="note-pin-btn"
 									>
@@ -200,7 +158,7 @@ const NoteCard = ({ note, route }: NoteCardProps) => {
 									<button
 										onClick={(e) => {
 											e.stopPropagation();
-											if (isUserNote(note)) handleFavorite(note);
+											handleFavorite(note);
 										}}
 										className="note-favorite-btn"
 									>
@@ -215,20 +173,12 @@ const NoteCard = ({ note, route }: NoteCardProps) => {
 						onChange={(e) => {
 							isSelected ? handleTitleInput(e) : null;
 						}}
-						value={
-							isUserNote(noteState)
-								? noteState.note?.title
-								: noteState.note_data?.title
-						}
+						value={noteState.note?.title}
 						disabled={!isSelected}
 					/>
 
 					<NoteContentEditor
-						content={
-							isUserNote(noteState)
-								? noteState.note?.content
-								: noteState.note_data?.content
-						}
+						content={noteState.note?.content}
 						handleContentInput={handleContentInput}
 						isSelected={isSelected!}
 						note={noteState}

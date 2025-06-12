@@ -55,7 +55,7 @@ const Home = () => {
 							style={{ maxWidth: isSideNavOpen ? '1200px' : '1360px' }}
 						>
 							{pinned.map((note: UserNote) => (
-								<Suspense key={note.id} fallback={<CardSkeleton />}>
+								<Suspense key={note.id} fallback={<CardSkeleton cards={6} />}>
 									<div key={note.id} className="note-div">
 										<NoteCard note={note} route={'/'} />
 									</div>
@@ -77,7 +77,7 @@ const Home = () => {
 							style={{ maxWidth: isSideNavOpen ? '1200px' : '1400px' }}
 						>
 							{other?.map((note: UserNote) => (
-								<Suspense key={note.id} fallback={<CardSkeleton/>}>
+								<Suspense key={note.id} fallback={<CardSkeleton cards={6}/>}>
 									<div key={note.id} className="note-div">
 										<NoteCard note={note} route={'/'} />
 									</div>

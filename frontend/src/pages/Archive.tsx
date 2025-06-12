@@ -33,7 +33,7 @@ const Archive = () => {
 				<div className="all-notes">
 					{archived &&
 						archived.map((note: UserNote) => (
-							<Suspense key={note.id} fallback={<CardSkeleton />}>
+							<Suspense key={note.id} fallback={<CardSkeleton cards={6} />}>
 								<div key={note.id} className="note-div">
 									<NoteCard note={note} route={'/archive'} />
 								</div>{' '}

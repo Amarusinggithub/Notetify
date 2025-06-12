@@ -1,6 +1,6 @@
 import { faBars, faGear } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useEffect, useState } from 'react';
+import React, {  useEffect, useState, useTransition } from 'react';
 import useDebounce from '../hooks/useDebounce.ts';
 import useSearchState from '../hooks/useSearchState.tsx';
 import { useSideNav } from '../hooks/useSideNav.tsx';
@@ -9,6 +9,8 @@ import logo from './../../assets/notetify-logo.png';
 import SearchBar from './ui/SearchBar.tsx';
 
 const Navbar = () => {
+        const [isPending, startTransition] = useTransition();
+    
 	const { isSideNavOpen, setIsSideNavOpen, temp } = useSideNav();
 	const { setQuery } = useSearchState();
 	const [search, setSearch] = useState<string>('');
@@ -26,7 +28,9 @@ const Navbar = () => {
 
 	const handleSideMenuChange = (e: React.MouseEvent<HTMLButtonElement>) => {
 		e.preventDefault();
-		setIsSideNavOpen(!isSideNavOpen);
+		startTransition(() => {
+			setIsSideNavOpen(!isSideNavOpen);
+		});
 	};
 
 	const handleSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {

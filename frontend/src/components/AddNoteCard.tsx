@@ -1,67 +1,45 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { CreateNote } from 'types';
+import React, {
+	useCallback,
+	useEffect,
+	useReducer,
+	useRef,
+	useState,
+} from 'react';
+import { createNoteReducer, initialNoteState } from '../utils/helpers';
 import useMutateNote from '../hooks/useMutateNote';
 import '../styles/AddNoteCard.css';
 import NoteContentEditor from './Editor/components/NoteContentEditor';
 
 const AddNoteCard = () => {
+	const [note, dispatch] = useReducer(createNoteReducer, initialNoteState);
+
 	const { addNote } = useMutateNote();
 	const cardRef = useRef<HTMLDivElement>(null);
-
-	const [noteState, setNoteState] = useState<CreateNote>({
-		note_data: {
-			title: '',
-			content: '',
-			users: [],
-		},
-		is_archived: false,
-		is_favorited: false,
-		is_pinned: false,
-		is_trashed: false,
-		tags: [],
-	});
 
 	const [isEdited, setIsEdited] = useState(false);
 	const [isSelected, setSelected] = useState(false);
 
-	const handleSave = useCallback(async () => {
+	const handleSave = async () => {
 		if (isEdited) {
-			await addNote({ ...noteState });
+			await addNote(note);
 		}
 		setIsEdited(false);
-	}, [addNote, isEdited, noteState]);
+		setSelected(false);
+	};
 
-	const handleSelect = useCallback(
-		async (
-			e:
-				| React.MouseEvent<HTMLButtonElement, MouseEvent>
-				| React.MouseEvent<HTMLDivElement, MouseEvent>,
-		) => {
-			e.preventDefault();
-			if (isSelected) {
-				if (isEdited) {
-					await handleSave();
-				}
-
-				setSelected(false);
-			} else {
-				setNoteState({
-					note_data: {
-						title: '',
-						content: '',
-						users: [],
-					},
-					is_archived: false,
-					is_favorited: false,
-					is_pinned: false,
-					is_trashed: false,
-					tags: [],
-				});
-				setSelected(true);
-			}
-		},
-		[handleSave, isEdited, isSelected],
-	);
+	const handleSelect = async (
+		e:
+			| React.MouseEvent<HTMLButtonElement, MouseEvent>
+			| React.MouseEvent<HTMLDivElement, MouseEvent>,
+	) => {
+		e.preventDefault();
+		if (isSelected) {
+			await handleSave();
+		} else {
+			dispatch({ type: 'RESET' });
+			setSelected(true);
+		}
+	};
 
 	useEffect(() => {
 		function onDocClick(e: MouseEvent) {
@@ -79,25 +57,22 @@ const AddNoteCard = () => {
 
 	useEffect(() => {
 		setIsEdited(false);
-		console.log(isSelected);
 	}, [isSelected]);
 
 	const handleTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const newTitle = e.target.value;
-		setNoteState((prev) => ({
-			...prev,
-			note_data: { ...prev.note_data, title: newTitle },
-		}));
+		dispatch({ type: 'SET_TITLE', payload: newTitle });
 		setIsEdited(newTitle !== null && newTitle !== '');
 	};
 
-	const handleContentInput = (newContent: string) => {
-		setNoteState((prev) => ({
-			...prev,
-			note_data: { ...prev.note_data, content: newContent },
-		}));
-		setIsEdited(newContent !== null && newContent !== '');
-	};
+	const handleContentInput = useCallback(
+		(newContent: string) => {
+			dispatch({ type: 'SET_CONTENT', payload: newContent });
+
+			setIsEdited(newContent !== null && newContent !== '');
+		},
+		[isEdited],
+	);
 
 	return (
 		<div className={isSelected ? 'notecard-bg' : ''}>
@@ -115,16 +90,16 @@ const AddNoteCard = () => {
 						className="note-title"
 						placeholder={isSelected ? 'Enter title here' : 'Add note here'}
 						onChange={handleTitle}
-						value={noteState.note_data.title}
+						value={note.note_data.title}
 						disabled={!isSelected}
 					/>
 
 					{isSelected && (
 						<NoteContentEditor
-							content={noteState.note_data.content}
+							content={note.note_data.content}
 							handleContentInput={handleContentInput}
 							isSelected={isSelected}
-							note={{ ...noteState }}
+							note={{ ...note }}
 						/>
 					)}
 				</div>
