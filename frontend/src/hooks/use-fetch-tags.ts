@@ -1,6 +1,6 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import axiosInstance from '../lib/axios-service';
-import { UserTag } from '../types/index';
+import { type UserTag } from '../types/index';
 
 const useFetchTags = () => {
 	const { data = [] } = useSuspenseQuery<UserTag[]>({

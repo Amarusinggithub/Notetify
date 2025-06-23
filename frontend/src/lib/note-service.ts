@@ -1,4 +1,4 @@
-import { CreateNote, UserNote } from '../types/index.ts';
+import { type CreateNote, type UserNote } from '../types/index.ts';
 import axiosInstance from './axios-service.ts';
 
 export const getNotes = async () => {

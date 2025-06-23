@@ -1,12 +1,12 @@
 import React, {
 	createContext,
-	PropsWithChildren,
+	type PropsWithChildren,
 	useContext,
 	useState,
 } from 'react';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { CreateTag, UserTag } from 'types/index.ts';
+import { type CreateTag, type UserTag } from '../types';
 import { createTag, deleteTag, updateTag } from '../lib/tag-service.ts';
 
 interface TagContextType {

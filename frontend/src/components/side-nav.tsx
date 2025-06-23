@@ -2,7 +2,7 @@ import { faEllipsis, faPlus, faTag } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState, useTransition } from 'react';
 import { useLocation, useNavigate } from 'react-router';
-import { UserTag } from 'types/index.ts';
+import {type UserTag } from 'types/index.ts';
 import useFetchTags from '../hooks/use-fetch-tags.ts';
 import useMutateTag from '../hooks/use-mutate-tag.tsx';
 import useSearchState from '../hooks/use-search-state.tsx';

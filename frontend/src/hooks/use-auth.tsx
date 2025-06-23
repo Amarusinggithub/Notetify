@@ -1,6 +1,6 @@
 import React, {
 	createContext,
-	PropsWithChildren,
+	type PropsWithChildren,
 	useCallback,
 	useContext,
 	useEffect,
@@ -8,7 +8,7 @@ import React, {
 } from 'react';
 import { useErrorBoundary } from 'react-error-boundary';
 import { login, logout, signUp, verifyAuth } from '../lib/auth-service.ts';
-import { CreateUser, USERDATA_STORAGE_KEY } from './../types/index.ts';
+import { type CreateUser, USERDATA_STORAGE_KEY } from './../types/index.ts';
 
 type AuthProviderProps = PropsWithChildren;
 interface AuthContextType {

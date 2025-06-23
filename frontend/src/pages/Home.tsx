@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { UserNote } from 'types/index.ts';
+import { type UserNote } from 'types/index.ts';
 import AddNoteCard from '../components/add-note-card.tsx';
 import CardSkeleton from '../components/card-skeleton.tsx';
 import NoteCard from '../components/note-card.tsx';

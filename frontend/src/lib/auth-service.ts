@@ -1,4 +1,4 @@
-import { CreateUser } from '../types/index.ts';
+import { type CreateUser } from '../types/index.ts';
 import axiosInstance from './axios-service.ts';
 
 export const login = async (user: CreateUser) => {

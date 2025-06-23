@@ -6,11 +6,11 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import React, {
 	createContext,
-	PropsWithChildren,
+	type PropsWithChildren,
 	useContext,
 	useState,
 } from 'react';
-import { SideMenuItem } from 'types';
+import { type SideMenuItem } from 'types';
 
 type SideNavContextType = {
 	sidebarMenuItems: SideMenuItem[];

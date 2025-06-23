@@ -1,12 +1,12 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import React, {
 	createContext,
-	PropsWithChildren,
+	type PropsWithChildren,
 	useContext,
 	useState,
 } from 'react';
 import { createNote, deleteNote, updateNote } from '../lib/note-service.ts';
-import { CreateNote, noteQueryKeys, UserNote } from '../types/index.ts';
+import { type CreateNote, noteQueryKeys, type UserNote } from '../types/index.ts';
 
 interface NoteContextType {
 	selectedNote: UserNote | null;

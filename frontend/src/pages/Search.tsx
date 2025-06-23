@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { UserNote } from 'types';
+import { type UserNote } from 'types';
 import CardSkeleton from '../components/card-skeleton.tsx';
 import NoteCard from '../components/note-card.tsx';
 import useSearchNotes from '../hooks/use-search-notes';

@@ -13,7 +13,7 @@ import React, {
 	useState,
 } from 'react';
 import { useNavigate } from 'react-router';
-import { UserNote } from 'types/index.ts';
+import {type  UserNote } from 'types/index.ts';
 import useMutateNote from '../hooks/use-mutate-note.tsx';
 import '../styles/NoteCard.css';
 import { isUserNote, userNoteReducer } from './../utils/helpers.ts';

@@ -10,15 +10,14 @@ import { SideNavProvider } from './hooks/use-side-nav.tsx';
 import { ensureCSRFToken } from './lib/axios-service.ts';
 import ErrorFallback from './pages/error';
 import AppRoutes from './routes/app-routes.tsx';
+import { initializeTheme } from './hooks/use-apperance.tsx';
+
+ensureCSRFToken();
+// This will set light / dark mode on load...
+initializeTheme();
 
 export default function App() {
-	useEffect(() => {
-		const initialize = async () => {
-			await ensureCSRFToken();
-		};
-		initialize();
-	}, []);
-
+	
 	const queryClient = new QueryClient();
 
 	return (
