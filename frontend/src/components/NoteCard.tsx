@@ -14,7 +14,7 @@ import React, {
 } from 'react';
 import { useNavigate } from 'react-router';
 import { UserNote } from 'types/index.ts';
-import useMutateNote from '../hooks/useMutateNote.tsx';
+import useMutateNote from '../hooks/use-mutate-note.tsx';
 import '../styles/NoteCard.css';
 import { isUserNote, userNoteReducer } from './../utils/helpers.ts';
 import NoteContentEditor from './Editor/components/NoteContentEditor.tsx';

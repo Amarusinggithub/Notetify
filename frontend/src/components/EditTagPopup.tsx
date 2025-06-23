@@ -1,7 +1,7 @@
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect, useRef, useState } from 'react';
-import useMutateTag from '../hooks/useMutateTag';
+import useMutateTag from '../hooks/use-mutate-tag';
 import '../styles/EditTagPopup.css';
 
 const EditTagPopup = () => {

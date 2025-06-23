@@ -1,5 +1,5 @@
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router';
-import { useAuth } from './../hooks/useAuth.tsx';
+import { useAuth } from './../hooks/use-auth.tsx';
 
 /*const AppLayout = lazy(() => import('../layouts/AppLayout.tsx'));
 const Home = lazy(() => import('../pages/Home.tsx'));

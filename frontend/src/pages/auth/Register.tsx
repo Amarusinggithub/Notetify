@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
-import { useAuth } from '../../hooks/useAuth.tsx';
+import { useAuth } from '../../hooks/use-auth.tsx';
 import '../../styles/SignUpForm.css';
 import { CreateUser } from '../../types/index.ts';
 

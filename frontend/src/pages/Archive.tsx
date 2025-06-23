@@ -2,10 +2,9 @@ import { UserNote } from 'types';
 import NoteCard from '../components/NoteCard';
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import useFetchNotes from '../hooks/useFetchNotes';
+import useFetchNotes from '../hooks/use-fetch-notes';
 import noArchivedNotes from './../../assets/No_Archive_notes.png';
 import ErrorFallback from './Error';
-import Loading from './Loading';
 import CardSkeleton from '../components/CardSkeleton';
 
 const Archive = () => {

@@ -3,10 +3,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState, useTransition } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { UserTag } from 'types/index.ts';
-import useFetchTags from '../hooks/useFetchTags.ts';
-import useMutateTag from '../hooks/useMutateTag.tsx';
-import useSearchState from '../hooks/useSearchState.tsx';
-import { useSideNav } from '../hooks/useSideNav.tsx';
+import useFetchTags from '../hooks/use-fetch-tags.ts';
+import useMutateTag from '../hooks/use-mutate-tag.tsx';
+import useSearchState from '../hooks/use-search-state.tsx';
+import { useSideNav } from '../hooks/use-side-nav.tsx';
 import '../styles/sidebar.css';
 
 const SideNav = () => {

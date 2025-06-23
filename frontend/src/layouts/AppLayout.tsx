@@ -4,9 +4,9 @@ import DeleteTagPopup from '../components/DeleteTagPopup.tsx';
 import EditTagPopup from '../components/EditTagPopup.tsx';
 import Navbar from '../components/Navbar.tsx';
 import SideNav from '../components/Sidebar.tsx';
-import useMutateTag from '../hooks/useMutateTag.tsx';
-import useSearchState from '../hooks/useSearchState.tsx';
-import { useSideNav } from '../hooks/useSideNav.tsx';
+import useMutateTag from '../hooks/use-mutate-tag.tsx';
+import useSearchState from '../hooks/use-search-state.tsx';
+import { useSideNav } from '../hooks/use-side-nav.tsx';
 import Search from '../pages/Search.tsx';
 import '../styles/mainpage.css';
 

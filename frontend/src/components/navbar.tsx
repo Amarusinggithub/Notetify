@@ -1,9 +1,9 @@
 import { faBars, faGear } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, {  useEffect, useState, useTransition } from 'react';
-import useDebounce from '../hooks/useDebounce.ts';
-import useSearchState from '../hooks/useSearchState.tsx';
-import { useSideNav } from '../hooks/useSideNav.tsx';
+import useDebounce from '../hooks/use-debounce.ts';
+import useSearchState from '../hooks/use-search-state.tsx';
+import { useSideNav } from '../hooks/use-side-nav.tsx';
 import '../styles/navbar.css';
 import logo from './../../assets/notetify-logo.png';
 import SearchBar from './ui/SearchBar.tsx';

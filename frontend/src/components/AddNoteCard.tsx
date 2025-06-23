@@ -6,7 +6,7 @@ import React, {
 	useState,
 } from 'react';
 import { createNoteReducer, initialNoteState } from '../utils/helpers';
-import useMutateNote from '../hooks/useMutateNote';
+import useMutateNote from '../hooks/use-mutate-note';
 import '../styles/AddNoteCard.css';
 import NoteContentEditor from './Editor/components/NoteContentEditor';
 

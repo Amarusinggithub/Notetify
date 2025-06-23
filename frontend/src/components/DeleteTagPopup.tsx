@@ -1,7 +1,7 @@
 import { faLightbulb, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import useMutateTag from '../hooks/useMutateTag';
+import useMutateTag from '../hooks/use-mutate-tag';
 import '../styles/DeleteTagPopup.css';
 
 const DeleteTagPopup = () => {
