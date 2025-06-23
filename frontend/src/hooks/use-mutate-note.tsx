@@ -6,7 +6,11 @@ import React, {
 	useState,
 } from 'react';
 import axiosInstance from '../lib/axios.ts';
-import { type CreateNote, noteQueryKeys, type UserNote } from '../types/index.ts';
+import {
+	type CreateNote,
+	noteQueryKeys,
+	type UserNote,
+} from '../types/index.ts';
 
 interface NoteContextType {
 	selectedNote: UserNote | null;
@@ -118,9 +122,6 @@ const useMutateNote = () => {
 export { NoteContext, NoteProvider };
 export default useMutateNote;
 
-
-
-
 export const getNotes = async () => {
 	try {
 		const response = await axiosInstance.get(
@@ -178,4 +179,3 @@ export const deleteNote = async (note: UserNote) => {
 		console.error(e);
 	}
 };
-

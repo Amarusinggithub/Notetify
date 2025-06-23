@@ -6,10 +6,8 @@ import React, {
 } from 'react';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { type CreateTag, type UserTag } from '../types';
 import axiosInstance from '../lib/axios.ts';
-
-
+import { type CreateTag, type UserTag } from '../types';
 
 interface TagContextType {
 	selectedTag: UserTag | null;
@@ -106,12 +104,6 @@ const useMutateTag = () => {
 
 export default useMutateTag;
 export { TagContext, TagProvider };
-
-
-
-
-
-
 
 export const getTags = async () => {
 	try {

@@ -11,11 +11,9 @@
 		"moduleResolution": "bundler",
 		"rootDir": "./" /* Specify the root folder within your source files. */,
 		"baseUrl": "./src" /* Specify the base directory to resolve non-relative module names. */,
-        "paths": {
-          "@/*": [
-            "./src/*"
-          ]
-        },
+		"paths": {
+			"@/*": ["./src/*"]
+		},
 		"outDir": "./dist" /* Specify an output folder for all emitted files. */,
 
 		"allowImportingTsExtensions": true,

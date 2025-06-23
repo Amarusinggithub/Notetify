@@ -7,8 +7,8 @@ import React, {
 	useState,
 } from 'react';
 import { useErrorBoundary } from 'react-error-boundary';
-import { type CreateUser, USERDATA_STORAGE_KEY } from './../types/index.ts';
 import axiosInstance from '../lib/axios.ts';
+import { type CreateUser, USERDATA_STORAGE_KEY } from './../types/index.ts';
 
 type AuthProviderProps = PropsWithChildren;
 interface AuthContextType {
@@ -157,9 +157,6 @@ export const useAuth = () => {
 	}
 	return context;
 };
-
-
-
 
 export const login = async (user: CreateUser) => {
 	try {
