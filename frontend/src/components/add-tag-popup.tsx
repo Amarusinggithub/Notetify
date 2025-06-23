@@ -1,7 +1,7 @@
 import { faLightbulb, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect, useRef, useState } from 'react';
-import { CreateTag } from 'types';
+import { type CreateTag } from 'types';
 import useMutateTag from '../hooks/use-mutate-tag';
 import { useSideNav } from '../hooks/use-side-nav';
 import '../styles/AddTagPopUp.css';
