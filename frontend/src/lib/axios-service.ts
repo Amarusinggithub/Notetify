@@ -1,6 +1,6 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import { CSRF_TOKEN_COOKIE_NAME } from './../types/index.ts';
+import { CSRF_TOKEN_COOKIE_NAME } from '../types/index.ts';
 
 let isRefreshing = false;
 let failedQueue: {

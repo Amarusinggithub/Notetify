@@ -1,5 +1,5 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
-import axiosInstance from '../lib/AxiosService';
+import axiosInstance from '../lib/axios-service';
 import { UserTag } from '../types/index';
 
 const useFetchTags = () => {

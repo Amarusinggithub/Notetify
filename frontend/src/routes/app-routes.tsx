@@ -1,5 +1,5 @@
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router';
-import { useAuth } from './../hooks/use-auth.tsx';
+import { useAuth } from '../hooks/use-auth.tsx';
 
 /*const AppLayout = lazy(() => import('../layouts/AppLayout.tsx'));
 const Home = lazy(() => import('../pages/Home.tsx'));
@@ -11,15 +11,15 @@ const Landing = lazy(() => import('../pages/Landing.tsx'));
 const Login = lazy(() => import('../pages/auth/Login.tsx'));
 const Register = lazy(() => import('../pages/auth/Register.tsx'));*/
 
-import AppLayout from '../layouts/AppLayout';
-import Archive from '../pages/Archive';
-import Favorite from '../pages/Favorites';
-import Home from '../pages/Home';
-import Landing from '../pages/Landing';
-import Tag from '../pages/Tag';
-import Trash from '../pages/Trash';
-import Login from '../pages/auth/Login';
-import Register from '../pages/auth/Register';
+import AppLayout from '../layouts/app-layout.tsx';
+import Archive from '../pages/archive.tsx';
+import Login from '../pages/auth/login.tsx';
+import Register from '../pages/auth/register.tsx';
+import Favorite from '../pages/favorites.tsx';
+import Home from '../pages/home.tsx';
+import Landing from '../pages/landing.tsx';
+import Tag from '../pages/tag.tsx';
+import Trash from '../pages/trash.tsx';
 
 const AppRoutes = () => {
 	const { isAuthenticated, checkingAuth } = useAuth();

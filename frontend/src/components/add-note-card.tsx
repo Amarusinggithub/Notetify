@@ -5,10 +5,10 @@ import React, {
 	useRef,
 	useState,
 } from 'react';
-import { createNoteReducer, initialNoteState } from '../utils/helpers';
 import useMutateNote from '../hooks/use-mutate-note';
 import '../styles/AddNoteCard.css';
-import NoteContentEditor from './Editor/components/NoteContentEditor';
+import { createNoteReducer, initialNoteState } from '../utils/helpers';
+import NoteContentEditor from './Editor/components/note-content-editor';
 
 const AddNoteCard = () => {
 	const [note, dispatch] = useReducer(createNoteReducer, initialNoteState);

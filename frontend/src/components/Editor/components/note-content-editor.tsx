@@ -13,14 +13,14 @@ import EditorTheme from '../style/EditorTheme.ts';
 import {
 	getRandomUserProfile,
 	UserProfile,
-} from '../utils/getRandomUserProfile.ts';
+} from '../utils/get-random-user-profile.ts';
 
 import { WebsocketProvider } from 'y-websocket';
 import '../../../styles/NoteContentEditor.css';
-import Editor from '../components/Editor.tsx';
-import StopPropagationPlugin from '../plugins/StopPropagationPlugin.tsx';
+import StopPropagationPlugin from '../plugins/stop-propagation-plugin.tsx';
 import parseOrDefault from '../utils/helpers.ts';
 import { createWebsocketProvider } from '../utils/providers.ts';
+import Editor from './editor.tsx';
 
 type NoteContentEditorProps = {
 	handleContentInput: any;

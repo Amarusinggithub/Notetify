@@ -1,15 +1,14 @@
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { UserNote } from 'types/index.ts';
-import AddNoteCard from '../components/AddNoteCard.tsx';
-import NoteCard from '../components/NoteCard.tsx';
+import AddNoteCard from '../components/add-note-card.tsx';
+import CardSkeleton from '../components/card-skeleton.tsx';
+import NoteCard from '../components/note-card.tsx';
 import useFetchNotes from '../hooks/use-fetch-notes.ts';
 import { useSideNav } from '../hooks/use-side-nav.tsx';
 import '../styles/Homepage.css';
 import noNotes from './../../assets/No_Note.png';
-import ErrorFallback from './Error.tsx';
-import CardSkeleton from '../components/CardSkeleton';
-
+import ErrorFallback from './error.tsx';
 
 const Home = () => {
 	const pinned = useFetchNotes(
@@ -77,7 +76,7 @@ const Home = () => {
 							style={{ maxWidth: isSideNavOpen ? '1200px' : '1400px' }}
 						>
 							{other?.map((note: UserNote) => (
-								<Suspense key={note.id} fallback={<CardSkeleton cards={6}/>}>
+								<Suspense key={note.id} fallback={<CardSkeleton cards={6} />}>
 									<div key={note.id} className="note-div">
 										<NoteCard note={note} route={'/'} />
 									</div>

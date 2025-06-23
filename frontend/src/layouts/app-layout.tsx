@@ -1,13 +1,13 @@
 import { Outlet } from 'react-router';
-import AddTagPopup from '../components/AddTagPopup.tsx';
-import DeleteTagPopup from '../components/DeleteTagPopup.tsx';
-import EditTagPopup from '../components/EditTagPopup.tsx';
-import Navbar from '../components/Navbar.tsx';
-import SideNav from '../components/Sidebar.tsx';
+import AddTagPopup from '../components/add-tag-popup.tsx';
+import DeleteTagPopup from '../components/delete-tag-popup.tsx';
+import EditTagPopup from '../components/edit-tag-popup.tsx';
+import Navbar from '../components/nav-bar.tsx';
+import SideNav from '../components/side-nav.tsx';
 import useMutateTag from '../hooks/use-mutate-tag.tsx';
 import useSearchState from '../hooks/use-search-state.tsx';
 import { useSideNav } from '../hooks/use-side-nav.tsx';
-import Search from '../pages/Search.tsx';
+import Search from '../pages/search.tsx';
 import '../styles/mainpage.css';
 
 const AppLayout = () => {

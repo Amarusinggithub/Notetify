@@ -1,5 +1,5 @@
-import { CreateTag, UserTag } from '../types/index.ts';
-import axiosInstance from './AxiosService.ts';
+import { CreateTag, UserTag } from '../types';
+import axiosInstance from './axios-service.ts';
 
 export const getTags = async () => {
 	try {
@@ -14,7 +14,7 @@ export const getTags = async () => {
 export const createTag = async (tag: CreateTag) => {
 	try {
 		const response = await axiosInstance.post('tags/', {
-			"tag_data":tag.tag_data,
+			tag_data: tag.tag_data,
 		});
 		console.log(response.data);
 		return response.status;

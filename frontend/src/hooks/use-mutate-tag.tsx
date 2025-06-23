@@ -7,7 +7,7 @@ import React, {
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { CreateTag, UserTag } from 'types/index.ts';
-import { createTag, deleteTag, updateTag } from '../lib/TagService.ts';
+import { createTag, deleteTag, updateTag } from '../lib/tag-service.ts';
 
 interface TagContextType {
 	selectedTag: UserTag | null;

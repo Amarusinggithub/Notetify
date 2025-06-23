@@ -58,7 +58,7 @@ export interface UserTag extends Omit<CreateTag, 'tag_data'> {
 }
 
 export interface Tag {
-    id:number;
+	id: number;
 	name: string;
 	users?: number[];
 	created_at: Date;

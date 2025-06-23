@@ -1,12 +1,12 @@
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { UserNote } from 'types/index.ts';
-import NoteCard from '../components/NoteCard.tsx';
+import CardSkeleton from '../components/card-skeleton.tsx';
+import NoteCard from '../components/note-card.tsx';
 import useFetchNotes from '../hooks/use-fetch-notes.ts';
 import { useSideNav } from '../hooks/use-side-nav.tsx';
 import noTaggedNotes from './../../assets/No_tagged_Notes.png';
-import ErrorFallback from './Error.tsx';
-import CardSkeleton from '../components/CardSkeleton';
+import ErrorFallback from './error.tsx';
 
 const Tag = () => {
 	const { isSideNavOpen } = useSideNav();

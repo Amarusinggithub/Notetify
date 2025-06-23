@@ -27,11 +27,11 @@ export function createNoteReducer(state: CreateNote, action: NoteAction) {
 				note_data: { ...state.note_data, content: action.payload },
 			};
 		case 'TOGGLE_ARCHIVED':
-			return { ...state, is_archived: !state.is_archived};
+			return { ...state, is_archived: !state.is_archived };
 		case 'TOGGLE_ARCHIVED':
-			return { ...state, is_pinned: !state.is_pinned};
+			return { ...state, is_pinned: !state.is_pinned };
 		case 'TOGGLE_ARCHIVED':
-			return { ...state, is_favorited: !state.is_favorited};
+			return { ...state, is_favorited: !state.is_favorited };
 		case 'TOGGLE_ARCHIVED':
 			return { ...state, is_trashed: !state.is_trashed };
 		case 'RESET':
@@ -40,7 +40,6 @@ export function createNoteReducer(state: CreateNote, action: NoteAction) {
 			return state;
 	}
 }
-
 
 export function userNoteReducer(state: UserNote, action: NoteAction) {
 	switch (action.type) {

@@ -17,7 +17,7 @@ import { UserNote } from 'types/index.ts';
 import useMutateNote from '../hooks/use-mutate-note.tsx';
 import '../styles/NoteCard.css';
 import { isUserNote, userNoteReducer } from './../utils/helpers.ts';
-import NoteContentEditor from './Editor/components/NoteContentEditor.tsx';
+import NoteContentEditor from './Editor/components/note-content-editor.tsx';
 
 type NoteCardProps = { note: UserNote; route: string };
 

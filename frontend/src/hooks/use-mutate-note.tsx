@@ -5,7 +5,7 @@ import React, {
 	useContext,
 	useState,
 } from 'react';
-import { createNote, deleteNote, updateNote } from '../lib/NoteService.ts';
+import { createNote, deleteNote, updateNote } from '../lib/note-service.ts';
 import { CreateNote, noteQueryKeys, UserNote } from '../types/index.ts';
 
 interface NoteContextType {
