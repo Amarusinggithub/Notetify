@@ -1,6 +1,6 @@
 // hooks/useFetchNotes.ts
 import { useSuspenseQuery } from '@tanstack/react-query';
-import axiosInstance from '../lib/axios-service.ts';
+import axiosInstance from '../lib/axios.ts';
 import { type UserNote, noteQueryKeys } from '../types/index.ts';
 
 const useFetchNotes = (category: string, params: string) => {

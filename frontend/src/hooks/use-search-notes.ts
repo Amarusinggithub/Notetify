@@ -1,5 +1,5 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
-import axiosInstance from '../lib/axios-service.ts';
+import axiosInstance from '../lib/axios.ts';
 import { type UserNote } from '../types/index.ts';
 
 const useSearchNotes = (query: string, params: string) => {

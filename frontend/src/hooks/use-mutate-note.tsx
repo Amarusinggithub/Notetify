@@ -5,7 +5,7 @@ import React, {
 	useContext,
 	useState,
 } from 'react';
-import { createNote, deleteNote, updateNote } from '../lib/note-service.ts';
+import axiosInstance from '../lib/axios.ts';
 import { type CreateNote, noteQueryKeys, type UserNote } from '../types/index.ts';
 
 interface NoteContextType {
@@ -117,3 +117,65 @@ const useMutateNote = () => {
 
 export { NoteContext, NoteProvider };
 export default useMutateNote;
+
+
+
+
+export const getNotes = async () => {
+	try {
+		const response = await axiosInstance.get(
+			'notes/?is_pinned=True&is_favorited=True',
+		);
+		console.log(response.data);
+		return response.data;
+	} catch (e) {
+		console.error(e);
+	}
+};
+export const createNote = async (note: CreateNote) => {
+	try {
+		const response = await axiosInstance.post('notes/', {
+			note_data: note.note_data,
+		});
+		return response.status;
+	} catch (e) {
+		console.error(e);
+	}
+};
+
+export const updateNote = async (note: UserNote) => {
+	console.log('this');
+	try {
+		const response = await axiosInstance.put(`notes/${note.id}/`, {
+			id: note.id,
+			note: note.note.id,
+
+			note_data: {
+				title: note.note.title,
+				content: note.note.content,
+				users: note.note.users,
+			},
+			user: note.user,
+			tags: note.tags,
+			is_pinned: note.is_pinned,
+			is_trashed: note.is_trashed,
+			is_archived: note.is_archived,
+			is_favorited: note.is_favorited,
+		});
+
+		return response.status;
+	} catch (error) {
+		console.error(error);
+		throw error;
+	}
+};
+
+export const deleteNote = async (note: UserNote) => {
+	try {
+		const response = await axiosInstance.delete(`notes/${note.id}/`);
+		return response.status;
+	} catch (e) {
+		console.error(e);
+	}
+};
+
