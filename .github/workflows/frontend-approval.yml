@@ -5,64 +5,60 @@ name: Frontend CI
 
 on:
   push:
-    branches: 
-    - main
+    branches:
+      - main
 
   pull_request:
-    branches: 
-    - main
+    branches:
+      - main
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: 'frontend'
+        working-directory: "frontend"
 
     strategy:
       matrix:
         node-version: [22.x]
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-        cache-dependency-path: '**/package-lock.json' 
+      - uses: actions/checkout@v4
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+          cache-dependency-path: "**/package-lock.json"
 
-    - name: Recreate .env from secret
-      run: echo "${{ secrets.PROD_ENV_FILE }}" > .env
-    - run: npm ci
-    - name: Run tests
-      run: npm test
-    - run: npm run build
+      - name: Recreate .env from secret
+        run: echo "${{ secrets.PROD_ENV_FILE }}" > .env
+      - run: npm ci
+      - name: Run tests
+        run: npm test
+      - name: Format Frontend
+        run: npm run format
 
+      - name: Lint Frontend
+        run: npm run lint
+      - name: Build Frontend
+        run: npm run build
 
-
-   # - name: Deploy to EC2
-     # uses: appleboy/scp-action@v0.1.4
-     # with:
-      #  host: ${{ secrets.EC2_HOST }}
-       # username: ${{ secrets.EC2_USER }}
-       # key: ${{ secrets.EC2_SSH_KEY }}
-       # source: "frontend/dist/*"
-       # target: "/var/www/notetify-frontend"
-
-
+    # - name: Deploy to EC2
+    # uses: appleboy/scp-action@v0.1.4
+    # with:
+    #  host: ${{ secrets.EC2_HOST }}
+    # username: ${{ secrets.EC2_USER }}
+    # key: ${{ secrets.EC2_SSH_KEY }}
+    # source: "frontend/dist/*"
+    # target: "/var/www/notetify-frontend"
 
     #- name: Reload Nginx
     #  uses: appleboy/ssh-action@v1.0.0
     #  with:
-     #   host: ${{ secrets.EC2_HOST }}
-     #   username: ${{ secrets.EC2_USER }}
-      #  key: ${{ secrets.EC2_SSH_KEY }}
-      #  script: |
-       #   sudo systemctl reload nginx
-
-
-
-
-
+    #   host: ${{ secrets.EC2_HOST }}
+    #   username: ${{ secrets.EC2_USER }}
+    #  key: ${{ secrets.EC2_SSH_KEY }}
+    #  script: |
+    #   sudo systemctl reload nginx

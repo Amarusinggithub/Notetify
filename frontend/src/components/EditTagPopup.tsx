@@ -12,7 +12,7 @@ const EditTagPopup = () => {
 
 	useEffect(() => {
 		if (selectedTag) {
-			setTagName(selectedTag.name);
+			setTagName(selectedTag.tag.name);
 
 			if (editInputRef.current) {
 				editInputRef.current.focus();
@@ -25,13 +25,21 @@ const EditTagPopup = () => {
 	const handleTagNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setTagName(e.target.value);
 	};
-
 	const handleEditTagName = () => {
-		if (TagName.trim() !== '') {
-			const updatedTag = { ...selectedTag, name: TagName };
-			editTag(updatedTag);
-			setTagName('');
-		}
+		if (TagName.trim() === '') return;
+
+		const updatedTag = {
+			...selectedTag!.tag,
+			name: TagName.trim(),
+		};
+
+		const updatedUserTag = {
+			...selectedTag!,
+			tag: updatedTag,
+		};
+
+		editTag(updatedUserTag);
+		setTagName('');
 		handleClose();
 	};
 

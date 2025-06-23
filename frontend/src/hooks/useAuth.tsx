@@ -54,7 +54,6 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 			setError(null);
 			const response = await signUp(user);
 			if (response.status >= 200 && response.status < 300) {
-				console.log('Signup successful');
 				setAuth(response.data);
 			} else {
 				console.error('Signup failed');

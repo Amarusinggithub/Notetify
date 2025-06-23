@@ -21,9 +21,7 @@ const Register = () => {
 		setState({ ...state, [e.target.name]: e.target.value.trim() });
 	}
 
-	async function handleSubmit(
-		e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-	) {
+	async function submit(e: React.FormEvent<HTMLFormElement>) {
 		e.preventDefault();
 
 		if (state.password !== confirmPassword) {
@@ -36,7 +34,7 @@ const Register = () => {
 
 	return (
 		<div className="signup-container">
-			<form className="signup-form">
+			<form className="signup-form" onSubmit={submit}>
 				<h1>Sign Up</h1>
 
 				<div className="form-ui">
@@ -114,13 +112,7 @@ const Register = () => {
 						/>
 					</div>
 
-					<button
-						disabled={isLoading}
-						className={'form-btn'}
-						onClick={(e) => {
-							handleSubmit(e);
-						}}
-					>
+					<button type="submit" disabled={isLoading} className={'form-btn'}>
 						Sign Up
 					</button>
 

@@ -61,7 +61,7 @@ services:
       db_prod:
         condition: service_healthy
     volumes:
-      - "redis-data-prod:/data"          
+      - "redis-data-prod:/data"
     ports:
       - "6379:6379"
     env_file:
@@ -88,7 +88,7 @@ services:
       - .env.production
     command: "python manage.py yroom"
 
-  frotend_prod:
+  frontend_prod:
     networks:
       - notetify-net-prod
     build:
