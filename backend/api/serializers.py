@@ -91,10 +91,10 @@ class UserNoteSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("A trashed note cannot be pinned.")
         if data.get("is_trashed") and data.get("is_archived"):
             raise serializers.ValidationError("A trashed note cannot be archived.")
-        if data.get("is_trashed") and data.get("is_favorited"):
-            raise serializers.ValidationError("A trashed note cannot be favorited.")
-        if data.get("is_archived") and data.get("is_favorited"):
-            raise serializers.ValidationError("An archived note cannot be favorited.")
+        if data.get("is_trashed") and data.get("is_favorite"):
+            raise serializers.ValidationError("A trashed note cannot be favorite.")
+        if data.get("is_archived") and data.get("is_favorite"):
+            raise serializers.ValidationError("An archived note cannot be favorite.")
         return data
 
 
@@ -139,7 +139,7 @@ class UserTagSerializer(serializers.ModelSerializer):
             return usertag
 
             # option B: raise a DRF ValidationError so the client gets a 400
-            #raise serializers.ValidationError(f"You already have a tag “{name}”")
+            # raise serializers.ValidationError(f"You already have a tag “{name}”")
 
         return usertag
 
@@ -208,11 +208,11 @@ class UserNotebookSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("A trashed notebook cannot be pinned.")
         if data.get("is_trashed") and data.get("is_archived"):
             raise serializers.ValidationError("A trashed notebook cannot be archived.")
-        if data.get("is_trashed") and data.get("is_favorited"):
-            raise serializers.ValidationError("A trashed notebook cannot be favorited.")
-        if data.get("is_archived") and data.get("is_favorited"):
+        if data.get("is_trashed") and data.get("is_favorite"):
+            raise serializers.ValidationError("A trashed notebook cannot be favorite.")
+        if data.get("is_archived") and data.get("is_favorite"):
             raise serializers.ValidationError(
-                "An archived notebook cannot be favorited."
+                "An archived notebook cannot be favorite."
             )
         return data
 

@@ -1,11 +1,11 @@
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { type UserNote } from 'types/index.ts';
+import { type UserNote } from '../types/index.ts';
 import CardSkeleton from '../components/card-skeleton.tsx';
 import NoteCard from '../components/note-card.tsx';
 import useFetchNotes from '../hooks/use-fetch-notes.ts';
 import { useSideNav } from '../hooks/use-side-nav.tsx';
-import noTrashedNotes from './../../assets/No_trashed_notes.png';
+import noTrashedNotes from '../assets/No_trashed_notes.png';
 import ErrorFallback from './error.tsx';
 
 const Trash = () => {

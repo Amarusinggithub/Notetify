@@ -10,7 +10,7 @@ import React, {
 	useContext,
 	useState,
 } from 'react';
-import { type SideMenuItem } from 'types';
+import { type SideMenuItem } from '../types';
 
 type SideNavContextType = {
 	sidebarMenuItems: SideMenuItem[];
@@ -56,7 +56,7 @@ export const SideNavProvider = ({ children }: SideNavProviderProps) => {
 			icon: faStar,
 			href: '/favorite',
 			isActive: false,
-			params: 'is_favorited=True&is_trashed=False&is_archived=False',
+			params: 'is_favorite=True&is_trashed=False&is_archived=False',
 		},
 		{
 			name: 'Archive',

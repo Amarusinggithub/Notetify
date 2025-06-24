@@ -5,7 +5,7 @@ import useDebounce from '../hooks/use-debounce.ts';
 import useSearchState from '../hooks/use-search-state.tsx';
 import { useSideNav } from '../hooks/use-side-nav.tsx';
 import '../styles/navbar.css';
-import logo from './../../assets/notetify-logo.png';
+import logo from '../assets/notetify-logo.png';
 import SearchBar from './ui/search-bar.tsx';
 
 const Navbar = () => {

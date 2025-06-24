@@ -197,7 +197,7 @@ class UserNotebook(models.Model):
         on_delete=models.CASCADE,
     )
     is_pinned = models.BooleanField(default=False)
-    is_favorited = models.BooleanField(default=False)
+    is_favorite = models.BooleanField(default=False)
     is_trashed = models.BooleanField(default=False)
     is_archived = models.BooleanField(default=False)
     shared_from = models.ForeignKey(
@@ -217,7 +217,7 @@ class UserNotebook(models.Model):
         auto_now_add=True,
         null=True,
     )
-    favorited_at = models.DateTimeField(
+    favorite_at = models.DateTimeField(
         auto_now_add=True,
         null=True,
     )
@@ -245,7 +245,7 @@ class UserNote(models.Model):
 
     note = models.ForeignKey(Note, on_delete=models.CASCADE)
     is_pinned = models.BooleanField(default=False)
-    is_favorited = models.BooleanField(default=False)
+    is_favorite = models.BooleanField(default=False)
     is_trashed = models.BooleanField(default=False)
     is_archived = models.BooleanField(default=False)
     shared_from = models.ForeignKey(
@@ -265,7 +265,7 @@ class UserNote(models.Model):
         auto_now_add=True,
         null=True,
     )
-    favorited_at = models.DateTimeField(
+    favorite_at = models.DateTimeField(
         auto_now_add=True,
         null=True,
     )

@@ -206,7 +206,7 @@ class NoteListCreateView(generics.ListCreateAPIView):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = [
         "is_pinned",
-        "is_favorited",
+        "is_favorite",
         "is_trashed",
         "is_archived",
         "tags__id",
@@ -248,7 +248,7 @@ class NotebookListCreateView(generics.ListCreateAPIView):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = [
         "is_pinned",
-        "is_favorited",
+        "is_favorite",
         "is_trashed",
         "is_archived",
         "notes__id",

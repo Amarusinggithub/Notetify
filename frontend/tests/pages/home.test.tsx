@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import Home from './../../src/pages/Home.tsx';
-import Wrapper from './../utils/WrrapperApp.tsx';
+import Home from '../../src/pages/home.tsx';
+import Wrapper from '../utils/wrapperApp.tsx';
 
 describe('Home', () => {
 	it('renders the main heading', () => {

@@ -1,4 +1,4 @@
-import { IconProp } from '@fortawesome/fontawesome-svg-core';
+import {type IconProp } from '@fortawesome/fontawesome-svg-core';
 import 'axios';
 
 //Constants
@@ -76,7 +76,7 @@ export type CreateNote = {
 	is_pinned: boolean;
 	is_trashed: boolean;
 	is_archived: boolean;
-	is_favorited: boolean;
+	is_favorite: boolean;
 };
 
 export interface UserNote extends Omit<CreateNote, 'note_data'> {
@@ -89,7 +89,7 @@ export interface UserNote extends Omit<CreateNote, 'note_data'> {
 	removed_at?: Date;
 	archived_at?: Date;
 	trashed_at?: Date;
-	favorited_at?: Date;
+	favorite_at?: Date;
 	created_at: Date;
 	updated_at: Date;
 }
@@ -120,13 +120,13 @@ export interface UserNotebook {
 	removed_at?: Date;
 	archived_at?: Date;
 	trashed_at?: Date;
-	favorited_at?: Date;
+	favorite_at?: Date;
 	created_at: Date;
 	updated_at: Date;
 	is_pinned: boolean;
 	is_trashed: boolean;
 	is_archived: boolean;
-	is_favorited: boolean;
+	is_favorite: boolean;
 }
 
 export interface Notebook {
@@ -152,14 +152,14 @@ export interface UserNoteBook {
 	user: number;
 	note_book: Notebook;
 	is_pinned: boolean;
-	is_favorited: boolean;
+	is_favorite: boolean;
 	is_trashed: boolean;
 	is_archived: boolean;
 	shared_from?: number;
 	shared_at?: Date;
 	archived_at?: Date;
 	trashed_at?: Date;
-	favorited_at?: Date;
+	favorite_at?: Date;
 	removed_at?: Date;
 	created_at: Date;
 }
@@ -198,6 +198,6 @@ export type NoteAction =
 	| { type: 'SET_CONTENT'; payload: string }
 	| { type: 'TOGGLE_ARCHIVED' }
 	| { type: 'TOGGLE_TRASHED' }
-	| { type: 'TOGGLE_FAVORITED' }
+	| { type: 'TOGGLE_favorite' }
 	| { type: 'TOGGLE_PINNED' }
 	| { type: 'RESET' };

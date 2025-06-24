@@ -85,7 +85,7 @@ const NoteProvider = ({ children }: NoteProviderProps) => {
 		note: UserNote,
 		field: keyof Pick<
 			UserNote,
-			'is_favorited' | 'is_archived' | 'is_trashed' | 'is_pinned'
+			'is_favorite' | 'is_archived' | 'is_trashed' | 'is_pinned'
 		>,
 	) => {
 		const updated = { ...note, [field]: !note[field] };
@@ -100,7 +100,7 @@ const NoteProvider = ({ children }: NoteProviderProps) => {
 				editNote,
 				removeNote,
 				handleArchive: (note) => handleToggle(note, 'is_archived'),
-				handleFavorite: (note) => handleToggle(note, 'is_favorited'),
+				handleFavorite: (note) => handleToggle(note, 'is_favorite'),
 				handleTrash: (note) => handleToggle(note, 'is_trashed'),
 				handlePin: (note) => handleToggle(note, 'is_pinned'),
 				setSelectedNote,
@@ -125,7 +125,7 @@ export default useMutateNote;
 export const getNotes = async () => {
 	try {
 		const response = await axiosInstance.get(
-			'notes/?is_pinned=True&is_favorited=True',
+			'notes/?is_pinned=True&is_favorite=True',
 		);
 		console.log(response.data);
 		return response.data;
@@ -161,7 +161,7 @@ export const updateNote = async (note: UserNote) => {
 			is_pinned: note.is_pinned,
 			is_trashed: note.is_trashed,
 			is_archived: note.is_archived,
-			is_favorited: note.is_favorited,
+			is_favorite: note.is_favorite,
 		});
 
 		return response.status;

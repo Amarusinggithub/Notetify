@@ -7,8 +7,8 @@ import SideNav from '../components/side-nav.tsx';
 import useMutateTag from '../hooks/use-mutate-tag.tsx';
 import useSearchState from '../hooks/use-search-state.tsx';
 import { useSideNav } from '../hooks/use-side-nav.tsx';
-import Search from '../pages/search.tsx';
 import '../styles/mainpage.css';
+import Search from '../pages/search.tsx';
 
 const AppLayout = () => {
 	const { isSideNavOpen, isAddTagPopupOpen } = useSideNav();
@@ -34,7 +34,9 @@ const AppLayout = () => {
 	);
 };
 
-/*export default AppLayout;
+export default AppLayout;
+
+/*
 
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/app-sidebar';

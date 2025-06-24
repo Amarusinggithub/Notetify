@@ -1,13 +1,13 @@
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { type UserNote } from 'types';
+import { type UserNote } from '../types/index.ts';
 import CardSkeleton from '../components/card-skeleton.tsx';
 import NoteCard from '../components/note-card.tsx';
-import useSearchNotes from '../hooks/use-search-notes';
+import useSearchNotes from '../hooks/use-search-notes.ts';
 import useSearchState from '../hooks/use-search-state.tsx';
-import { useSideNav } from '../hooks/use-side-nav';
-import noSearchNotes from './../../assets/No_Search.png';
-import ErrorFallback from './error';
+import { useSideNav } from '../hooks/use-side-nav.tsx';
+import noSearchNotes from '../assets/No_Search.png';
+import ErrorFallback from './error.tsx';
 
 const Search = () => {
 	const { params, query } = useSearchState();

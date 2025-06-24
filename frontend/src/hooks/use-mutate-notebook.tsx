@@ -4,7 +4,7 @@ import { type CreateNote, type UserNotebook } from '../types/index.ts';
 export const getNotebooks = async () => {
 	try {
 		const response = await axiosInstance.get(
-			'notebooks/?is_pinned=True&is_favorited=True',
+			'notebooks/?is_pinned=True&is_favorite=True',
 		);
 		console.log(response.data);
 		return response.data;
@@ -38,7 +38,7 @@ export const updateNotebook = async (userNotebook: UserNotebook) => {
 			is_pinned: userNotebook.is_pinned,
 			is_trashed: userNotebook.is_trashed,
 			is_archived: userNotebook.is_archived,
-			is_favorited: userNotebook.is_favorited,
+			is_favorite: userNotebook.is_favorite,
 		});
 
 		return response.status;

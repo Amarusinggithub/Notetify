@@ -1,11 +1,11 @@
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { type UserNote } from 'types/index.ts';
+import noFavoriteNotes from '../assets/No_favorite_notes.png';
 import CardSkeleton from '../components/card-skeleton.tsx';
 import NoteCard from '../components/note-card.tsx';
 import useFetchNotes from '../hooks/use-fetch-notes.ts';
 import { useSideNav } from '../hooks/use-side-nav.tsx';
-import noFavoriteNotes from './../../assets/No_favorited_notes.png';
+import { type UserNote } from '../types/index.ts';
 import ErrorFallback from './error.tsx';
 
 const Favorite = () => {
@@ -13,7 +13,7 @@ const Favorite = () => {
 
 	const favorites = useFetchNotes(
 		'favorites',
-		'is_favorited=True&is_trashed=False&is_archived=False',
+		'is_favorite=True&is_trashed=False&is_archived=False',
 	);
 
 	if (favorites.length == 0) {
@@ -23,7 +23,7 @@ const Favorite = () => {
 					src={noFavoriteNotes}
 					style={{ width: '100%', height: 'auto' }}
 					className="no-notes"
-					alt="No favorited notes"
+					alt="No favorite notes"
 				/>
 			</div>
 		);

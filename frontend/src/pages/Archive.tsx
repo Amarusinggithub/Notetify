@@ -4,7 +4,7 @@ import CardSkeleton from '../components/card-skeleton';
 import NoteCard from '../components/note-card';
 import useFetchNotes from '../hooks/use-fetch-notes';
 import { type UserNote } from '../types';
-import noArchivedNotes from './../../assets/No_Archive_notes.png';
+import noArchivedNotes from '../assets/No_Archive_notes.png';
 import ErrorFallback from './error';
 
 const Archive = () => {

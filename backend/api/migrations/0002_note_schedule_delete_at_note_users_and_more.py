@@ -9,164 +9,221 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0001_initial'),
+        ("api", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='note',
-            name='schedule_delete_at',
+            model_name="note",
+            name="schedule_delete_at",
             field=models.DateTimeField(auto_now=True, null=True),
         ),
         migrations.AddField(
-            model_name='note',
-            name='users',
-            field=models.ManyToManyField(through='api.UserNote', through_fields=('note', 'user'), to=settings.AUTH_USER_MODEL),
+            model_name="note",
+            name="users",
+            field=models.ManyToManyField(
+                through="api.UserNote",
+                through_fields=("note", "user"),
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
-            model_name='notebook',
-            name='schedule_delete_at',
+            model_name="notebook",
+            name="schedule_delete_at",
             field=models.DateTimeField(auto_now=True, null=True),
         ),
         migrations.AddField(
-            model_name='notebook',
-            name='users',
-            field=models.ManyToManyField(through='api.UserNoteBook', through_fields=('note_book', 'user'), to=settings.AUTH_USER_MODEL),
+            model_name="notebook",
+            name="users",
+            field=models.ManyToManyField(
+                through="api.UserNoteBook",
+                through_fields=("note_book", "user"),
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
-            model_name='notetag',
-            name='added_at',
-            field=models.DateTimeField(auto_now_add=True, default=django.utils.timezone.now),
+            model_name="notetag",
+            name="added_at",
+            field=models.DateTimeField(
+                auto_now_add=True, default=django.utils.timezone.now
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='notetag',
-            name='created_at',
-            field=models.DateTimeField(auto_now_add=True, default=django.utils.timezone.now),
+            model_name="notetag",
+            name="created_at",
+            field=models.DateTimeField(
+                auto_now_add=True, default=django.utils.timezone.now
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='notetag',
-            name='removed_at',
+            model_name="notetag",
+            name="removed_at",
             field=models.DateTimeField(auto_now=True, null=True),
         ),
         migrations.AddField(
-            model_name='tag',
-            name='notes',
-            field=models.ManyToManyField(through='api.NoteTag', to='api.note'),
+            model_name="tag",
+            name="notes",
+            field=models.ManyToManyField(through="api.NoteTag", to="api.note"),
         ),
         migrations.AddField(
-            model_name='tag',
-            name='schedule_delete_at',
+            model_name="tag",
+            name="schedule_delete_at",
             field=models.DateTimeField(auto_now=True, null=True),
         ),
         migrations.AddField(
-            model_name='tag',
-            name='users',
-            field=models.ManyToManyField(through='api.UserTag', to=settings.AUTH_USER_MODEL),
+            model_name="tag",
+            name="users",
+            field=models.ManyToManyField(
+                through="api.UserTag", to=settings.AUTH_USER_MODEL
+            ),
         ),
         migrations.AddField(
-            model_name='usernote',
-            name='archived_at',
+            model_name="usernote",
+            name="archived_at",
             field=models.DateTimeField(auto_now_add=True, null=True),
         ),
         migrations.AddField(
-            model_name='usernote',
-            name='created_at',
-            field=models.DateTimeField(auto_now_add=True, default=django.utils.timezone.now),
+            model_name="usernote",
+            name="created_at",
+            field=models.DateTimeField(
+                auto_now_add=True, default=django.utils.timezone.now
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='usernote',
-            name='favorited_at',
+            model_name="usernote",
+            name="favorited_at",
             field=models.DateTimeField(auto_now_add=True, null=True),
         ),
         migrations.AddField(
-            model_name='usernote',
-            name='trashed_at',
+            model_name="usernote",
+            name="trashed_at",
             field=models.DateTimeField(auto_now_add=True, null=True),
         ),
         migrations.AddField(
-            model_name='usernotebook',
-            name='archived_at',
+            model_name="usernotebook",
+            name="archived_at",
             field=models.DateTimeField(auto_now_add=True, null=True),
         ),
         migrations.AddField(
-            model_name='usernotebook',
-            name='created_at',
-            field=models.DateTimeField(auto_now_add=True, default=django.utils.timezone.now),
+            model_name="usernotebook",
+            name="created_at",
+            field=models.DateTimeField(
+                auto_now_add=True, default=django.utils.timezone.now
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='usernotebook',
-            name='favorited_at',
+            model_name="usernotebook",
+            name="favorite_at",
             field=models.DateTimeField(auto_now_add=True, null=True),
         ),
         migrations.AddField(
-            model_name='usernotebook',
-            name='trashed_at',
+            model_name="usernotebook",
+            name="trashed_at",
             field=models.DateTimeField(auto_now_add=True, null=True),
         ),
         migrations.AddField(
-            model_name='usertag',
-            name='created_at',
-            field=models.DateTimeField(auto_now_add=True, default=django.utils.timezone.now),
+            model_name="usertag",
+            name="created_at",
+            field=models.DateTimeField(
+                auto_now_add=True, default=django.utils.timezone.now
+            ),
             preserve_default=False,
         ),
         migrations.AlterField(
-            model_name='user',
-            name='password',
+            model_name="user",
+            name="password",
             field=models.CharField(max_length=128, null=True),
         ),
         migrations.AlterField(
-            model_name='usernotebook',
-            name='shared_from',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+            model_name="usernotebook",
+            name="shared_from",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AlterUniqueTogether(
-            name='notetag',
-            unique_together={('note', 'tag')},
+            name="notetag",
+            unique_together={("note", "tag")},
         ),
         migrations.AlterUniqueTogether(
-            name='usernote',
-            unique_together={('user', 'note')},
+            name="usernote",
+            unique_together={("user", "note")},
         ),
         migrations.AlterUniqueTogether(
-            name='usernotebook',
-            unique_together={('user', 'note_book')},
+            name="usernotebook",
+            unique_together={("user", "note_book")},
         ),
         migrations.AlterUniqueTogether(
-            name='usertag',
-            unique_together={('user', 'tag')},
+            name="usertag",
+            unique_together={("user", "tag")},
         ),
         migrations.CreateModel(
-            name='NoteBookNote',
+            name="NoteBookNote",
             fields=[
-                ('id', models.AutoField(primary_key=True, serialize=False)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('added_at', models.DateTimeField(auto_now_add=True)),
-                ('removed_at', models.DateTimeField(auto_now=True, null=True)),
-                ('note', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='api.note')),
-                ('note_book', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='api.notebook')),
+                ("id", models.AutoField(primary_key=True, serialize=False)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("added_at", models.DateTimeField(auto_now_add=True)),
+                ("removed_at", models.DateTimeField(auto_now=True, null=True)),
+                (
+                    "note",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="api.note"
+                    ),
+                ),
+                (
+                    "note_book",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="api.notebook"
+                    ),
+                ),
             ],
             options={
-                'unique_together': {('note', 'note_book')},
+                "unique_together": {("note", "note_book")},
             },
         ),
         migrations.AddField(
-            model_name='notebook',
-            name='notes',
-            field=models.ManyToManyField(through='api.NoteBookNote', to='api.note'),
+            model_name="notebook",
+            name="notes",
+            field=models.ManyToManyField(through="api.NoteBookNote", to="api.note"),
         ),
         migrations.CreateModel(
-            name='OAuthAccount',
+            name="OAuthAccount",
             fields=[
-                ('id', models.AutoField(primary_key=True, serialize=False)),
-                ('OAuthProvider', models.CharField(choices=[('GOOGLE', 'google'), ('GITHUB', 'github'), ('FACEBOOK', 'facebook')], max_length=20)),
-                ('access_token', models.CharField(blank=True, max_length=200, null=True)),
-                ('refresh_token', models.CharField(blank=True, max_length=200, null=True)),
-                ('expires_at', models.DateTimeField(auto_now=True, null=True)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='OAuth_accounts', to=settings.AUTH_USER_MODEL)),
+                ("id", models.AutoField(primary_key=True, serialize=False)),
+                (
+                    "OAuthProvider",
+                    models.CharField(
+                        choices=[
+                            ("GOOGLE", "google"),
+                            ("GITHUB", "github"),
+                            ("FACEBOOK", "facebook"),
+                        ],
+                        max_length=20,
+                    ),
+                ),
+                (
+                    "access_token",
+                    models.CharField(blank=True, max_length=200, null=True),
+                ),
+                (
+                    "refresh_token",
+                    models.CharField(blank=True, max_length=200, null=True),
+                ),
+                ("expires_at", models.DateTimeField(auto_now=True, null=True)),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="OAuth_accounts",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
     ]

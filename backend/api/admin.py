@@ -73,7 +73,7 @@ class MyUserAdmin(UserAdmin):
 class OAuthAccountAdmin(admin.ModelAdmin):
 
     list_display = ("OAuthProvider", "user")
-    search_fields = ("OAuthProvider", "user__email" )
+    search_fields = ("OAuthProvider", "user__email")
     list_filter = ("OAuthProvider",)
     ordering = ("user__email",)
 
@@ -141,10 +141,10 @@ class UserNoteAdmin(admin.ModelAdmin):
                     "shared_from",
                     "shared_at",
                     "is_pinned",
-                    "is_favorited",
+                    "is_favorite",
                     "is_archived",
                     "is_trashed",
-                    "favorited_at",
+                    "favorite_at",
                     "archived_at",
                     "trashed_at",
                     "removed_at",
@@ -158,7 +158,7 @@ class UserNoteAdmin(admin.ModelAdmin):
         "shared_at",
         "archived_at",
         "trashed_at",
-        "favorited_at",
+        "favorite_at",
         "removed_at",
         "created_at",
     )
@@ -313,10 +313,10 @@ class UserNotebookAdmin(admin.ModelAdmin):
                     "shared_from",
                     "shared_at",
                     "is_pinned",
-                    "is_favorited",
+                    "is_favorite",
                     "is_archived",
                     "is_trashed",
-                    "favorited_at",
+                    "favorite_at",
                     "archived_at",
                     "trashed_at",
                     "removed_at",
@@ -328,7 +328,7 @@ class UserNotebookAdmin(admin.ModelAdmin):
 
     readonly_fields = (
         "shared_at",
-        "favorited_at",
+        "favorite_at",
         "archived_at",
         "trashed_at",
         "removed_at",
