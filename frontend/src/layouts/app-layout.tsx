@@ -38,7 +38,7 @@ export default AppLayout;
 
 /*
 
-import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import { SidebarProvider, SidebarTrigger } from '../components/ui/sidebar';
 import { AppSidebar } from '@/components/app-sidebar';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
@@ -52,3 +52,19 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 		</SidebarProvider>
 	);
 }*/
+
+
+import { type ReactNode } from 'react';
+import { type BreadcrumbItem } from '../types';
+import AppLayoutTemplate from './app/app-sidebar-layout';
+
+interface AppLayoutProps {
+	children: ReactNode;
+	breadcrumbs?: BreadcrumbItem[];
+}
+
+export default ({ children, breadcrumbs, ...props }: AppLayoutProps) => (
+	<AppLayoutTemplate breadcrumbs={breadcrumbs} {...props}>
+		{children}
+	</AppLayoutTemplate>
+);

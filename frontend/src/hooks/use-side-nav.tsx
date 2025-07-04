@@ -10,10 +10,10 @@ import React, {
 	useContext,
 	useState,
 } from 'react';
-import { type SideMenuItem } from '../types';
+import { type NavItem } from '../types';
 
 type SideNavContextType = {
-	sidebarMenuItems: SideMenuItem[];
+	sidebarMenuItems: NavItem[];
 	isSideNavOpen: boolean;
 	page: number;
 	isAddTagPopupOpen: boolean;
@@ -22,7 +22,7 @@ type SideNavContextType = {
 	setIsSideNavOpen: React.Dispatch<React.SetStateAction<boolean>>;
 	setPage: React.Dispatch<React.SetStateAction<number>>;
 	setAddTagPopupOpen: React.Dispatch<React.SetStateAction<boolean>>;
-	setSidebarMenuItems: React.Dispatch<React.SetStateAction<SideMenuItem[]>>;
+	setSidebarMenuItems: React.Dispatch<React.SetStateAction<NavItem[]>>;
 };
 
 type SideNavProviderProps = PropsWithChildren;
@@ -43,30 +43,30 @@ export const SideNavProvider = ({ children }: SideNavProviderProps) => {
 	const [isSideNavOpen, setIsSideNavOpen] = useState<boolean>(true);
 	const [page, setPage] = useState<number>(0);
 	const [isAddTagPopupOpen, setAddTagPopupOpen] = useState<boolean>(false);
-	const [sidebarMenuItems, setSidebarMenuItems] = useState<SideMenuItem[]>([
+	const [sidebarMenuItems, setSidebarMenuItems] = useState<NavItem[]>([
 		{
-			name: 'Notes',
+			title: 'Notes',
 			icon: faLightbulb,
 			href: '/',
 			isActive: true,
 			params: 'is_trashed=False&is_archived=False',
 		},
 		{
-			name: 'Favorites',
+			title: 'Favorites',
 			icon: faStar,
 			href: '/favorite',
 			isActive: false,
 			params: 'is_favorite=True&is_trashed=False&is_archived=False',
 		},
 		{
-			name: 'Archive',
+			title: 'Archive',
 			icon: faArchive,
 			href: '/archive',
 			isActive: false,
 			params: 'is_archived=True&is_trashed=False',
 		},
 		{
-			name: 'Trash',
+			title: 'Trash',
 			icon: faTrash,
 			href: '/trash',
 			isActive: false,

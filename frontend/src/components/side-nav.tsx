@@ -2,12 +2,12 @@ import { faEllipsis, faPlus, faTag } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState, useTransition } from 'react';
 import { useLocation, useNavigate } from 'react-router';
-import { type UserTag } from '../types/index.ts';
 import useFetchTags from '../hooks/use-fetch-tags.ts';
 import useMutateTag from '../hooks/use-mutate-tag.tsx';
 import useSearchState from '../hooks/use-search-state.tsx';
 import { useSideNav } from '../hooks/use-side-nav.tsx';
 import '../styles/sidebar.css';
+import { type UserTag } from '../types/index.ts';
 
 const SideNav = () => {
 	const location = useLocation();
@@ -95,7 +95,7 @@ const SideNav = () => {
 					>
 						<div className="icon-and-name">
 							<FontAwesomeIcon icon={item.icon!} className="icon" />
-							{isSideNavOpen && <h3>{item.name}</h3>}
+							{isSideNavOpen && <h3>{item.title}</h3>}
 						</div>
 					</li>
 				))}

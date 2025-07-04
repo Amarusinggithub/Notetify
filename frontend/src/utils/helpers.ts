@@ -1,4 +1,4 @@
-import { CreateNote, NoteAction, UserNote } from '../types';
+import { type CreateNote,type NoteAction, type UserNote } from '../types';
 
 // Type guard to distinguish between UserNote and UserNoteData.
 export const isUserNote = (note: UserNote | CreateNote): note is UserNote => {

@@ -1,5 +1,6 @@
-import {type IconProp } from '@fortawesome/fontawesome-svg-core';
+import { type IconProp } from '@fortawesome/fontawesome-svg-core';
 import 'axios';
+import type { LucideIcon } from 'lucide-react';
 
 //Constants
 export const CSRF_TOKEN_COOKIE_NAME = 'csrftoken';
@@ -173,17 +174,36 @@ export interface NoteTag {
 	created_at: Date;
 }
 
+
+
 export interface BreadcrumbItem {
 	title: string;
 	href: string;
 }
 
-export interface SideMenuItem {
-	name: string;
+export interface NavGroup {
+	title: string;
+	items: NavItem[];
+}
+
+export interface NavItem {
+	title: string;
 	href: string;
-	icon?: IconProp;
+	icon?: LucideIcon | null;
 	isActive?: boolean;
-	params: string;
+	params?: string;
+}
+
+export interface SharedData {
+	name: string;
+	quote: { message: string; author: string };
+	auth: Auth;
+	sidebarOpen: boolean;
+	[key: string]: unknown;
+}
+
+export interface Auth {
+	user: User;
 }
 
 export const noteQueryKeys = {
@@ -195,7 +215,14 @@ export const noteQueryKeys = {
 
 export type NoteAction =
 	| { type: 'SET_TITLE'; payload: string }
-	| { type: 'SET_CONTENT'; payload: string }
+	| { type: 'TOGGLE_ARCHIVED' }
+	| { type: 'TOGGLE_TRASHED' }
+	| { type: 'TOGGLE_favorite' }
+	| { type: 'TOGGLE_PINNED' }
+	| { type: 'RESET' };
+
+export type NotebookAction =
+	| { type: 'SET_TITLE'; payload: string }
 	| { type: 'TOGGLE_ARCHIVED' }
 	| { type: 'TOGGLE_TRASHED' }
 	| { type: 'TOGGLE_favorite' }
