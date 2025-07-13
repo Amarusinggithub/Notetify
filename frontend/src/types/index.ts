@@ -1,4 +1,3 @@
-import { type IconProp } from '@fortawesome/fontawesome-svg-core';
 import 'axios';
 import type { LucideIcon } from 'lucide-react';
 
@@ -10,6 +9,23 @@ export const USERDATA_STORAGE_KEY = 'userData';
 export type Role = 'OWNER' | 'EDITOR' | 'MEMBER';
 export type OAuthProvider = 'GOOGLE' | 'GITHUB' | 'FACEBOOK';
 
+export type AuthField =
+	| 'firstName'
+	| 'lastName'
+	| 'email'
+	| 'password'
+	| 'confirmPassword'
+	| 'auth';
+
+export type AuthErrorType =
+	| 'This field cannot be empty'
+	| 'invalid-credentials'
+	| 'user-not-found'
+	| 'password and confirm password must match'
+	| 'unknown';
+
+export type AuthErrorCode = `${AuthField}:${AuthErrorType}`;
+
 //  Models
 export type CreateOAuthAccount = {
 	OAuthProvider: OAuthProvider;
@@ -17,6 +33,7 @@ export type CreateOAuthAccount = {
 	refresh_token?: string;
 	expires_at?: Date;
 };
+
 
 export interface OAuthAccount {
 	id: number;
@@ -174,8 +191,6 @@ export interface NoteTag {
 	created_at: Date;
 }
 
-
-
 export interface BreadcrumbItem {
 	title: string;
 	href: string;
@@ -193,6 +208,7 @@ export interface NavItem {
 	isActive?: boolean;
 	params?: string;
 }
+
 
 export interface SharedData {
 	name: string;
@@ -215,9 +231,10 @@ export const noteQueryKeys = {
 
 export type NoteAction =
 	| { type: 'SET_TITLE'; payload: string }
+	|{type:'SET_CONTENT'; payload:string}
 	| { type: 'TOGGLE_ARCHIVED' }
 	| { type: 'TOGGLE_TRASHED' }
-	| { type: 'TOGGLE_favorite' }
+	| { type: 'TOGGLE_FAVORITE' }
 	| { type: 'TOGGLE_PINNED' }
 	| { type: 'RESET' };
 
@@ -225,6 +242,6 @@ export type NotebookAction =
 	| { type: 'SET_TITLE'; payload: string }
 	| { type: 'TOGGLE_ARCHIVED' }
 	| { type: 'TOGGLE_TRASHED' }
-	| { type: 'TOGGLE_favorite' }
+	| { type: 'TOGGLE_FAVORITE' }
 	| { type: 'TOGGLE_PINNED' }
 	| { type: 'RESET' };

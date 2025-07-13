@@ -1,14 +1,31 @@
 import HeadingSmall from './heading-small';
-import { useDeleteUser } from './hooks/use-delete-user'; // <-- import your hook
+import { useDeleteUser } from './hooks/use-delete-user';
 import InputError from './input-error';
 import { Button } from './ui/button';
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from './ui/dialog';
+import {
+	Dialog,
+	DialogClose,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogTitle,
+	DialogTrigger,
+} from './ui/dialog';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 
 export default function DeleteUser() {
-	const { password, setPassword, processing, errors, passwordRef, submit, reset, clearErrors } = useDeleteUser({
-		url: '/api/profile', // your delete endpoint
+	const {
+		password,
+		setPassword,
+		processing,
+		errors,
+		passwordRef,
+		submit,
+		reset,
+		clearErrors,
+	} = useDeleteUser({
+		url: '/api/profile',
 		onSuccess: () => closeModal(),
 		onError: () => {},
 		onFinish: () => reset(),
@@ -21,7 +38,10 @@ export default function DeleteUser() {
 
 	return (
 		<div className="space-y-6">
-			<HeadingSmall title="Delete account" description="Delete your account and all of its resources" />
+			<HeadingSmall
+				title="Delete account"
+				description="Delete your account and all of its resources"
+			/>
 
 			<div className="space-y-4 rounded-lg border border-red-100 bg-red-50 p-4 dark:border-red-200/10 dark:bg-red-700/10">
 				<div className="text-red-600 dark:text-red-100">
@@ -36,7 +56,10 @@ export default function DeleteUser() {
 
 					<DialogContent>
 						<DialogTitle>Confirm account deletion</DialogTitle>
-						<DialogDescription>All data will be permanently deleted. Enter your password to proceed.</DialogDescription>
+						<DialogDescription>
+							All data will be permanently deleted. Enter your password to
+							proceed.
+						</DialogDescription>
 
 						<form className="space-y-6" onSubmit={submit}>
 							<div className="grid gap-2">
@@ -56,7 +79,9 @@ export default function DeleteUser() {
 								/>
 
 								{errors.password && <InputError message={errors.password} />}
-								{errors.form && <div className="text-red-600">{errors.form}</div>}
+								{errors.form && (
+									<div className="text-red-600">{errors.form}</div>
+								)}
 							</div>
 
 							<DialogFooter className="gap-2">
@@ -66,7 +91,11 @@ export default function DeleteUser() {
 									</Button>
 								</DialogClose>
 
-								<Button variant="destructive" disabled={processing} type="submit">
+								<Button
+									variant="destructive"
+									disabled={processing}
+									type="submit"
+								>
 									{processing ? 'Deleting…' : 'Delete account'}
 								</Button>
 							</DialogFooter>

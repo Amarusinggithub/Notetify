@@ -1,10 +1,4 @@
-import {
-	faStar,
-	faThumbTack,
-	faTrashCan,
-	faXmark,
-} from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
 import React, {
 	useCallback,
 	useEffect,
@@ -13,9 +7,9 @@ import React, {
 	useState,
 } from 'react';
 import { useNavigate } from 'react-router';
-import { type UserNote } from '../types/index.ts';
 import useMutateNote from '../hooks/use-mutate-note.tsx';
 import '../styles/NoteCard.css';
+import { type UserNote } from '../types/index.ts';
 import { isUserNote, userNoteReducer } from './../utils/helpers.ts';
 import NoteContentEditor from './Editor/components/note-content-editor.tsx';
 
@@ -123,7 +117,6 @@ const NoteCard = ({ note, route }: NoteCardProps) => {
 								}}
 								className="note-close-btn"
 							>
-								<FontAwesomeIcon icon={faXmark} className="note-close-icon" />
 							</button>
 						)}
 
@@ -135,10 +128,7 @@ const NoteCard = ({ note, route }: NoteCardProps) => {
 								}}
 								className="delete-note-btn"
 							>
-								<FontAwesomeIcon
-									icon={faTrashCan}
-									className="note-trash-icon"
-								/>
+
 							</button>
 						)}
 
@@ -152,7 +142,6 @@ const NoteCard = ({ note, route }: NoteCardProps) => {
 										}}
 										className="note-pin-btn"
 									>
-										<FontAwesomeIcon icon={faThumbTack} className="pin-icon" />
 									</button>
 
 									<button
@@ -162,7 +151,6 @@ const NoteCard = ({ note, route }: NoteCardProps) => {
 										}}
 										className="note-favorite-btn"
 									>
-										<FontAwesomeIcon icon={faStar} className="favorite-icon" />
 									</button>
 								</div>
 							)}

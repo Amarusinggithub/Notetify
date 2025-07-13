@@ -1,78 +1,145 @@
-// LoginPage.tsx
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router';
 import { useAuth } from '../../hooks/use-auth.tsx';
-import '../../styles/LoginForm.css';
-import { CreateUser } from '../../types/index.ts';
+import type { AuthField } from 'types';
+import InputError from '../../components/input-error';
+import TextLink from '../../components/text-link';
+import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
+import { Label } from '../../components/ui/label';
+import AuthLayout from '../../layouts/auth-layout';
+import { LoaderCircle } from 'lucide-react';
+import { Checkbox } from '../../components/ui/checkbox.tsx';
 
-const Login = () => {
-	const navigate = useNavigate();
-	const [state, setState] = useState<CreateUser>({
+type LoginForm = {
+	email: string;
+	password: string;
+	remember: boolean;
+};
+
+interface LoginProps {
+	status?: string;
+	canResetPassword: boolean;
+}
+
+const Login = ({ status, canResetPassword }: LoginProps) => {
+	const [form, setForm] = useState<LoginForm>({
 		email: '',
 		password: '',
+		remember: false,
 	});
-	const { handleLogin, isAuthenticated, isLoading } = useAuth();
+	const { Login, isLoading, errors } = useAuth();
 
-	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setState({ ...state, [e.target.name]: e.target.value.trim() });
+	const change = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setForm({ ...form, [e.target.name]: e.target.value.trim() });
 	};
 
-	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+	const submit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		await handleLogin(state);
+		await Login(form.email,form.password);
 	};
+
+	function getFieldError(field: AuthField): string | undefined {
+		if (!errors) return undefined;
+		const error = errors.find((err) => err.startsWith(`${field}:`));
+		return error ? error.split(':')[1] : undefined;
+	}
 
 	return (
-		<div className="login-container">
-			<form
-				className="login-form"
-				data-testid="cypress-Login-form"
-				onSubmit={handleSubmit}
-			>
-				<h1 data-testid="cypress-Login-title">Login</h1>
-				<div className="form-ui">
-					<div className="fields">
-						<label className="labels">Email</label>
-						<input
-							data-testid="cypress-Login-Email-input"
+		<AuthLayout
+			title="Log in to your account"
+			description="Enter your email and password below to log in"
+		>
+			<h1>Log in</h1>
+
+			<form className="flex flex-col gap-6" onSubmit={submit}>
+				<div className="grid gap-6">
+					<div className="grid gap-2">
+						<Label htmlFor="email">Email address</Label>
+						<Input
+							id="email"
 							type="email"
-							className="form-control"
+							required
+							autoFocus
+							tabIndex={1}
 							name="email"
-							value={state.email}
-							placeholder="Enter a valid email"
-							onChange={handleChange}
+							autoComplete="email"
+							value={form.email}
+							onChange={change}
+							placeholder="email@example.com"
 						/>
+						{getFieldError('email') && (
+							<InputError message={getFieldError('email')} className="mt-2" />
+						)}
 					</div>
 
-					<div className="fields">
-						<label className="labels">Password</label>
-						<input
-							data-testid="cypress-Login-Password-input"
+					<div className="grid gap-2">
+						<div className="flex items-center">
+							<Label htmlFor="password">Password</Label>
+							{canResetPassword && (
+								<TextLink
+									to={'/reset-password'}
+									className="ml-auto text-sm"
+									tabIndex={5}
+								>
+									Forgot password?
+								</TextLink>
+							)}
+						</div>
+						<Input
+							id="password"
 							type="password"
-							className="form-control"
+							required
+							tabIndex={2}
 							name="password"
-							value={state.password}
-							placeholder="Enter your password"
-							onChange={handleChange}
+							autoComplete="current-password"
+							value={form.password}
+							onChange={change}
+							placeholder="Password"
 						/>
+						{getFieldError('password') && (
+							<InputError
+								message={getFieldError('password')}
+								className="mt-2"
+							/>
+						)}
 					</div>
 
-					<button
-						data-testid="cypress-Login-btn"
-						className="form-btn"
+					<div className="flex items-center space-x-3">
+						<Checkbox
+							id="remember"
+							name="remember"
+							checked={form.remember}
+							onClick={() => setForm({ ...form, ['remember']: !form.remember })}
+							tabIndex={3}
+						/>
+						<Label htmlFor="remember">Remember me</Label>
+					</div>
+
+					<Button
 						type="submit"
+						className="mt-4 w-full"
+						tabIndex={4}
 						disabled={isLoading}
 					>
-						Login
-					</button>
+						{isLoading && <LoaderCircle className="h-4 w-4 animate-spin" />}
+						Log in
+					</Button>
+				</div>
 
-					<div>
-						<span className="no-account">Dont have an Account? </span>
-						<Link to="/register">Sign Up</Link>
-					</div>
+				<div className="text-muted-foreground text-center text-sm">
+					Don't have an account?{' '}
+					<TextLink to="/register" tabIndex={5}>
+						Sign up
+					</TextLink>
 				</div>
 			</form>
-		</div>
+
+			{status && (
+				<div className="mb-4 text-center text-sm font-medium text-green-600">
+					{status}
+				</div>
+			)}
+		</AuthLayout>
 	);
 };
 

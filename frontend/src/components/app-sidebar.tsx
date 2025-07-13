@@ -1,7 +1,15 @@
 import { Link } from 'react-router';
-import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from './ui/sidebar';
+import {
+	Sidebar,
+	SidebarContent,
+	SidebarFooter,
+	SidebarHeader,
+	SidebarMenu,
+	SidebarMenuButton,
+	SidebarMenuItem,
+} from './ui/sidebar';
 
-import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
+import { StarIcon, NotebookTextIcon, Trash2Icon,ArchiveIcon, BookOpen, Folder } from 'lucide-react';
 import { type NavItem } from '../types';
 import AppLogo from './app-logo';
 import { NavFooter } from './nav-footer';
@@ -12,22 +20,26 @@ const mainNavItems: NavItem[] = [
 	{
 		title: 'Notes',
 		href: '/',
-		icon: LayoutGrid,
+		icon: NotebookTextIcon,
+		params: 'is_trashed=False&is_archived=False',
 	},
 	{
 		title: 'Favorites',
 		href: '/favorite',
-		icon: LayoutGrid,
+		icon: StarIcon,
+		params: 'is_favorite=True&is_trashed=False&is_archived=False',
 	},
 	{
 		title: 'Archive',
 		href: '/archive',
-		icon: LayoutGrid,
+		icon: ArchiveIcon,
+		params: 'is_archived=True&is_trashed=False',
 	},
 	{
 		title: 'Trash',
 		href: '/trash',
-		icon: LayoutGrid,
+		icon: Trash2Icon,
+		params: 'is_trashed=True',
 	},
 ];
 
@@ -71,7 +83,6 @@ export function AppSidebar() {
 	);
 }
 
-
 /*import {
 	Sidebar,
 	SidebarContent,
@@ -102,8 +113,6 @@ export function AppSidebar() {
 		</Sidebar>
 	);
 }*/
-
-
 
 /*
 import { Calendar, Home, Inbox, Search, Settings } from 'lucide-react';
@@ -174,4 +183,3 @@ export function AppSidebar() {
 	);
 }
 */
-

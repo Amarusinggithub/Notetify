@@ -1,7 +1,14 @@
 import { Link } from 'react-router';
 import { type NavItem } from '../types';
 
-import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from './ui/sidebar';
+import {
+	SidebarGroup,
+	SidebarGroupLabel,
+	SidebarMenu,
+	SidebarMenuButton,
+	SidebarMenuItem,
+} from './ui/sidebar';
+import usePage from '../hooks/use-page';
 
 type NavMainProps = { items: NavItem[] };
 export function NavMain({ items = [] }: NavMainProps) {
@@ -12,7 +19,11 @@ export function NavMain({ items = [] }: NavMainProps) {
 			<SidebarMenu>
 				{items.map((item) => (
 					<SidebarMenuItem key={item.title}>
-						<SidebarMenuButton asChild isActive={page.url.startsWith(item.href)} tooltip={{ children: item.title }}>
+						<SidebarMenuButton
+							asChild
+							isActive={page.url.startsWith(item.href)}
+							tooltip={{ children: item.title }}
+						>
 							<Link to={item.href}>
 								{item.icon && <item.icon />}
 								<span>{item.title}</span>

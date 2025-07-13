@@ -6,12 +6,12 @@ import AuthProvider from './hooks/use-auth.tsx';
 import { NoteProvider } from './hooks/use-mutate-note.tsx';
 import { TagProvider } from './hooks/use-mutate-tag.tsx';
 import { SearchProvider } from './hooks/use-search-state.tsx';
-import { SideNavProvider } from './hooks/use-side-nav.tsx';
 import { ensureCSRFToken } from './lib/axios.ts';
-import ErrorFallback from './pages/error';
+import ErrorFallback from './pages/error.tsx';
 import AppRoutes from './routes/app-routes.tsx';
 
 ensureCSRFToken();
+
 // This will set light / dark mode on load...
 initializeTheme();
 
@@ -25,9 +25,7 @@ export default function App() {
 					<SearchProvider>
 						<NoteProvider>
 							<TagProvider>
-								<SideNavProvider>
 									<AppRoutes />
-								</SideNavProvider>
 							</TagProvider>
 						</NoteProvider>
 					</SearchProvider>

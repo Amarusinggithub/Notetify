@@ -1,4 +1,4 @@
-import { type CreateNote,type NoteAction, type UserNote } from '../types';
+import { type CreateNote, type NoteAction, type UserNote } from '../types';
 
 // Type guard to distinguish between UserNote and UserNoteData.
 export const isUserNote = (note: UserNote | CreateNote): note is UserNote => {
@@ -28,11 +28,11 @@ export function createNoteReducer(state: CreateNote, action: NoteAction) {
 			};
 		case 'TOGGLE_ARCHIVED':
 			return { ...state, is_archived: !state.is_archived };
-		case 'TOGGLE_ARCHIVED':
+		case 'TOGGLE_PINNED':
 			return { ...state, is_pinned: !state.is_pinned };
-		case 'TOGGLE_ARCHIVED':
+		case 'TOGGLE_FAVORITE':
 			return { ...state, is_favorite: !state.is_favorite };
-		case 'TOGGLE_ARCHIVED':
+		case 'TOGGLE_TRASHED':
 			return { ...state, is_trashed: !state.is_trashed };
 		case 'RESET':
 			return initialNoteState;
@@ -55,11 +55,11 @@ export function userNoteReducer(state: UserNote, action: NoteAction) {
 			};
 		case 'TOGGLE_ARCHIVED':
 			return { ...state, is_archived: !state.is_archived };
-		case 'TOGGLE_ARCHIVED':
+		case 'TOGGLE_PINNED':
 			return { ...state, is_pinned: !state.is_pinned };
-		case 'TOGGLE_ARCHIVED':
+		case 'TOGGLE_FAVORITE':
 			return { ...state, is_favorite: !state.is_favorite };
-		case 'TOGGLE_ARCHIVED':
+		case 'TOGGLE_TRASHED':
 			return { ...state, is_trashed: !state.is_trashed };
 		default:
 			return state;
