@@ -48,14 +48,14 @@ class MyUserAdmin(UserAdmin):
 
         return form
 
-    list_display = ("email", "username", "date_joined")
-    search_fields = ("email", "username", "date_joined")
+    list_display = ("email", "username","last_name","first_name" ,"date_joined")
+    search_fields = ("email", "username", "last_name", "first_name" ,"date_joined")
     ordering = ("date_joined",)
     readonly_fields = ["date_joined"]
 
     fieldsets = (
         (None, {"fields": ("email", "password")}),
-        ("Personal info", {"fields": ("username",)}),
+        ("Personal info", {"fields": ("username", "last_name", "first_name")}),
         ("Permissions", {"fields": ("is_superuser", "groups", "user_permissions")}),
     )
 
@@ -64,7 +64,13 @@ class MyUserAdmin(UserAdmin):
             None,
             {
                 "classes": ("wide",),
-                "fields": ("email", "username", "password1", "password2"),
+                "fields": (
+                    "email",
+                    "username",
+                    "last_name",
+                    "first_name" ,"password1",
+                    "password2",
+                ),
             },
         ),
     )

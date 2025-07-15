@@ -1,13 +1,14 @@
+import { LoaderCircle } from 'lucide-react';
 import React, { useState } from 'react';
-import { useAuth } from '../../hooks/use-auth.tsx';
 import type { AuthField } from 'types';
 import InputError from '../../components/input-error';
 import TextLink from '../../components/text-link';
-import { Button } from '../../components/ui/button';
+import { Button } from '../../components/ui/button.tsx';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
+import { useAuth } from '../../hooks/use-auth.tsx';
 import AuthLayout from '../../layouts/auth-layout';
-import { LoaderCircle } from 'lucide-react';
+import { registerSchema } from '../../utils/validators.ts';
 
 type RegisterForm = {
 	firstName: string;
@@ -24,11 +25,9 @@ const Register = () => {
 		firstName: '',
 		lastName: '',
 		confirmPassword: '',
-
 	});
 
-
-	const { SignUp, isLoading,errors } = useAuth();
+	const { SignUp, isLoading, errors,setErrors } = useAuth();
 
 	function change(e: React.ChangeEvent<HTMLInputElement>) {
 		setForm({ ...form, [e.target.name]: e.target.value.trim() });
@@ -37,23 +36,33 @@ const Register = () => {
 	async function submit(e: React.FormEvent<HTMLFormElement>) {
 		e.preventDefault();
 
-		if (form.password !== form.confirmPassword) {
-			console.log('Passwords do not match');
-			return;
-		}
+        setErrors(null);
 
-		await SignUp(form.firstName,form.lastName,form.email,form.password,form.confirmPassword);
+				const validationResult = registerSchema.safeParse(form);
+
+
+
+		await SignUp(
+			form.firstName,
+			form.lastName,
+			form.email,
+			form.password,
+		);
 	}
 
-    	function getFieldError(field: AuthField): string | undefined {
-				if (!errors) return undefined;
-				const error = errors.find((err) => err.startsWith(`${field}:`));
-				return error ? error.split(':')[1] : undefined;
-			}
+	function getFieldError(field: AuthField): string | undefined {
+		if (!Array.isArray(errors)) return undefined;
+		const error = (errors as string[]).find((err) =>
+			err.startsWith(`${field}:`),
+		);
+		return error?.split(':')[1];
+	}
 
 	return (
-		<AuthLayout title="Create an account" description="Enter your details below to create your account">
-			<h1>Register</h1>
+		<AuthLayout
+			title="Create an account"
+			description="Enter your details below to create your account"
+		>
 			<form className="flex flex-col gap-6" onSubmit={(e) => submit(e)}>
 				<div className="grid gap-6">
 					<div className="grid gap-2">
@@ -71,7 +80,12 @@ const Register = () => {
 							disabled={isLoading}
 							placeholder="first name"
 						/>
-						{getFieldError('firstName') && <InputError message={getFieldError('firstName')} className="mt-2" />}
+						{getFieldError('firstName') && (
+							<InputError
+								message={getFieldError('firstName')}
+								className="mt-2"
+							/>
+						)}
 					</div>
 					<div className="grid gap-2">
 						<Label htmlFor="last-name">Last Name</Label>
@@ -88,7 +102,12 @@ const Register = () => {
 							disabled={isLoading}
 							placeholder="last name"
 						/>
-						{getFieldError('lastName') && <InputError message={getFieldError('lastName')} className="mt-2" />}
+						{getFieldError('lastName') && (
+							<InputError
+								message={getFieldError('lastName')}
+								className="mt-2"
+							/>
+						)}
 					</div>
 
 					<div className="grid gap-2">
@@ -105,7 +124,9 @@ const Register = () => {
 							disabled={isLoading}
 							placeholder="email@example.com"
 						/>
-						{getFieldError('email') && <InputError message={getFieldError('email')} className="mt-2" />}
+						{getFieldError('email') && (
+							<InputError message={getFieldError('email')} className="mt-2" />
+						)}
 					</div>
 
 					<div className="grid gap-2">
@@ -122,7 +143,12 @@ const Register = () => {
 							disabled={isLoading}
 							placeholder="Password"
 						/>
-						{getFieldError('password') && <InputError message={getFieldError('password')} className="mt-2" />}
+						{getFieldError('password') && (
+							<InputError
+								message={getFieldError('password')}
+								className="mt-2"
+							/>
+						)}
 					</div>
 
 					<div className="grid gap-2">
@@ -139,10 +165,20 @@ const Register = () => {
 							disabled={isLoading}
 							placeholder="Confirm password"
 						/>
-						{getFieldError('confirmPassword') && <InputError message={getFieldError('confirmPassword')} className="mt-2" />}
+						{getFieldError('confirmPassword') && (
+							<InputError
+								message={getFieldError('confirmPassword')}
+								className="mt-2"
+							/>
+						)}
 					</div>
 
-					<Button type="submit" className="mt-2 w-full" tabIndex={5} disabled={isLoading}>
+					<Button
+						type="submit"
+						className="mt-2 w-full"
+						tabIndex={5}
+						disabled={isLoading}
+					>
 						{isLoading && <LoaderCircle className="h-4 w-4 animate-spin" />}
 						Create account
 					</Button>

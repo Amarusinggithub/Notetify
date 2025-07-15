@@ -1,3 +1,3 @@
 export default function Welcome() {
-	return <></>;
+	return <><h1>Hello world</h1></>;
 }

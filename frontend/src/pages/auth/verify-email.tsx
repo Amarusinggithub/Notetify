@@ -2,8 +2,8 @@ import { LoaderCircle } from 'lucide-react';
 import { type FormEventHandler } from 'react';
 
 import TextLink from '../../components/text-link';
-import { Button } from '../../components/ui/button';
-import useAuth from '../../hooks/use-auth';
+import { Button } from '../../components/ui/button.tsx';
+import { useAuth } from '../../hooks/use-auth.tsx';
 import AuthLayout from '../../layouts/auth-layout';
 
 interface VerifyEmailProps {
@@ -17,12 +17,14 @@ export default function VerifyEmail({ status }: VerifyEmailProps) {
 	};
 
 	return (
-		<AuthLayout title="Verify email" description="Please verify your email address by clicking on the link we just emailed to you.">
-			<h1 title="Email verification" />
-
+		<AuthLayout
+			title="Verify email"
+			description="Please verify your email address by clicking on the link we just emailed to you."
+		>
 			{status === 'verification-link-sent' && (
 				<div className="mb-4 text-center text-sm font-medium text-green-600">
-					A new verification link has been sent to the email address you provided during registration.
+					A new verification link has been sent to the email address you
+					provided during registration.
 				</div>
 			)}
 

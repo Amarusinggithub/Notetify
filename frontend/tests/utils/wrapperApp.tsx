@@ -14,9 +14,7 @@ const Wrapper = ({ component }: WrapperProps) => {
 		<QueryClientProvider client={queryClient}>
 			<AuthProvider>
 				<NoteProvider>
-					<TagProvider>
-						{component}
-					</TagProvider>
+					<TagProvider>{component}</TagProvider>
 				</NoteProvider>
 			</AuthProvider>
 		</QueryClientProvider>

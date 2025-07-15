@@ -7,8 +7,10 @@ interface AppLayoutProps {
 	breadcrumbs?: BreadcrumbItem[];
 }
 
-export default AppLayout = ({ children, breadcrumbs, ...props }: AppLayoutProps) => (
+const AppLayout = ({ children, breadcrumbs, ...props }: AppLayoutProps) => (
 	<AppLayoutTemplate breadcrumbs={breadcrumbs} {...props}>
 		{children}
 	</AppLayoutTemplate>
 );
+
+export default AppLayout;

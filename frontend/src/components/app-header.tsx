@@ -1,7 +1,7 @@
 import { BookOpen, Folder, LayoutGrid, Menu, Search } from 'lucide-react';
 import { Link } from 'react-router';
 import { useInitials } from '../hooks/use-initials';
-import { type BreadcrumbItem, type NavItem,  } from '../types';
+import { type BreadcrumbItem, type NavItem } from '../types';
 
 import { cn } from '../lib/utils';
 import AppLogo from './app-logo';
@@ -16,6 +16,14 @@ import {
 	DropdownMenuTrigger,
 } from './ui/dropdown-menu';
 
+import useAuth from 'hooks/use-auth';
+import usePage from 'hooks/use-page';
+import {
+	NavigationMenu,
+	NavigationMenuItem,
+	NavigationMenuList,
+	navigationMenuTriggerStyle,
+} from './ui/navigation-menu';
 import {
 	Sheet,
 	SheetContent,
@@ -30,9 +38,6 @@ import {
 	TooltipTrigger,
 } from './ui/tooltip';
 import { UserMenuContent } from './user-menu-content';
-import usePage from 'hooks/use-page';
-import { NavigationMenu, NavigationMenuItem, NavigationMenuList, navigationMenuTriggerStyle } from './ui/navigation-menu';
-import useAuth from 'hooks/use-auth';
 
 const mainNavItems: NavItem[] = [
 	{
@@ -63,9 +68,9 @@ interface AppHeaderProps {
 }
 
 export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
-	const {sharedData} = useAuth();
+	const { sharedData } = useAuth();
 	const { auth } = sharedData;
-    const page=usePage();
+	const page = usePage();
 	const getInitials = useInitials();
 	return (
 		<>

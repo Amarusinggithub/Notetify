@@ -10,6 +10,7 @@ import axiosInstance from '../lib/axios.ts';
 import {
 	type AuthErrorCode,
 	type SharedData,
+	type User,
 	USERDATA_STORAGE_KEY,
 } from './../types';
 
@@ -20,17 +21,16 @@ interface AuthContextType {
 		lastName: string,
 		email: string,
 		password: string,
-		confirmPassword: string,
 	) => void;
 	Login: (email: string, password: string) => void;
 	Logout: () => void;
+	PasswordReset: (token: string | undefined, password: string) => void;
+	ForgotPassword: (email: string) => void;
 	setLoading: React.Dispatch<React.SetStateAction<boolean>>;
-	setError: React.Dispatch<React.SetStateAction<AuthErrorCode[] | null>>;
-	setUserData: React.Dispatch<any>;
+	setErrors: React.Dispatch<React.SetStateAction<AuthErrorCode[] | null>>;
 	setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
-	setSharedData: React.Dispatch<React.SetStateAction<SharedData | undefined>>;
-	sharedData: SharedData | undefined;
-	userData: any;
+	setSharedData: React.Dispatch<React.SetStateAction<SharedData | null>>;
+	sharedData: SharedData | null;
 	errors: AuthErrorCode[] | null;
 	isLoading: boolean;
 	isAuthenticated: boolean;
@@ -43,19 +43,25 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 	const [isLoading, setLoading] = useState<boolean>(false);
 	const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 	const [checkingAuth, setCheckingAuth] = useState<boolean>(true);
-	const [userData, setUserData] = useState<any>(null);
-	const [errors, setError] = useState<AuthErrorCode[] | null>(null);
-	const [sharedData, setSharedData] = useState<SharedData | undefined>();
+	const [errors, setErrors] = useState<AuthErrorCode[] | null>(null);
+	const [sharedData, setSharedData] = useState<SharedData | null>(null);
 
-	const setAuth = (userData: any) => {
+	const setAuth = (apiReponse: User) => {
+		const user = apiReponse;
+		const shared: SharedData = {
+			auth: { user },
+			name: `${user.first_name} ${user.last_name}`,
+			quote: { message: '', author: '' },
+			sidebarOpen: false,
+		};
 		setIsAuthenticated(true);
-		setUserData(userData);
-		localStorage.setItem(USERDATA_STORAGE_KEY, JSON.stringify(userData));
+		setSharedData(shared);
+
+		localStorage.setItem(USERDATA_STORAGE_KEY, JSON.stringify(shared));
 	};
 
 	const setNotAuth = () => {
 		setIsAuthenticated(false);
-		setUserData(null);
 		localStorage.removeItem(USERDATA_STORAGE_KEY);
 	};
 
@@ -64,32 +70,10 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 		lastName: string,
 		email: string,
 		password: string,
-		confirmPassword: string,
 	) {
 		try {
 			setLoading(true);
-			setError(null);
-			const tempErrors: AuthErrorCode[] = [];
-
-			if (!firstName.trim())
-				tempErrors.push('firstName:This field cannot be empty');
-			if (!lastName.trim())
-				tempErrors.push('lastName:This field cannot be empty');
-			if (!email.trim()) tempErrors.push('email:This field cannot be empty');
-			if (!password.trim())
-				tempErrors.push('password:This field cannot be empty');
-			if (!confirmPassword.trim())
-				tempErrors.push('confirmPassword:This field cannot be empty');
-			if (password && confirmPassword && password !== confirmPassword) {
-				tempErrors.push(
-					'confirmPassword:password and confirm password must match',
-				);
-			}
-
-			if (tempErrors.length > 0) {
-				setError(tempErrors);
-				return;
-			}
+			setErrors(null);
 
 			const response = await axiosInstance.post('register/', {
 				first_name: firstName,
@@ -104,11 +88,8 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 				console.error('Signup failed');
 			}
 		} catch (error: any) {
-			console.error(
-				'Signup error:',
-				error.response ? error.response.data : error.message,
-			);
-			throw error;
+			console.error('Sign Up error:', error);
+			setErrors(['auth:unknown']);
 		} finally {
 			setLoading(false);
 		}
@@ -117,17 +98,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 	async function Login(email: string, password: string) {
 		try {
 			setLoading(true);
-			setError(null);
-			const tempErrors: AuthErrorCode[] = [];
-
-			if (!email.trim()) tempErrors.push('email:This field cannot be empty');
-			if (!password.trim())
-				tempErrors.push('password:This field cannot be empty');
-
-			if (tempErrors.length > 0) {
-				setError(tempErrors);
-				return;
-			}
+			setErrors(null);
 
 			const response = await axiosInstance.post('login/', {
 				email: email,
@@ -140,11 +111,48 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 				console.error('Login failed');
 			}
 		} catch (error: any) {
-			console.error(
-				'Login error:',
-				error.response ? error.response.data : error.message,
-			);
-			throw error;
+			console.error('Login error:', error);
+			setErrors(['auth:unknown']);
+		} finally {
+			setLoading(false);
+		}
+	}
+	async function PasswordReset(token: string | undefined, password: string) {
+		try {
+			setLoading(true);
+			setErrors(null);
+
+			const response = await axiosInstance.post('password_reset/confirm/', {
+				password: password,
+				token: token,
+			});
+
+			if (response.status >= 200 && response.status < 300) {
+				setAuth(response.data);
+			} else {
+				console.error('Login failed');
+			}
+		} catch (error: any) {
+			console.error('Login error:', error);
+			setErrors(['auth:unknown']);
+		} finally {
+			setLoading(false);
+		}
+	}
+
+	async function ForgotPassword(email: string) {
+		try {
+			setLoading(true);
+			setErrors(null);
+
+			const response = await axiosInstance.post('password_reset/', {
+				email: email,
+			});
+
+			return response.data.token;
+		} catch (error: any) {
+			console.error('PasswordResetRequest error:', error);
+			setErrors(['auth:unknown']);
 		} finally {
 			setLoading(false);
 		}
@@ -153,7 +161,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 	async function Logout() {
 		try {
 			setLoading(true);
-			setError(null);
+			setErrors(null);
 			const response = await axiosInstance.post('logout/');
 			return response;
 		} catch (error: any) {
@@ -177,7 +185,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 				setNotAuth();
 			}
 		} catch (e: any) {
-			setError(e);
+			setErrors(e);
 			console.error(e);
 			setNotAuth();
 		} finally {
@@ -188,7 +196,10 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 	useEffect(() => {
 		const cached = localStorage.getItem(USERDATA_STORAGE_KEY);
 
-		if (cached) setAuth(JSON.parse(cached));
+		if (cached) {
+			setSharedData(JSON.parse(cached) as SharedData);
+			setIsAuthenticated(true);
+		}
 		confirmAuth();
 	}, [confirmAuth]);
 
@@ -198,13 +209,14 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 				SignUp,
 				Login,
 				Logout,
-				setError,
+				setErrors: setErrors,
 				setIsAuthenticated,
 				setLoading,
-				setUserData,
-sharedData			,	setSharedData,
+				ForgotPassword,
+				PasswordReset,
+				sharedData,
+				setSharedData,
 				checkingAuth,
-				userData,
 				errors,
 				isLoading,
 				isAuthenticated,

@@ -1,4 +1,3 @@
-
 import React, {
 	useCallback,
 	useEffect,
@@ -116,8 +115,7 @@ const NoteCard = ({ note, route }: NoteCardProps) => {
 									handleSelect(e);
 								}}
 								className="note-close-btn"
-							>
-							</button>
+							></button>
 						)}
 
 						{noteState.is_trashed && (
@@ -127,9 +125,7 @@ const NoteCard = ({ note, route }: NoteCardProps) => {
 									handleDeleteNote(e);
 								}}
 								className="delete-note-btn"
-							>
-
-							</button>
+							></button>
 						)}
 
 						{noteState.is_archived == false &&
@@ -141,8 +137,7 @@ const NoteCard = ({ note, route }: NoteCardProps) => {
 											handlePin(note);
 										}}
 										className="note-pin-btn"
-									>
-									</button>
+									></button>
 
 									<button
 										onClick={(e) => {
@@ -150,8 +145,7 @@ const NoteCard = ({ note, route }: NoteCardProps) => {
 											handleFavorite(note);
 										}}
 										className="note-favorite-btn"
-									>
-									</button>
+									></button>
 								</div>
 							)}
 					</div>

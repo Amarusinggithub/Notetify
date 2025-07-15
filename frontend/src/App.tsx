@@ -9,6 +9,7 @@ import { SearchProvider } from './hooks/use-search-state.tsx';
 import { ensureCSRFToken } from './lib/axios.ts';
 import ErrorFallback from './pages/error.tsx';
 import AppRoutes from './routes/app-routes.tsx';
+import { PageProvider } from './hooks/use-page.tsx';
 
 ensureCSRFToken();
 
@@ -22,13 +23,15 @@ export default function App() {
 		<ErrorBoundary FallbackComponent={ErrorFallback}>
 			<QueryClientProvider client={queryClient}>
 				<AuthProvider>
-					<SearchProvider>
-						<NoteProvider>
-							<TagProvider>
+					<PageProvider>
+						<SearchProvider>
+							<NoteProvider>
+								<TagProvider>
 									<AppRoutes />
-							</TagProvider>
-						</NoteProvider>
-					</SearchProvider>
+								</TagProvider>
+							</NoteProvider>
+						</SearchProvider>
+					</PageProvider>
 				</AuthProvider>
 			</QueryClientProvider>
 		</ErrorBoundary>

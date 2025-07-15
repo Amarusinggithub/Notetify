@@ -49,6 +49,18 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 30,
 }
 
+DJANGO_REST_PASSWORDRESET_TOKEN_CONFIG = {
+    "CLASS": "django_rest_passwordreset.tokens.RandomStringTokenGenerator",
+    "OPTIONS": {"min_length": 20, "max_length": 30},
+}
+
+
+AUTHENTICATION_BACKENDS = [
+    # 'users.authback.EmailBackend',
+    "django.contrib.auth.backends.ModelBackend",  # this line fixed my problem
+]
+
+DJANGO_REST_MULTITOKENAUTH_RESET_TOKEN_EXPIRY_TIME=24
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
@@ -102,10 +114,13 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "rest_framework_simplejwt.token_blacklist",
+    "django_rest_passwordreset",
     "corsheaders",
     "django_otp",
     "django_otp.plugins.otp_static",
     "django_otp.plugins.otp_totp",
+    "two_factor",
+    "two_factor.plugins.phonenumber",
     "silk",
 ]
 
@@ -158,7 +173,7 @@ ROOT_URLCONF = "backend.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -290,6 +305,17 @@ JAZZMIN_SETTINGS = {
     "show_sidebar": True,  # Show sidebar in the admin interface
     "hide_apps": [],  # Hide specific apps from the admin sidebar
 }
+
+# THE EMAIL SETTINGS
+EMAIL_BACKEND = os.environ.get(
+    "EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend"
+)
+EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp.gmail.com")
+EMAIL_PORT = os.environ.get("EMAIL_PORT", 587)
+EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", True)
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL","Notetify")
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "myemailadress@email.com")
+EMAIL_HOST_PASSWORD = os.environ.get("REDISEMAIL_HOST_PASSWORD_PORT", "apppassword")
 
 
 MEDIA_URL =   "/media/"

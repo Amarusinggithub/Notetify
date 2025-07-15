@@ -4,10 +4,10 @@ import { useState, type FormEventHandler } from 'react';
 
 import type { AuthField } from 'types';
 import InputError from '../../components/input-error';
-import { Button } from '../../components/ui/button';
+import { Button } from '../../components/ui/button.tsx';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
-import useAuth from '../../hooks/use-auth';
+import { useAuth } from '../../hooks/use-auth.tsx';
 import AuthLayout from '../../layouts/auth-layout';
 
 type ConfirmPasswordType = { password: string };
@@ -16,16 +16,19 @@ export default function ConfirmPassword() {
 	const [form, setForm] = useState<ConfirmPasswordType>({
 		password: '',
 	});
-	const { isLoading, errors } = useAuth();
+	const { isLoading,setErrors, errors } = useAuth();
 
 	const submit: FormEventHandler = (e) => {
 		e.preventDefault();
+		setErrors(null);
 	};
 
 	function getFieldError(field: AuthField): string | undefined {
-		if (!errors) return undefined;
-		const error = errors.find((err) => err.startsWith(`${field}:`));
-		return error ? error.split(':')[1] : undefined;
+		if (!Array.isArray(errors)) return undefined;
+		const error = (errors as string[]).find((err) =>
+			err.startsWith(`${field}:`),
+		);
+		return error?.split(':')[1];
 	}
 
 	function change(e: React.ChangeEvent<HTMLInputElement>) {
@@ -33,8 +36,10 @@ export default function ConfirmPassword() {
 	}
 
 	return (
-		<AuthLayout title="Confirm your password" description="This is a secure area of the application. Please confirm your password before continuing.">
-			<h1>Confirm password</h1>
+		<AuthLayout
+			title="Confirm your password"
+			description="This is a secure area of the application. Please confirm your password before continuing."
+		>
 
 			<form onSubmit={submit}>
 				<div className="space-y-6">
@@ -51,7 +56,12 @@ export default function ConfirmPassword() {
 							onChange={change}
 						/>
 
-						{getFieldError('password') && <InputError message={getFieldError('password')} className="mt-2" />}
+						{getFieldError('password') && (
+							<InputError
+								message={getFieldError('password')}
+								className="mt-2"
+							/>
+						)}
 					</div>
 
 					<div className="flex items-center">

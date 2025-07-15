@@ -1,6 +1,7 @@
 import { Link } from 'react-router';
 import { type NavItem } from '../types';
 
+import usePage from '../hooks/use-page';
 import {
 	SidebarGroup,
 	SidebarGroupLabel,
@@ -8,7 +9,6 @@ import {
 	SidebarMenuButton,
 	SidebarMenuItem,
 } from './ui/sidebar';
-import usePage from '../hooks/use-page';
 
 type NavMainProps = { items: NavItem[] };
 export function NavMain({ items = [] }: NavMainProps) {

@@ -9,7 +9,14 @@ import {
 	SidebarMenuItem,
 } from './ui/sidebar';
 
-import { StarIcon, NotebookTextIcon, Trash2Icon,ArchiveIcon, BookOpen, Folder } from 'lucide-react';
+import {
+	ArchiveIcon,
+	BookOpen,
+	Folder,
+	NotebookTextIcon,
+	StarIcon,
+	Trash2Icon,
+} from 'lucide-react';
 import { type NavItem } from '../types';
 import AppLogo from './app-logo';
 import { NavFooter } from './nav-footer';

@@ -34,7 +34,6 @@ export type CreateOAuthAccount = {
 	expires_at?: Date;
 };
 
-
 export interface OAuthAccount {
 	id: number;
 	user: number;
@@ -60,6 +59,18 @@ export interface User extends Omit<CreateUser, 'password'> {
 	updated_at: Date;
 	is_active: boolean;
 }
+export interface SharedData {
+	name: string;
+	quote: { message: string; author: string };
+	auth: Auth;
+	sidebarOpen: boolean;
+	[key: string]: unknown;
+}
+
+export interface Auth {
+	user: User;
+}
+
 
 export type CreateTag = {
 	tag_data: {
@@ -210,18 +221,6 @@ export interface NavItem {
 }
 
 
-export interface SharedData {
-	name: string;
-	quote: { message: string; author: string };
-	auth: Auth;
-	sidebarOpen: boolean;
-	[key: string]: unknown;
-}
-
-export interface Auth {
-	user: User;
-}
-
 export const noteQueryKeys = {
 	all: ['notes'] as const,
 	lists: () => [...noteQueryKeys.all, 'lists'] as const,
@@ -231,7 +230,7 @@ export const noteQueryKeys = {
 
 export type NoteAction =
 	| { type: 'SET_TITLE'; payload: string }
-	|{type:'SET_CONTENT'; payload:string}
+	| { type: 'SET_CONTENT'; payload: string }
 	| { type: 'TOGGLE_ARCHIVED' }
 	| { type: 'TOGGLE_TRASHED' }
 	| { type: 'TOGGLE_FAVORITE' }

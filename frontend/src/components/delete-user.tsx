@@ -26,9 +26,6 @@ export default function DeleteUser() {
 		clearErrors,
 	} = useDeleteUser({
 		url: '/api/profile',
-		onSuccess: () => closeModal(),
-		onError: () => {},
-		onFinish: () => reset(),
 	});
 
 	const closeModal = () => {

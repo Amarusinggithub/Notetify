@@ -15,7 +15,6 @@ import {
 } from './ui/sidebar';
 import { UserInfo } from './user-info';
 import { UserMenuContent } from './user-menu-content';
-import { SharedData } from './../types/index';
 
 export function NavUser() {
 	const { sharedData } = useAuth();
