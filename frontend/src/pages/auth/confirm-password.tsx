@@ -2,13 +2,13 @@
 import { LoaderCircle } from 'lucide-react';
 import { useState, type FormEventHandler } from 'react';
 
-import type { AuthField } from 'types';
 import InputError from '../../components/input-error';
 import { Button } from '../../components/ui/button.tsx';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { useAuth } from '../../hooks/use-auth.tsx';
 import AuthLayout from '../../layouts/auth-layout';
+import { confirmPasswordSchema } from '../../utils/validators.ts';
 
 type ConfirmPasswordType = { password: string };
 
@@ -16,20 +16,21 @@ export default function ConfirmPassword() {
 	const [form, setForm] = useState<ConfirmPasswordType>({
 		password: '',
 	});
-	const { isLoading,setErrors, errors } = useAuth();
+	const { isLoading, setErrors, errors, ConfirmPassword } = useAuth();
 
-	const submit: FormEventHandler = (e) => {
+	const submit: FormEventHandler = async (e) => {
 		e.preventDefault();
 		setErrors(null);
-	};
 
-	function getFieldError(field: AuthField): string | undefined {
-		if (!Array.isArray(errors)) return undefined;
-		const error = (errors as string[]).find((err) =>
-			err.startsWith(`${field}:`),
-		);
-		return error?.split(':')[1];
-	}
+		const validationResult = confirmPasswordSchema.safeParse(form);
+
+		if (!validationResult.success) {
+			const formattedErrors = validationResult.error.flatten().fieldErrors;
+			setErrors(formattedErrors);
+			return;
+		}
+		await ConfirmPassword(form.password);
+	};
 
 	function change(e: React.ChangeEvent<HTMLInputElement>) {
 		setForm({ ...form, [e.target.name]: e.target.value.trim() });
@@ -40,7 +41,6 @@ export default function ConfirmPassword() {
 			title="Confirm your password"
 			description="This is a secure area of the application. Please confirm your password before continuing."
 		>
-
 			<form onSubmit={submit}>
 				<div className="space-y-6">
 					<div className="grid gap-2">
@@ -56,11 +56,8 @@ export default function ConfirmPassword() {
 							onChange={change}
 						/>
 
-						{getFieldError('password') && (
-							<InputError
-								message={getFieldError('password')}
-								className="mt-2"
-							/>
+						{errors!.password && (
+							<InputError message={errors.password[0]} className="mt-2" />
 						)}
 					</div>
 

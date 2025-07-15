@@ -7,12 +7,7 @@ import React, {
 	useState,
 } from 'react';
 import axiosInstance from '../lib/axios.ts';
-import {
-	type AuthErrorCode,
-	type SharedData,
-	type User,
-	USERDATA_STORAGE_KEY,
-} from './../types';
+import { type SharedData, type User, USERDATA_STORAGE_KEY } from './../types';
 
 type AuthProviderProps = PropsWithChildren;
 interface AuthContextType {
@@ -26,12 +21,15 @@ interface AuthContextType {
 	Logout: () => void;
 	PasswordReset: (token: string | undefined, password: string) => void;
 	ForgotPassword: (email: string) => void;
+	VerifyEmail: (email: string) => void;
+	ConfirmPassword: (password: string) => void;
+
 	setLoading: React.Dispatch<React.SetStateAction<boolean>>;
-	setErrors: React.Dispatch<React.SetStateAction<AuthErrorCode[] | null>>;
+	setErrors: React.Dispatch<React.SetStateAction<any | null>>;
 	setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
 	setSharedData: React.Dispatch<React.SetStateAction<SharedData | null>>;
 	sharedData: SharedData | null;
-	errors: AuthErrorCode[] | null;
+	errors: any | null;
 	isLoading: boolean;
 	isAuthenticated: boolean;
 	checkingAuth: boolean;
@@ -43,7 +41,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 	const [isLoading, setLoading] = useState<boolean>(false);
 	const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 	const [checkingAuth, setCheckingAuth] = useState<boolean>(true);
-	const [errors, setErrors] = useState<AuthErrorCode[] | null>(null);
+	const [errors, setErrors] = useState<any | null>(null);
 	const [sharedData, setSharedData] = useState<SharedData | null>(null);
 
 	const setAuth = (apiReponse: User) => {
@@ -117,6 +115,28 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 			setLoading(false);
 		}
 	}
+
+	async function ConfirmPassword(password: string) {
+		try {
+			setLoading(true);
+			setErrors(null);
+
+			const response = await axiosInstance.post('confirm_password/', {
+				password: password,
+			});
+
+			if (response.status >= 200 && response.status < 300) {
+				setAuth(response.data);
+			} else {
+				console.error('Login failed');
+			}
+		} catch (error: any) {
+			console.error('Login error:', error);
+			setErrors(['auth:unknown']);
+		} finally {
+			setLoading(false);
+		}
+	}
 	async function PasswordReset(token: string | undefined, password: string) {
 		try {
 			setLoading(true);
@@ -158,6 +178,24 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 		}
 	}
 
+	async function VerifyEmail(email: string) {
+		try {
+			setLoading(true);
+			setErrors(null);
+
+			const response = await axiosInstance.post('verify_email/', {
+				email: email,
+			});
+
+			return response.data.token;
+		} catch (error: any) {
+			console.error('PasswordResetRequest error:', error);
+			setErrors(['auth:unknown']);
+		} finally {
+			setLoading(false);
+		}
+	}
+
 	async function Logout() {
 		try {
 			setLoading(true);
@@ -178,7 +216,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
 	const confirmAuth = useCallback(async () => {
 		try {
-			const response = await verifyAuth();
+			const response = await axiosInstance.get('auth/me/');
 			if (response.status >= 200 && response.status < 300) {
 				setAuth(response.data);
 			} else {
@@ -213,9 +251,11 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 				setIsAuthenticated,
 				setLoading,
 				ForgotPassword,
+				VerifyEmail,
+				ConfirmPassword,
 				PasswordReset,
-				sharedData,
 				setSharedData,
+				sharedData,
 				checkingAuth,
 				errors,
 				isLoading,
@@ -235,9 +275,4 @@ export const useAuth = () => {
 		throw new Error('useAuth must be used within AuthProvider');
 	}
 	return context;
-};
-
-export const verifyAuth = async () => {
-	const response = await axiosInstance.get('auth/me/');
-	return response;
 };

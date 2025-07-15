@@ -1,13 +1,13 @@
 import { LoaderCircle } from 'lucide-react';
 import { type FormEventHandler, useState } from 'react';
 import { useParams } from 'react-router';
-import type { AuthField } from 'types';
 import InputError from '../../components/input-error';
 import { Button } from '../../components/ui/button.tsx';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { useAuth } from '../../hooks/use-auth.tsx';
 import AuthLayout from '../../layouts/auth-layout';
+import { resetPasswordSchema } from '../../utils/validators.ts';
 
 type ResetPasswordForm = {
 	password: string;
@@ -22,20 +22,21 @@ export default function ResetPassword() {
 		confirmPassword: '',
 	});
 
-	const { isLoading, errors,PasswordReset } = useAuth();
+	const { isLoading, errors, PasswordReset, setErrors } = useAuth();
 
 	const submit: FormEventHandler = async (e) => {
 		e.preventDefault();
-await PasswordReset(token, form.password, form.confirmPassword);
-	};
+		setErrors(null);
 
-	function getFieldError(field: AuthField): string | undefined {
-		if (!Array.isArray(errors)) return undefined;
-		const error = (errors as string[]).find((err) =>
-			err.startsWith(`${field}:`),
-		);
-		return error?.split(':')[1];
-	}
+		const validationResult = resetPasswordSchema.safeParse(form);
+
+		if (!validationResult.success) {
+			const formattedErrors = validationResult.error.flatten().fieldErrors;
+			setErrors(formattedErrors);
+			return;
+		}
+		await PasswordReset(token, form.password);
+	};
 
 	function change(e: React.ChangeEvent<HTMLInputElement>) {
 		setForm({ ...form, [e.target.name]: e.target.value.trim() });
@@ -60,11 +61,8 @@ await PasswordReset(token, form.password, form.confirmPassword);
 							onChange={change}
 							placeholder="Password"
 						/>
-						{getFieldError('password') && (
-							<InputError
-								message={getFieldError('password')}
-								className="mt-2"
-							/>
+						{errors!.password && (
+							<InputError message={errors.password[0]} className="mt-2" />
 						)}
 					</div>
 
@@ -80,9 +78,9 @@ await PasswordReset(token, form.password, form.confirmPassword);
 							onChange={change}
 							placeholder="Confirm password"
 						/>
-						{getFieldError('confirmPassword') && (
+						{errors!.confirmPassword && (
 							<InputError
-								message={getFieldError('confirmPassword')}
+								message={errors.confirmPassword[0]}
 								className="mt-2"
 							/>
 						)}

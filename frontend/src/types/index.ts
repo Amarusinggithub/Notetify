@@ -1,32 +1,12 @@
 import 'axios';
 import type { LucideIcon } from 'lucide-react';
 
-//Constants
 export const CSRF_TOKEN_COOKIE_NAME = 'csrftoken';
 export const USERDATA_STORAGE_KEY = 'userData';
 
-//Enums
 export type Role = 'OWNER' | 'EDITOR' | 'MEMBER';
 export type OAuthProvider = 'GOOGLE' | 'GITHUB' | 'FACEBOOK';
 
-export type AuthField =
-	| 'firstName'
-	| 'lastName'
-	| 'email'
-	| 'password'
-	| 'confirmPassword'
-	| 'auth';
-
-export type AuthErrorType =
-	| 'This field cannot be empty'
-	| 'invalid-credentials'
-	| 'user-not-found'
-	| 'password and confirm password must match'
-	| 'unknown';
-
-export type AuthErrorCode = `${AuthField}:${AuthErrorType}`;
-
-//  Models
 export type CreateOAuthAccount = {
 	OAuthProvider: OAuthProvider;
 	access_token?: string;
@@ -70,7 +50,6 @@ export interface SharedData {
 export interface Auth {
 	user: User;
 }
-
 
 export type CreateTag = {
 	tag_data: {
@@ -219,7 +198,6 @@ export interface NavItem {
 	isActive?: boolean;
 	params?: string;
 }
-
 
 export const noteQueryKeys = {
 	all: ['notes'] as const,

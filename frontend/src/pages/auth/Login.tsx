@@ -1,6 +1,5 @@
-import {  LoaderCircle } from 'lucide-react';
+import { LoaderCircle } from 'lucide-react';
 import React, { useState } from 'react';
-import type { AuthField } from 'types';
 import InputError from '../../components/input-error';
 import TextLink from '../../components/text-link';
 import { Button } from '../../components/ui/button.tsx';
@@ -9,7 +8,7 @@ import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { useAuth } from '../../hooks/use-auth.tsx';
 import AuthLayout from '../../layouts/auth-layout';
-import Heading from '../../components/heading.tsx';
+import { loginSchema } from '../../utils/validators.ts';
 
 type LoginForm = {
 	email: string;
@@ -17,18 +16,13 @@ type LoginForm = {
 	remember: boolean;
 };
 
-interface LoginProps {
-	status?: string;
-	canResetPassword: boolean;
-}
-
-const Login = ({ status, canResetPassword }: LoginProps) => {
+const Login = () => {
 	const [form, setForm] = useState<LoginForm>({
 		email: '',
 		password: '',
 		remember: false,
 	});
-	const { Login, isLoading, errors } = useAuth();
+	const { Login, isLoading, errors, setErrors } = useAuth();
 
 	const change = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setForm({ ...form, [e.target.name]: e.target.value.trim() });
@@ -36,16 +30,17 @@ const Login = ({ status, canResetPassword }: LoginProps) => {
 
 	const submit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
+		setErrors(null);
+
+		const validationResult = loginSchema.safeParse(form);
+
+		if (!validationResult.success) {
+			const formattedErrors = validationResult.error.flatten().fieldErrors;
+			setErrors(formattedErrors);
+			return;
+		}
 		await Login(form.email, form.password);
 	};
-
-	function getFieldError(field: AuthField): string | undefined {
-		if (!Array.isArray(errors)) return undefined;
-		const error = (errors as string[]).find((err) =>
-			err.startsWith(`${field}:`),
-		);
-		return error?.split(':')[1];
-	}
 
 	return (
 		<AuthLayout
@@ -68,23 +63,22 @@ const Login = ({ status, canResetPassword }: LoginProps) => {
 							onChange={change}
 							placeholder="email@example.com"
 						/>
-						{getFieldError('email') && (
-							<InputError message={getFieldError('email')} className="mt-2" />
+						{errors!.email && (
+							<InputError message={errors.email[0]} className="mt-2" />
 						)}
 					</div>
 
 					<div className="grid gap-2">
 						<div className="flex items-center">
 							<Label htmlFor="password">Password</Label>
-							{canResetPassword && (
-								<TextLink
-									to={'/reset-password'}
-									className="ml-auto text-sm"
-									tabIndex={5}
-								>
-									Forgot password?
-								</TextLink>
-							)}
+
+							<TextLink
+								to={'/reset-password'}
+								className="ml-auto text-sm"
+								tabIndex={5}
+							>
+								Forgot password?
+							</TextLink>
 						</div>
 						<Input
 							id="password"
@@ -97,18 +91,9 @@ const Login = ({ status, canResetPassword }: LoginProps) => {
 							onChange={change}
 							placeholder="Password"
 						/>
-						{getFieldError('password') && (
-							<InputError
-								message={getFieldError('password')}
-								className="mt-2"
-							/>
+						{errors!.password && (
+							<InputError message={errors.password[0]} className="mt-2" />
 						)}
-					</div>
-
-					<div className="text-muted-foreground text-start text-sm">
-						<TextLink to="/forgot-password" tabIndex={5}>
-							Forgot Password
-						</TextLink>
 					</div>
 
 					<div className="flex items-center space-x-3">
