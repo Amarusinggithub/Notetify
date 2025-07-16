@@ -128,7 +128,7 @@ class LoginView(APIView):
                     "Success": "Login successfully",
                     "data": serializer.data,
                 }
-                response.status_code = status.HTTP_201_CREATED
+                response.status_code = status.HTTP_200_OK
                 return response
             else:
                 return Response(

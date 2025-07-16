@@ -10,16 +10,13 @@ import {
 } from './ui/sidebar';
 
 import {
-	ArchiveIcon,
 	BookOpen,
-	Folder,
-	NotebookTextIcon,
-	StarIcon,
-	Trash2Icon,
+	NotebookText,
+	Star,
+	Trash2,
 } from 'lucide-react';
 import { type NavItem } from '../types';
 import AppLogo from './app-logo';
-import { NavFooter } from './nav-footer';
 import { NavMain } from './nav-main';
 import { NavUser } from './nav-user';
 
@@ -27,41 +24,37 @@ const mainNavItems: NavItem[] = [
 	{
 		title: 'Notes',
 		href: '/',
-		icon: NotebookTextIcon,
-		params: 'is_trashed=False&is_archived=False',
+		icon: NotebookText,
+		params: 'is_trashed=False',
+	},
+	{
+		title: 'Tags',
+		href: '/',
+		icon: NotebookText,
+		params: 'is_trashed=False',
+	},
+	{
+		title: 'Notebook',
+		href: '/',
+		icon: BookOpen,
+		params: 'is_trashed=False',
 	},
 	{
 		title: 'Favorites',
 		href: '/favorite',
-		icon: StarIcon,
-		params: 'is_favorite=True&is_trashed=False&is_archived=False',
+		icon: Star,
+		params: 'is_favorite=True&is_trashed=False',
 	},
-	{
-		title: 'Archive',
-		href: '/archive',
-		icon: ArchiveIcon,
-		params: 'is_archived=True&is_trashed=False',
-	},
+
 	{
 		title: 'Trash',
 		href: '/trash',
-		icon: Trash2Icon,
+		icon: Trash2,
 		params: 'is_trashed=True',
 	},
 ];
 
-const footerNavItems: NavItem[] = [
-	{
-		title: 'Repository',
-		href: '',
-		icon: Folder,
-	},
-	{
-		title: 'Documentation',
-		href: '',
-		icon: BookOpen,
-	},
-];
+
 
 export function AppSidebar() {
 	return (
@@ -83,110 +76,11 @@ export function AppSidebar() {
 			</SidebarContent>
 
 			<SidebarFooter>
-				<NavFooter items={footerNavItems} className="mt-auto" />
 				<NavUser />
 			</SidebarFooter>
 		</Sidebar>
 	);
 }
 
-/*import {
-	Sidebar,
-	SidebarContent,
-	SidebarFooter,
-	SidebarGroup,
-	SidebarHeader,
-} from './ui/sidebar';
 
-export function AppSidebar() {
-	return (
-		<Sidebar >
-			<SidebarHeader />
-			<SidebarContent>
-				<SidebarGroup />
-				<SidebarGroup />
-			</SidebarContent>
-			<SidebarFooter />
-		</Sidebar>
-	);
-}*/
 
-/*import { Sidebar, SidebarContent } from '@/components/ui/sidebar';
-
-export function AppSidebar() {
-	return (
-		<Sidebar>
-			<SidebarContent />
-		</Sidebar>
-	);
-}*/
-
-/*
-import { Calendar, Home, Inbox, Search, Settings } from 'lucide-react';
-
-import {
-	Sidebar,
-	SidebarContent,
-	SidebarGroup,
-	SidebarGroupContent,
-	SidebarGroupLabel,
-	SidebarMenu,
-	SidebarMenuButton,
-	SidebarMenuItem,
-} from '@/components/ui/sidebar';
-
-// Menu items.
-const items = [
-	{
-		title: 'Home',
-		url: '#',
-		icon: Home,
-	},
-	{
-		title: 'Inbox',
-		url: '#',
-		icon: Inbox,
-	},
-	{
-		title: 'Calendar',
-		url: '#',
-		icon: Calendar,
-	},
-	{
-		title: 'Search',
-		url: '#',
-		icon: Search,
-	},
-	{
-		title: 'Settings',
-		url: '#',
-		icon: Settings,
-	},
-];
-
-export function AppSidebar() {
-	return (
-		<Sidebar>
-			<SidebarContent>
-				<SidebarGroup>
-					<SidebarGroupLabel>Application</SidebarGroupLabel>
-					<SidebarGroupContent>
-						<SidebarMenu>
-							{items.map((item) => (
-								<SidebarMenuItem key={item.title}>
-									<SidebarMenuButton asChild>
-										<a href={item.url}>
-											<item.icon />
-											<span>{item.title}</span>
-										</a>
-									</SidebarMenuButton>
-								</SidebarMenuItem>
-							))}
-						</SidebarMenu>
-					</SidebarGroupContent>
-				</SidebarGroup>
-			</SidebarContent>
-		</Sidebar>
-	);
-}
-*/

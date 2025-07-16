@@ -70,7 +70,7 @@ const Register = () => {
 							disabled={isLoading}
 							placeholder="first name"
 						/>
-						{errors!.firstName && (
+						{errors?.firstName && (
 							<InputError message={errors.firstName[0]} className="mt-2" />
 						)}
 					</div>
@@ -89,7 +89,7 @@ const Register = () => {
 							disabled={isLoading}
 							placeholder="last name"
 						/>
-						{errors!.lastName && (
+						{errors?.lastName && (
 							<InputError message={errors.lastName[0]} className="mt-2" />
 						)}
 					</div>
@@ -108,7 +108,7 @@ const Register = () => {
 							disabled={isLoading}
 							placeholder="email@example.com"
 						/>
-						{errors!.email && (
+						{errors?.email && (
 							<InputError message={errors.email[0]} className="mt-2" />
 						)}
 					</div>
@@ -127,7 +127,7 @@ const Register = () => {
 							disabled={isLoading}
 							placeholder="Password"
 						/>
-						{errors!.password && (
+						{errors?.password && (
 							<InputError message={errors.password[0]} className="mt-2" />
 						)}
 					</div>
@@ -146,7 +146,7 @@ const Register = () => {
 							disabled={isLoading}
 							placeholder="Confirm password"
 						/>
-						{errors!.confirmPassword && (
+						{errors?.confirmPassword && (
 							<InputError
 								message={errors.confirmPassword[0]}
 								className="mt-2"

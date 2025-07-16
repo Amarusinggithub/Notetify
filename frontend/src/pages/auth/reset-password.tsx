@@ -61,7 +61,7 @@ export default function ResetPassword() {
 							onChange={change}
 							placeholder="Password"
 						/>
-						{errors!.password && (
+						{errors?.password && (
 							<InputError message={errors.password[0]} className="mt-2" />
 						)}
 					</div>
@@ -78,7 +78,7 @@ export default function ResetPassword() {
 							onChange={change}
 							placeholder="Confirm password"
 						/>
-						{errors!.confirmPassword && (
+						{errors?.confirmPassword && (
 							<InputError
 								message={errors.confirmPassword[0]}
 								className="mt-2"

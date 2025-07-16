@@ -1,4 +1,4 @@
-import { Link } from 'react-router';
+import { Link, useLocation } from 'react-router';
 import Heading from '../../components/heading';
 import { Button } from '../../components/ui/button.tsx';
 import { Separator } from '../../components/ui/separator';
@@ -14,8 +14,8 @@ const sidebarNavItems: NavItem[] = [
 		icon: null,
 	},
 	{
-		title: 'Password',
-		href: '/settings/password',
+		title: 'Security',
+		href: '/settings/security',
 		icon: null,
 	},
 	{
@@ -23,15 +23,16 @@ const sidebarNavItems: NavItem[] = [
 		href: '/settings/appearance',
 		icon: null,
 	},
+	{
+		title: 'Notifications',
+		href: '/settings/notification',
+		icon: null,
+	},
 ];
 
 export default function SettingsLayout({ children }: PropsWithChildren) {
-	// When server-side rendering, we only render the layout on the client...
-	if (typeof window === 'undefined') {
-		return null;
-	}
-
-	const currentPath = window.location.pathname;
+	const location = useLocation();
+	const currentPath = location.pathname;
 
 	return (
 		<div className="px-4 py-6">

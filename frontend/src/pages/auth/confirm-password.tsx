@@ -56,7 +56,7 @@ export default function ConfirmPassword() {
 							onChange={change}
 						/>
 
-						{errors!.password && (
+						{errors?.password && (
 							<InputError message={errors.password[0]} className="mt-2" />
 						)}
 					</div>

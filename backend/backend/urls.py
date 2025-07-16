@@ -13,7 +13,7 @@ urlpatterns = [
     path("api/admin/", admin.site.urls),
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/token/refresh/", CookieTokenRefreshView.as_view(), name="token_refresh"),
-    path("", include("two_factor.urls", "two_factor")),
+   # path("", include("two_factor.urls", "two_factor")),
     path(
         r"^api/password_reset/",
         include("django_rest_passwordreset.urls", namespace="password_reset"),

@@ -2,7 +2,6 @@
 
 @plugin 'tailwindcss-animate';
 
-@source '../src';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -204,3 +203,7 @@
 		@apply bg-background text-foreground;
 	}
 }
+
+
+
+

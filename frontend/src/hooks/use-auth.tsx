@@ -44,8 +44,14 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 	const [errors, setErrors] = useState<any | null>(null);
 	const [sharedData, setSharedData] = useState<SharedData | null>(null);
 
-	const setAuth = (apiReponse: User) => {
-		const user = apiReponse;
+	const setAuth = (apiReponse: any) => {
+		const user: User = {
+            id:apiReponse.id,
+			first_name: apiReponse.first_name,
+			last_name: apiReponse.last_name,
+			email: apiReponse.email,
+			is_active: apiReponse.is_active,
+		};
 		const shared: SharedData = {
 			auth: { user },
 			name: `${user.first_name} ${user.last_name}`,
@@ -104,6 +110,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 			});
 
 			if (response.status >= 200 && response.status < 300) {
+                console.log(response.data);
 				setAuth(response.data);
 			} else {
 				console.error('Login failed');
@@ -124,14 +131,8 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 			const response = await axiosInstance.post('confirm_password/', {
 				password: password,
 			});
-
-			if (response.status >= 200 && response.status < 300) {
-				setAuth(response.data);
-			} else {
-				console.error('Login failed');
-			}
 		} catch (error: any) {
-			console.error('Login error:', error);
+			console.error('ConfirmPassword error:', error);
 			setErrors(['auth:unknown']);
 		} finally {
 			setLoading(false);
@@ -146,14 +147,8 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 				password: password,
 				token: token,
 			});
-
-			if (response.status >= 200 && response.status < 300) {
-				setAuth(response.data);
-			} else {
-				console.error('Login failed');
-			}
 		} catch (error: any) {
-			console.error('Login error:', error);
+			console.error('PasswordReset error:', error);
 			setErrors(['auth:unknown']);
 		} finally {
 			setLoading(false);
@@ -171,7 +166,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
 			return response.data.token;
 		} catch (error: any) {
-			console.error('PasswordResetRequest error:', error);
+			console.error('ForgotPassword error:', error);
 			setErrors(['auth:unknown']);
 		} finally {
 			setLoading(false);
@@ -189,7 +184,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
 			return response.data.token;
 		} catch (error: any) {
-			console.error('PasswordResetRequest error:', error);
+			console.error('VerifyEmail error:', error);
 			setErrors(['auth:unknown']);
 		} finally {
 			setLoading(false);
