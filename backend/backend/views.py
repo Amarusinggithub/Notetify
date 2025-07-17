@@ -9,8 +9,8 @@ from rest_framework_simplejwt.exceptions import (
     ExpiredTokenError,
     TokenError,
     InvalidToken, AuthenticationFailed
-    
-    
+
+
 )
 
 from rest_framework.decorators import api_view
@@ -23,6 +23,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.decorators import api_view, renderer_classes
+
+from api.serializers import UserSerializer
 
 
 load_dotenv()
@@ -54,7 +56,7 @@ class CookieTokenRefreshView(TokenRefreshView):
         access = serializer.validated_data["access"]
         refresh = serializer.validated_data.get("refresh", None)
         response = Response(status=200)
-        
+
         # reset the access cookie
         response.set_cookie(
             key=settings.SIMPLE_JWT["AUTH_COOKIE"],
@@ -97,6 +99,7 @@ def get_csrf_token(request):
 @api_view(["GET"])
 def verify_token( request):
     auth = JWTAuthentication()
+
     raw_token = request.COOKIES.get(settings.SIMPLE_JWT["AUTH_COOKIE"]) or None
     if (raw_token==None) :
         return Response(
@@ -108,7 +111,13 @@ def verify_token( request):
         validated_token = auth.get_validated_token(raw_token)
         if validated_token:
             user=auth.get_user(validated_token=validated_token)
-            return Response({}, status=status.HTTP_200_OK)
+            response = Response()
+            serializer = UserSerializer(user, context={"request": request})
+
+            response.data =serializer.data
+
+            response.status_code = status.HTTP_200_OK
+            return response
     except  (InvalidToken, AuthenticationFailed,ExpiredTokenError,TokenError):
         return Response(
             {"error": "Token is invalid or expired"},

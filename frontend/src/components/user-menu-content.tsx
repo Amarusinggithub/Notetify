@@ -1,7 +1,7 @@
 import { Link } from 'react-router';
 
 import { LogOut, Settings } from 'lucide-react';
-import useAuth from '../hooks/use-auth';
+import {useAuth} from '../hooks/use-auth';
 import { useMobileNavigation } from '../hooks/use-mobile-navigation';
 import { type User } from '../types';
 import {

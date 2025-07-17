@@ -1,6 +1,5 @@
 import { Monitor, Moon, Sun } from 'lucide-react';
 import { type HTMLAttributes } from 'react';
-import { useAppearance } from '../hooks/use-appearance';
 import { Button } from './ui/button';
 import {
 	DropdownMenu,
@@ -8,6 +7,7 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from './ui/dropdown-menu';
+import { useAppearance } from '../hooks/use-appearance';
 
 export default function AppearanceToggleDropdown({
 	className = '',

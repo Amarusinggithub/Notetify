@@ -67,10 +67,8 @@ class RegisterView(APIView):
                     samesite=settings.SIMPLE_JWT["AUTH_COOKIE_SAMESITE"],
                 )
 
-                response.data = {
-                    "Success": "User registered successfully",
-                    "data": serializer.data,
-                }
+                response.data =serializer.data
+
                 response.status_code = status.HTTP_201_CREATED
                 return response
             else:
@@ -124,10 +122,8 @@ class LoginView(APIView):
                     samesite=settings.SIMPLE_JWT["AUTH_COOKIE_SAMESITE"],
                 )
 
-                response.data = {
-                    "Success": "Login successfully",
-                    "data": serializer.data,
-                }
+                response.data =serializer.data
+
                 response.status_code = status.HTTP_200_OK
                 return response
             else:

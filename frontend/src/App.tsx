@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ErrorBoundary } from 'react-error-boundary';
 import './App.css';
-import { initializeTheme } from './hooks/use-apperance.tsx';
+import { initializeTheme } from './hooks/use-appearance.tsx';
 import AuthProvider from './hooks/use-auth.tsx';
 import { NoteProvider } from './hooks/use-mutate-note.tsx';
 import { TagProvider } from './hooks/use-mutate-tag.tsx';

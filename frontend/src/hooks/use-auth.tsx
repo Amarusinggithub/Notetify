@@ -23,7 +23,6 @@ interface AuthContextType {
 	ForgotPassword: (email: string) => void;
 	VerifyEmail: (email: string) => void;
 	ConfirmPassword: (password: string) => void;
-
 	setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 	setErrors: React.Dispatch<React.SetStateAction<any | null>>;
 	setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
@@ -44,13 +43,13 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 	const [errors, setErrors] = useState<any | null>(null);
 	const [sharedData, setSharedData] = useState<SharedData | null>(null);
 
-	const setAuth = (apiReponse: any) => {
+	const setAuth = (apiResponse: any) => {
 		const user: User = {
-            id:apiReponse.id,
-			first_name: apiReponse.first_name,
-			last_name: apiReponse.last_name,
-			email: apiReponse.email,
-			is_active: apiReponse.is_active,
+            id:apiResponse.id,
+			first_name: apiResponse.first_name,
+			last_name: apiResponse.last_name,
+			email: apiResponse.email,
+			is_active: apiResponse.is_active,
 		};
 		const shared: SharedData = {
 			auth: { user },

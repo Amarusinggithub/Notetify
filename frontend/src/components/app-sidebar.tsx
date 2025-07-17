@@ -9,9 +9,9 @@ import {
 	SidebarMenuItem,
 } from './ui/sidebar';
 
-import {
-	BookOpen,
-	NotebookText,
+import {Home,Tag,
+	Notebook,
+	Newspaper,
 	Star,
 	Trash2,
 } from 'lucide-react';
@@ -22,28 +22,33 @@ import { NavUser } from './nav-user';
 
 const mainNavItems: NavItem[] = [
 	{
-		title: 'Notes',
+		title: 'Home',
 		href: '/',
-		icon: NotebookText,
-		params: 'is_trashed=False',
-	},
-	{
-		title: 'Tags',
-		href: '/',
-		icon: NotebookText,
-		params: 'is_trashed=False',
-	},
-	{
-		title: 'Notebook',
-		href: '/',
-		icon: BookOpen,
-		params: 'is_trashed=False',
+		icon: Home,
 	},
 	{
 		title: 'Favorites',
 		href: '/favorite',
 		icon: Star,
 		params: 'is_favorite=True&is_trashed=False',
+	},
+	{
+		title: 'Notes',
+		href: '/notes',
+		icon: Newspaper,
+		params: 'is_trashed=False',
+	},
+	{
+		title: 'Tags',
+		href: '/',
+		icon: Tag,
+		params: 'is_trashed=False',
+	},
+	{
+		title: 'Notebook',
+		href: '/',
+		icon: Notebook,
+		params: 'is_trashed=False',
 	},
 
 	{
@@ -63,7 +68,7 @@ export function AppSidebar() {
 				<SidebarMenu>
 					<SidebarMenuItem>
 						<SidebarMenuButton size="lg" asChild>
-							<Link to={'/dashboard'}>
+							<Link to={'/home'}>
 								<AppLogo />
 							</Link>
 						</SidebarMenuButton>
