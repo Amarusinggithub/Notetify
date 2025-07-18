@@ -37,7 +37,6 @@ export const updateNotebook = async (userNotebook: UserNotebook) => {
 			user: userNotebook.user,
 			is_pinned: userNotebook.is_pinned,
 			is_trashed: userNotebook.is_trashed,
-			is_archived: userNotebook.is_archived,
 			is_favorite: userNotebook.is_favorite,
 		});
 

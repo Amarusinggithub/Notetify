@@ -83,17 +83,12 @@ class UserNoteSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
     def validate(self, data):
-        if data.get("is_pinned") and data.get("is_archived"):
-            raise serializers.ValidationError(
-                "A note cannot be pinned and archived at the same time."
-            )
+           
         if data.get("is_trashed") and data.get("is_pinned"):
             raise serializers.ValidationError("A trashed note cannot be pinned.")
-        if data.get("is_trashed") and data.get("is_archived"):
             raise serializers.ValidationError("A trashed note cannot be archived.")
         if data.get("is_trashed") and data.get("is_favorite"):
             raise serializers.ValidationError("A trashed note cannot be favorite.")
-        if data.get("is_archived") and data.get("is_favorite"):
             raise serializers.ValidationError("An archived note cannot be favorite.")
         return data
 
@@ -200,20 +195,13 @@ class UserNotebookSerializer(serializers.ModelSerializer):
         return UserNotebook.objects.create(note_book=note_book, **validated_data)
 
     def validate(self, data):
-        if data.get("is_pinned") and data.get("is_archived"):
-            raise serializers.ValidationError(
-                "A notebook cannot be pinned and archived at the same time."
-            )
+            
         if data.get("is_trashed") and data.get("is_pinned"):
             raise serializers.ValidationError("A trashed notebook cannot be pinned.")
-        if data.get("is_trashed") and data.get("is_archived"):
-            raise serializers.ValidationError("A trashed notebook cannot be archived.")
+       
         if data.get("is_trashed") and data.get("is_favorite"):
             raise serializers.ValidationError("A trashed notebook cannot be favorite.")
-        if data.get("is_archived") and data.get("is_favorite"):
-            raise serializers.ValidationError(
-                "An archived notebook cannot be favorite."
-            )
+      
         return data
 
 

@@ -15,7 +15,7 @@ urlpatterns = [
     path("api/token/refresh/", CookieTokenRefreshView.as_view(), name="token_refresh"),
    # path("", include("two_factor.urls", "two_factor")),
     path(
-        r"^api/password_reset/",
+        r"api/password_reset/",
         include("django_rest_passwordreset.urls", namespace="password_reset"),
     ),
     path("api/ws/", AsgiTokenValidatorView.as_view()),

@@ -128,7 +128,7 @@ const NoteCard = ({ note, route }: NoteCardProps) => {
 							></button>
 						)}
 
-						{noteState.is_archived == false &&
+						{
 							noteState.is_trashed == false && (
 								<div className="pin-favorite-actions">
 									<button

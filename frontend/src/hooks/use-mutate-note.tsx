@@ -18,7 +18,6 @@ interface NoteContextType {
 	addNote: (note: CreateNote) => Promise<void>;
 	editNote: (newNote: UserNote) => Promise<void>;
 	removeNote: (note: UserNote) => Promise<void>;
-	handleArchive: (note: UserNote) => void;
 	handleFavorite: (note: UserNote) => void;
 	handleTrash: (note: UserNote) => void;
 	handlePin: (note: UserNote) => void;
@@ -85,7 +84,7 @@ const NoteProvider = ({ children }: NoteProviderProps) => {
 		note: UserNote,
 		field: keyof Pick<
 			UserNote,
-			'is_favorite' | 'is_archived' | 'is_trashed' | 'is_pinned'
+			'is_favorite'  | 'is_trashed' | 'is_pinned'
 		>,
 	) => {
 		const updated = { ...note, [field]: !note[field] };
@@ -99,7 +98,6 @@ const NoteProvider = ({ children }: NoteProviderProps) => {
 				addNote,
 				editNote,
 				removeNote,
-				handleArchive: (note) => handleToggle(note, 'is_archived'),
 				handleFavorite: (note) => handleToggle(note, 'is_favorite'),
 				handleTrash: (note) => handleToggle(note, 'is_trashed'),
 				handlePin: (note) => handleToggle(note, 'is_pinned'),
@@ -160,7 +158,6 @@ export const updateNote = async (note: UserNote) => {
 			tags: note.tags,
 			is_pinned: note.is_pinned,
 			is_trashed: note.is_trashed,
-			is_archived: note.is_archived,
 			is_favorite: note.is_favorite,
 		});
 

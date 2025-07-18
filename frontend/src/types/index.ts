@@ -82,7 +82,6 @@ export type CreateNote = {
 	tags: number[];
 	is_pinned: boolean;
 	is_trashed: boolean;
-	is_archived: boolean;
 	is_favorite: boolean;
 };
 
@@ -132,7 +131,6 @@ export interface UserNotebook {
 	updated_at: Date;
 	is_pinned: boolean;
 	is_trashed: boolean;
-	is_archived: boolean;
 	is_favorite: boolean;
 }
 
@@ -161,7 +159,6 @@ export interface UserNoteBook {
 	is_pinned: boolean;
 	is_favorite: boolean;
 	is_trashed: boolean;
-	is_archived: boolean;
 	shared_from?: number;
 	shared_at?: Date;
 	archived_at?: Date;

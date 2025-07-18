@@ -28,7 +28,7 @@ const mainNavItems: NavItem[] = [
 	},
 	{
 		title: 'Favorites',
-		href: '/favorite',
+		href: '/favorites',
 		icon: Star,
 		params: 'is_favorite=True&is_trashed=False',
 	},

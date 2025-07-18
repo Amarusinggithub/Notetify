@@ -7,7 +7,6 @@ export const isUserNote = (note: UserNote | CreateNote): note is UserNote => {
 
 export const initialNoteState: CreateNote = {
 	note_data: { title: '', content: '', users: [] },
-	is_archived: false,
 	is_favorite: false,
 	is_pinned: false,
 	is_trashed: false,
@@ -26,8 +25,7 @@ export function createNoteReducer(state: CreateNote, action: NoteAction) {
 				...state,
 				note_data: { ...state.note_data, content: action.payload },
 			};
-		case 'TOGGLE_ARCHIVED':
-			return { ...state, is_archived: !state.is_archived };
+		
 		case 'TOGGLE_PINNED':
 			return { ...state, is_pinned: !state.is_pinned };
 		case 'TOGGLE_FAVORITE':
@@ -53,8 +51,7 @@ export function userNoteReducer(state: UserNote, action: NoteAction) {
 				...state,
 				note: { ...state.note, content: action.payload },
 			};
-		case 'TOGGLE_ARCHIVED':
-			return { ...state, is_archived: !state.is_archived };
+		
 		case 'TOGGLE_PINNED':
 			return { ...state, is_pinned: !state.is_pinned };
 		case 'TOGGLE_FAVORITE':

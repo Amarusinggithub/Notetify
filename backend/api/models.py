@@ -199,7 +199,7 @@ class UserNotebook(models.Model):
     is_pinned = models.BooleanField(default=False)
     is_favorite = models.BooleanField(default=False)
     is_trashed = models.BooleanField(default=False)
-    is_archived = models.BooleanField(default=False)
+
     shared_from = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -247,7 +247,7 @@ class UserNote(models.Model):
     is_pinned = models.BooleanField(default=False)
     is_favorite = models.BooleanField(default=False)
     is_trashed = models.BooleanField(default=False)
-    is_archived = models.BooleanField(default=False)
+
     shared_from = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,

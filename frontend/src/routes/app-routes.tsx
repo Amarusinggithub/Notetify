@@ -1,13 +1,14 @@
-import { useAuth } from '../hooks/use-auth';
-import Settings from '../pages/settings/settings';
-import Home from '../pages/home';
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router';
+import { useAuth } from '../hooks/use-auth';
 import Welcome from '../pages//welcome';
+import Home from '../pages/app/home';
+import ForgotPassword from '../pages/auth/forgot-password';
 import Login from '../pages/auth/login';
 import Register from '../pages/auth/register';
-import ForgotPassword from '../pages/auth/forgot-password';
 import ResetPassword from '../pages/auth/reset-password';
 import VerifyEmail from '../pages/auth/verify-email';
+import Settings from '../pages/settings/settings';
+import Favorites from '../pages/app/favorites';
 
 function AppRoutes() {
 	const { isAuthenticated, checkingAuth } = useAuth();
@@ -25,6 +26,7 @@ function AppRoutes() {
 
 	const privateRoutes = [
 		{ index: true, Component: Home },
+		{ path: "favorites", Component: Favorites },
 
 		{ path: 'settings', Component: Settings },
 		{ path: 'verify-email', Component: VerifyEmail },

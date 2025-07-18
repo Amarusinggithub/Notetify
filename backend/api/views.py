@@ -204,7 +204,6 @@ class NoteListCreateView(generics.ListCreateAPIView):
         "is_pinned",
         "is_favorite",
         "is_trashed",
-        "is_archived",
         "tags__id",
         "created_at",
     ]
@@ -246,7 +245,6 @@ class NotebookListCreateView(generics.ListCreateAPIView):
         "is_pinned",
         "is_favorite",
         "is_trashed",
-        "is_archived",
         "notes__id",
         "created_at",
     ]
