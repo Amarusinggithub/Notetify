@@ -1,5 +1,5 @@
-import { BookOpen, Folder, LayoutGrid, Menu, Search } from 'lucide-react';
-import { Link } from 'react-router';
+import { BookOpen, Folder, Home, Menu, Search } from 'lucide-react';
+import { Link, useLocation } from 'react-router';
 import { useInitials } from '../hooks/use-initials';
 import { type BreadcrumbItem, type NavItem } from '../types';
 
@@ -16,8 +16,7 @@ import {
 	DropdownMenuTrigger,
 } from './ui/dropdown-menu';
 
-import useAuth from 'hooks/use-auth';
-import usePage from 'hooks/use-page';
+import { useAuth } from '../hooks/use-auth';
 import {
 	NavigationMenu,
 	NavigationMenuItem,
@@ -41,9 +40,14 @@ import { UserMenuContent } from './user-menu-content';
 
 const mainNavItems: NavItem[] = [
 	{
-		title: 'Dashboard',
-		href: '/dashboard',
-		icon: LayoutGrid,
+		title: 'Home',
+		href: '/',
+		icon: Home,
+	},
+	{
+		title: 'Favorites',
+		href: '/favorites',
+		icon: Home,
 	},
 ];
 
@@ -69,8 +73,8 @@ interface AppHeaderProps {
 
 export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
 	const { sharedData } = useAuth();
-	const { auth } = sharedData;
-	const page = usePage();
+	const { auth } = sharedData!;
+	const page = useLocation();
 	const getInitials = useInitials();
 	return (
 		<>
@@ -152,7 +156,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
 											to={item.href}
 											className={cn(
 												navigationMenuTriggerStyle(),
-												page.url === item.href && activeItemStyles,
+												page.pathname === item.href && activeItemStyles,
 												'h-9 cursor-pointer px-3',
 											)}
 										>
@@ -161,7 +165,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
 											)}
 											{item.title}
 										</Link>
-										{page.url === item.href && (
+										{page.pathname === item.href && (
 											<div className="absolute bottom-0 left-0 h-0.5 w-full translate-y-px bg-black dark:bg-white"></div>
 										)}
 									</NavigationMenuItem>
@@ -211,9 +215,14 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
 							<DropdownMenuTrigger asChild>
 								<Button variant="ghost" className="size-10 rounded-full p-1">
 									<Avatar className="size-8 overflow-hidden rounded-full">
-										<AvatarImage src={auth.user.avatar} alt={auth.user.name} />
+										<AvatarImage
+											src={auth.user.avatar}
+											alt={`${auth.user.first_name} ${auth.user.last_name}`}
+										/>
 										<AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
-											{getInitials(auth.user.name)}
+											{getInitials(
+												`${auth.user.first_name} ${auth.user.last_name}`,
+											)}
 										</AvatarFallback>
 									</Avatar>
 								</Button>

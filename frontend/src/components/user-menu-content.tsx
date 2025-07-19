@@ -1,7 +1,14 @@
 import { Link } from 'react-router';
 
-import { LogOut, Settings } from 'lucide-react';
-import {useAuth} from '../hooks/use-auth';
+import {
+	BadgeCheck,
+	Bell,
+	CreditCard,
+	LogOut,
+	Settings,
+	Sparkles,
+} from 'lucide-react';
+import { useAuth } from '../hooks/use-auth';
 import { useMobileNavigation } from '../hooks/use-mobile-navigation';
 import { type User } from '../types';
 import {
@@ -33,15 +40,30 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
 			</DropdownMenuLabel>
 			<DropdownMenuSeparator />
 			<DropdownMenuGroup>
+				<DropdownMenuItem>
+					<Sparkles className="mr-2" />
+					Upgrade to Pro
+				</DropdownMenuItem>
+			</DropdownMenuGroup>
+			<DropdownMenuSeparator />{' '}
+			<DropdownMenuGroup>
 				<DropdownMenuItem asChild>
-					<Link
-						className="block w-full"
-						to={'./profile.edit'}
-						onClick={cleanup}
-					>
+					<Link className="block w-full" to={'./settings'} onClick={cleanup}>
 						<Settings className="mr-2" />
 						Settings
 					</Link>
+				</DropdownMenuItem>
+				<DropdownMenuItem>
+					<BadgeCheck className="mr-2" />
+					Account
+				</DropdownMenuItem>
+				<DropdownMenuItem>
+					<CreditCard className="mr-2" />
+					Billing
+				</DropdownMenuItem>
+				<DropdownMenuItem>
+					<Bell className="mr-2" />
+					Notifications
 				</DropdownMenuItem>
 			</DropdownMenuGroup>
 			<DropdownMenuSeparator />

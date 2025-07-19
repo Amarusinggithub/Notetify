@@ -7,14 +7,10 @@ import {
 	SidebarMenu,
 	SidebarMenuButton,
 	SidebarMenuItem,
+	SidebarSeparator,
 } from './ui/sidebar';
 
-import {Home,Tag,
-	Notebook,
-	Newspaper,
-	Star,
-	Trash2,
-} from 'lucide-react';
+import { Home, Newspaper, Notebook, Star, Tag, Trash2 } from 'lucide-react';
 import { type NavItem } from '../types';
 import AppLogo from './app-logo';
 import { NavMain } from './nav-main';
@@ -40,13 +36,13 @@ const mainNavItems: NavItem[] = [
 	},
 	{
 		title: 'Tags',
-		href: '/',
+		href: '/tags',
 		icon: Tag,
 		params: 'is_trashed=False',
 	},
 	{
 		title: 'Notebook',
-		href: '/',
+		href: '/notebooks',
 		icon: Notebook,
 		params: 'is_trashed=False',
 	},
@@ -59,11 +55,9 @@ const mainNavItems: NavItem[] = [
 	},
 ];
 
-
-
 export function AppSidebar() {
 	return (
-		<Sidebar collapsible="icon" variant="inset">
+		<Sidebar collapsible="icon" variant="floating">
 			<SidebarHeader>
 				<SidebarMenu>
 					<SidebarMenuItem>
@@ -79,13 +73,10 @@ export function AppSidebar() {
 			<SidebarContent>
 				<NavMain items={mainNavItems} />
 			</SidebarContent>
-
+			<SidebarSeparator />
 			<SidebarFooter>
 				<NavUser />
 			</SidebarFooter>
 		</Sidebar>
 	);
 }
-
-
-

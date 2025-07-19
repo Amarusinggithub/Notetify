@@ -1,5 +1,5 @@
 import { ChevronsUpDown } from 'lucide-react';
-import {useAuth} from '../hooks/use-auth';
+import { useAuth } from '../hooks/use-auth';
 import { useIsMobile } from '../hooks/use-mobile';
 import {
 	DropdownMenu,
@@ -29,7 +29,7 @@ export function NavUser() {
 							size="lg"
 							className="group text-sidebar-accent-foreground data-[state=open]:bg-sidebar-accent"
 						>
-							<UserInfo user={sharedData!.auth.user} />
+							<UserInfo showEmail={true} user={sharedData!.auth.user} />
 							<ChevronsUpDown className="ml-auto size-4" />
 						</SidebarMenuButton>
 					</DropdownMenuTrigger>

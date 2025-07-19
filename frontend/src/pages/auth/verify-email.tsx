@@ -6,13 +6,11 @@ import { Button } from '../../components/ui/button.tsx';
 import { useAuth } from '../../hooks/use-auth.tsx';
 import AuthLayout from '../../layouts/auth-layout';
 
-
-
 export default function VerifyEmail() {
-	const { isLoading,VerifyEmail } = useAuth();
+	const { isLoading, VerifyEmail } = useAuth();
 	const submit: FormEventHandler = async (e) => {
 		e.preventDefault();
-//await verifyEmail();
+		//await verifyEmail();
 	};
 
 	return (

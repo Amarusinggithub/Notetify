@@ -128,26 +128,25 @@ const NoteCard = ({ note, route }: NoteCardProps) => {
 							></button>
 						)}
 
-						{
-							noteState.is_trashed == false && (
-								<div className="pin-favorite-actions">
-									<button
-										onClick={(e) => {
-											e.stopPropagation();
-											handlePin(note);
-										}}
-										className="note-pin-btn"
-									></button>
+						{noteState.is_trashed == false && (
+							<div className="pin-favorite-actions">
+								<button
+									onClick={(e) => {
+										e.stopPropagation();
+										handlePin(note);
+									}}
+									className="note-pin-btn"
+								></button>
 
-									<button
-										onClick={(e) => {
-											e.stopPropagation();
-											handleFavorite(note);
-										}}
-										className="note-favorite-btn"
-									></button>
-								</div>
-							)}
+								<button
+									onClick={(e) => {
+										e.stopPropagation();
+										handleFavorite(note);
+									}}
+									className="note-favorite-btn"
+								></button>
+							</div>
+						)}
 					</div>
 
 					<input

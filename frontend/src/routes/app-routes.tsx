@@ -1,14 +1,17 @@
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router';
 import { useAuth } from '../hooks/use-auth';
+import AppLayout from '../layouts/app-layout';
+import SettingsLayout from '../layouts/settings/layout';
 import Welcome from '../pages//welcome';
+import Favorites from '../pages/app/favorites';
 import Home from '../pages/app/home';
 import ForgotPassword from '../pages/auth/forgot-password';
 import Login from '../pages/auth/login';
 import Register from '../pages/auth/register';
 import ResetPassword from '../pages/auth/reset-password';
 import VerifyEmail from '../pages/auth/verify-email';
-import Settings from '../pages/settings/settings';
-import Favorites from '../pages/app/favorites';
+import Authentication from '../pages/settings/authentication';
+import General from '../pages/settings/general';
 
 function AppRoutes() {
 	const { isAuthenticated, checkingAuth } = useAuth();
@@ -18,20 +21,29 @@ function AppRoutes() {
 		{ index: true, Component: Welcome },
 		{ path: 'login', Component: Login },
 		{ path: 'forgot-password', Component: ForgotPassword },
-		{ path: 'reset-password', Component: ResetPassword },
+		{ path: 'reset-password/:token', Component: ResetPassword },
 		{ path: 'verify-email', Component: VerifyEmail },
 		{ path: 'register', Component: Register },
 		{ path: '*', Component: () => <Navigate to="/" replace /> },
 	];
 
 	const privateRoutes = [
-		{ index: true, Component: Home },
-		{ path: "favorites", Component: Favorites },
-
-		{ path: 'settings', Component: Settings },
-		{ path: 'verify-email', Component: VerifyEmail },
-		{ path: 'forgot-password', Component: ForgotPassword },
-		{ path: 'reset-password/:token', Component: ResetPassword },
+		{
+			path: '/',
+			Component: AppLayout,
+			children: [
+				{ index: true, Component: Home },
+				{ path: 'favorites', Component: Favorites },
+			],
+		},
+		{
+			path: 'settings',
+			Component: SettingsLayout,
+			children: [
+				{ path: 'general', Component: General },
+				{ path: 'authentication', Component: Authentication },
+			],
+		},
 
 		{ path: '*', Component: () => <Navigate to="/" replace /> },
 	];

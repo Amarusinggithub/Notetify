@@ -82,10 +82,7 @@ const NoteProvider = ({ children }: NoteProviderProps) => {
 
 	const handleToggle = (
 		note: UserNote,
-		field: keyof Pick<
-			UserNote,
-			'is_favorite'  | 'is_trashed' | 'is_pinned'
-		>,
+		field: keyof Pick<UserNote, 'is_favorite' | 'is_trashed' | 'is_pinned'>,
 	) => {
 		const updated = { ...note, [field]: !note[field] };
 		editNote(updated);

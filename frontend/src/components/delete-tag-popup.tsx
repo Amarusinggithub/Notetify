@@ -1,6 +1,4 @@
-import { faLightbulb, faXmark } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
+import { Lightbulb, X } from 'lucide-react';
 import useMutateTag from '../hooks/use-mutate-tag';
 import '../styles/DeleteTagPopup.css';
 
@@ -23,12 +21,12 @@ const DeleteTagPopup = () => {
 				<div className="delete-tag-header">
 					<h1 className="delete-tag-title">Delete Tag</h1>
 					<button onClick={handleClose} className="close-btn">
-						<FontAwesomeIcon icon={faXmark} className="close-icon" />
+						<X />
 					</button>
 				</div>
 
 				<div className="delete-tag-info-container">
-					<FontAwesomeIcon icon={faLightbulb} className="info-icon" />
+					<Lightbulb />
 
 					<div className="tag-info-text">
 						<p className="delete-tag-info">

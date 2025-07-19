@@ -1,15 +1,15 @@
-import { type ReactNode } from 'react';
+//import { type ReactNode } from 'react';
+import { Outlet } from 'react-router';
 import { type BreadcrumbItem } from '../types';
 import AppLayoutTemplate from './app/app-sidebar-layout';
 
 interface AppLayoutProps {
-	children: ReactNode;
 	breadcrumbs?: BreadcrumbItem[];
 }
 
-const AppLayout = ({ children, breadcrumbs, ...props }: AppLayoutProps) => (
+const AppLayout = ({ breadcrumbs, ...props }: AppLayoutProps) => (
 	<AppLayoutTemplate breadcrumbs={breadcrumbs} {...props}>
-		{children}
+		<Outlet />{' '}
 	</AppLayoutTemplate>
 );
 

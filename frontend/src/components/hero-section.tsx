@@ -4,7 +4,6 @@ import { Button } from './ui/button';
 import InfiniteSlider from './ui/infinite-slider';
 import { ProgressiveBlur } from './ui/progressive-bur';
 
-
 export default function HeroSection() {
 	return (
 		<>

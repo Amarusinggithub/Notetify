@@ -45,7 +45,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
 	const setAuth = (apiResponse: any) => {
 		const user: User = {
-            id:apiResponse.id,
+			id: apiResponse.id,
 			first_name: apiResponse.first_name,
 			last_name: apiResponse.last_name,
 			email: apiResponse.email,
@@ -109,7 +109,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 			});
 
 			if (response.status >= 200 && response.status < 300) {
-                console.log(response.data);
+				console.log(response.data);
 				setAuth(response.data);
 			} else {
 				console.error('Login failed');

@@ -7,7 +7,6 @@ export const USERDATA_STORAGE_KEY = 'userData';
 export type Role = 'OWNER' | 'EDITOR' | 'MEMBER';
 export type OAuthProvider = 'GOOGLE' | 'GITHUB' | 'FACEBOOK';
 
-
 export type CreateOAuthAccount = {
 	OAuthProvider: OAuthProvider;
 	access_token?: string;
@@ -48,7 +47,6 @@ export interface SharedData {
 export interface Auth {
 	user: User;
 }
-
 
 export type CreateTag = {
 	tag_data: {
@@ -194,7 +192,6 @@ export interface NavItem {
 	isActive?: boolean;
 	params?: string;
 }
-
 
 export const noteQueryKeys = {
 	all: ['notes'] as const,

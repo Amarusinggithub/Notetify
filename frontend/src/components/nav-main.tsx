@@ -1,7 +1,6 @@
-import { Link } from 'react-router';
+import { Link, useLocation } from 'react-router';
 import { type NavItem } from '../types';
 
-import usePage from '../hooks/use-page';
 import {
 	SidebarGroup,
 	SidebarGroupLabel,
@@ -12,7 +11,7 @@ import {
 
 type NavMainProps = { items: NavItem[] };
 export function NavMain({ items = [] }: NavMainProps) {
-	const page = usePage();
+	const path = useLocation();
 	return (
 		<SidebarGroup className="px-2 py-0">
 			<SidebarGroupLabel>Platform</SidebarGroupLabel>
@@ -21,7 +20,7 @@ export function NavMain({ items = [] }: NavMainProps) {
 					<SidebarMenuItem key={item.title}>
 						<SidebarMenuButton
 							asChild
-							isActive={page.url.startsWith(item.href)}
+							isActive={path.pathname == item.href}
 							tooltip={{ children: item.title }}
 						>
 							<Link to={item.href}>
