@@ -1,8 +1,9 @@
-import { faXmark } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Dialog, DialogContent, DialogTitle } from '@radix-ui/react-dialog';
 import React, { useEffect, useRef, useState } from 'react';
 import useMutateTag from '../hooks/use-mutate-tag';
-import '../styles/EditTagPopup.css';
+import { Button } from './ui/button';
+import { DialogClose, DialogFooter, DialogHeader } from './ui/dialog';
+import { Input } from './ui/input';
 
 const EditTagPopup = () => {
 	const [TagName, setTagName] = useState('');
@@ -44,19 +45,12 @@ const EditTagPopup = () => {
 	};
 
 	return (
-		<div className="edit-tag-popup-bg" onClick={handleClose}>
-			<div
-				className="edit-tag-popup-container"
-				onClick={(e) => e.stopPropagation()}
-			>
-				<div className="edit-tag-header">
-					<h1 className="edit-tag-title">Edit Tag</h1>
-					<button onClick={handleClose} className="close-btn">
-						<FontAwesomeIcon icon={faXmark} className="close-icon" />
-					</button>
-				</div>
-
-				<input
+		<Dialog>
+			<DialogHeader>
+				<DialogTitle>Edit Tag</DialogTitle>
+			</DialogHeader>
+			<DialogContent>
+				<Input
 					ref={editInputRef}
 					className="edit-tag-input"
 					placeholder="Eg. School or Work"
@@ -65,17 +59,20 @@ const EditTagPopup = () => {
 						handleTagNameChange(e);
 					}}
 				/>
+			</DialogContent>
 
-				<div className="edit-tag-actions">
-					<button onClick={handleClose} className="cancel-btn">
+			<DialogFooter>
+				<DialogClose asChild>
+					<Button onClick={handleClose} size={'sm'}>
 						Cancel
-					</button>
-					<button onClick={handleEditTagName} className="edit-btn">
-						Edit
-					</button>
-				</div>
-			</div>
-		</div>
+					</Button>
+				</DialogClose>
+
+				<Button onClick={handleEditTagName} size={'sm'}>
+					Edit
+				</Button>
+			</DialogFooter>
+		</Dialog>
 	);
 };
 

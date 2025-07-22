@@ -1,6 +1,16 @@
-import { Lightbulb, X } from 'lucide-react';
 import useMutateTag from '../hooks/use-mutate-tag';
-import '../styles/DeleteTagPopup.css';
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from './ui/dialog'; 
+import { Button } from './ui/button';
+import { LightbulbIcon } from 'lucide-react';
 
 const DeleteTagPopup = () => {
 	const { removeTag, selectedTag, setWantToDeleteTag } = useMutateTag();
@@ -13,40 +23,37 @@ const DeleteTagPopup = () => {
 	};
 
 	return (
-		<div className="delete-tag-popup-bg" onClick={handleClose}>
-			<div
-				className="delete-tag-popup-container"
-				onClick={(e) => e.stopPropagation()}
-			>
-				<div className="delete-tag-header">
-					<h1 className="delete-tag-title">Delete Tag</h1>
-					<button onClick={handleClose} className="close-btn">
-						<X />
-					</button>
-				</div>
+		<Dialog >
+			<DialogHeader>
+									<DialogTitle >Delete Tag</DialogTitle>
 
-				<div className="delete-tag-info-container">
-					<Lightbulb />
+			</DialogHeader>
+		
+					
 
-					<div className="tag-info-text">
-						<p className="delete-tag-info">
+				<DialogContent>
+					<LightbulbIcon />
+
+					<DialogDescription >
+						
 							Deleting this tag will permanently remove it from all associated
 							notes. The notes themselves will remain, but they will no longer
 							be linked to this tag.
-						</p>
-					</div>
-				</div>
+					</DialogDescription>
+				</DialogContent>
 
-				<div className="delete-tag-actions">
-					<button onClick={handleClose} className="cancel-btn">
+				<DialogFooter >
+					<DialogClose asChild>
+						<Button variant={"outline"} onClick={handleClose} >
 						Cancel
-					</button>
-					<button onClick={handleDeleteTag} className="delete-btn">
+					</Button>
+					</DialogClose>
+					
+					<Button variant={"destructive"} size={"sm"} onClick={handleDeleteTag}>
 						Delete
-					</button>
-				</div>
-			</div>
-		</div>
+					</Button>
+				</DialogFooter>
+		</Dialog>
 	);
 };
 

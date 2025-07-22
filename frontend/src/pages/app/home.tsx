@@ -1,6 +1,9 @@
-import { Editor } from 'components/tiptap';
-import { PlaceholderPattern } from '../../components/ui/placeholder-pattern';
-//import AppLayout from '../../layouts/app-layout';
+import { Editor } from 'components/editor';
+import {
+  LiveblocksProvider,
+  RoomProvider,
+  ClientSideSuspense,
+} from "@liveblocks/react/suspense";
 //import { type BreadcrumbItem } from '../../types';
 
 /*const breadcrumbs: BreadcrumbItem[] = [
@@ -27,7 +30,13 @@ const providerA = new TiptapCollabProvider({
 export default function Home() {
 	return (
 		<>
+		<LiveblocksProvider publicApiKey={"pk_dev_-jCBKl4-AWCtRQRkEgoS3IGyZTb7G1kfkVuX20cPxJrz4RjDA2ttgGR1EuGkX6z1"}>
+      <RoomProvider id="my-room">
+		        <ClientSideSuspense fallback={<div>Loading…</div>}>
 			<Editor provider={providerA} ydoc={ydocA} room={room} />
+			        </ClientSideSuspense>
+			  </RoomProvider>
+    </LiveblocksProvider>
 		</>
 	);
 }
