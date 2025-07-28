@@ -8,12 +8,12 @@ from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework_simplejwt.exceptions import (
     ExpiredTokenError,
     TokenError,
-    InvalidToken, AuthenticationFailed
-
-
+    InvalidToken,
+    AuthenticationFailed,
 )
 
 from rest_framework.decorators import api_view
+from django.views.decorators.csrf import csrf_exempt
 
 
 from django.conf import settings
@@ -32,48 +32,59 @@ DEBUG = os.environ.get("DEBUG", default=True)
 
 
 class CookieTokenRefreshView(TokenRefreshView):
-
-    def finalize_response(self, request, response, *args, **kwargs):
-        return super().finalize_response(request, response, *args, **kwargs)
-
     def post(self, request, *args, **kwargs):
         refresh_token = request.COOKIES.get(settings.SIMPLE_JWT["AUTH_COOKIE_REFRESH"])
+
         if not refresh_token:
-            return Response({"detail": "Refresh cookie missing"}, status=401)
+            return Response(
+                {"detail": "Refresh token not found"},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
 
         serializer = self.get_serializer(data={"refresh": refresh_token})
 
         try:
             serializer.is_valid(raise_exception=True)
-        except (ExpiredTokenError, TokenError, InvalidToken):
-            # delete cookies and tell the SPA to re-login
-            resp = Response({"detail": "Refresh token expired"}, status=401)
-            resp.delete_cookie(settings.SIMPLE_JWT["AUTH_COOKIE"])
-            resp.delete_cookie(settings.SIMPLE_JWT["AUTH_COOKIE_REFRESH"])
-            return resp
+        except (ExpiredTokenError, TokenError, InvalidToken) as e:
+            response = Response(
+                {"detail": "Refresh token expired or invalid"},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+            response.delete_cookie(
+                settings.SIMPLE_JWT["AUTH_COOKIE"],
+                path=settings.SIMPLE_JWT["AUTH_COOKIE_PATH"],
+            )
+            response.delete_cookie(
+                settings.SIMPLE_JWT["AUTH_COOKIE_REFRESH"],
+                path=settings.SIMPLE_JWT["AUTH_COOKIE_PATH"],
+            )
+            return response
 
-        # get new tokens
+        # Get new tokens
         access = serializer.validated_data["access"]
-        refresh = serializer.validated_data.get("refresh", None)
-        response = Response(status=200)
+        refresh = serializer.validated_data.get("refresh", refresh_token)
 
-        # reset the access cookie
+        response = Response({"detail": "Token refreshed successfully"}, status=200)
+
         response.set_cookie(
             key=settings.SIMPLE_JWT["AUTH_COOKIE"],
             value=access,
-            expires=settings.SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"],
+            max_age=settings.SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"].total_seconds(),
             secure=settings.SIMPLE_JWT["AUTH_COOKIE_SECURE"],
             httponly=settings.SIMPLE_JWT["AUTH_COOKIE_HTTP_ONLY"],
             samesite=settings.SIMPLE_JWT["AUTH_COOKIE_SAMESITE"],
+            path=settings.SIMPLE_JWT["AUTH_COOKIE_PATH"],
         )
-        if refresh:
+
+        if refresh != refresh_token:
             response.set_cookie(
                 key=settings.SIMPLE_JWT["AUTH_COOKIE_REFRESH"],
                 value=refresh,
-                expires=settings.SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"],
+                max_age=settings.SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"].total_seconds(),
                 secure=settings.SIMPLE_JWT["AUTH_COOKIE_SECURE"],
                 httponly=settings.SIMPLE_JWT["AUTH_COOKIE_HTTP_ONLY"],
                 samesite=settings.SIMPLE_JWT["AUTH_COOKIE_SAMESITE"],
+                path=settings.SIMPLE_JWT["AUTH_COOKIE_PATH"],
             )
 
         return response
@@ -86,40 +97,49 @@ class AsgiTokenValidatorView(APIView):
         ticket_uuid = uuid4()
         user_id = request.user.id
         cache.set(ticket_uuid, user_id, 600)
-        Response({"uuid": ticket_uuid})
+        return Response({"uuid": ticket_uuid})
 
 
 @require_GET
 @api_view(["GET"])
 @ensure_csrf_cookie
 def get_csrf_token(request):
-    return Response( status=status.HTTP_204_NO_CONTENT)
+    return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 @api_view(["GET"])
-def verify_token( request):
+@csrf_exempt
+def verify_token(request):
+    """Verify JWT token from cookies and return user data"""
     auth = JWTAuthentication()
+    raw_token = request.COOKIES.get(settings.SIMPLE_JWT["AUTH_COOKIE"])
 
-    raw_token = request.COOKIES.get(settings.SIMPLE_JWT["AUTH_COOKIE"]) or None
-    if (raw_token==None) :
+    if not raw_token:
         return Response(
-            {"error": "Token is invalid or expired"},
+            {"error": "Authentication token not found"},
             status=status.HTTP_401_UNAUTHORIZED,
         )
 
     try:
         validated_token = auth.get_validated_token(raw_token)
-        if validated_token:
-            user=auth.get_user(validated_token=validated_token)
-            response = Response()
-            serializer = UserSerializer(user, context={"request": request})
+        user = auth.get_user(validated_token)
 
-            response.data =serializer.data
+        if not user.is_active:
+            return Response(
+                {"error": "User account is inactive"},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
 
-            response.status_code = status.HTTP_200_OK
-            return response
-    except  (InvalidToken, AuthenticationFailed,ExpiredTokenError,TokenError):
+        serializer = UserSerializer(user, context={"request": request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    except (InvalidToken, AuthenticationFailed, ExpiredTokenError, TokenError) as e:
         return Response(
-            {"error": "Token is invalid or expired"},
+            {"error": "Token is invalid or expired", "detail": str(e)},
             status=status.HTTP_401_UNAUTHORIZED,
+        )
+    except Exception as e:
+        return Response(
+            {"error": "Authentication failed", "detail": str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )

@@ -10,11 +10,13 @@ import {
 	SidebarSeparator,
 } from './ui/sidebar';
 
-import { Home, Newspaper, Notebook, Star, Tag, Trash2 } from 'lucide-react';
+import { Home, Newspaper, Notebook,  Star, Tag, Trash2,  UsersRound } from 'lucide-react';
 import { type NavItem } from '../types';
 import AppLogo from './app-logo';
 import { NavMain } from './nav-main';
 import { NavUser } from './nav-user';
+import { SearchInput } from './search-input';
+import { Dialog, DialogContent, DialogOverlay, DialogPortal, DialogTrigger } from './ui/dialog';
 
 const mainNavItems: NavItem[] = [
 	{
@@ -48,6 +50,13 @@ const mainNavItems: NavItem[] = [
 	},
 
 	{
+		title: 'Shared with me',
+		href: '/shared',
+		icon: UsersRound,
+		params: 'is_trashed=False',
+	},
+
+	{
 		title: 'Trash',
 		href: '/trash',
 		icon: Trash2,
@@ -57,7 +66,7 @@ const mainNavItems: NavItem[] = [
 
 export function AppSidebar() {
 	return (
-		<Sidebar collapsible="icon" variant="floating">
+		<Sidebar collapsible="offcanvas" variant="floating">
 			<SidebarHeader>
 				<SidebarMenu>
 					<SidebarMenuItem>
@@ -65,6 +74,22 @@ export function AppSidebar() {
 							<Link to={'/home'}>
 								<AppLogo />
 							</Link>
+						</SidebarMenuButton>
+					</SidebarMenuItem>
+
+					<SidebarMenuItem>
+						<SidebarMenuButton asChild>
+							<Dialog>
+								<DialogTrigger asChild>
+									<SearchInput disabled={true}  />
+								</DialogTrigger>
+                                <DialogPortal>
+                                    <DialogOverlay/>
+                                    <DialogContent>
+
+                                    </DialogContent>
+                                </DialogPortal>
+							</Dialog>
 						</SidebarMenuButton>
 					</SidebarMenuItem>
 				</SidebarMenu>

@@ -27,7 +27,7 @@ export default function ContentSection() {
 
 					<div className="relative space-y-4">
 						<p className="text-muted-foreground">
-							Gemini is evolving to be more than just the models.{' '}
+							Gemini is evolving to be more than just the models.
 							<span className="text-accent-foreground font-bold">
 								It supports an entire ecosystem
 							</span>{' '}

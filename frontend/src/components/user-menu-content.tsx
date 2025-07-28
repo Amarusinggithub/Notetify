@@ -12,6 +12,19 @@ import { useAuth } from '../hooks/use-auth';
 import { useMobileNavigation } from '../hooks/use-mobile-navigation';
 import { type User } from '../types';
 import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogOverlay,
+	AlertDialogPortal,
+	AlertDialogTitle,
+	AlertDialogTrigger,
+} from './ui/alert-dialog';
+import { Button } from './ui/button';
+import {
 	DropdownMenuGroup,
 	DropdownMenuItem,
 	DropdownMenuLabel,
@@ -68,10 +81,33 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
 			</DropdownMenuGroup>
 			<DropdownMenuSeparator />
 			<DropdownMenuItem asChild>
-				<Link className="block w-full" to={'/logout'} onClick={handleLogout}>
-					<LogOut className="mr-2" />
-					Log out
-				</Link>
+				<AlertDialog>
+					<AlertDialogTrigger asChild>
+						<Button
+							variant={'ghost'}
+							className="flex h-full w-full justify-start"
+						>
+							<LogOut className="mr-2" />
+							Log out
+						</Button>
+					</AlertDialogTrigger>
+					<AlertDialogPortal>
+						<AlertDialogOverlay />
+						<AlertDialogContent>
+							<AlertDialogHeader>
+								<AlertDialogTitle>
+									Are you absolutely sure you want to logout?
+								</AlertDialogTitle>
+							</AlertDialogHeader>
+							<AlertDialogFooter>
+								<AlertDialogCancel>Cancel</AlertDialogCancel>
+								<AlertDialogAction  onClick={handleLogout} >
+									Confirm
+								</AlertDialogAction>
+							</AlertDialogFooter>
+						</AlertDialogContent>
+					</AlertDialogPortal>
+				</AlertDialog>
 			</DropdownMenuItem>
 		</>
 	);

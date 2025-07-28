@@ -133,3 +133,78 @@ export const getInitialUser = () => {
 		color: getRandomColor(),
 	};
 };
+
+export function mapErrorToMessage(error: any): string[] {
+	// Network errors
+	if (!error.response) {
+		if (
+			error.code === 'NETWORK_ERROR' ||
+			error.message?.includes('Network Error')
+		) {
+			return ['Network error. Please check your internet connection.'];
+		}
+		if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
+			return ['Request timeout. Please try again.'];
+		}
+		return ['Connection error. Please try again.'];
+	}
+
+	const { status, data } = error.response;
+
+	switch (status) {
+		case 400:
+			if (data?.errors) {
+				return Array.isArray(data.errors) ? data.errors : [data.errors];
+			}
+			if (data?.message) return [data.message];
+			if (data?.detail) return [data.detail];
+			return ['Invalid request. Please check your input.'];
+
+		case 401:
+			if (data?.message) return [data.message];
+			return ['Invalid credentials. Please try again.'];
+
+		case 403:
+			if (data?.message) return [data.message];
+			return ['Access forbidden. Your account may be locked or inactive.'];
+
+		case 404:
+			return ['Resource not found. Please try again.'];
+
+		case 409:
+			if (data?.message) return [data.message];
+			return ['Conflict error. This resource may already exist.'];
+
+		case 422:
+			if (data?.errors) {
+				// Handle validation errors from backend
+				const errors = [];
+				for (const [field, messages] of Object.entries(data.errors)) {
+					if (Array.isArray(messages)) {
+						errors.push(...messages.map((msg) => `${field}: ${msg}`));
+					} else {
+						errors.push(`${field}: ${messages}`);
+					}
+				}
+				return errors;
+			}
+			if (data?.message) return [data.message];
+			return ['Validation error. Please check your input.'];
+
+		case 429:
+			return ['Too many requests. Please wait a moment and try again.'];
+
+		case 500:
+			return ['Server error. Please try again later.'];
+
+		case 502:
+		case 503:
+		case 504:
+			return ['Service temporarily unavailable. Please try again later.'];
+
+		default:
+			if (data?.message) return [data.message];
+			if (data?.detail) return [data.detail];
+			return [`An error occurred (${status}). Please try again.`];
+	}
+}

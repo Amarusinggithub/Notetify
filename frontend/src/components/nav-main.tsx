@@ -3,7 +3,6 @@ import { type NavItem } from '../types';
 
 import {
 	SidebarGroup,
-	SidebarGroupLabel,
 	SidebarMenu,
 	SidebarMenuButton,
 	SidebarMenuItem,
@@ -14,7 +13,6 @@ export function NavMain({ items = [] }: NavMainProps) {
 	const path = useLocation();
 	return (
 		<SidebarGroup className="px-2 py-0">
-			<SidebarGroupLabel>Platform</SidebarGroupLabel>
 			<SidebarMenu>
 				{items.map((item) => (
 					<SidebarMenuItem key={item.title}>

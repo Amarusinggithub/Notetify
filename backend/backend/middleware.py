@@ -15,7 +15,7 @@ from channels.db import database_sync_to_async
 
 @database_sync_to_async
 def get_user_for_token(token_str):
- 
+
     jwt_auth = JWTAuthentication()
     validated_token = jwt_auth.get_validated_token(token_str)
     return jwt_auth.get_user(validated_token)
@@ -46,7 +46,7 @@ class CookieJWTAuthMiddleware(BaseMiddleware):
             )
         }
 
-        access_token = cookies.get("access_token") 
+        access_token = cookies.get("access_token")
         if access_token:
             try:
                 user = await get_user_for_token(access_token)
@@ -61,11 +61,15 @@ def JwtAuthMiddlewareStack(inner):
     return CookieJWTAuthMiddleware(AuthMiddlewareStack(inner))
 
 
+
+
 class CustomCsrfMiddleware(CsrfViewMiddleware):
     def process_view(self, request, callback, callback_args, callback_kwargs):
-        if 'HTTP_X_CSRFTOKEN' not in request.META:
-            csrf_token = request.COOKIES.get('csrftoken')
-            if csrf_token:
-                request.CSRF_COOKIE = csrf_token
-            request.META['HTTP_X_CSRFTOKEN'] = csrf_token
-            super().process_view(request, callback, callback_args, callback_kwargs)
+        if request.method in ("GET", "HEAD", "OPTIONS", "TRACE"):
+            return None
+
+        csrf_token = request.COOKIES.get("csrftoken")
+        if csrf_token:
+            request.META["HTTP_X_CSRFTOKEN"] = csrf_token
+
+        return super().process_view(request, callback, callback_args, callback_kwargs)

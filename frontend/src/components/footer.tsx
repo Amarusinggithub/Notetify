@@ -11,10 +11,6 @@ const links = [
 		href: '#',
 	},
 	{
-		title: 'Customers',
-		href: '#',
-	},
-	{
 		title: 'Pricing',
 		href: '#',
 	},
@@ -176,7 +172,7 @@ export default function FooterSection() {
 				</div>
 				<span className="text-muted-foreground block text-center text-sm">
 					{' '}
-					© {new Date().getFullYear()} Tailus UI, All rights reserved
+					© {new Date().getFullYear()} Notetify, All rights reserved
 				</span>
 			</div>
 		</footer>

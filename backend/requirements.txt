@@ -13,7 +13,6 @@ django-quill-editor
 PyJWT
 django-redis
 PyMySQL
-pymysql
 django-storages
 python-dotenv
 arrow
@@ -31,16 +30,15 @@ channels
 channels-yroom
 django-jazzmin
 Pillow
-django_quill
+django-quill
+django-rest-passwordreset
 redis
-channels_redis
+channels-redis
 django-ckeditor
- whitenoise
+whitenoise
 yroom
-dotenv
-environ
+environ  
 uvicorn
 websockets
-uvicorn-worker
 redis[hiredis]
 django-silk

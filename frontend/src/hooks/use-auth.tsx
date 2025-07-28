@@ -6,7 +6,8 @@ import React, {
 	useEffect,
 	useState,
 } from 'react';
-import axiosInstance from '../lib/axios.ts';
+import axiosInstance, { ensureCSRFToken } from '../lib/axios.ts';
+import { mapErrorToMessage } from '../utils/helpers.ts';
 import { type SharedData, type User, USERDATA_STORAGE_KEY } from './../types';
 
 type AuthProviderProps = PropsWithChildren;
@@ -16,19 +17,23 @@ interface AuthContextType {
 		lastName: string,
 		email: string,
 		password: string,
-	) => void;
-	Login: (email: string, password: string) => void;
-	Logout: () => void;
-	PasswordReset: (token: string | undefined, password: string) => void;
-	ForgotPassword: (email: string) => void;
-	VerifyEmail: (email: string) => void;
-	ConfirmPassword: (password: string) => void;
+	) => Promise<boolean>;
+	Login: (email: string, password: string) => Promise<boolean>;
+	Logout: () => Promise<void>;
+	PasswordReset: (
+		token: string | undefined,
+		password: string,
+	) => Promise<boolean>;
+	ForgotPassword: (email: string) => Promise<string | null>;
+	VerifyEmail: (email: string) => Promise<string | null>;
+	ConfirmPassword: (password: string) => Promise<boolean>;
 	setLoading: React.Dispatch<React.SetStateAction<boolean>>;
-	setErrors: React.Dispatch<React.SetStateAction<any | null>>;
+	setErrors: React.Dispatch<React.SetStateAction<string[] | null>>;
 	setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
 	setSharedData: React.Dispatch<React.SetStateAction<SharedData | null>>;
+	clearErrors: () => void;
 	sharedData: SharedData | null;
-	errors: any | null;
+	errors: string[] | null;
 	isLoading: boolean;
 	isAuthenticated: boolean;
 	checkingAuth: boolean;
@@ -40,31 +45,38 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 	const [isLoading, setLoading] = useState<boolean>(false);
 	const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 	const [checkingAuth, setCheckingAuth] = useState<boolean>(true);
-	const [errors, setErrors] = useState<any | null>(null);
+	const [errors, setErrors] = useState<string[] | null>(null);
 	const [sharedData, setSharedData] = useState<SharedData | null>(null);
 
-	const setAuth = (apiResponse: any) => {
-		const user: User = {
-			id: apiResponse.id,
-			first_name: apiResponse.first_name,
-			last_name: apiResponse.last_name,
-			email: apiResponse.email,
-			is_active: apiResponse.is_active,
-		};
-		const shared: SharedData = {
-			auth: { user },
-			name: `${user.first_name} ${user.last_name}`,
-			quote: { message: '', author: '' },
-			sidebarOpen: false,
-		};
-		setIsAuthenticated(true);
-		setSharedData(shared);
+	const clearErrors = () => setErrors(null);
 
-		localStorage.setItem(USERDATA_STORAGE_KEY, JSON.stringify(shared));
+	const setAuth = (apiResponse: any) => {
+		try {
+			const user: User = {
+				id: apiResponse.id,
+				first_name: apiResponse.first_name,
+				last_name: apiResponse.last_name,
+				email: apiResponse.email,
+				is_active: apiResponse.is_active,
+			};
+			const shared: SharedData = {
+				auth: { user },
+				name: `${user.first_name} ${user.last_name}`,
+				quote: { message: '', author: '' },
+				sidebarOpen: false,
+			};
+			setIsAuthenticated(true);
+			setSharedData(shared);
+			localStorage.setItem(USERDATA_STORAGE_KEY, JSON.stringify(shared));
+		} catch (error) {
+			console.error('Error setting auth data:', error);
+			setErrors(['Error processing authentication data.']);
+		}
 	};
 
 	const setNotAuth = () => {
 		setIsAuthenticated(false);
+		setSharedData(null);
 		localStorage.removeItem(USERDATA_STORAGE_KEY);
 	};
 
@@ -73,152 +85,253 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 		lastName: string,
 		email: string,
 		password: string,
-	) {
+	): Promise<boolean> {
 		try {
 			setLoading(true);
 			setErrors(null);
 
+			if (
+				!firstName?.trim() ||
+				!lastName?.trim() ||
+				!email?.trim() ||
+				!password?.trim()
+			) {
+				setErrors(['All fields are required.']);
+				return false;
+			}
+
+			if (password.length < 8) {
+				setErrors(['Password must be at least 8 characters long.']);
+				return false;
+			}
+
+			await ensureCSRFToken();
+
 			const response = await axiosInstance.post('register/', {
-				first_name: firstName,
-				last_name: lastName,
-				email: email,
+				first_name: firstName.trim(),
+				last_name: lastName.trim(),
+				email: email.trim().toLowerCase(),
 				password: password,
 			});
 
 			if (response.status >= 200 && response.status < 300) {
 				setAuth(response.data);
+				return true;
 			} else {
-				console.error('Signup failed');
+				setErrors(['Registration failed. Please try again.']);
+				return false;
 			}
 		} catch (error: any) {
 			console.error('Sign Up error:', error);
-			setErrors(['auth:unknown']);
+			setErrors(mapErrorToMessage(error));
+			return false;
 		} finally {
 			setLoading(false);
 		}
 	}
 
-	async function Login(email: string, password: string) {
+	async function Login(email: string, password: string): Promise<boolean> {
 		try {
 			setLoading(true);
 			setErrors(null);
 
+			if (!email?.trim() || !password?.trim()) {
+				setErrors(['Email and password are required.']);
+				return false;
+			}
+
+			await ensureCSRFToken();
+
 			const response = await axiosInstance.post('login/', {
-				email: email,
+				email: email.trim().toLowerCase(),
 				password: password,
 			});
 
 			if (response.status >= 200 && response.status < 300) {
-				console.log(response.data);
 				setAuth(response.data);
+				return true;
 			} else {
-				console.error('Login failed');
+				setErrors(['Login failed. Please try again.']);
+				return false;
 			}
 		} catch (error: any) {
 			console.error('Login error:', error);
-			setErrors(['auth:unknown']);
+			setErrors(mapErrorToMessage(error));
+			return false;
 		} finally {
 			setLoading(false);
 		}
 	}
 
-	async function ConfirmPassword(password: string) {
+	async function ConfirmPassword(password: string): Promise<boolean> {
 		try {
 			setLoading(true);
 			setErrors(null);
+
+			if (!password?.trim()) {
+				setErrors(['Password is required.']);
+				return false;
+			}
+
+			await ensureCSRFToken();
 
 			const response = await axiosInstance.post('confirm_password/', {
 				password: password,
 			});
+
+			if (response.status >= 200 && response.status < 300) {
+				return true;
+			} else {
+				setErrors(['Password confirmation failed.']);
+				return false;
+			}
 		} catch (error: any) {
 			console.error('ConfirmPassword error:', error);
-			setErrors(['auth:unknown']);
+			setErrors(mapErrorToMessage(error));
+			return false;
 		} finally {
 			setLoading(false);
 		}
 	}
-	async function PasswordReset(token: string | undefined, password: string) {
+
+	async function PasswordReset(
+		token: string | undefined,
+		password: string,
+	): Promise<boolean> {
 		try {
 			setLoading(true);
 			setErrors(null);
+
+			if (!token || !password?.trim()) {
+				setErrors(['Invalid reset token or password.']);
+				return false;
+			}
+
+			if (password.length < 8) {
+				setErrors(['Password must be at least 8 characters long.']);
+				return false;
+			}
+
+			await ensureCSRFToken();
 
 			const response = await axiosInstance.post('password_reset/confirm/', {
 				password: password,
 				token: token,
 			});
+
+			if (response.status >= 200 && response.status < 300) {
+				return true;
+			} else {
+				setErrors(['Password reset failed. Please try again.']);
+				return false;
+			}
 		} catch (error: any) {
 			console.error('PasswordReset error:', error);
-			setErrors(['auth:unknown']);
+			setErrors(mapErrorToMessage(error));
+			return false;
 		} finally {
 			setLoading(false);
 		}
 	}
 
-	async function ForgotPassword(email: string) {
+	async function ForgotPassword(email: string): Promise<string | null> {
 		try {
 			setLoading(true);
 			setErrors(null);
+
+			if (!email?.trim()) {
+				setErrors(['Email is required.']);
+				return null;
+			}
+
+			await ensureCSRFToken();
 
 			const response = await axiosInstance.post('password_reset/', {
-				email: email,
+				email: email.trim().toLowerCase(),
 			});
 
-			return response.data.token;
+			if (response.status >= 200 && response.status < 300) {
+				return response.data.token || 'success';
+			} else {
+				setErrors(['Failed to send reset email. Please try again.']);
+				return null;
+			}
 		} catch (error: any) {
 			console.error('ForgotPassword error:', error);
-			setErrors(['auth:unknown']);
+			setErrors(mapErrorToMessage(error));
+			return null;
 		} finally {
 			setLoading(false);
 		}
 	}
 
-	async function VerifyEmail(email: string) {
+	async function VerifyEmail(email: string): Promise<string | null> {
 		try {
 			setLoading(true);
 			setErrors(null);
+
+			if (!email?.trim()) {
+				setErrors(['Email is required.']);
+				return null;
+			}
+
+			await ensureCSRFToken();
 
 			const response = await axiosInstance.post('verify_email/', {
-				email: email,
+				email: email.trim().toLowerCase(),
 			});
 
-			return response.data.token;
+			if (response.status >= 200 && response.status < 300) {
+				return response.data.token || 'success';
+			} else {
+				setErrors(['Failed to send verification email. Please try again.']);
+				return null;
+			}
 		} catch (error: any) {
 			console.error('VerifyEmail error:', error);
-			setErrors(['auth:unknown']);
+			setErrors(mapErrorToMessage(error));
+			return null;
 		} finally {
 			setLoading(false);
 		}
 	}
 
-	async function Logout() {
+	async function Logout(): Promise<void> {
 		try {
 			setLoading(true);
 			setErrors(null);
-			const response = await axiosInstance.post('logout/');
-			return response;
-		} catch (error: any) {
-			console.error(
-				'Logout error:',
-				error.response ? error.response.data : error.message,
-			);
-			throw error;
-		} finally {
+
 			setNotAuth();
+
+			axiosInstance
+				.post('logout/')
+				.then(() => {
+					console.log('Server logout successful');
+				})
+				.catch((error) => {
+					console.error('Server logout failed:', error);
+				});
+		} catch (error: any) {
+			console.error('Logout error:', error);
+			setNotAuth();
+		} finally {
 			setLoading(false);
 		}
 	}
 
 	const confirmAuth = useCallback(async () => {
 		try {
+			await ensureCSRFToken();
+
 			const response = await axiosInstance.get('auth/me/');
 			if (response.status >= 200 && response.status < 300) {
 				setAuth(response.data);
 			} else {
 				setNotAuth();
 			}
-		} catch (e: any) {
-			setErrors(e);
-			console.error(e);
+		} catch (error: any) {
+			console.error('Auth confirmation failed:', error);
+
 			setNotAuth();
 		} finally {
 			setCheckingAuth(false);
@@ -227,11 +340,16 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
 	useEffect(() => {
 		const cached = localStorage.getItem(USERDATA_STORAGE_KEY);
-
 		if (cached) {
-			setSharedData(JSON.parse(cached) as SharedData);
-			setIsAuthenticated(true);
+			try {
+				const parsedData = JSON.parse(cached) as SharedData;
+				setSharedData(parsedData);
+			} catch (error) {
+				console.error('Error parsing cached auth data:', error);
+				localStorage.removeItem(USERDATA_STORAGE_KEY);
+			}
 		}
+
 		confirmAuth();
 	}, [confirmAuth]);
 
@@ -241,7 +359,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 				SignUp,
 				Login,
 				Logout,
-				setErrors: setErrors,
+				setErrors,
 				setIsAuthenticated,
 				setLoading,
 				ForgotPassword,
@@ -249,6 +367,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 				ConfirmPassword,
 				PasswordReset,
 				setSharedData,
+				clearErrors,
 				sharedData,
 				checkingAuth,
 				errors,

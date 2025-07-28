@@ -12,6 +12,15 @@ import ResetPassword from '../pages/auth/reset-password';
 import VerifyEmail from '../pages/auth/verify-email';
 import Authentication from '../pages/settings/authentication';
 import General from '../pages/settings/general';
+import { TwoFactorVerification } from '../pages/auth/two-factor-verification';
+import Trash from '../pages/app/trash';
+import Shared from '../pages/app/shared-with-me';
+import Files from '../pages/app/files';
+import Calender from '../pages/app/calender';
+import Tags from '../pages/app/tags';
+import Notebooks from '../pages/app/notebook';
+import Notes from '../pages/app/notes';
+import Tasks from '../pages/app/tasks';
 
 function AppRoutes() {
 	const { isAuthenticated, checkingAuth } = useAuth();
@@ -23,6 +32,8 @@ function AppRoutes() {
 		{ path: 'forgot-password', Component: ForgotPassword },
 		{ path: 'reset-password/:token', Component: ResetPassword },
 		{ path: 'verify-email', Component: VerifyEmail },
+        { path: 'Two-factor-verification', Component: TwoFactorVerification },
+
 		{ path: 'register', Component: Register },
 		{ path: '*', Component: () => <Navigate to="/" replace /> },
 	];
@@ -34,6 +45,14 @@ function AppRoutes() {
 			children: [
 				{ index: true, Component: Home },
 				{ path: 'favorites', Component: Favorites },
+				{ path: 'trash', Component: Trash },
+				{ path: 'shared', Component: Shared },
+				{ path: 'files', Component: Files },
+				{ path: 'calender', Component: Calender },
+				{ path: 'tags', Component: Tags },
+				{ path: 'notebooks', Component: Notebooks },
+				{ path: 'notes', Component: Notes },
+				{ path: 'tasks', Component: Tasks },
 			],
 		},
 		{

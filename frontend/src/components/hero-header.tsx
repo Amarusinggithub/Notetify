@@ -1,9 +1,11 @@
+import { Button } from './ui/button';
+import { cn } from '../lib/utils';
 import { Menu, X } from 'lucide-react';
+import { useScroll } from 'motion/react';
 import React from 'react';
 import { Link } from 'react-router';
-import AppAppLogo from './app-logo';
 import { ModeToggle } from './mode-toggle';
-import { Button } from './ui/button';
+import AppLogo from './app-logo';
 
 const menuItems = [
 	{ name: 'Features', href: '#link' },
@@ -11,16 +13,29 @@ const menuItems = [
 	{ name: 'Pricing', href: '#link' },
 	{ name: 'About', href: '#link' },
 ];
-
 export const HeroHeader = () => {
 	const [menuState, setMenuState] = React.useState(false);
+	const [scrolled, setScrolled] = React.useState(false);
+
+	const { scrollYProgress } = useScroll();
+
+	React.useEffect(() => {
+		const unsubscribe = scrollYProgress.on('change', (latest) => {
+			setScrolled(latest > 0.05);
+		});
+		return () => unsubscribe();
+	}, [scrollYProgress]);
+
 	return (
 		<header>
 			<nav
 				data-state={menuState && 'active'}
-				className="bg-background/50 fixed z-20 w-full border-b backdrop-blur-3xl"
+				className={cn(
+					'fixed z-20 w-full border-b transition-colors duration-150',
+					scrolled && 'bg-background/50 backdrop-blur-3xl',
+				)}
 			>
-				<div className="mx-auto max-w-6xl px-6 transition-all duration-300">
+				<div className="mx-auto max-w-5xl px-6 transition-all duration-300">
 					<div className="relative flex flex-wrap items-center justify-between gap-6 py-3 lg:gap-0 lg:py-4">
 						<div className="flex w-full items-center justify-between gap-12 lg:w-auto">
 							<Link
@@ -28,7 +43,7 @@ export const HeroHeader = () => {
 								aria-label="home"
 								className="flex items-center space-x-2"
 							>
-								<AppAppLogo />
+								<AppLogo/>
 							</Link>
 
 							<button
@@ -72,17 +87,20 @@ export const HeroHeader = () => {
 								</ul>
 							</div>
 							<div className="flex w-full flex-col space-y-3 sm:flex-row sm:gap-3 sm:space-y-0 md:w-fit">
+								<div className="flex items-center">
+
+									<ModeToggle />
+								</div>
 								<Button asChild variant="outline" size="sm">
 									<Link to="/login">
 										<span>Login</span>
 									</Link>
 								</Button>
 								<Button asChild size="sm">
-									<Link to="/register">
+									<Link to="/signup">
 										<span>Sign Up</span>
 									</Link>
 								</Button>
-								<ModeToggle />
 							</div>
 						</div>
 					</div>

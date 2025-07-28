@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import React, { useState } from 'react';
 import { CompactPicker, type ColorResult } from 'react-color';
-import useEditorStore from '../../hooks/use-editore-store';
+import useEditorStore from '../../hooks/use-editor-store';
 import { cn } from '../../lib/utils';
 import { Button } from './button';
 import {
@@ -46,7 +46,8 @@ function ToolbarFontSizeMenuButton() {
 		label: String(size),
 		value: `${size}px`,
 		isActive: () => editor?.isActive({ fontSize: `${size}px` }),
-		onClick: () => editor?.commands.setFontSize(`${size}px`),
+		onClick: () =>
+			/*editor?.commands.setFontSize(`${size}px`)*/ console.log(''),
 	}));
 
 	return (
@@ -343,7 +344,7 @@ function ToolbarTextColorButton() {
 	const { editor } = useEditorStore();
 	const value = editor?.getAttributes('textStyle').color || '#000000';
 	const onChange = (color: ColorResult) => {
-		editor?.chain().focus().setColor(color.hex).run();
+		//editor?.chain().focus().setColor(color.hex).run();
 	};
 
 	return (
@@ -463,7 +464,7 @@ function ToolbarFontFamilyMenuButton() {
 						{' '}
 						<button
 							key={value}
-							onClick={editor?.chain().focus().setFontFamily(value).run}
+							//	onClick={editor?.chain().focus().setFontFamily(value).run}
 							style={{ fontFamily: value }}
 							className={cn(
 								'hover:bg-nuetral-200/80 flex items-center gap-x-2 rounded-sm px-2 py-1',
@@ -549,7 +550,7 @@ function ToolbarHeadingLevelMenuButton() {
 }
 
 function ToolbarInsertMenuButton() {
-	const { editor } = useEditorStore();
+	//	const { editor } = useEditorStore();
 }
 
 function ToolbarGroup({ className, ...props }: React.ComponentProps<'div'>) {
@@ -572,7 +573,7 @@ function ToolbarSeparator({
 			data-slot="toolbar-separator"
 			data-toolbar="separator"
 			orientation={'vertical'}
-			className={cn('h-6 bg-neutral-300', className)}
+			className={cn('h-1 bg-neutral-300', className)}
 			{...props}
 		/>
 	);
@@ -589,6 +590,7 @@ export {
 	ToolbarImageButton,
 	ToolbarInsertMenuButton,
 	ToolbarLinkButton,
+	ToolbarListButton,
 	toolbarMenuButtonVariants,
 	ToolbarSeparator,
 	ToolbarTextColorButton,

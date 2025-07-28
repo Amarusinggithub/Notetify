@@ -311,7 +311,17 @@
 			padding: 0;
 		}
 	}
-	/* Link styles */
+ /* Link styles*/
+  a {
+    color: var(--purple);
+    cursor: pointer;
+
+    &:hover {
+      color: var(--purple-contrast);
+    }
+  }
+
+	/* Link styles
 	a {
 		@apply cursor: pointer text-blue-600;
 		cursor: pointer;
@@ -319,7 +329,7 @@
 		&:hover {
 			@apply underline;
 		}
-	}
+	}*/
 
 	blockquote {
 		border-left: 3px solid var(--gray-3);

@@ -18,6 +18,7 @@ import {
 	InputOTPGroup,
 	InputOTPSlot,
 } from '../../components/ui/input-otp';
+import AuthLayout from '../../layouts/auth-layout';
 
 const InputOTPFormSchema = z.object({
 	pin: z.string().min(6, {
@@ -25,7 +26,7 @@ const InputOTPFormSchema = z.object({
 	}),
 });
 
-export function InputOTPForm() {
+export function TwoFactorVerification() {
 	const form = useForm<z.infer<typeof InputOTPFormSchema>>({
 		resolver: zodResolver(InputOTPFormSchema),
 		defaultValues: {
@@ -44,7 +45,11 @@ export function InputOTPForm() {
 	}
 
 	return (
-
+		<AuthLayout
+			title="Enter one time password"
+			description="Please enter the one-time password sent to your phone or
+									email or from Authenticator app."
+		>
 			<Form {...form}>
 				<form
 					onSubmit={form.handleSubmit(onSubmit)}
@@ -69,8 +74,8 @@ export function InputOTPForm() {
 									</InputOTP>
 								</FormControl>
 								<FormDescription>
-									Please enter the one-time password sent to your phone or
-									email.
+									Please enter the one-time password sent to your phone or email
+									or Authenticator app.
 								</FormDescription>
 								<FormMessage />
 							</FormItem>
@@ -80,5 +85,6 @@ export function InputOTPForm() {
 					<Button type="submit">Submit</Button>
 				</form>
 			</Form>
+		</AuthLayout>
 	);
 }

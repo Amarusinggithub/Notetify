@@ -1,53 +1,19 @@
 import CodeBlock from '@tiptap/extension-code-block';
 import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
-import { OrderedList, TaskItem, TaskList } from '@tiptap/extension-list';
 import Strike from '@tiptap/extension-strike';
-import { TableKit } from '@tiptap/extension-table';
-import {
-	BackgroundColor,
-	Color,
-	FontFamily,
-	FontSize,
-	TextStyle,
-} from '@tiptap/extension-text-style';
+import { TextStyle } from '@tiptap/extension-text-style';
 import Youtube from '@tiptap/extension-youtube';
-import { CharacterCount, Placeholder } from '@tiptap/extensions';
 import { EditorContent, useEditor } from '@tiptap/react';
-import { BubbleMenu, FloatingMenu } from '@tiptap/react/menus';
 
-import Collaboration from '@tiptap/extension-collaboration';
-import CollaborationCaret from '@tiptap/extension-collaboration-caret';
+//import Collaboration from '@tiptap/extension-collaboration';
+//import CollaborationCaret from '@tiptap/extension-collaboration-caret';
 import Highlight from '@tiptap/extension-highlight';
 import TextAlign from '@tiptap/extension-text-align';
 import StarterKit from '@tiptap/starter-kit';
-import {
-	BoldIcon,
-	ItalicIcon,
-	ListTodoIcon,
-	type LucideIcon,
-	PrinterIcon,
-	Redo2Icon,
-	RemoveFormattingIcon,
-	SpellCheckIcon,
-	StrikethroughIcon,
-	UnderlineIcon,
-	UndoIcon,
-} from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import { useState } from 'react';
 
-import {
-	Toolbar,
-	ToolbarButton,
-	ToolbarFontFamilyMenuButton,
-	ToolbarGroup,
-	ToolbarHeadingLevelMenuButton,
-	ToolbarLinkButton,
-	ToolbarSeparator,
-	ToolbarTextColorButton,
-	ToolbarTextHighlightButton,
-} from './ui/toolbar';
-import {  useLiveblocksExtension } from "@liveblocks/react-tiptap";
+import { useLiveblocksExtension } from '@liveblocks/react-tiptap';
 //import { TiptapCollabProvider } from '@hocuspocus/provider';
 import Blockquote from '@tiptap/extension-blockquote';
 import Document from '@tiptap/extension-document';
@@ -55,18 +21,17 @@ import Emoji, { gitHubEmojis } from '@tiptap/extension-emoji';
 import Heading from '@tiptap/extension-heading';
 import Paragraph from '@tiptap/extension-paragraph';
 import Text from '@tiptap/extension-text';
-import { type BreadcrumbItem as BreadcrumbItemType } from '../types';
 
-import useEditorStore from '../hooks/use-editore-store';
-import { defaultContent, getInitialUser } from '../utils/helpers';
-import { Breadcrumbs } from './breadcrumbs';
-import { ModeToggle } from './mode-toggle';
+import useEditorStore from '../hooks/use-editor-store';
+import { getInitialUser } from '../utils/helpers';
 import suggestion from './suggestion';
-import { SidebarTrigger } from './ui/sidebar';
+import EditorFooter from './editor-footer';
+import { EditorHeader } from './editor-header';
+import EditorToolbar from './editor-toolbar';
+import { cn } from '../lib/utils';
 
-
-export const Editor = ({ ydoc, provider, room }) => {
-      const liveblocks = useLiveblocksExtension();
+export const Editor = () => {
+	const liveblocks = useLiveblocksExtension();
 	const [status, setStatus] = useState('connecting');
 	const [currentUser, setCurrentUser] = useState(getInitialUser);
 	const { setEditor } = useEditorStore();
@@ -86,11 +51,11 @@ export const Editor = ({ ydoc, provider, room }) => {
 		},
 		onCreate: ({ editor: currentEditor }) => {
 			setEditor(currentEditor);
-			provider.on('synced', () => {
+			/*provider.on('synced', () => {
 				if (currentEditor.isEmpty) {
 					currentEditor.commands.setContent(defaultContent);
 				}
-			});
+			});*/
 		},
 		onDestroy: () => {
 			setEditor(null);
@@ -111,33 +76,28 @@ export const Editor = ({ ydoc, provider, room }) => {
 			setEditor(currentEditor);
 		},
 
-		extensions: [ 
-liveblocks,            
-			StarterKit,    
-			TextStyle,FontSize,
+		extensions: [
+			liveblocks.configure({history:false}),
+			StarterKit,
+			TextStyle,
 			Strike,
 			TextAlign.configure({
 				defaultAlignment: 'right',
 
 				types: ['heading', 'paragraph'],
 			}),
-			FontFamily,
 			Emoji.configure({
 				emojis: gitHubEmojis,
 				enableEmoticons: true,
 				suggestion,
 			}),
-			TableKit.configure({
-				table: { resizable: true },
-			}),
+
 			Heading.configure({
 				levels: [1, 2, 3],
 			}),
-			Color,
 			Document,
 			Image,
 			Image,
-			BackgroundColor,
 			Paragraph,
 			Text,
 			Youtube.configure({
@@ -232,39 +192,23 @@ liveblocks,
 				origin: 'yourdomain.com',
 				progressBarColor: 'white',
 			}),
-			OrderedList.configure({
-				itemTypeName: 'listItem',
-				keepMarks: true,
-				keepAttributes: true,
-			}),
+
 			CodeBlock.configure({
 				exitOnArrowDown: false,
 				exitOnTripleEnter: false,
 				defaultLanguage: 'plaintext',
 			}),
-			TaskList.configure({
-				itemTypeName: 'taskItem',
-			}),
-			TaskItem.configure({
-				nested: true,
-			}),
-			CharacterCount.extend().configure({
-				limit: 10000,
-			}),
-			Collaboration.extend().configure({
+
+			/*Collaboration.extend().configure({
 				document: ydoc,
 			}),
 			CollaborationCaret.extend().configure({
 				provider,
-			}),
-			Placeholder.configure({
-				placeholder:
-					'Write something …',
-			}),
+			}),*/
 		],
 	});
 
-	useEffect(() => {
+	/*useEffect(() => {
 		// Update status changes
 		const statusHandler = (event) => {
 			setStatus(event.status);
@@ -275,10 +219,10 @@ liveblocks,
 		return () => {
 			provider.off('status', statusHandler);
 		};
-	}, [provider]);
+	}, [provider]);*/
 
 	// Save current user to localStorage and emit to editor
-	useEffect(() => {
+	/*useEffect(() => {
 		if (editor && currentUser) {
 			localStorage.setItem('currentUser', JSON.stringify(currentUser));
 			editor.chain().focus().updateUser(currentUser).run();
@@ -297,187 +241,19 @@ liveblocks,
 
 	if (!editor) {
 		return null;
-	}
+	}*/
 
 	return (
 		<>
-			<EditorHeader />
+			<EditorHeader  />
 			<EditorToolbar />
 
-			<div className="print: pring:bg-white print: overflow-auto- size-full overflow-x-auto bg-white p-0 px-4">
-				<EditorContent editor={editor} className="" />
-				<FloatingMenu editor={editor}>This is the floating menu</FloatingMenu>
-				<BubbleMenu editor={editor}>This is the bubble menu</BubbleMenu>
-
-				<div
-					className="collab-status-group"
-					data-state={status === 'connected' ? 'online' : 'offline'}
-				>
-					<label>
-						{status === 'connected'
-							? `${editor.storage.collaborationCaret.users.length} user${
-									editor.storage.collaborationCaret.users.length === 1
-										? ''
-										: 's'
-								} online in ${room}`
-							: 'offline'}
-					</label>
-					<button style={{ '--color': currentUser.color }} onClick={setName}>
-						✎ {currentUser.name}
-					</button>
-				</div>
-			</div>
+				<EditorContent editor={editor} className={cn("")}/>
 			<EditorFooter />
 		</>
 	);
 };
 
-export function EditorHeader({
-	breadcrumbs = [],
-}: {
-	breadcrumbs?: BreadcrumbItemType[];
-}) {
-	return (
-		<header className="border-sidebar-border/50 flex h-16 shrink-0 items-center gap-2 border-b px-6 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 md:px-4">
-			<div className="flex items-center gap-2">
-				<SidebarTrigger className="-ml-1" /> <ModeToggle />
-				<Breadcrumbs breadcrumbs={breadcrumbs} />
-			</div>
-		</header>
-	);
-}
-function EditorFooter() {
-	return <></>;
-}
 
-export default function EditorToolbar() {
-	const { editor } = useEditorStore();
 
-	const sections: {
-		label: string;
-		icon: LucideIcon;
-		onClick: () => void;
-		isActive?: boolean;
-	}[][] = [
-		[
-			{
-				label: 'Undo',
-				icon: UndoIcon,
-				onClick: () => {
-					editor?.chain().focus().undo().run();
-				},
-			},
-			{
-				label: 'Redo',
-				icon: Redo2Icon,
-				onClick: () => {
-					editor?.chain().focus().redo().run();
-				},
-			},
-			{
-				label: 'Print',
-				icon: PrinterIcon,
-				onClick: () => {
-					window.print();
-				},
-			},
-			{
-				label: 'Spell Check',
-				icon: SpellCheckIcon,
-				onClick: () => {
-					const current = editor?.view.dom.getAttribute('spellcheck');
-					editor?.view.dom.setAttribute(
-						'spellcheck',
-						current === 'false' ? 'true' : 'false',
-					);
-				},
-			},
-		],
-		[
-			{
-				label: 'Bold',
-				icon: BoldIcon,
-				isActive: editor?.isActive('bold'),
-				onClick: () => {
-					editor?.chain().focus().toggleBold().run();
-				},
-			},
-			{
-				label: 'Italic',
-				icon: ItalicIcon,
-				isActive: editor?.isActive('italic'),
-				onClick: () => {
-					editor?.chain().focus().toggleItalic().run();
-				},
-			},
-			{
-				label: 'Underline',
-				icon: UnderlineIcon,
-				isActive: editor?.isActive('underline'),
-				onClick: () => {
-					editor?.chain().focus().toggleUnderline().run();
-				},
-			},
-			{
-				label: 'Strike',
-				icon: StrikethroughIcon,
-				isActive: editor?.isActive('strike'),
-				onClick: () => {
-					editor?.chain().focus().toggleStrike().run();
-				},
-			},
-		],
-		[
-			{
-				label: 'List Todo',
-				icon: ListTodoIcon,
-				isActive: editor?.isActive('tasklist'),
-				onClick: () => {
-					editor?.chain().focus().toggleTaskList().run();
-				},
-			},
 
-			{
-				label: 'Remove Formatting',
-				icon: RemoveFormattingIcon,
-				onClick: () => {
-					editor?.chain().focus().unsetAllMarks().run();
-				},
-			},
-		],
-	];
-	return (
-		<>
-			<Toolbar className="flex min-h-[40px] items-center gap-x-0.5 overflow-x-auto rounded-[24px] bg-[#F1F4F9] px-2.5 py-0.5">
-				<ToolbarGroup>
-					{sections[0].map((item) => (
-						<ToolbarButton key={item.label} {...item} />
-					))}
-				</ToolbarGroup>
-				<ToolbarSeparator />
-				<ToolbarFontFamilyMenuButton />
-				<ToolbarSeparator />
-				<ToolbarHeadingLevelMenuButton />
-				<ToolbarSeparator />
-				<ToolbarTextColorButton />
-				<ToolbarSeparator />
-				<ToolbarTextHighlightButton />
-				<ToolbarSeparator />
-				<ToolbarLinkButton />
-				<ToolbarSeparator />
-
-				<ToolbarGroup>
-					{sections[1].map((item) => (
-						<ToolbarButton key={item.label} {...item} />
-					))}
-				</ToolbarGroup>
-				<ToolbarSeparator />
-				<ToolbarGroup>
-					{sections[2].map((item) => (
-						<ToolbarButton key={item.label} {...item} />
-					))}
-				</ToolbarGroup>
-			</Toolbar>
-		</>
-	);
-}
