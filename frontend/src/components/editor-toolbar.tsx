@@ -101,7 +101,7 @@ export default function EditorToolbar() {
 	];
 	return (
 		<>
-			<Toolbar className="flex min-h-[40px] items-center gap-x-0.5 overflow-x-auto rounded-[24px] bg-[#F1F4F9] px-2.5 py-0.5" editor={editor}>
+			<Toolbar className="flex min-h-[40px] items-center gap-x-0.5 overflow-x-auto rounded-[24px] bg-editor- px-2.5 py-0.5" editor={editor}>
 				<ToolbarGroup>
 					{sections[0].map((item) => (
 						<ToolbarButton key={item.label} {...item} />

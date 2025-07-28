@@ -248,7 +248,7 @@ export const Editor = () => {
 			<EditorHeader  />
 			<EditorToolbar />
 
-				<EditorContent editor={editor} className={cn("")}/>
+				<EditorContent editor={editor} className={cn(" h-full bg-")}/>
 			<EditorFooter />
 		</>
 	);
