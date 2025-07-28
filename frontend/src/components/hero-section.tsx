@@ -1,6 +1,6 @@
 import { Link } from 'react-router';
-import dark from '../../public/dark.png';
-import light from '../../public/light.png';
+import dark from '../assets/dark.png';
+import light from '../assets/light.png';
 import { AnimatedGroup } from '../components/ui/animated-group';
 import { Button } from '../components/ui/button';
 import { TextEffect } from '../components/ui/text-effect';

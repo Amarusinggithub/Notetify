@@ -6,15 +6,11 @@ import { TextStyle } from '@tiptap/extension-text-style';
 import Youtube from '@tiptap/extension-youtube';
 import { EditorContent, useEditor } from '@tiptap/react';
 
-//import Collaboration from '@tiptap/extension-collaboration';
-//import CollaborationCaret from '@tiptap/extension-collaboration-caret';
 import Highlight from '@tiptap/extension-highlight';
 import TextAlign from '@tiptap/extension-text-align';
 import StarterKit from '@tiptap/starter-kit';
-import { useState } from 'react';
 
 import { useLiveblocksExtension } from '@liveblocks/react-tiptap';
-//import { TiptapCollabProvider } from '@hocuspocus/provider';
 import Blockquote from '@tiptap/extension-blockquote';
 import Document from '@tiptap/extension-document';
 import Emoji, { gitHubEmojis } from '@tiptap/extension-emoji';
@@ -23,25 +19,22 @@ import Paragraph from '@tiptap/extension-paragraph';
 import Text from '@tiptap/extension-text';
 
 import useEditorStore from '../hooks/use-editor-store';
-import { getInitialUser } from '../utils/helpers';
-import suggestion from './suggestion';
+import { cn } from '../lib/utils';
 import EditorFooter from './editor-footer';
 import { EditorHeader } from './editor-header';
 import EditorToolbar from './editor-toolbar';
-import { cn } from '../lib/utils';
+import suggestion from './suggestion';
 
 export const Editor = () => {
 	const liveblocks = useLiveblocksExtension();
-	const [status, setStatus] = useState('connecting');
-	const [currentUser, setCurrentUser] = useState(getInitialUser);
+
 	const { setEditor } = useEditorStore();
 	const editor = useEditor({
 		editorProps: {
 			attributes: {
 				spellcheck: 'false',
-
 				class:
-					'focus:outline-none print:border-o bg-white border  border-[#c7c7c7] flex-col min-h-[1054px w-[816px]pt-10 pr-14 pb-10 cursor-text',
+					'focus:outline-none print:border-0 bg-editor text-editor-foreground border border-editor-border flex-col min-h-[1054px] w-full pt-10 pr-14 pb-10 pl-14 cursor-text',
 			},
 		},
 		enableContentCheck: true,
@@ -51,11 +44,6 @@ export const Editor = () => {
 		},
 		onCreate: ({ editor: currentEditor }) => {
 			setEditor(currentEditor);
-			/*provider.on('synced', () => {
-				if (currentEditor.isEmpty) {
-					currentEditor.commands.setContent(defaultContent);
-				}
-			});*/
 		},
 		onDestroy: () => {
 			setEditor(null);
@@ -77,13 +65,12 @@ export const Editor = () => {
 		},
 
 		extensions: [
-			liveblocks.configure({history:false}),
-			StarterKit,
+			liveblocks,
+			StarterKit.configure({ history: false }),
 			TextStyle,
 			Strike,
 			TextAlign.configure({
-				defaultAlignment: 'right',
-
+				defaultAlignment: 'left',
 				types: ['heading', 'paragraph'],
 			}),
 			Emoji.configure({
@@ -96,7 +83,6 @@ export const Editor = () => {
 				levels: [1, 2, 3],
 			}),
 			Document,
-			Image,
 			Image,
 			Paragraph,
 			Text,
@@ -111,17 +97,14 @@ export const Editor = () => {
 				protocols: ['http', 'https'],
 				isAllowedUri: (url, ctx) => {
 					try {
-						// construct URL
 						const parsedUrl = url.includes(':')
 							? new URL(url)
 							: new URL(`${ctx.defaultProtocol}://${url}`);
 
-						// use default validation
 						if (!ctx.defaultValidate(parsedUrl.href)) {
 							return false;
 						}
 
-						// disallowed protocols
 						const disallowedProtocols = ['ftp', 'file', 'mailto'];
 						const protocol = parsedUrl.protocol.replace(':', '');
 
@@ -129,7 +112,6 @@ export const Editor = () => {
 							return false;
 						}
 
-						// only allow protocols specified in ctx.protocols
 						const allowedProtocols = ctx.protocols.map((p) =>
 							typeof p === 'string' ? p : p.scheme,
 						);
@@ -138,7 +120,6 @@ export const Editor = () => {
 							return false;
 						}
 
-						// disallowed domains
 						const disallowedDomains = [
 							'example-phishing.com',
 							'malicious-site.net',
@@ -149,7 +130,6 @@ export const Editor = () => {
 							return false;
 						}
 
-						// all checks have passed
 						return true;
 					} catch {
 						return false;
@@ -157,12 +137,10 @@ export const Editor = () => {
 				},
 				shouldAutoLink: (url) => {
 					try {
-						// construct URL
 						const parsedUrl = url.includes(':')
 							? new URL(url)
 							: new URL(`https://${url}`);
 
-						// only auto-link if the domain is not in the disallowed list
 						const disallowedDomains = [
 							'example-no-autolink.com',
 							'another-no-autolink.com',
@@ -198,62 +176,30 @@ export const Editor = () => {
 				exitOnTripleEnter: false,
 				defaultLanguage: 'plaintext',
 			}),
-
-			/*Collaboration.extend().configure({
-				document: ydoc,
-			}),
-			CollaborationCaret.extend().configure({
-				provider,
-			}),*/
 		],
 	});
 
-	/*useEffect(() => {
-		// Update status changes
-		const statusHandler = (event) => {
-			setStatus(event.status);
-		};
-
-		provider.on('status', statusHandler);
-
-		return () => {
-			provider.off('status', statusHandler);
-		};
-	}, [provider]);*/
-
-	// Save current user to localStorage and emit to editor
-	/*useEffect(() => {
-		if (editor && currentUser) {
-			localStorage.setItem('currentUser', JSON.stringify(currentUser));
-			editor.chain().focus().updateUser(currentUser).run();
-		}
-	}, [editor, currentUser]);
-
-	const setName = useCallback(() => {
-		const name = (window.prompt('Name', currentUser.name) || '')
-			.trim()
-			.substring(0, 32);
-
-		if (name) {
-			return setCurrentUser({ ...currentUser, name });
-		}
-	}, [currentUser]);
-
 	if (!editor) {
-		return null;
-	}*/
+		return (
+			<div className="bg-editor text-editor-foreground flex h-screen items-center justify-center">
+				<div className="text-lg">Loading editor...</div>
+			</div>
+		);
+	}
 
 	return (
-		<>
-			<EditorHeader  />
+		<div className="bg-editor flex h-screen flex-col">
+			<EditorHeader />
 			<EditorToolbar />
-
-				<EditorContent editor={editor} className={cn(" h-full bg-")}/>
+			<div className="flex-1 overflow-auto">
+				<EditorContent
+					editor={editor}
+					className={cn(
+						'bg-editor text-editor-foreground mx-auto h-full min-h-full w-full border-0 shadow-lg',
+					)}
+				/>
+			</div>
 			<EditorFooter />
-		</>
+		</div>
 	);
 };
-
-
-
-

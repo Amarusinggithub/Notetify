@@ -1,7 +1,6 @@
-import  { Toolbar } from "@liveblocks/react-tiptap";
 import useEditorStore from "../hooks/use-editor-store";
 import { type LucideIcon, UndoIcon, Redo2Icon, PrinterIcon, SpellCheckIcon, BoldIcon, ItalicIcon, UnderlineIcon, StrikethroughIcon, ListTodoIcon, RemoveFormattingIcon } from "lucide-react";
-import { ToolbarGroup, ToolbarButton, ToolbarSeparator, ToolbarFontFamilyMenuButton, ToolbarHeadingLevelMenuButton, ToolbarTextColorButton, ToolbarTextHighlightButton, ToolbarLinkButton } from "./ui/toolbar";
+import { ToolbarGroup,Toolbar, ToolbarButton, ToolbarSeparator, ToolbarFontFamilyMenuButton, ToolbarHeadingLevelMenuButton, ToolbarTextColorButton, ToolbarTextHighlightButton, ToolbarLinkButton } from "./ui/toolbar";
 
 export default function EditorToolbar() {
 	const { editor } = useEditorStore();
@@ -93,6 +92,7 @@ export default function EditorToolbar() {
 			{
 				label: 'Remove Formatting',
 				icon: RemoveFormattingIcon,
+
 				onClick: () => {
 					editor?.chain().focus().unsetAllMarks().run();
 				},
@@ -100,8 +100,8 @@ export default function EditorToolbar() {
 		],
 	];
 	return (
-		<>
-			<Toolbar className="flex min-h-[40px] items-center gap-x-0.5 overflow-x-auto rounded-[24px] bg-editor- px-2.5 py-0.5" editor={editor}>
+		<div className="bg-editor border-editor-border border-b">
+			<Toolbar className="bg-editor flex h-10 items-center gap-x-0.5 overflow-x-auto rounded-none px-2.5 py-0.5">
 				<ToolbarGroup>
 					{sections[0].map((item) => (
 						<ToolbarButton key={item.label} {...item} />
@@ -129,8 +129,18 @@ export default function EditorToolbar() {
 						<ToolbarButton key={item.label} {...item} />
 					))}
 				</ToolbarGroup>
+					{sections[3]?.length > 0 && (
+						<>
+							<ToolbarSeparator />
+							<ToolbarGroup>
+								{sections[3].map((item) => (
+									<ToolbarButton key={item.label} {...item} />
+								))}
+							</ToolbarGroup>
+						</>
+					)}
 			</Toolbar>
-		</>
+		</div>
 	);
 }
 

@@ -97,7 +97,7 @@ export const HeroHeader = () => {
 									</Link>
 								</Button>
 								<Button asChild size="sm">
-									<Link to="/signup">
+									<Link to="/register">
 										<span>Sign Up</span>
 									</Link>
 								</Button>
