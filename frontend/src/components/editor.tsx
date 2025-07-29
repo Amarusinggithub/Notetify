@@ -1,22 +1,17 @@
-import CodeBlock from '@tiptap/extension-code-block';
+import { Color } from '@tiptap/extension-color';
+import { FontFamily } from '@tiptap/extension-font-family';
+import Highlight from '@tiptap/extension-highlight';
 import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
-import Strike from '@tiptap/extension-strike';
 import { TextStyle } from '@tiptap/extension-text-style';
 import Youtube from '@tiptap/extension-youtube';
 import { EditorContent, useEditor } from '@tiptap/react';
 
-import Highlight from '@tiptap/extension-highlight';
 import TextAlign from '@tiptap/extension-text-align';
 import StarterKit from '@tiptap/starter-kit';
 
-import { useLiveblocksExtension } from '@liveblocks/react-tiptap';
-import Blockquote from '@tiptap/extension-blockquote';
-import Document from '@tiptap/extension-document';
+import {  useLiveblocksExtension } from '@liveblocks/react-tiptap';
 import Emoji, { gitHubEmojis } from '@tiptap/extension-emoji';
-import Heading from '@tiptap/extension-heading';
-import Paragraph from '@tiptap/extension-paragraph';
-import Text from '@tiptap/extension-text';
 
 import useEditorStore from '../hooks/use-editor-store';
 import { cn } from '../lib/utils';
@@ -67,29 +62,23 @@ export const Editor = () => {
 		extensions: [
 			liveblocks,
 			StarterKit.configure({ history: false }),
-			TextStyle,
-			Strike,
+			Color,
+			Highlight,
+			FontFamily,
 			TextAlign.configure({
 				defaultAlignment: 'left',
 				types: ['heading', 'paragraph'],
 			}),
+			TextStyle.configure({ mergeNestedSpanStyles: true }),
+
 			Emoji.configure({
 				emojis: gitHubEmojis,
 				enableEmoticons: true,
 				suggestion,
 			}),
 
-			Heading.configure({
-				levels: [1, 2, 3],
-			}),
-			Document,
 			Image,
-			Paragraph,
-			Text,
-			Youtube.configure({
-				controls: false,
-				nocookie: true,
-			}),
+			
 			Link.configure({
 				openOnClick: false,
 				autolink: true,
@@ -153,8 +142,6 @@ export const Editor = () => {
 					}
 				},
 			}),
-			Highlight.configure({ multicolor: true }),
-			Blockquote,
 			Youtube.configure({
 				controls: false,
 				nocookie: true,
@@ -169,12 +156,6 @@ export const Editor = () => {
 				enableIFrameApi: true,
 				origin: 'yourdomain.com',
 				progressBarColor: 'white',
-			}),
-
-			CodeBlock.configure({
-				exitOnArrowDown: false,
-				exitOnTripleEnter: false,
-				defaultLanguage: 'plaintext',
 			}),
 		],
 	});
@@ -198,6 +179,7 @@ export const Editor = () => {
 						'bg-editor text-editor-foreground mx-auto h-full min-h-full w-full border-0 shadow-lg',
 					)}
 				/>
+				
 			</div>
 			<EditorFooter />
 		</div>

@@ -8,14 +8,21 @@ import { ModeToggle } from './mode-toggle';
 import AppLogo from './app-logo';
 
 const menuItems = [
-	{ name: 'Features', href: '#link' },
-	{ name: 'Solution', href: '#link' },
-	{ name: 'Pricing', href: '#link' },
-	{ name: 'About', href: '#link' },
+	{ name: 'Features', href: '#features' },
+	{ name: 'About', href: '#about' },
+	{ name: 'Pricing', href: '#pricing' },
+	{ name: 'Contact', href: '#contact' },
 ];
 export const HeroHeader = () => {
 	const [menuState, setMenuState] = React.useState(false);
 	const [scrolled, setScrolled] = React.useState(false);
+    const scrollToSection = (href) => {
+			const element = document.querySelector(href);
+			if (element) {
+				element.scrollIntoView({ behavior: 'smooth' });
+				setMenuState(false); // Close mobile menu after click
+			}
+		};
 
 	const { scrollYProgress } = useScroll();
 

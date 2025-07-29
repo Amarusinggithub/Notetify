@@ -2,37 +2,37 @@ import { createBrowserRouter, Navigate, RouterProvider } from 'react-router';
 import { useAuth } from '../hooks/use-auth';
 import AppLayout from '../layouts/app-layout';
 import SettingsLayout from '../layouts/settings/layout';
-import Welcome from '../pages//welcome';
+import Landing from '../pages/landing';
+import Calender from '../pages/app/calender';
 import Favorites from '../pages/app/favorites';
+import Files from '../pages/app/files';
 import Home from '../pages/app/home';
+import Notebooks from '../pages/app/notebook';
+import Notes from '../pages/app/notes';
+import Shared from '../pages/app/shared-with-me';
+import Tags from '../pages/app/tags';
+import Tasks from '../pages/app/tasks';
+import Trash from '../pages/app/trash';
 import ForgotPassword from '../pages/auth/forgot-password';
 import Login from '../pages/auth/login';
 import Register from '../pages/auth/register';
 import ResetPassword from '../pages/auth/reset-password';
+import { TwoFactorVerification } from '../pages/auth/two-factor-verification';
 import VerifyEmail from '../pages/auth/verify-email';
 import Authentication from '../pages/settings/authentication';
 import General from '../pages/settings/general';
-import { TwoFactorVerification } from '../pages/auth/two-factor-verification';
-import Trash from '../pages/app/trash';
-import Shared from '../pages/app/shared-with-me';
-import Files from '../pages/app/files';
-import Calender from '../pages/app/calender';
-import Tags from '../pages/app/tags';
-import Notebooks from '../pages/app/notebook';
-import Notes from '../pages/app/notes';
-import Tasks from '../pages/app/tasks';
 
 function AppRoutes() {
 	const { isAuthenticated, checkingAuth } = useAuth();
 	if (checkingAuth) return null;
 
 	const publicRoutes = [
-		{ index: true, Component: Welcome },
+		{ index: true, Component: Landing },
 		{ path: 'login', Component: Login },
 		{ path: 'forgot-password', Component: ForgotPassword },
 		{ path: 'reset-password/:token', Component: ResetPassword },
 		{ path: 'verify-email', Component: VerifyEmail },
-        { path: 'Two-factor-verification', Component: TwoFactorVerification },
+		{ path: 'Two-factor-verification', Component: TwoFactorVerification },
 
 		{ path: 'register', Component: Register },
 		{ path: '*', Component: () => <Navigate to="/" replace /> },

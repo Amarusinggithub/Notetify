@@ -33,23 +33,18 @@ def set_auth_cookies(response, tokens):
     response.set_cookie(
         key=settings.SIMPLE_JWT["AUTH_COOKIE"],
         value=tokens["access"],
-        expires=datetime.now(timezone.utc)
-        + settings.SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"],
+        expires=settings.SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"],
         secure=settings.SIMPLE_JWT["AUTH_COOKIE_SECURE"],
         httponly=settings.SIMPLE_JWT["AUTH_COOKIE_HTTP_ONLY"],
         samesite=settings.SIMPLE_JWT["AUTH_COOKIE_SAMESITE"],
-        path=settings.SIMPLE_JWT["AUTH_COOKIE_PATH"],
     )
-
     response.set_cookie(
         key=settings.SIMPLE_JWT["AUTH_COOKIE_REFRESH"],
         value=tokens["refresh"],
-        expires=datetime.now(timezone.utc)
-        + settings.SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"],
+        expires=settings.SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"],
         secure=settings.SIMPLE_JWT["AUTH_COOKIE_SECURE"],
         httponly=settings.SIMPLE_JWT["AUTH_COOKIE_HTTP_ONLY"],
         samesite=settings.SIMPLE_JWT["AUTH_COOKIE_SAMESITE"],
-        path=settings.SIMPLE_JWT["AUTH_COOKIE_PATH"],
     )
 
 
@@ -75,9 +70,10 @@ class RegisterView(APIView):
             tokens = get_tokens_for_user(user)
 
             response = Response(serializer.data, status=status.HTTP_201_CREATED)
-            set_auth_cookies(response, tokens)
 
+            set_auth_cookies(response, tokens)
             return response
+
         else:
             return Response(
                 {"error": "Account creation failed or account not active"},
@@ -104,9 +100,11 @@ class LoginView(APIView):
             tokens = get_tokens_for_user(user)
 
             response = Response(serializer.data, status=status.HTTP_200_OK)
+
             set_auth_cookies(response, tokens)
 
             return response
+
         else:
             return Response(
                 {"error": "Invalid credentials or inactive account"},
@@ -135,11 +133,9 @@ class LogoutView(APIView):
             )
             response.delete_cookie(
                 settings.SIMPLE_JWT["AUTH_COOKIE"],
-                path=settings.SIMPLE_JWT["AUTH_COOKIE_PATH"],
             )
             response.delete_cookie(
                 settings.SIMPLE_JWT["AUTH_COOKIE_REFRESH"],
-                path=settings.SIMPLE_JWT["AUTH_COOKIE_PATH"],
             )
 
             return response

@@ -61,15 +61,11 @@ def JwtAuthMiddlewareStack(inner):
     return CookieJWTAuthMiddleware(AuthMiddlewareStack(inner))
 
 
-
-
 class CustomCsrfMiddleware(CsrfViewMiddleware):
     def process_view(self, request, callback, callback_args, callback_kwargs):
-        if request.method in ("GET", "HEAD", "OPTIONS", "TRACE"):
-            return None
-
-        csrf_token = request.COOKIES.get("csrftoken")
-        if csrf_token:
+        if "HTTP_X_CSRFTOKEN" not in request.META:
+            csrf_token = request.COOKIES.get("csrftoken")
+            if csrf_token:
+                request.CSRF_COOKIE = csrf_token
             request.META["HTTP_X_CSRFTOKEN"] = csrf_token
-
-        return super().process_view(request, callback, callback_args, callback_kwargs)
+            super().process_view(request, callback, callback_args, callback_kwargs)

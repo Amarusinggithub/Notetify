@@ -10,9 +10,6 @@ def dummy_get_response(request):
 
 
 def enforce_csrf(request):
-    """Only enforce CSRF for non-safe methods"""
-    if request.method in ("GET", "HEAD", "OPTIONS", "TRACE"):
-        return
 
     check = CSRFCheck(dummy_get_response)
     check.process_request(request)
@@ -23,7 +20,7 @@ def enforce_csrf(request):
 
 class CustomAuthentication(JWTAuthentication):
     def authenticate(self, request):
-        raw_token = request.COOKIES.get(settings.SIMPLE_JWT["AUTH_COOKIE"])
+        raw_token = request.COOKIES.get(settings.SIMPLE_JWT["AUTH_COOKIE"]) or None
         if raw_token is None:
             return None
 
@@ -31,9 +28,8 @@ class CustomAuthentication(JWTAuthentication):
             validated_token = self.get_validated_token(raw_token)
             user = self.get_user(validated_token)
 
-          
-            if request.method not in ("GET", "HEAD", "OPTIONS", "TRACE"):
-                enforce_csrf(request)
+
+            enforce_csrf(request)
 
             return user, validated_token
 

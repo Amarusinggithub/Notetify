@@ -13,7 +13,6 @@ from rest_framework_simplejwt.exceptions import (
 )
 
 from rest_framework.decorators import api_view
-from django.views.decorators.csrf import csrf_exempt
 
 
 from django.conf import settings
@@ -32,6 +31,10 @@ DEBUG = os.environ.get("DEBUG", default=True)
 
 
 class CookieTokenRefreshView(TokenRefreshView):
+
+    def finalize_response(self, request, response, *args, **kwargs):
+        return super().finalize_response(request, response, *args, **kwargs)
+
     def post(self, request, *args, **kwargs):
         refresh_token = request.COOKIES.get(settings.SIMPLE_JWT["AUTH_COOKIE_REFRESH"])
 
@@ -69,22 +72,19 @@ class CookieTokenRefreshView(TokenRefreshView):
         response.set_cookie(
             key=settings.SIMPLE_JWT["AUTH_COOKIE"],
             value=access,
-            max_age=settings.SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"].total_seconds(),
+            expires=settings.SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"],
             secure=settings.SIMPLE_JWT["AUTH_COOKIE_SECURE"],
             httponly=settings.SIMPLE_JWT["AUTH_COOKIE_HTTP_ONLY"],
             samesite=settings.SIMPLE_JWT["AUTH_COOKIE_SAMESITE"],
-            path=settings.SIMPLE_JWT["AUTH_COOKIE_PATH"],
         )
-
         if refresh != refresh_token:
             response.set_cookie(
                 key=settings.SIMPLE_JWT["AUTH_COOKIE_REFRESH"],
                 value=refresh,
-                max_age=settings.SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"].total_seconds(),
+                expires=settings.SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"],
                 secure=settings.SIMPLE_JWT["AUTH_COOKIE_SECURE"],
                 httponly=settings.SIMPLE_JWT["AUTH_COOKIE_HTTP_ONLY"],
                 samesite=settings.SIMPLE_JWT["AUTH_COOKIE_SAMESITE"],
-                path=settings.SIMPLE_JWT["AUTH_COOKIE_PATH"],
             )
 
         return response
@@ -104,11 +104,10 @@ class AsgiTokenValidatorView(APIView):
 @api_view(["GET"])
 @ensure_csrf_cookie
 def get_csrf_token(request):
-    return Response(status=status.HTTP_204_NO_CONTENT)
+    return Response(status=status.HTTP_200_OK)
 
 
 @api_view(["GET"])
-@csrf_exempt
 def verify_token(request):
     """Verify JWT token from cookies and return user data"""
     auth = JWTAuthentication()
@@ -122,7 +121,8 @@ def verify_token(request):
 
     try:
         validated_token = auth.get_validated_token(raw_token)
-        user = auth.get_user(validated_token)
+        if validated_token:
+            user = auth.get_user(validated_token)
 
         if not user.is_active:
             return Response(
@@ -130,14 +130,14 @@ def verify_token(request):
                 status=status.HTTP_401_UNAUTHORIZED,
             )
 
-        serializer = UserSerializer(user, context={"request": request})
+        serializer = UserSerializer(request.user, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
-
     except (InvalidToken, AuthenticationFailed, ExpiredTokenError, TokenError) as e:
         return Response(
             {"error": "Token is invalid or expired", "detail": str(e)},
             status=status.HTTP_401_UNAUTHORIZED,
         )
+
     except Exception as e:
         return Response(
             {"error": "Authentication failed", "detail": str(e)},

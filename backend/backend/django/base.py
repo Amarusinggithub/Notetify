@@ -63,11 +63,11 @@ AUTHENTICATION_BACKENDS = [
 DJANGO_REST_MULTITOKENAUTH_RESET_TOKEN_EXPIRY_TIME=24
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
-    "ROTATE_REFRESH_TOKENS": True,
+    "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": True,
-    "UPDATE_LAST_LOGIN": True,
+    "UPDATE_LAST_LOGIN": False,
     "ALGORITHM": "HS256",
     "SIGNING_KEY": SECRET_KEY,
     "VERIFYING_KEY": None,
@@ -82,7 +82,7 @@ SIMPLE_JWT = {
     "TOKEN_TYPE_CLAIM": "token_type",
     "JTI_CLAIM": "jti",
     "SLIDING_TOKEN_REFRESH_EXP_CLAIM": "refresh_exp",
-    "SLIDING_TOKEN_LIFETIME": timedelta(minutes=15),
+    "SLIDING_TOKEN_LIFETIME": timedelta(minutes=30),
     "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=7),
     # custom
     "AUTH_COOKIE": "access_token",  # Cookie name. Enables cookies if value is set.
@@ -114,13 +114,13 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "rest_framework_simplejwt.token_blacklist",
-    "django_rest_passwordreset",
     "corsheaders",
+    "django_rest_passwordreset",
     "django_otp",
     "django_otp.plugins.otp_static",
     "django_otp.plugins.otp_totp",
-   # "two_factor",
-    #"two_factor.plugins.phonenumber",
+    # "two_factor",
+    # "two_factor.plugins.phonenumber",
     "silk",
 ]
 
@@ -128,10 +128,10 @@ INSTALLED_APPS = [
 ASGI_APPLICATION = "backend.asgi.application"
 
 MIDDLEWARE = [
-    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "backend.middleware.CustomCsrfMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",

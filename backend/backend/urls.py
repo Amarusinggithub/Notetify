@@ -3,15 +3,12 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework_simplejwt import views as jwt_views
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-)
+
 from .views import AsgiTokenValidatorView,get_csrf_token,CookieTokenRefreshView,verify_token
 
 
 urlpatterns = [
     path("api/admin/", admin.site.urls),
-    path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/token/refresh/", CookieTokenRefreshView.as_view(), name="token_refresh"),
    # path("", include("two_factor.urls", "two_factor")),
     path(

@@ -313,7 +313,7 @@ function ToolbarTextHighlightButton() {
 	const value = editor?.getAttributes('highlight').color || '#000000';
 
 	const onChange = (color: ColorResult) => {
-		editor?.chain().focus().setHighlight({ color: color.hex }).run();
+		editor?.commands.setHighlight({ color: color.hex });
 	};
 
 	return (
@@ -339,7 +339,7 @@ function ToolbarTextColorButton() {
 	const { editor } = useEditorStore();
 	const value = editor?.getAttributes('textStyle').color || '#000000';
 	const onChange = (color: ColorResult) => {
-		editor?.chain().focus().setColor(color.hex).run();
+		editor?.commands.setColor(color.hex);
 	};
 
 	return (
@@ -457,7 +457,7 @@ function ToolbarFontFamilyMenuButton() {
 				{fonts.map(({ label, value }) => (
 					<DropdownMenuItem key={value}>
 						<button
-							//	onClick={editor?.chain().focus().setFontFamily(value).run}
+								onClick={()=>editor?.commands.setFontFamily(value)}
 							style={{ fontFamily: value }}
 							className={cn(
 								'flex items-center gap-x-2 rounded-sm px-2 py-1 hover:bg-editor-accent hover:text-editor-accent-foreground transition-colors',
