@@ -10,7 +10,7 @@ import { EditorContent, useEditor } from '@tiptap/react';
 import TextAlign from '@tiptap/extension-text-align';
 import StarterKit from '@tiptap/starter-kit';
 
-import {  useLiveblocksExtension } from '@liveblocks/react-tiptap';
+import { useLiveblocksExtension } from '@liveblocks/react-tiptap';
 import Emoji, { gitHubEmojis } from '@tiptap/extension-emoji';
 
 import useEditorStore from '../hooks/use-editor-store';
@@ -78,7 +78,7 @@ export const Editor = () => {
 			}),
 
 			Image,
-			
+
 			Link.configure({
 				openOnClick: false,
 				autolink: true,
@@ -179,7 +179,6 @@ export const Editor = () => {
 						'bg-editor text-editor-foreground mx-auto h-full min-h-full w-full border-0 shadow-lg',
 					)}
 				/>
-				
 			</div>
 			<EditorFooter />
 		</div>

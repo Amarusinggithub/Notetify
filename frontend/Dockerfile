@@ -9,7 +9,7 @@ COPY ./nginx/nginx.conf /usr/src/app/nginx.conf
 COPY package.json package-lock.json ./
 
 RUN --mount=type=cache,target=/root/.npm \
-    npm ci
+    npm ci --legacy-peer-deps
 
 COPY . .
 

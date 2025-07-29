@@ -1,11 +1,11 @@
-import { Button } from './ui/button';
-import { cn } from '../lib/utils';
 import { Menu, X } from 'lucide-react';
 import { useScroll } from 'motion/react';
 import React from 'react';
 import { Link } from 'react-router';
-import { ModeToggle } from './mode-toggle';
+import { cn } from '../lib/utils';
 import AppLogo from './app-logo';
+import { ModeToggle } from './mode-toggle';
+import { Button } from './ui/button';
 
 const menuItems = [
 	{ name: 'Features', href: '#features' },
@@ -16,13 +16,13 @@ const menuItems = [
 export const HeroHeader = () => {
 	const [menuState, setMenuState] = React.useState(false);
 	const [scrolled, setScrolled] = React.useState(false);
-    const scrollToSection = (href) => {
-			const element = document.querySelector(href);
-			if (element) {
-				element.scrollIntoView({ behavior: 'smooth' });
-				setMenuState(false); // Close mobile menu after click
-			}
-		};
+	const scrollToSection = (href) => {
+		const element = document.querySelector(href);
+		if (element) {
+			element.scrollIntoView({ behavior: 'smooth' });
+			setMenuState(false); // Close mobile menu after click
+		}
+	};
 
 	const { scrollYProgress } = useScroll();
 
@@ -50,7 +50,7 @@ export const HeroHeader = () => {
 								aria-label="home"
 								className="flex items-center space-x-2"
 							>
-								<AppLogo/>
+								<AppLogo />
 							</Link>
 
 							<button
@@ -95,7 +95,6 @@ export const HeroHeader = () => {
 							</div>
 							<div className="flex w-full flex-col space-y-3 sm:flex-row sm:gap-3 sm:space-y-0 md:w-fit">
 								<div className="flex items-center">
-
 									<ModeToggle />
 								</div>
 								<Button asChild variant="outline" size="sm">

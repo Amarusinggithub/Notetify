@@ -1,10 +1,13 @@
-import { Card, CardContent, CardHeader } from '../components/ui/card';
 import { Code, NotebookPen, ShieldCheck } from 'lucide-react';
-import  {type ReactNode } from 'react';
+import { type ReactNode } from 'react';
+import { Card, CardContent, CardHeader } from '../components/ui/card';
 
 export default function Features() {
 	return (
-		<section id="features" className="scroll-mt-20 bg-zinc-50 py-16 md:py-32 dark:bg-transparent">
+		<section
+			id="features"
+			className="scroll-mt-20 bg-zinc-50 py-16 md:py-32 dark:bg-transparent"
+		>
 			<div className="@container mx-auto max-w-5xl px-6">
 				<div className="text-center">
 					<h2 className="text-4xl font-semibold text-balance lg:text-5xl">

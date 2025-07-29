@@ -2,7 +2,6 @@ import { createBrowserRouter, Navigate, RouterProvider } from 'react-router';
 import { useAuth } from '../hooks/use-auth';
 import AppLayout from '../layouts/app-layout';
 import SettingsLayout from '../layouts/settings/layout';
-import Landing from '../pages/landing';
 import Calender from '../pages/app/calender';
 import Favorites from '../pages/app/favorites';
 import Files from '../pages/app/files';
@@ -19,6 +18,7 @@ import Register from '../pages/auth/register';
 import ResetPassword from '../pages/auth/reset-password';
 import { TwoFactorVerification } from '../pages/auth/two-factor-verification';
 import VerifyEmail from '../pages/auth/verify-email';
+import Landing from '../pages/landing';
 import Authentication from '../pages/settings/authentication';
 import General from '../pages/settings/general';
 

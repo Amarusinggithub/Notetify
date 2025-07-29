@@ -10,13 +10,27 @@ import {
 	SidebarSeparator,
 } from './ui/sidebar';
 
-import { Home, Newspaper, Notebook,  Star, Tag, Trash2,  UsersRound } from 'lucide-react';
+import {
+	Home,
+	Newspaper,
+	Notebook,
+	Star,
+	Tag,
+	Trash2,
+	UsersRound,
+} from 'lucide-react';
 import { type NavItem } from '../types';
 import AppLogo from './app-logo';
 import { NavMain } from './nav-main';
 import { NavUser } from './nav-user';
 import { SearchInput } from './search-input';
-import { Dialog, DialogContent, DialogOverlay, DialogPortal, DialogTrigger } from './ui/dialog';
+import {
+	Dialog,
+	DialogContent,
+	DialogOverlay,
+	DialogPortal,
+	DialogTrigger,
+} from './ui/dialog';
 
 const mainNavItems: NavItem[] = [
 	{
@@ -81,14 +95,12 @@ export function AppSidebar() {
 						<SidebarMenuButton asChild>
 							<Dialog>
 								<DialogTrigger asChild>
-									<SearchInput   />
+									<SearchInput />
 								</DialogTrigger>
-                                <DialogPortal>
-                                    <DialogOverlay/>
-                                    <DialogContent>
-
-                                    </DialogContent>
-                                </DialogPortal>
+								<DialogPortal>
+									<DialogOverlay />
+									<DialogContent></DialogContent>
+								</DialogPortal>
 							</Dialog>
 						</SidebarMenuButton>
 					</SidebarMenuItem>

@@ -1,5 +1,5 @@
 import { LoaderCircle } from 'lucide-react';
-import {  useState } from 'react';
+import { useState } from 'react';
 import InputError from '../../components/input-error';
 import TextLink from '../../components/text-link';
 import { Button } from '../../components/ui/button.tsx';
@@ -22,27 +22,25 @@ export default function ForgotPassword({ status }: ForgotPasswordProps) {
 		email: '',
 	});
 
-	const { isLoading, errors,setErrors,ForgotPassword } = useAuth();
+	const { isLoading, errors, setErrors, ForgotPassword } = useAuth();
 
 	const change = (e: React.ChangeEvent<HTMLInputElement>) => {
-            setForm({ ...form, [e.target.name]: e.target.value.trim() });
-        };
-    
-        const submit = async (e: React.FormEvent<HTMLFormElement>) => {
-            e.preventDefault();
-            setErrors(null);
-    
-            const validationResult = forgatPasswordSchema.safeParse(form);
-    
-            if (!validationResult.success) {
-                const formattedErrors = validationResult.error.flatten().fieldErrors;
-                setErrors(formattedErrors);
-                return;
-            }
-            await ForgotPassword(form.email);
-        };
+		setForm({ ...form, [e.target.name]: e.target.value.trim() });
+	};
 
-	
+	const submit = async (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault();
+		setErrors(null);
+
+		const validationResult = forgatPasswordSchema.safeParse(form);
+
+		if (!validationResult.success) {
+			const formattedErrors = validationResult.error.flatten().fieldErrors;
+			setErrors(formattedErrors);
+			return;
+		}
+		await ForgotPassword(form.email);
+	};
 
 	return (
 		<AuthLayout
@@ -71,9 +69,9 @@ export default function ForgotPassword({ status }: ForgotPasswordProps) {
 							onChange={(e) => change(e)}
 							placeholder="email@example.com"
 						/>
-{errors?.email && (
-                            <InputError message={errors.email[0]} className="mt-2" />
-                        )}
+						{errors?.email && (
+							<InputError message={errors.email[0]} className="mt-2" />
+						)}
 					</div>
 
 					<div className="my-6 flex items-center justify-start">

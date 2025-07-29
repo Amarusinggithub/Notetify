@@ -1,6 +1,28 @@
-import useEditorStore from "../hooks/use-editor-store";
-import { type LucideIcon, UndoIcon, Redo2Icon, PrinterIcon, SpellCheckIcon, BoldIcon, ItalicIcon, UnderlineIcon, StrikethroughIcon, ListTodoIcon, RemoveFormattingIcon } from "lucide-react";
-import { ToolbarGroup,Toolbar, ToolbarButton, ToolbarSeparator, ToolbarFontFamilyMenuButton, ToolbarHeadingLevelMenuButton, ToolbarTextColorButton, ToolbarTextHighlightButton, ToolbarLinkButton } from "./ui/toolbar";
+import {
+	BoldIcon,
+	ItalicIcon,
+	ListTodoIcon,
+	type LucideIcon,
+	PrinterIcon,
+	Redo2Icon,
+	RemoveFormattingIcon,
+	SpellCheckIcon,
+	StrikethroughIcon,
+	UnderlineIcon,
+	UndoIcon,
+} from 'lucide-react';
+import useEditorStore from '../hooks/use-editor-store';
+import {
+	Toolbar,
+	ToolbarButton,
+	ToolbarFontFamilyMenuButton,
+	ToolbarGroup,
+	ToolbarHeadingLevelMenuButton,
+	ToolbarLinkButton,
+	ToolbarSeparator,
+	ToolbarTextColorButton,
+	ToolbarTextHighlightButton,
+} from './ui/toolbar';
 
 export default function EditorToolbar() {
 	const { editor } = useEditorStore();
@@ -129,23 +151,20 @@ export default function EditorToolbar() {
 						<ToolbarButton key={item.label} {...item} />
 					))}
 				</ToolbarGroup>
-					{sections[3]?.length > 0 && (
-						<>
-							<ToolbarSeparator />
-							<ToolbarGroup>
-								{sections[3].map((item) => (
-									<ToolbarButton key={item.label} {...item} />
-								))}
-							</ToolbarGroup>
-						</>
-					)}
+				{sections[3]?.length > 0 && (
+					<>
+						<ToolbarSeparator />
+						<ToolbarGroup>
+							{sections[3].map((item) => (
+								<ToolbarButton key={item.label} {...item} />
+							))}
+						</ToolbarGroup>
+					</>
+				)}
 			</Toolbar>
 		</div>
 	);
 }
-
-
-
 
 /*import {
   AlignCenter,

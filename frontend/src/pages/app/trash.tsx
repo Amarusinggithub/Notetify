@@ -1,3 +1,3 @@
-export default function Trash(){
-    return<></>
+export default function Trash() {
+	return <></>;
 }

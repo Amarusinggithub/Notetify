@@ -47,24 +47,7 @@ services:
     env_file:
       - .env.development
 
-  yroom_worker:
-    #networks:
-     # - notetify-net
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-      target: development
-      args:
-        - REQUIREMENTS_FILE=requirements_dev.txt
-    # depends_on:
-    #  redis:
-    # condition: service_started
-    #db:
-    #  condition: service_healthy
-    entrypoint: []
-    command: "python manage.py yroom"
-    env_file:
-      - .env
+  
 
   backend:
     networks:

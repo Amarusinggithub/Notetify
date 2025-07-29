@@ -67,26 +67,7 @@ services:
     env_file:
       - .env.production
 
-  yroom_worker_prod:
-    networks:
-      - notetify-net-prod
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-      target: production
-      args:
-        - REQUIREMENTS_FILE=requirements_prod.txt
-    depends_on:
-      redis_prod:
-        condition: service_healthy
-      db_prod:
-        condition: service_healthy
-      backend_prod:
-        condition: service_started
-    entrypoint: []
-    env_file:
-      - .env.production
-    command: "python manage.py yroom"
+  
 
   frontend_prod:
     networks:

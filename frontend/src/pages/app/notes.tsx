@@ -3,12 +3,11 @@ import {
 	LiveblocksProvider,
 	RoomProvider,
 } from '@liveblocks/react/suspense';
-import { Editor } from '../../components/editor';
 import { useParams } from 'react-router';
-
+import { Editor } from '../../components/editor';
 
 export default function Notes() {
-    const params=useParams();
+	const params = useParams();
 	return (
 		<>
 			<LiveblocksProvider

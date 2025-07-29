@@ -2,8 +2,8 @@ import { Link } from 'react-router';
 import dark from '../assets/dark.png';
 import light from '../assets/light.png';
 import { AnimatedGroup } from '../components/ui/animated-group';
-import { Button } from '../components/ui/button';
 import { TextEffect } from '../components/ui/text-effect';
+import { Button } from './ui/button';
 
 const transitionVariants = {
 	item: {
@@ -93,7 +93,6 @@ export default function HeroSection() {
 					}}
 				>
 					<div className="relative mt-8 -mr-56 px-2 sm:mt-12 sm:mr-0 md:mt-20">
-
 						<div
 							aria-hidden
 							className="to-background absolute inset-0 z-10 bg-linear-to-b from-transparent from-35%"

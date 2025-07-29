@@ -1,5 +1,5 @@
 import { motion, type Variants } from 'motion/react';
-import React, {type ReactNode } from 'react';
+import React, { type ReactNode } from 'react';
 
 export type PresetType =
 	| 'fade'

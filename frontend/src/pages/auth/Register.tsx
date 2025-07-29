@@ -1,12 +1,12 @@
 import { LoaderCircle } from 'lucide-react';
 import React, { useState } from 'react';
-import InputError from '../../components/input-error';
-import TextLink from '../../components/text-link';
+import InputError from '../../components/input-error.tsx';
+import TextLink from '../../components/text-link.tsx';
 import { Button } from '../../components/ui/button.tsx';
-import { Input } from '../../components/ui/input';
-import { Label } from '../../components/ui/label';
+import { Input } from '../../components/ui/input.tsx';
+import { Label } from '../../components/ui/label.tsx';
 import { useAuth } from '../../hooks/use-auth.tsx';
-import AuthLayout from '../../layouts/auth-layout';
+import AuthLayout from '../../layouts/auth-layout.tsx';
 import { registerSchema } from '../../utils/validators.ts';
 
 type RegisterForm = {

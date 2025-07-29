@@ -1,7 +1,7 @@
-import type { BreadcrumbItem } from "types";
-import { Breadcrumbs } from "./breadcrumbs";
-import { ModeToggle } from "./mode-toggle";
-import { SidebarTrigger } from "./ui/sidebar";
+import type { BreadcrumbItem } from 'types';
+import { Breadcrumbs } from './breadcrumbs';
+import { ModeToggle } from './mode-toggle';
+import { SidebarTrigger } from './ui/sidebar';
 
 export function EditorHeader({
 	breadcrumbs = [],

@@ -101,7 +101,7 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
 							</AlertDialogHeader>
 							<AlertDialogFooter>
 								<AlertDialogCancel>Cancel</AlertDialogCancel>
-								<AlertDialogAction  onClick={handleLogout} >
+								<AlertDialogAction onClick={handleLogout}>
 									Confirm
 								</AlertDialogAction>
 							</AlertDialogFooter>

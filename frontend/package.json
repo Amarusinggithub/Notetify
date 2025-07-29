@@ -20,7 +20,7 @@
 		"@hocuspocus/provider": "^3.2.2",
 		"@hookform/resolvers": "^5.2.1",
 		"@liveblocks/client": "^3.2.1",
-        "@liveblocks/node": "^3.2.1",
+		"@liveblocks/node": "^3.2.1",
 		"@liveblocks/react": "^3.2.1",
 		"@liveblocks/react-tiptap": "^3.2.1",
 		"@liveblocks/react-ui": "^3.2.1",
