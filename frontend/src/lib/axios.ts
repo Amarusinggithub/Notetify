@@ -34,6 +34,14 @@ axiosInstance.interceptors.request.use(
 				config.headers['X-CSRFToken'] = csrfToken;
 			}
 		}
+
+		console.log('Request config:', {
+			url: config.url,
+			method: config.method,
+			withCredentials: config.withCredentials,
+			headers: config.headers
+		});
+
 		return config;
 	},
 	(error) => Promise.reject(error),
@@ -41,62 +49,62 @@ axiosInstance.interceptors.request.use(
 
 // Response interceptor to handle token refresh on 401 errors.
 axiosInstance.interceptors.response.use(
-	(response) => response,
+	(response) => {
+		console.log('Response received:', {
+			url: response.config.url,
+			status: response.status,
+			headers: response.headers
+		});
+		return response;
+	},
 	async (error) => {
 		const originalRequest = error.config;
 
-		if (originalRequest.url?.includes('token/refresh')) {
+		console.log('Response error:', {
+			url: originalRequest?.url,
+			status: error.response?.status,
+			data: error.response?.data
+		});
+
+		const skipRetryUrls = [
+			'token/refresh',
+			'auth/me',
+			'csrf/',
+			'login/',
+			'register/'
+		];
+
+		if (skipRetryUrls.some(url => originalRequest?.url?.includes(url))) {
 			return Promise.reject(error);
 		}
 
-		if (originalRequest.url?.includes('auth/me')) {
-			return Promise.reject(error);
-		}
-
-		if (originalRequest.url?.includes('csrf/')) {
-			return Promise.reject(error);
-		}
-
-		if (originalRequest.url?.includes('login/')) {
-			return Promise.reject(error);
-		}
-
-		if (originalRequest.url?.includes('register/')) {
-			return Promise.reject(error);
-		}
-
-		if (originalRequest.url?.includes('token/refresh')) {
-			return Promise.reject(error);
-		}
 		if (
 			error.response &&
 			error.response.status === 401 &&
 			!originalRequest._retry
 		) {
 			if (isRefreshing) {
-				// If a refresh is already in progress, queue the request
 				return new Promise((resolve, reject) => {
 					failedQueue.push({ resolve, reject });
 				})
-					.then(() => {
-						return axiosInstance(originalRequest);
-					})
+					.then(() => axiosInstance(originalRequest))
 					.catch((err) => Promise.reject(err));
 			}
 
 			originalRequest._retry = true;
 			isRefreshing = true;
+
 			try {
 				await ensureCSRFToken();
+				const refreshResponse = await axiosInstance.post('token/refresh/');
+				console.log('Token refresh successful:', refreshResponse.status);
 
-				await axiosInstance.post('token/refresh/');
 				processQueue();
-
 				return axiosInstance(originalRequest);
 			} catch (refreshError) {
+				console.log('Token refresh failed:', refreshError);
 				processQueue(refreshError);
 				window.location.href = '/login';
-
 				return Promise.reject(refreshError);
 			} finally {
 				isRefreshing = false;
@@ -110,7 +118,9 @@ export async function ensureCSRFToken() {
 	const csrfToken = Cookies.get(CSRF_TOKEN_COOKIE_NAME);
 	if (!csrfToken) {
 		try {
+			console.log('Fetching CSRF token...');
 			await axiosInstance.get('csrf/');
+			console.log('CSRF token fetched successfully');
 		} catch (error) {
 			console.error('Failed to get CSRF token:', error);
 		}

@@ -1,4 +1,4 @@
-import { Code, NotebookPen, ShieldCheck } from 'lucide-react';
+import {  LocateIcon, NotebookPen, User2 } from 'lucide-react';
 import { type ReactNode } from 'react';
 import { Card, CardContent, CardHeader } from '../components/ui/card';
 
@@ -11,11 +11,11 @@ export default function Features() {
 			<div className="@container mx-auto max-w-5xl px-6">
 				<div className="text-center">
 					<h2 className="text-4xl font-semibold text-balance lg:text-5xl">
-						🔧 Crafted for Developers Like You
+						Remember everything
 					</h2>
 					<p className="mt-4">
-						Smart, flexible, and powerful — everything you need to build your
-						second brain.
+						Make notes more useful by adding text, images, audio, scans, PDFs,
+						and documents.
 					</p>
 				</div>
 				<div className="mx-auto mt-8 grid max-w-sm gap-6 *:text-center md:mt-16 @min-4xl:max-w-full @min-4xl:grid-cols-3">
@@ -39,16 +39,16 @@ export default function Features() {
 					<Card className="group bg-background">
 						<CardHeader className="pb-3">
 							<CardDecorator>
-								<Code className="size-6" aria-hidden />
+								<LocateIcon className="size-6" aria-hidden />
 							</CardDecorator>
 
-							<h3 className="mt-6 font-medium">Developer Friendly</h3>
+							<h3 className="mt-6 font-medium">Work anywhere</h3>
 						</CardHeader>
 
 						<CardContent>
 							<p className="mt-3 text-sm">
-								Markdown, code blocks, CLI shortcuts, and Git-style versioning.
-								Feels like home.
+								Keep important info handy—your notes sync automatically to all
+								your devices.
 							</p>
 						</CardContent>
 					</Card>
@@ -56,10 +56,10 @@ export default function Features() {
 					<Card className="group bg-background">
 						<CardHeader className="pb-3">
 							<CardDecorator>
-								<ShieldCheck className="size-6" aria-hidden />
+								<User2 className="size-6" aria-hidden />
 							</CardDecorator>
 
-							<h3 className="mt-6 font-medium">Secure by Design</h3>
+							<h3 className="mt-6 font-medium">Collaboration</h3>
 						</CardHeader>
 
 						<CardContent>

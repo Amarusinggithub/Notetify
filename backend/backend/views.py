@@ -9,7 +9,7 @@ from rest_framework_simplejwt.exceptions import (
     ExpiredTokenError,
     TokenError,
     InvalidToken,
-    AuthenticationFailed,
+    
 )
 
 from rest_framework.decorators import api_view
@@ -20,8 +20,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework.decorators import api_view, renderer_classes
+from rest_framework.decorators import api_view
 
 from api.serializers import UserSerializer
 
@@ -31,10 +30,6 @@ DEBUG = os.environ.get("DEBUG", default=True)
 
 
 class CookieTokenRefreshView(TokenRefreshView):
-
-    def finalize_response(self, request, response, *args, **kwargs):
-        return super().finalize_response(request, response, *args, **kwargs)
-
     def post(self, request, *args, **kwargs):
         refresh_token = request.COOKIES.get(settings.SIMPLE_JWT["AUTH_COOKIE_REFRESH"])
 
@@ -56,14 +51,15 @@ class CookieTokenRefreshView(TokenRefreshView):
             response.delete_cookie(
                 settings.SIMPLE_JWT["AUTH_COOKIE"],
                 path=settings.SIMPLE_JWT["AUTH_COOKIE_PATH"],
+                domain=settings.SIMPLE_JWT.get("AUTH_COOKIE_DOMAIN"),
             )
             response.delete_cookie(
                 settings.SIMPLE_JWT["AUTH_COOKIE_REFRESH"],
                 path=settings.SIMPLE_JWT["AUTH_COOKIE_PATH"],
+                domain=settings.SIMPLE_JWT.get("AUTH_COOKIE_DOMAIN"),
             )
             return response
 
-        # Get new tokens
         access = serializer.validated_data["access"]
         refresh = serializer.validated_data.get("refresh", refresh_token)
 
@@ -72,16 +68,23 @@ class CookieTokenRefreshView(TokenRefreshView):
         response.set_cookie(
             key=settings.SIMPLE_JWT["AUTH_COOKIE"],
             value=access,
-            expires=settings.SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"],
-            secure=settings.SIMPLE_JWT["AUTH_COOKIE_SECURE"],
+            max_age=int(settings.SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"].total_seconds()),
+            domain=settings.SIMPLE_JWT.get("AUTH_COOKIE_DOMAIN"),
+            path=settings.SIMPLE_JWT["AUTH_COOKIE_PATH"],
             httponly=settings.SIMPLE_JWT["AUTH_COOKIE_HTTP_ONLY"],
             samesite=settings.SIMPLE_JWT["AUTH_COOKIE_SAMESITE"],
+            secure=settings.SIMPLE_JWT["AUTH_COOKIE_SECURE"],
         )
+
         if refresh != refresh_token:
             response.set_cookie(
                 key=settings.SIMPLE_JWT["AUTH_COOKIE_REFRESH"],
                 value=refresh,
-                expires=settings.SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"],
+                max_age=int(
+                    settings.SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"].total_seconds()
+                ),
+                domain=settings.SIMPLE_JWT.get("AUTH_COOKIE_DOMAIN"),
+                path=settings.SIMPLE_JWT["AUTH_COOKIE_PATH"],
                 secure=settings.SIMPLE_JWT["AUTH_COOKIE_SECURE"],
                 httponly=settings.SIMPLE_JWT["AUTH_COOKIE_HTTP_ONLY"],
                 samesite=settings.SIMPLE_JWT["AUTH_COOKIE_SAMESITE"],
@@ -107,39 +110,11 @@ def get_csrf_token(request):
     return Response(status=status.HTTP_200_OK)
 
 
-@api_view(["GET"])
-def verify_token(request):
-    """Verify JWT token from cookies and return user data"""
-    auth = JWTAuthentication()
-    raw_token = request.COOKIES.get(settings.SIMPLE_JWT["AUTH_COOKIE"])
+class UserDetailView(APIView):
+    permission_classes = [
+        IsAuthenticated
+    ]
 
-    if not raw_token:
-        return Response(
-            {"error": "Authentication token not found"},
-            status=status.HTTP_401_UNAUTHORIZED,
-        )
-
-    try:
-        validated_token = auth.get_validated_token(raw_token)
-        if validated_token:
-            user = auth.get_user(validated_token)
-
-        if not user.is_active:
-            return Response(
-                {"error": "User account is inactive"},
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
-
+    def get(self, request):
         serializer = UserSerializer(request.user, context={"request": request})
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    except (InvalidToken, AuthenticationFailed, ExpiredTokenError, TokenError) as e:
-        return Response(
-            {"error": "Token is invalid or expired", "detail": str(e)},
-            status=status.HTTP_401_UNAUTHORIZED,
-        )
-
-    except Exception as e:
-        return Response(
-            {"error": "Authentication failed", "detail": str(e)},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        )
+        return Response(serializer.data)

@@ -10,6 +10,11 @@ def dummy_get_response(request):
 
 
 def enforce_csrf(request):
+    if request.method in ["GET", "HEAD", "OPTIONS"]:
+        return
+
+    if request.path.startswith("/api/auth/me/"):
+        return
 
     check = CSRFCheck(dummy_get_response)
     check.process_request(request)
@@ -28,8 +33,12 @@ class CustomAuthentication(JWTAuthentication):
             validated_token = self.get_validated_token(raw_token)
             user = self.get_user(validated_token)
 
+            if request.method not in ["GET", "HEAD", "OPTIONS"]:
+                try:
+                    enforce_csrf(request)
+                except exceptions.PermissionDenied:
 
-            enforce_csrf(request)
+                    raise
 
             return user, validated_token
 

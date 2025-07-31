@@ -95,7 +95,7 @@ export function AppSidebar() {
 						<SidebarMenuButton asChild>
 							<Dialog>
 								<DialogTrigger asChild>
-									<SearchInput />
+									<SearchInput disabled={false} />
 								</DialogTrigger>
 								<DialogPortal>
 									<DialogOverlay />

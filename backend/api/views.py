@@ -33,15 +33,20 @@ def set_auth_cookies(response, tokens):
     response.set_cookie(
         key=settings.SIMPLE_JWT["AUTH_COOKIE"],
         value=tokens["access"],
-        expires=settings.SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"],
+        max_age=int(settings.SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"].total_seconds()),
+        domain=settings.SIMPLE_JWT.get("AUTH_COOKIE_DOMAIN"),
+        path=settings.SIMPLE_JWT["AUTH_COOKIE_PATH"],
         secure=settings.SIMPLE_JWT["AUTH_COOKIE_SECURE"],
         httponly=settings.SIMPLE_JWT["AUTH_COOKIE_HTTP_ONLY"],
         samesite=settings.SIMPLE_JWT["AUTH_COOKIE_SAMESITE"],
     )
+
     response.set_cookie(
         key=settings.SIMPLE_JWT["AUTH_COOKIE_REFRESH"],
         value=tokens["refresh"],
-        expires=settings.SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"],
+        max_age=int(settings.SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"].total_seconds()),
+        domain=settings.SIMPLE_JWT.get("AUTH_COOKIE_DOMAIN"),
+        path=settings.SIMPLE_JWT["AUTH_COOKIE_PATH"],
         secure=settings.SIMPLE_JWT["AUTH_COOKIE_SECURE"],
         httponly=settings.SIMPLE_JWT["AUTH_COOKIE_HTTP_ONLY"],
         samesite=settings.SIMPLE_JWT["AUTH_COOKIE_SAMESITE"],
@@ -60,7 +65,7 @@ class RegisterView(APIView):
         if not email or not first_name or not last_name or not password:
             raise ValidationError("All fields are required")
 
-        user = User.objects.create_user(
+        User.objects.create_user(
             last_name=last_name, first_name=first_name, email=email, password=password
         )
 
@@ -131,16 +136,22 @@ class LogoutView(APIView):
             response = Response(
                 {"message": "Successfully logged out"}, status=status.HTTP_200_OK
             )
+
             response.delete_cookie(
                 settings.SIMPLE_JWT["AUTH_COOKIE"],
+                path=settings.SIMPLE_JWT["AUTH_COOKIE_PATH"],
+                domain=settings.SIMPLE_JWT.get("AUTH_COOKIE_DOMAIN"),
             )
             response.delete_cookie(
                 settings.SIMPLE_JWT["AUTH_COOKIE_REFRESH"],
+                path=settings.SIMPLE_JWT["AUTH_COOKIE_PATH"],
+                domain=settings.SIMPLE_JWT.get("AUTH_COOKIE_DOMAIN"),
             )
 
             return response
 
         except Exception as e:
+            print(f"Logout error: {str(e)}")
             return Response(
                 {"error": "Invalid refresh token"}, status=status.HTTP_400_BAD_REQUEST
             )

@@ -303,14 +303,15 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
 			setNotAuth();
 
-			axiosInstance
-				.post('logout/')
-				.then(() => {
-					console.log('Server logout successful');
-				})
-				.catch((error) => {
-					console.error('Server logout failed:', error);
-				});
+			try {
+				await axiosInstance.post('logout/');
+				console.log('Server logout successful');
+			} catch (error) {
+				console.error(
+					'Server logout failed (but local logout successful):',
+					error,
+				);
+			}
 		} catch (error: any) {
 			console.error('Logout error:', error);
 			setNotAuth();
@@ -320,34 +321,63 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 	}
 
 	const confirmAuth = useCallback(async () => {
+		console.log('=== Starting auth confirmation ===');
+
 		try {
 			await ensureCSRFToken();
+			console.log('CSRF token ensured, making auth/me request...');
 
 			const response = await axiosInstance.get('auth/me/');
+			console.log(
+				'Auth confirmation response:',
+				response.status,
+				response.data,
+			);
+
 			if (response.status >= 200 && response.status < 300) {
+				console.log('Auth confirmation successful');
 				setAuth(response.data);
 			} else {
+				console.log('Auth confirmation failed - invalid response status');
 				setNotAuth();
 			}
 		} catch (error: any) {
-			console.error('Auth confirmation failed:', error);
+			console.error('Auth confirmation failed:', {
+				message: error.message,
+				status: error.response?.status,
+				data: error.response?.data,
+			});
 
-			setNotAuth();
+
+			if (error.response?.status === 401 || error.response?.status === 403) {
+				console.log('Clearing auth due to 401/403 response');
+				setNotAuth();
+			} else {
+				console.log('Network/server error - keeping existing auth state');
+				
+			}
 		} finally {
+			console.log('Auth confirmation finished, setting checkingAuth to false');
 			setCheckingAuth(false);
 		}
 	}, []);
 
 	useEffect(() => {
+		console.log('AuthProvider useEffect - checking cached data...');
+
 		const cached = localStorage.getItem(USERDATA_STORAGE_KEY);
 		if (cached) {
 			try {
 				const parsedData = JSON.parse(cached) as SharedData;
+				console.log('Found cached auth data:', parsedData.auth.user.email);
 				setSharedData(parsedData);
+				setIsAuthenticated(true);
 			} catch (error) {
 				console.error('Error parsing cached auth data:', error);
 				localStorage.removeItem(USERDATA_STORAGE_KEY);
 			}
+		} else {
+			console.log('No cached auth data found');
 		}
 
 		confirmAuth();

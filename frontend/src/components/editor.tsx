@@ -1,17 +1,27 @@
+import { useLiveblocksExtension } from '@liveblocks/react-tiptap';
 import { Color } from '@tiptap/extension-color';
+import Emoji, { gitHubEmojis } from '@tiptap/extension-emoji';
 import { FontFamily } from '@tiptap/extension-font-family';
 import Highlight from '@tiptap/extension-highlight';
 import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
+import Table from '@tiptap/extension-table';
+import TableCell from '@tiptap/extension-table-cell';
+import TableHeader from '@tiptap/extension-table-header';
+import TableRow from '@tiptap/extension-table-row';
+import TaskItem from '@tiptap/extension-task-item';
+import TaskList from '@tiptap/extension-task-list';
+import TextAlign from '@tiptap/extension-text-align';
 import { TextStyle } from '@tiptap/extension-text-style';
+import Underline from '@tiptap/extension-underline';
 import Youtube from '@tiptap/extension-youtube';
 import { EditorContent, useEditor } from '@tiptap/react';
-
-import TextAlign from '@tiptap/extension-text-align';
 import StarterKit from '@tiptap/starter-kit';
-
-import { useLiveblocksExtension } from '@liveblocks/react-tiptap';
-import Emoji, { gitHubEmojis } from '@tiptap/extension-emoji';
+import { Mathematics } from '@tiptap/extension-mathematics';
+import Placeholder from '@tiptap/extension-placeholder';
+import Superscript from '@tiptap/extension-superscript';
+import Subscript from '@tiptap/extension-subscript'
+import DragHandle from '@tiptap/extension-drag-handle-react';
 
 import useEditorStore from '../hooks/use-editor-store';
 import { cn } from '../lib/utils';
@@ -24,6 +34,7 @@ export const Editor = () => {
 	const liveblocks = useLiveblocksExtension();
 
 	const { setEditor } = useEditorStore();
+    
 	const editor = useEditor({
 		editorProps: {
 			attributes: {
@@ -64,20 +75,50 @@ export const Editor = () => {
 			StarterKit.configure({ history: false }),
 			Color,
 			Highlight,
+			Mathematics.configure({
+				shouldRender: (state, pos, node) => {
+					const $pos = state.doc.resolve(pos);
+					return (
+						node.type.name === 'text' && $pos.parent.type.name !== 'codeBlock'
+					);
+				},
+			}),
+			Underline,
+			Table,
+			TableRow,
+			TableHeader,
+			TableCell,
 			FontFamily,
 			TextAlign.configure({
 				defaultAlignment: 'left',
 				types: ['heading', 'paragraph'],
 			}),
 			TextStyle.configure({ mergeNestedSpanStyles: true }),
+			Superscript,
+			Subscript,
 
 			Emoji.configure({
 				emojis: gitHubEmojis,
 				enableEmoticons: true,
 				suggestion,
 			}),
+			Placeholder.configure({
+				// Use a placeholder:
+				placeholder: 'Write something …',
+				// Use different placeholders depending on the node type:
+				// placeholder: ({ node }) => {
+				//   if (node.type.name === 'heading') {
+				//     return 'What’s the title?'
+				//   }
 
+				//   return 'Can you add some further context?'
+				// },
+			}),
 			Image,
+			TaskList,
+			TaskItem.configure({
+				nested: true,
+			}),
 
 			Link.configure({
 				openOnClick: false,
@@ -168,11 +209,34 @@ export const Editor = () => {
 		);
 	}
 
+    /* const toggleEditable = () => {
+				editor.setEditable(!editor.isEditable);
+				editor.view.dispatch(editor.view.state.tr);
+			};*/
+
 	return (
 		<div className="bg-editor flex h-screen flex-col">
 			<EditorHeader />
 			<EditorToolbar />
+			{/*<div>
+				<button onClick={toggleEditable}>Toggle editable</button>
+			</div>*/}
 			<div className="flex-1 overflow-auto">
+				<DragHandle editor={editor}>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						fill="none"
+						viewBox="0 0 24 24"
+						strokeWidth="1.5"
+						stroke="currentColor"
+					>
+						<path
+							strokeLinecap="round"
+							strokeLinejoin="round"
+							d="M3.75 9h16.5m-16.5 6.75h16.5"
+						/>
+					</svg>
+				</DragHandle>
 				<EditorContent
 					editor={editor}
 					className={cn(

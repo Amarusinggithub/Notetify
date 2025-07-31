@@ -38,7 +38,7 @@ export default function HeroSection() {
 							as="h1"
 							className="mt-8 max-w-2xl text-5xl font-medium text-balance md:text-6xl lg:mt-16"
 						>
-							Smarter Notes. Code Better.
+							Create Your Second Brain
 						</TextEffect>
 						<TextEffect
 							per="line"

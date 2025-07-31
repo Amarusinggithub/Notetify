@@ -89,7 +89,7 @@ export default function EditorToolbar() {
 				icon: UnderlineIcon,
 				isActive: editor?.isActive('underline'),
 				onClick: () => {
-					//editor?.chain().focus().toggleUnderline().run();
+					editor?.commands.toggleUnderline();
 				},
 			},
 			{
@@ -107,7 +107,7 @@ export default function EditorToolbar() {
 				icon: ListTodoIcon,
 				isActive: editor?.isActive('tasklist'),
 				onClick: () => {
-					//editor?.chain().focus().toggleTaskList().run();
+					editor?.chain().focus().toggleTaskList().run();
 				},
 			},
 
