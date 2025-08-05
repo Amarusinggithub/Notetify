@@ -1,5 +1,5 @@
 {
-	"name": "notetify",
+	"name": "notetify-client",
 	"private": true,
 	"version": "0.0.0",
 	"type": "module",
@@ -145,8 +145,8 @@
 		"prettier-plugin-organize-imports": "^4.2.0",
 		"prettier-plugin-tailwindcss": "^0.6.14",
 		"tw-animate-css": "^1.3.6",
-		"typescript": "^5.8.3",
-		"typescript-eslint": "^8.38.0",
+		"typescript": "^5.9.2",
+		"typescript-eslint": "^8.39.0",
 		"vite": "^7.0.6",
 		"vitest": "^3.2.4"
 	}

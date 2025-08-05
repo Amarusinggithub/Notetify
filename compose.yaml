@@ -2,26 +2,26 @@ services:
   db:
     networks:
       - notetify-net
-    image: mysql:latest
+    image: postgres:latest
     container_name: notetify_db
     healthcheck:
-      test:
-        [
-          "CMD",
-          "mysqladmin",
-          "ping",
-          "-h",
-          "localhost",
-          "-uroot",
-          "-p${MYSQL_ROOT_PASSWORD}",
-        ]
+      test: [ "CMD", "pg_isready" ]
+      interval: 10s
       timeout: 10s
       retries: 10
     restart: always
+    user: postgres
+    secrets:
+      - db-password
     volumes:
-      - db-data:/var/lib/mysql
+      - db-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=example
+      - POSTGRES_PASSWORD_FILE=/run/secrets/db-password
+    expose:
+      - 5432
     ports:
-      - "3307:3306"
+      - "5432:5432"
     env_file:
       - .env.development
 
@@ -47,22 +47,20 @@ services:
     env_file:
       - .env.development
 
-  
+
 
   backend:
     networks:
       - notetify-net
     build:
-      context: ./backend
+      context: ./api
       dockerfile: Dockerfile
       target: development
-      args:
-        - REQUIREMENTS_FILE=requirements.txt
     command: sh ./entrypoint.dev.sh
-    container_name: notetify-backend
+    container_name: notetify-api
     restart: always
     ports:
-      - "8000:8000"
+      - "8000:80"
     depends_on:
       db:
         condition: service_healthy
@@ -103,3 +101,8 @@ volumes:
   redis-data: {}
   db-data: {}
   node_modules_frontend: {}
+
+
+# secrets:
+#   db-password:
+#     file: db/password.txt

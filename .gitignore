@@ -1,6 +1,6 @@
-docker-compose.override.yml  
-docker-compose.dev.yml      
-docker-compose.test.yml     
+docker-compose.override.yml
+docker-compose.dev.yml
+docker-compose.test.yml
 
 !Dockerfile
 !docker-compose.yml
@@ -23,12 +23,12 @@ frontend/yjs-wss-db/*
 
 cypress.env.json
 *.local
-.env  
+.env
 .env.production
 .env.development
 .env.local
 .vscode/
-!.vscode/extensions.json  
+!.vscode/extensions.json
 .idea/
 .DS_Store
 
@@ -50,3 +50,28 @@ secrets.dev.yaml
 values.dev.yaml
 
 
+
+*.log
+.DS_Store
+.env
+.env.backup
+.env.production
+.phpactor.json
+.phpunit.result.cache
+/.fleet
+/.idea
+/.nova
+/.phpunit.cache
+/.vscode
+/.zed
+/auth.json
+/node_modules
+/public/build
+/public/hot
+/public/storage
+/storage/*.key
+/storage/pail
+/vendor
+Homestead.json
+Homestead.yaml
+Thumbs.db
