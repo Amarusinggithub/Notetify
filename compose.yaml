@@ -3,7 +3,7 @@ services:
     networks:
       - notetify-net
     image: postgres:latest
-    container_name: notetify_db
+    container_name: notetify-db
     healthcheck:
       test: [ "CMD", "pg_isready" ]
       interval: 10s
@@ -28,8 +28,8 @@ services:
   redis:
     networks:
       - notetify-net
-    image: redis:latest
-    container_name: notetify_redis
+    image: redis:8.0.1-alpine
+    container_name: notetify-redis-cache
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -47,9 +47,7 @@ services:
     env_file:
       - .env.development
 
-
-
-  backend:
+  api:
     networks:
       - notetify-net
     build:
@@ -60,7 +58,7 @@ services:
     container_name: notetify-api
     restart: always
     ports:
-      - "8000:80"
+      - "8000:8000"
     depends_on:
       db:
         condition: service_healthy
@@ -69,27 +67,37 @@ services:
     env_file:
       - .env.development
 
-  frontend:
+  client:
     networks:
       - notetify-net
     build:
-      context: ./frontend
+      context: ./client
       dockerfile: Dockerfile
       target: development
-    container_name: notetify-frontend
+      args:
+      - VITE_BASE_URL= http://0.0.0.0:8000/api/
+      - VITE_WS_ORIGIN= ws://0.0.0.0:8000
+      - VITE_APP_NAME= Notetify
+      - VITE_CLIENT_URL= http://0.0.0.0:5173/
+    container_name: notetify-client
     ports:
       - "3000:3000"
     depends_on:
-      backend:
+      api:
         condition: service_started
       db:
         condition: service_healthy
     volumes:
-      - ./frontend:/usr/src/app
-      - node_modules_frontend:/usr/src/app/node_modules
+      - ./client:/usr/src/app
+      - node_modules_client:/usr/src/app/node_modules
     stdin_open: true
     tty: true
     command: ["sh", "entrypoint.sh"]
+    environment:
+      VITE_BASE_URL: ${VITE_BASE_URL}
+      VITE_WS_ORIGIN: ${VITE_WS_ORIGIN}
+      VITE_APP_NAME: ${VITE_APP_NAME}
+      VITE_CLIENT_URL: ${VITE_CLIENT_URL}
     env_file:
       - .env.development
 
@@ -100,7 +108,7 @@ networks:
 volumes:
   redis-data: {}
   db-data: {}
-  node_modules_frontend: {}
+  node_modules_client: {}
 
 
 # secrets:

@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: Notetify-frontend
+  name: Notetify-client
 spec:
   selector:
     matchLabels:
-      app: Notetify-frontend
+      app: Notetify-api
   replicas: 3
   strategy:
     type: RollingUpdate
   template:
     metadata:
       labels:
-        app: Notetify-frontend
+        app: Notetify-client
     spec:
       containers:
-      - name: notetify-frontend
+      - name: notetify-api
         image: nginx:stable-alpine
         ports:
         - containerPort: 80

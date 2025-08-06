@@ -3,29 +3,33 @@
 
 services:
   db_dev:
-    image: mysql:latest
-    container_name: notetify_db_dev
+    image: postgres:latest
+    container_name: notetify-db-dev
     networks:
       notetify-net-dev:
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: [ "CMD", "pg_isready" ]
       interval: 10s
       retries: 10
     restart: always
+    user: postgres
+    secrets:
+      - db-password
     volumes:
-      - db-data-dev:/var/lib/mysql
+      - db-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=notetify_db
+      - POSTGRES_PASSWORD_FILE=/run/secrets/db-password
+    expose:
+      - 5432
     ports:
-      - "3307:3306"
+      - "5432:5432"
     env_file:
       - .env.development
-    environment:
-      MYSQL_ROOT_PASSWORD: mysql
-      MYSQL_ROOT_HOST: "%"
-      MYSQL_DATABASE: notetify_db
 
   redis_dev:
     image: redis:8.0.1-alpine
-    container_name: notetify_redis_dev
+    container_name: notetify-redis-cache-dev
     networks:
       notetify-net-dev:
     healthcheck:
@@ -43,15 +47,13 @@ services:
     env_file:
       - .env.development
 
-  
-  backend_dev:
+
+  api_dev:
     build:
-      context: ./backend
+      context: ./api
       dockerfile: Dockerfile
       target: development
-      args:
-        - REQUIREMENTS_FILE=requirements_dev.txt
-    container_name: notetify-backend_dev
+    container_name: notetify-api-dev
     networks:
       - notetify-net-dev
     depends_on:
@@ -60,43 +62,39 @@ services:
       redis_dev:
         condition: service_healthy
     volumes:
-      - ./backend:/app
-      - static_data-dev:/app/static
-      - media_data-dev:/app/media
-
-
+      - ./api:/app
     ports:
       - "8000:8000"
     env_file:
       - .env.development
     command: sh ./entrypoint.dev.sh
 
-  frontend_dev:
+  client_dev:
     build:
-      context: ./frontend
+      context: ./client
       dockerfile: Dockerfile
       target: development
       args:
       - VITE_BASE_URL= http://0.0.0.0:8000/api/
       - VITE_WS_ORIGIN= ws://0.0.0.0:8000
       - VITE_APP_NAME= Notetify
-      - VITE_FRONTEND_URL= http://0.0.0.0:5173/
-    container_name: notetify-frontend_dev
+      - VITE_CLIENT_URL= http://0.0.0.0:5173/
+    container_name: notetify-client-dev
     networks:
       - notetify-net-dev
     depends_on:
-      backend_dev:
+      api_dev:
         condition: service_started
     volumes:
-      - ./frontend:/usr/src/app
-      - node_modules_frontend-dev:/usr/src/app/node_modules
+      - ./client:/usr/src/app
+      - node_modules_client-dev:/usr/src/app/node_modules
     ports:
       - "3000:3000"
     environment:
       VITE_BASE_URL: ${VITE_BASE_URL}
       VITE_WS_ORIGIN: ${VITE_WS_ORIGIN}
       VITE_APP_NAME: ${VITE_APP_NAME}
-      VITE_FRONTEND_URL: ${VITE_FRONTEND_URL}
+      VITE_CLIENT_URL: ${VITE_CLIENT_URL}
     env_file:
       - .env.development
     command: ["sh", "entrypoint.sh"]
@@ -106,8 +104,11 @@ networks:
     driver: bridge
 
 volumes:
-  media_data-dev: {}
   redis-data-dev: {}
   db-data-dev: {}
-  static_data-dev: {}
-  node_modules_frontend-dev: {}
+  node_modules_client-dev: {}
+
+
+# secrets:
+#   db-password:
+#     file: db/password.txt
