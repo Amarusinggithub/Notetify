@@ -75,3 +75,5 @@ values.dev.yaml
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+/example-app
