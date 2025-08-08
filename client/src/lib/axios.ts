@@ -21,6 +21,7 @@ const axiosInstance = axios.create({
 		'Content-Type': 'application/json',
 	},
 	withCredentials: true,
+    withXSRFToken:true
 });
 
 axiosInstance.interceptors.request.use(

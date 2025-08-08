@@ -1,7 +1,7 @@
 import 'axios';
 import type { LucideIcon } from 'lucide-react';
 
-export const CSRF_TOKEN_COOKIE_NAME = 'csrftoken';
+export const CSRF_TOKEN_COOKIE_NAME = 'X-XSRF-TOKEN';
 export const USERDATA_STORAGE_KEY = 'userData';
 
 export type Role = 'OWNER' | 'EDITOR' | 'MEMBER';
