@@ -15,12 +15,5 @@ done
 echo "redis is up!"
 
 
-python manage.py collectstatic --noinput
-python manage.py makemigrations
-python manage.py migrate --noinput
 
 
-exec gunicorn  backend.asgi:application \
-    --bind 0.0.0.0:8000 \
-    --workers 4 \
-    --worker-class uvicorn.workers.UvicornWorker

@@ -14,11 +14,3 @@ while ! nc -z "$REDIS_HOST" "$REDIS_PORT"; do
 done
 echo "redis is up!"
 
-python manage.py collectstatic  --noinput
-python manage.py makemigrations
-python manage.py migrate --no-input
-
-exec uvicorn backend.asgi:application \
-     --reload \
-     --host 0.0.0.0 \
-     --port 8000

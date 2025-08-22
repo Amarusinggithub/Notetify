@@ -12,12 +12,17 @@ $app = Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        //  $middleware->alias([
+        //    'auth.cookie' => \App\Http\Middleware\CookieAuthMiddleware::class,
+        //]);
     })
+
     ->withExceptions(function (Exceptions $exceptions): void {
         //
     })
     ->create();
+
+
 
 $app->useEnvironmentPath(dirname($app->basePath()));
 
