@@ -42,7 +42,7 @@ axiosInstance.interceptors.request.use(
 			url: config.url,
 			method: config.method,
 			withCredentials: config.withCredentials,
-			headers: config.headers
+			headers: config.headers,
 		});
 
 		return config;

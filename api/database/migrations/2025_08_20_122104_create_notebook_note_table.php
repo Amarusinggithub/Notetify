@@ -12,20 +12,31 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('notebook_note', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('note_id')
-                  ->constrained()
-                  ->cascadeOnDelete();
+$table->uuid('id')->primary();
+            $table->uuid('note_id');
+        $table->uuid('notebook_id');
 
-            $table->foreignId('notebook_id')
-                  ->constrained()
-                  ->cascadeOnDelete();
+         $table->foreign('note_id')
+              ->references('id')->on('notes')
+              ->cascadeOnDelete();
+
+        $table->foreign('notebook_id')
+              ->references('id')->on('notebooks')
+              ->cascadeOnDelete();
+
 
             $table->unsignedInteger('order')->nullable();
 
             $table->unique(['note_id','notebook_id']);
 
             $table->timestamps();
+
+              $table->index(['notebook_id','note_id']);
+
+                            $table->index('note_id');
+              $table->index('notebook_id');
+
+
         });
     }
 

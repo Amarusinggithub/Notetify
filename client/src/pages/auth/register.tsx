@@ -10,8 +10,8 @@ import AuthLayout from '../../layouts/auth-layout.tsx';
 import { registerSchema } from '../../utils/validators.ts';
 
 type RegisterForm = {
-	firstName: string;
-	lastName: string;
+	first_name: string;
+	last_name: string;
 	email: string;
 	password: string;
 	confirmPassword: string;
@@ -21,8 +21,8 @@ const Register = () => {
 	const [form, setForm] = useState<RegisterForm>({
 		email: '',
 		password: '',
-		firstName: '',
-		lastName: '',
+		first_name: '',
+		last_name: '',
 		confirmPassword: '',
 	});
 
@@ -65,13 +65,13 @@ const Register = () => {
 							tabIndex={1}
 							name="firstName"
 							autoComplete="firstName"
-							value={form.firstName}
+							value={form.first_name}
 							onChange={change}
 							disabled={isLoading}
 							placeholder="first name"
 						/>
-						{errors?.firstName && (
-							<InputError message={errors.firstName[0]} className="mt-2" />
+						{errors?.first_name && (
+							<InputError message={errors.first_name[0]} className="mt-2" />
 						)}
 					</div>
 					<div className="grid gap-2">
@@ -84,13 +84,13 @@ const Register = () => {
 							name="lastName"
 							tabIndex={2}
 							autoComplete="lastName"
-							value={form.lastName}
+							value={form.last_name}
 							onChange={change}
 							disabled={isLoading}
 							placeholder="last name"
 						/>
-						{errors?.lastName && (
-							<InputError message={errors.lastName[0]} className="mt-2" />
+						{errors?.last_name && (
+							<InputError message={errors.last_name[0]} className="mt-2" />
 						)}
 					</div>
 

@@ -1,10 +1,15 @@
 import { useLiveblocksExtension } from '@liveblocks/react-tiptap';
 import { Color } from '@tiptap/extension-color';
+import DragHandle from '@tiptap/extension-drag-handle-react';
 import Emoji, { gitHubEmojis } from '@tiptap/extension-emoji';
 import { FontFamily } from '@tiptap/extension-font-family';
 import Highlight from '@tiptap/extension-highlight';
 import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
+import { Mathematics } from '@tiptap/extension-mathematics';
+import Placeholder from '@tiptap/extension-placeholder';
+import Subscript from '@tiptap/extension-subscript';
+import Superscript from '@tiptap/extension-superscript';
 import Table from '@tiptap/extension-table';
 import TableCell from '@tiptap/extension-table-cell';
 import TableHeader from '@tiptap/extension-table-header';
@@ -17,11 +22,6 @@ import Underline from '@tiptap/extension-underline';
 import Youtube from '@tiptap/extension-youtube';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { Mathematics } from '@tiptap/extension-mathematics';
-import Placeholder from '@tiptap/extension-placeholder';
-import Superscript from '@tiptap/extension-superscript';
-import Subscript from '@tiptap/extension-subscript'
-import DragHandle from '@tiptap/extension-drag-handle-react';
 
 import useEditorStore from '../hooks/use-editor-store';
 import { cn } from '../lib/utils';
@@ -34,7 +34,7 @@ export const Editor = () => {
 	const liveblocks = useLiveblocksExtension();
 
 	const { setEditor } = useEditorStore();
-    
+
 	const editor = useEditor({
 		editorProps: {
 			attributes: {
@@ -209,7 +209,7 @@ export const Editor = () => {
 		);
 	}
 
-    /* const toggleEditable = () => {
+	/* const toggleEditable = () => {
 				editor.setEditable(!editor.isEditable);
 				editor.view.dispatch(editor.view.state.tr);
 			};*/

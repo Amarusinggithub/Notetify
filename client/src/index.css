@@ -248,31 +248,31 @@
 		margin-top: 0;
 	}
 
-  .Tiptap-mathematics-editor {
-    background: #202020;
-    color: #fff;
-    font-family: monospace;
-    padding: 0.2rem 0.5rem;
-  }
+	.Tiptap-mathematics-editor {
+		background: #202020;
+		color: #fff;
+		font-family: monospace;
+		padding: 0.2rem 0.5rem;
+	}
 
-  .Tiptap-mathematics-render {
-    padding: 0 0.25rem;
+	.Tiptap-mathematics-render {
+		padding: 0 0.25rem;
 
-    &--editable {
-      cursor: pointer;
-      transition: background 0.2s;
+		&--editable {
+			cursor: pointer;
+			transition: background 0.2s;
 
-      &:hover {
-        background: #eee;
-      }
-    }
-  }
+			&:hover {
+				background: #eee;
+			}
+		}
+	}
 
-  .Tiptap-mathematics-editor,
-  .Tiptap-mathematics-render {
-    border-radius: 0.25rem;
-    display: inline-block;
-  }
+	.Tiptap-mathematics-editor,
+	.Tiptap-mathematics-render {
+		border-radius: 0.25rem;
+		display: inline-block;
+	}
 
 	img {
 		display: block;
@@ -407,16 +407,14 @@
 		}
 	}*/
 
-    /* Placeholder (at the top) */
-  p.is-editor-empty:first-child::before {
-    color: var(--gray-4);
-    content: attr(data-placeholder);
-    float: left;
-    height: 0;
-    pointer-events: none;
-  }
-
-  
+	/* Placeholder (at the top) */
+	p.is-editor-empty:first-child::before {
+		color: var(--gray-4);
+		content: attr(data-placeholder);
+		float: left;
+		height: 0;
+		pointer-events: none;
+	}
 
 	blockquote {
 		border-left: 3px solid var(--gray-3);
@@ -543,50 +541,49 @@ html {
 }
 
 .ProseMirror {
-  padding-inline: 4rem;
+	padding-inline: 4rem;
 
-  > * + * {
-    margin-top: 0.75em;
-  }
+	> * + * {
+		margin-top: 0.75em;
+	}
 
-  [data-id] {
-    border: 3px solid #0D0D0D;
-    border-radius: 0.5rem;
-    margin: 1rem 0;
-    position: relative;
-    margin-top: 1.5rem;
-    padding: 2rem 1rem 1rem;
+	[data-id] {
+		border: 3px solid #0d0d0d;
+		border-radius: 0.5rem;
+		margin: 1rem 0;
+		position: relative;
+		margin-top: 1.5rem;
+		padding: 2rem 1rem 1rem;
 
-    &::before {
-      content: attr(data-id);
-      background-color: #0D0D0D;
-      font-size: 0.6rem;
-      letter-spacing: 1px;
-      font-weight: bold;
-      text-transform: uppercase;
-      color: #fff;
-      position: absolute;
-      top: 0;
-      padding: 0.25rem 0.75rem;
-      border-radius: 0 0 0.5rem 0.5rem;
-    }
-  }
+		&::before {
+			content: attr(data-id);
+			background-color: #0d0d0d;
+			font-size: 0.6rem;
+			letter-spacing: 1px;
+			font-weight: bold;
+			text-transform: uppercase;
+			color: #fff;
+			position: absolute;
+			top: 0;
+			padding: 0.25rem 0.75rem;
+			border-radius: 0 0 0.5rem 0.5rem;
+		}
+	}
 }
 
 .drag-handle {
-  align-items: center;
-  background: #f0f0f0;
-  border-radius: .25rem;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  cursor: grab;
-  display: flex;
-  height: 1.5rem;
-  justify-content: center;
-  width: 1.5rem;
+	align-items: center;
+	background: #f0f0f0;
+	border-radius: 0.25rem;
+	border: 1px solid rgba(0, 0, 0, 0.1);
+	cursor: grab;
+	display: flex;
+	height: 1.5rem;
+	justify-content: center;
+	width: 1.5rem;
 
-  svg {
-    width: 1.25rem;
-    height: 1.25rem;
-  }
+	svg {
+		width: 1.25rem;
+		height: 1.25rem;
+	}
 }
-

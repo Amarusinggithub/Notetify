@@ -13,12 +13,20 @@ import { type SharedData, type User, USERDATA_STORAGE_KEY } from './../types';
 type AuthProviderProps = PropsWithChildren;
 interface AuthContextType {
 	SignUp: (
-		firstName: string,
-		lastName: string,
+		first_name: string,
+		last_name: string,
 		email: string,
 		password: string,
 	) => Promise<boolean>;
-	Login: (email: string, password: string) => Promise<boolean>;
+	Login: ({
+		email,
+		password,
+		remember,
+	}: {
+		email: string;
+		password: string;
+		remember?: boolean;
+	}) => Promise<boolean>;
 	Logout: () => Promise<void>;
 	PasswordReset: (
 		token: string | undefined,
@@ -81,8 +89,8 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 	};
 
 	async function SignUp(
-		firstName: string,
-		lastName: string,
+		first_name: string,
+		last_name: string,
 		email: string,
 		password: string,
 	): Promise<boolean> {
@@ -91,8 +99,8 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 			setErrors(null);
 
 			if (
-				!firstName?.trim() ||
-				!lastName?.trim() ||
+				!first_name?.trim() ||
+				!last_name?.trim() ||
 				!email?.trim() ||
 				!password?.trim()
 			) {
@@ -108,8 +116,8 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 			await ensureCSRFToken();
 
 			const response = await axiosInstance.post('register/', {
-				first_name: firstName.trim(),
-				last_name: lastName.trim(),
+				first_name: first_name.trim(),
+				last_name: last_name.trim(),
 				email: email.trim().toLowerCase(),
 				password: password,
 			});
@@ -130,7 +138,15 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 		}
 	}
 
-	async function Login(email: string, password: string): Promise<boolean> {
+	async function Login({
+		email,
+		password,
+		remember,
+	}: {
+		email: string;
+		password: string;
+		remember?: boolean;
+	}): Promise<boolean> {
 		try {
 			setLoading(true);
 			setErrors(null);
@@ -145,6 +161,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 			const response = await axiosInstance.post('login/', {
 				email: email.trim().toLowerCase(),
 				password: password,
+				remember: remember,
 			});
 
 			if (response.status >= 200 && response.status < 300) {
@@ -348,13 +365,11 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 				data: error.response?.data,
 			});
 
-
 			if (error.response?.status === 401 || error.response?.status === 403) {
 				console.log('Clearing auth due to 401/403 response');
 				setNotAuth();
 			} else {
 				console.log('Network/server error - keeping existing auth state');
-				
 			}
 		} finally {
 			console.log('Auth confirmation finished, setting checkingAuth to false');

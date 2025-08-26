@@ -12,18 +12,23 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('notebook_shares', function (Blueprint $table) {
-            $table->id();
-             $table->foreignId('notebook_id')
-          ->constrained()
-          ->cascadeOnDelete();
+$table->uuid('id')->primary();
+             $table->uuid('notebook_id');
+        $table->uuid('shared_by_user_id');
+                $table->uuid('shared_with_user_id');
 
-    $table->foreignId('shared_by_user_id')
-          ->constrained('users')
-          ->cascadeOnDelete();
 
-    $table->foreignId('shared_with_user_id')
-          ->constrained('users')
-          ->cascadeOnDelete();
+         $table->foreign('notebook_id')
+              ->references('id')->on('notebooks')
+              ->cascadeOnDelete();
+
+        $table->foreign('shared_with_user_id')
+              ->references('id')->on('users')
+              ->cascadeOnDelete();
+
+               $table->foreign('shared_by_user_id')
+              ->references('id')->on('users')
+              ->cascadeOnDelete();
 
     $table->enum('permission', ['view', 'comment', 'edit'])->default('view');
 
@@ -32,6 +37,17 @@ return new class extends Migration
 
 
             $table->timestamps();
+
+            $table->index('notebook_id');
+            $table->index('shared_by_user_id');
+            $table->index('shared_with_user_id');
+            $table->index('accepted');
+            $table->index('expires_at');
+            $table->index(['notebook_id', 'shared_with_user_id']);
+            $table->index(['shared_with_user_id', 'accepted']);
+            $table->index(['expires_at', 'accepted']);
+
+            $table->unique(['notebook_id', 'shared_with_user_id']);
         });
     }
 

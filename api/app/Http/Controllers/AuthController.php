@@ -12,10 +12,10 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules;
 use Illuminate\Auth\Events\PasswordReset;
-use Illuminate\Auth\Events\Registered;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Support\Str;
-use App\Http\Controllers\Controller;
+use Illuminate\Routing\Controller;
+
 
 
 class AuthController extends Controller
@@ -30,6 +30,8 @@ class AuthController extends Controller
             'email'      => $data['email'],
             'password'   => bcrypt($data['password']),
         ]);
+
+         $remember = $request->has('remember');
 Auth::login($user);
 
 return response()->json([
@@ -43,11 +45,11 @@ return response()->json([
     {
         $data = $request->validated();
         $credentials = Arr::only($data, ['email', 'password']);
-if (Auth::attempt($credentials)) {
+         $remember = $request->has('remember');
+if (Auth::attempt($credentials,$remember)) {
     //  prevent session fixation attacks
             $request->session()->regenerate();
 
-        // User authenticated successfully
         $user = Auth::user();
 
             return response()->json([
@@ -93,7 +95,6 @@ public function forgotPassword(Request $request)
             'email' => ['required', 'email'],
         ]);
 
-        // Send password reset link
         $status = Password::sendResetLink(
             $request->only('email')
         );

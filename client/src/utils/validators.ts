@@ -2,10 +2,10 @@ import { z } from 'zod';
 
 export const registerSchema = z
 	.object({
-		firstName: z
+		first_name: z
 			.string()
 			.min(3, { message: 'First Name must be at least 3 characters long.' }),
-		lastName: z
+		last_name: z
 			.string()
 			.min(3, { message: 'Last Name must be at least 3 characters long.' }),
 		email: z.email({ message: 'Please enter a valid email address.' }),

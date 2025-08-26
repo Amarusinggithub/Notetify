@@ -12,20 +12,34 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('note_tag', function (Blueprint $table) {
-            $table->id();
-                $table->foreignId('tag_id')
-                  ->constrained()
-                  ->cascadeOnDelete();
+                $table->uuid('id')->primary();
+   $table->uuid('note_id');
+        $table->uuid('tag_id');
 
-            $table->foreignId('note_id')
-                  ->constrained()
-                  ->cascadeOnDelete();
+         $table->foreign('note_id')
+              ->references('id')->on('notes')
+              ->cascadeOnDelete();
+
+        $table->foreign('tag_id')
+              ->references('id')->on('tags')
+              ->cascadeOnDelete();
 
 
                 $table->unsignedInteger('order')->nullable();
 
                   $table->unique(['note_id','tag_id']);
             $table->timestamps();
+
+
+                          $table->index(['note_id','tag_id']);
+
+                          $table->index('tag_id');
+                          $table->index('note_id');
+
+
+
+
+
         });
     }
 

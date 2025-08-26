@@ -1,4 +1,4 @@
-import {  LocateIcon, NotebookPen, User2 } from 'lucide-react';
+import { LocateIcon, NotebookPen, User2 } from 'lucide-react';
 import { type ReactNode } from 'react';
 import { Card, CardContent, CardHeader } from '../components/ui/card';
 

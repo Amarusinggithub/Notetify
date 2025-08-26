@@ -33,6 +33,7 @@ export type CreateUser = {
 
 export interface User extends Omit<CreateUser, 'password'> {
 	id: number;
+	remember?: boolean;
 	avatar?: string;
 	is_active: boolean;
 }
@@ -69,6 +70,7 @@ export interface Tag {
 	created_at: Date;
 	updated_at: Date;
 	schedule_delete_at?: Date;
+	removed_at?: Date;
 }
 
 export type CreateNote = {
@@ -119,8 +121,7 @@ export interface UserNotebook {
 	notes?: number[];
 	user: number;
 	role: Role;
-	shared_from?: number;
-	shared_at?: Date;
+
 	removed_at?: Date;
 	archived_at?: Date;
 	trashed_at?: Date;
@@ -138,7 +139,6 @@ export interface Notebook {
 	created_at: Date;
 	updated_at: Date;
 	schedule_delete_at?: Date;
-	users?: number[];
 }
 export interface NoteBookNote {
 	id: number;
@@ -157,8 +157,6 @@ export interface UserNoteBook {
 	is_pinned: boolean;
 	is_favorite: boolean;
 	is_trashed: boolean;
-	shared_from?: number;
-	shared_at?: Date;
 	archived_at?: Date;
 	trashed_at?: Date;
 	favorite_at?: Date;
@@ -170,7 +168,6 @@ export interface NoteTag {
 	id: number;
 	note: Note;
 	tag: Tag;
-	added_at: Date;
 	removed_at?: Date;
 	created_at: Date;
 }

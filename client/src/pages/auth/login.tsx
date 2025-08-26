@@ -39,7 +39,7 @@ const Login = () => {
 			setErrors(formattedErrors);
 			return;
 		}
-		await Login(form.email, form.password);
+		await Login(...form);
 	};
 
 	return (

@@ -12,14 +12,18 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('user_notebook', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')
-                  ->constrained()
-                  ->cascadeOnDelete();
+$table->uuid('id')->primary();
+           $table->uuid('user_id');
+        $table->uuid('notebook_id');
 
-            $table->foreignId('notebook_id')
-                  ->constrained()
-                  ->cascadeOnDelete();
+         $table->foreign('notebook_id')
+              ->references('id')->on('notebooks')
+              ->cascadeOnDelete();
+
+        $table->foreign('user_id')
+              ->references('id')->on('users')
+              ->cascadeOnDelete();
+
             $table->boolean('is_favorited')->default(false);
             $table->boolean('is_pinned')->default(false);
             $table->boolean('is_trashed')->default(false);
@@ -33,6 +37,20 @@ return new class extends Migration
 
                   $table->unique(['user_id','notebook_id']);
             $table->timestamps();
+
+
+$table->index(['user_id', 'is_pinned']);
+$table->index(['user_id', 'is_favorited']);
+$table->index(['user_id', 'is_trashed']);
+
+                  $table->unique('user_id');
+                  $table->unique('notebook_id');
+              $table->index(['user_id','notebook_id']);
+
+
+
+
+
         });
     }
 

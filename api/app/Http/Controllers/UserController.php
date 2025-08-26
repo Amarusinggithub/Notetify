@@ -1,8 +1,11 @@
 <?php
 
 namespace App\Http\Controllers;
+use Illuminate\Routing\Controller;
 
-abstract class UserController
+
+
+ class UserController extends Controller
 {
 
 }

@@ -4,9 +4,12 @@ import {
 	RoomProvider,
 } from '@liveblocks/react/suspense';
 import { useParams } from 'react-router';
-import { Editor } from '../../components/editor';
 import { EditorNotesSidebar } from '../../components/app-notes-sidebar';
-import { NotesSidebarInset, NotesSidebarProvider } from '../../components/ui/notes-sidebar';
+import { Editor } from '../../components/editor';
+import {
+	NotesSidebarInset,
+	NotesSidebarProvider,
+} from '../../components/ui/notes-sidebar';
 
 export default function Notes() {
 	const params = useParams();
