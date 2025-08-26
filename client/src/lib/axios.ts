@@ -2,7 +2,7 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 import { CSRF_TOKEN_COOKIE_NAME } from '../types';
 
-let isRefreshing = false;
+/*let isRefreshing = false;
 let failedQueue: {
 	resolve: (value: unknown) => void;
 	reject: (e?: unknown) => void;
@@ -13,15 +13,17 @@ const processQueue = (error?: any) => {
 		error ? prom.reject(error) : prom.resolve();
 	});
 	failedQueue = [];
-};
+};*/
 
 const axiosInstance = axios.create({
 	baseURL: `${import.meta.env.VITE_BASE_URL}`,
 	headers: {
 		'Content-Type': 'application/json',
+		'X-Requested-With': 'XMLHttpRequest',
+		Accept: 'application/json',
 	},
 	withCredentials: true,
-    withXSRFToken:true
+	withXSRFToken: true,
 });
 
 axiosInstance.interceptors.request.use(
@@ -32,7 +34,7 @@ axiosInstance.interceptors.request.use(
 		) {
 			const csrfToken = Cookies.get(CSRF_TOKEN_COOKIE_NAME);
 			if (csrfToken) {
-				config.headers['X-CSRFToken'] = csrfToken;
+				config.headers['X-XSRF-TOKEN'] = csrfToken;
 			}
 		}
 
@@ -48,7 +50,7 @@ axiosInstance.interceptors.request.use(
 	(error) => Promise.reject(error),
 );
 
-// Response interceptor to handle token refresh on 401 errors.
+/*// Response interceptor to handle token refresh on 401 errors.
 axiosInstance.interceptors.response.use(
 	(response) => {
 		console.log('Response received:', {
@@ -113,14 +115,14 @@ axiosInstance.interceptors.response.use(
 		}
 		return Promise.reject(error);
 	},
-);
+);*/
 
 export async function ensureCSRFToken() {
 	const csrfToken = Cookies.get(CSRF_TOKEN_COOKIE_NAME);
 	if (!csrfToken) {
 		try {
 			console.log('Fetching CSRF token...');
-			await axiosInstance.get('csrf/');
+			await axiosInstance.get('/sanctum/csrf-cookie/');
 			console.log('CSRF token fetched successfully');
 		} catch (error) {
 			console.error('Failed to get CSRF token:', error);

@@ -12,9 +12,9 @@ $app = Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //  $middleware->alias([
-        //    'auth.cookie' => \App\Http\Middleware\CookieAuthMiddleware::class,
-        //]);
+       
+            $middleware->statefulApi();
+
     })
 
     ->withExceptions(function (Exceptions $exceptions): void {

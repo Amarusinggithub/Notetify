@@ -6,10 +6,16 @@ use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
 use Illuminate\Support\Arr;
-use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Http\Request;
-
+use Illuminate\Validation\Rules;
+use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Support\Str;
+use App\Http\Controllers\Controller;
 
 
 class AuthController extends Controller
@@ -24,113 +30,155 @@ class AuthController extends Controller
             'email'      => $data['email'],
             'password'   => bcrypt($data['password']),
         ]);
+Auth::login($user);
 
-        $token = JWTAuth::fromUser($user);
-        $refreshToken = JWTAuth::claims(['token_type' => 'refresh'])->fromUser($user);
-        return response()
-            ->json(['message' => 'Registration successful'])
-            ->cookie('access_token', $token, 15, '/', null, request()->secure(), true, false, 'Strict')
-            ->cookie('refresh_token', $refreshToken, 10080, '/', null, request()->secure(), true, false, 'Strict');
+return response()->json([
+            'message' => 'Registration successful!',
+            'user' => $user->only(['id', 'first_name', 'last_name', 'email']),
+        ], 201);
+
     }
 
     public function login(LoginRequest $request)
     {
         $data = $request->validated();
         $credentials = Arr::only($data, ['email', 'password']);
+if (Auth::attempt($credentials)) {
+    //  prevent session fixation attacks
+            $request->session()->regenerate();
 
-        if (!$token =Auth::attempt($credentials)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
-
+        // User authenticated successfully
         $user = Auth::user();
-        $refreshToken = JWTAuth::claims(['token_type' => 'refresh'])->attempt($credentials);
 
-        return response()
-            ->json(['message' => 'Login successful',
-                    'user' => $user
-])
-            ->cookie('access_token', $token, 15, '/', null, request()->secure(), true, false, 'Strict')
-            ->cookie('refresh_token', $refreshToken, 10080, '/', null, request()->secure(), true, false, 'Strict');
+            return response()->json([
+                'message' => 'Login successful!',
+                'user' => $user->only(['id', 'first_name', 'last_name', 'email']),
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Invalid login credentials!',
+            ], 401);
+        }
     }
 
     public function me(Request $request)
     {
-try{
-            $token = $request->cookie('access_token');
-           if(!$token){
-            return response()->json(['error'=> 'Token not provided'],401);
-           }
-
-           $user=JWTAuth::setToken($token)->authenticate();
-           if(!$user){
-            return response()->json(['error'=> 'User not found'],401);
-           }
-            return response()->json(['user' => $user]);
-
-}catch(\Exception $e){
-                return response()->json(['error' => 'Token is invalid'], 401);
-
-}
+  return response()->json([
+            'user' => $request->user()->only(['id', 'first_name', 'last_name', 'email']),
+        ]);
     }
 
     public function logout(Request $request)
     {
-        try {
 
-               $accessToken = $request->cookie('access_token');
-            $refreshToken = $request->cookie('refresh_token');
+ Auth::logout();
 
-           if ($accessToken) {
-                try {
-                    JWTAuth::setToken($accessToken)->invalidate();
-                } catch (\Exception $e) {
-                }
-            }
+        // Invalidate the session
+        $request->session()->invalidate();
 
-            // Invalidate refresh token if present
-            if ($refreshToken) {
-                try {
-                    JWTAuth::setToken($refreshToken)->invalidate();
-                } catch (\Exception $e) {
-                    // Token might already be invalid
-                }
-            }
+        // Regenerate the CSRF token
+        $request->session()->regenerateToken();
 
-return response()
-                ->json(['message' => 'Logged out successfully'])
-                ->cookie('access_token', '', -1, '/', null, request()->secure(), true, false, 'Strict')
-                ->cookie('refresh_token', '', -1, '/', null, request()->secure(), true, false, 'Strict');
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Logout failed'], 500);
-        }
-    }
+        return response()->json([
+            'message' => 'Logged out successfully!',
+        ]);
 
-    public function refresh(Request $request)
-    {
-        try {
-                        $refreshToken = $request->cookie('refresh_token');
-if(!$refreshToken){
-                return response()->json(['error' => 'Refresh token not provided'], 401);
 }
 
-            $user = JWTAuth::setToken($refreshToken)->authenticate();
 
 
-             if (!$user) {
-                return response()->json(['error' => 'Invalid refresh token'], 401);
-            }
+public function forgotPassword(Request $request)
+    {
+        $request->validate([
+            'email' => ['required', 'email'],
+        ]);
 
-                        $newAccessToken = JWTAuth::fromUser($user);
+        // Send password reset link
+        $status = Password::sendResetLink(
+            $request->only('email')
+        );
 
-
-            return response()
-                ->json([
-                    'message' => 'Token refreshed',
-                    'user' => $user
-                ])
-                ->cookie('access_token', $newAccessToken, 15, '/', null, false, true, false, 'Strict');
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Refresh failed'], 401);
+        if ($status == Password::RESET_LINK_SENT) {
+            return response()->json([
+                'message' => 'Password reset link sent to your email!',
+            ]);
         }
+
+        return response()->json([
+            'message' => 'Unable to send password reset link.',
+            'error' => __($status),
+        ], 400);
+    }
+
+    public function showResetForm(Request $request, $token = null)
+    {
+        return response()->json([
+            'token' => $token,
+            'email' => $request->email,
+        ]);
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+        ]);
+
+        // Reset the password
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user) use ($request) {
+                $user->forceFill([
+                    'password' => Hash::make($request->password),
+                    'remember_token' => Str::random(60),
+                ])->save();
+
+                event(new PasswordReset($user));
+            }
+        );
+
+        if ($status == Password::PASSWORD_RESET) {
+            return response()->json([
+                'message' => 'Password has been reset successfully!',
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Unable to reset password.',
+            'error' => __($status),
+        ], 400);
+    }
+
+      public function verifyEmailNotice(Request $request)
+    {
+        return $request->user()->hasVerifiedEmail()
+            ? response()->json(['message' => 'Email already verified.'])
+            : response()->json(['message' => 'Please verify your email address.']);
+    }
+
+    public function verifyEmail(EmailVerificationRequest $request)
+    {
+        $request->fulfill();
+
+        return response()->json([
+            'message' => 'Email verified successfully!',
+        ]);
+    }
+
+    public function resendVerificationEmail(Request $request)
+    {
+        if ($request->user()->hasVerifiedEmail()) {
+            return response()->json([
+                'message' => 'Email already verified.',
+            ]);
+        }
+
+        $request->user()->sendEmailVerificationNotification();
+
+        return response()->json([
+            'message' => 'Verification link sent!',
+        ]);
     }
 }
