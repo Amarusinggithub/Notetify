@@ -115,7 +115,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
 			await ensureCSRFToken();
 
-			const response = await axiosInstance.post('register/', {
+			const response = await axiosInstance.post('api/auth/register/', {
 				first_name: first_name.trim(),
 				last_name: last_name.trim(),
 				email: email.trim().toLowerCase(),
@@ -158,7 +158,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
 			await ensureCSRFToken();
 
-			const response = await axiosInstance.post('login/', {
+			const response = await axiosInstance.post('api/auth/login/', {
 				email: email.trim().toLowerCase(),
 				password: password,
 				remember: remember,
@@ -192,7 +192,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
 			await ensureCSRFToken();
 
-			const response = await axiosInstance.post('confirm_password/', {
+			const response = await axiosInstance.post('api/auth/confirm-password/', {
 				password: password,
 			});
 
@@ -231,10 +231,13 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
 			await ensureCSRFToken();
 
-			const response = await axiosInstance.post('password_reset/confirm/', {
-				password: password,
-				token: token,
-			});
+			const response = await axiosInstance.post(
+				'api/auth/password-reset/confirm/',
+				{
+					password: password,
+					token: token,
+				},
+			);
 
 			if (response.status >= 200 && response.status < 300) {
 				return true;
@@ -263,7 +266,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
 			await ensureCSRFToken();
 
-			const response = await axiosInstance.post('password_reset/', {
+			const response = await axiosInstance.post('api/auth/password-reset/', {
 				email: email.trim().toLowerCase(),
 			});
 
@@ -294,7 +297,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
 			await ensureCSRFToken();
 
-			const response = await axiosInstance.post('verify_email/', {
+			const response = await axiosInstance.post('api/auth/verify-email/', {
 				email: email.trim().toLowerCase(),
 			});
 
@@ -321,7 +324,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 			setNotAuth();
 
 			try {
-				await axiosInstance.post('logout/');
+				await axiosInstance.post('api/auth/logout/');
 				console.log('Server logout successful');
 			} catch (error) {
 				console.error(
@@ -344,7 +347,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 			await ensureCSRFToken();
 			console.log('CSRF token ensured, making auth/me request...');
 
-			const response = await axiosInstance.get('auth/me/');
+			const response = await axiosInstance.get('api/auth/me/');
 			console.log(
 				'Auth confirmation response:',
 				response.status,

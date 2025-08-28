@@ -13,7 +13,7 @@ import { loginSchema } from '../../utils/validators.ts';
 type LoginForm = {
 	email: string;
 	password: string;
-	remember: boolean;
+	remember?: boolean;
 };
 
 const Login = () => {
@@ -39,7 +39,7 @@ const Login = () => {
 			setErrors(formattedErrors);
 			return;
 		}
-		await Login(...form);
+		await Login(form);
 	};
 
 	return (

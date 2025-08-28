@@ -171,6 +171,20 @@ return [
 
     'secure' => env('SESSION_SECURE_COOKIE'),
 
+
+    /*
+|--------------------------------------------------------------------------
+| CSRF Cookie Name
+|--------------------------------------------------------------------------
+|
+| Here you may change the name of the cookie used to identify a CSRF
+| token. This will change the name of the cookie that the framework
+| uses to verify the authenticity of the request.
+|
+*/
+
+'csrf_cookie' => env('SESSION_CSRF_COOKIE', 'XSRF-TOKEN'),
+
     /*
     |--------------------------------------------------------------------------
     | HTTP Access Only

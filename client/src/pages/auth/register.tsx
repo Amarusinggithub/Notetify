@@ -45,7 +45,7 @@ const Register = () => {
 			return;
 		}
 
-		await SignUp(form.firstName, form.lastName, form.email, form.password);
+		await SignUp(form.first_name, form.last_name, form.email, form.password);
 	}
 
 	return (
