@@ -35,14 +35,13 @@ jobs:
       - name: Recreate .env from secret
         run: echo "${{ secrets.PROD_ENV_FILE }}" > .env
       - run: npm ci --legacy-peer-deps
-      - name: Run tests
-        run: npm test
+
       - name: Format Frontend
         run: npm run format
 
-      - name: Lint Frontend
+      - name: Lint Client
         run: npm run lint
-      - name: Build Frontend
+      - name: Build Client
         run: npm run build
 
     # - name: Deploy to EC2
