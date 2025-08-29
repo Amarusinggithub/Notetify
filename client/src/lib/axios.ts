@@ -47,6 +47,8 @@ axiosInstance.interceptors.response.use(
 			status: response.status,
 			headers: response.headers,
 		});
+        console.log(response);
+
 		return response;
 	},
 	(error) => {

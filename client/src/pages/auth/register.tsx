@@ -63,7 +63,7 @@ const Register = () => {
 							required
 							autoFocus
 							tabIndex={1}
-							name="firstName"
+							name="first_name"
 							autoComplete="firstName"
 							value={form.first_name}
 							onChange={change}
@@ -81,7 +81,7 @@ const Register = () => {
 							type="text"
 							required
 							autoFocus
-							name="lastName"
+							name="last_name"
 							tabIndex={2}
 							autoComplete="lastName"
 							value={form.last_name}
