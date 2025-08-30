@@ -31,6 +31,8 @@ $table->uuid('id')->primary();
             $table->timestamp('favorited_at')->nullable();
             $table->timestamp('pinned_at')->nullable();
             $table->timestamp('trashed_at')->nullable();
+                         $table->softDeletes();
+
 
 
                 $table->unsignedInteger('order')->nullable();

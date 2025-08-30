@@ -15,26 +15,15 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
 	async (config) => {
-		if (
+		const isWriteMethod =
 			config.method &&
-			!['get', 'head', 'options'].includes(config.method.toLowerCase()) &&
-			!config.url?.includes('/sanctum/csrf-cookie')
-		) {
-			await ensureCSRFToken();
+			!['get', 'head', 'options'].includes(config.method.toLowerCase());
 
-			const csrfToken = Cookies.get(CSRF_TOKEN_COOKIE_NAME);
-			if (csrfToken) {
-				config.headers['X-XSRF-TOKEN'] = csrfToken;
-			}
+		if (isWriteMethod) {
+			await ensureCSRFToken();
 		}
 
-		console.log('Request config:', {
-			url: config.url,
-			method: config.method,
-			withCredentials: config.withCredentials,
-			headers: config.headers,
-		});
-
+		console.log('Request config:', config);
 		return config;
 	},
 	(error) => Promise.reject(error),
@@ -42,36 +31,23 @@ axiosInstance.interceptors.request.use(
 
 axiosInstance.interceptors.response.use(
 	(response) => {
-		console.log('Response received:', {
-			url: response.config.url,
-			status: response.status,
-			headers: response.headers,
-		});
-        console.log(response);
-
+		console.log('Response received:', response);
 		return response;
 	},
 	(error) => {
-		console.error('Response error:', {
-			url: error.config?.url,
-			status: error.response?.status,
-			data: error.response?.data,
-			message: error.message,
-		});
+		console.error('Response error:', error.toJSON());
 		return Promise.reject(error);
 	},
 );
 
 export async function ensureCSRFToken() {
-	const csrfToken = Cookies.get(CSRF_TOKEN_COOKIE_NAME);
-	if (!csrfToken) {
+	if (!Cookies.get(CSRF_TOKEN_COOKIE_NAME)) {
 		try {
 			console.log('Fetching CSRF token...');
 			await axiosInstance.get('/sanctum/csrf-cookie');
 			console.log('CSRF token fetched successfully');
 		} catch (error) {
 			console.error('Failed to get CSRF token:', error);
-			throw error;
 		}
 	}
 }

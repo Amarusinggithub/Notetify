@@ -35,6 +35,8 @@ return new class extends Migration
 
                           $table->index('tag_id');
                           $table->index('note_id');
+                                       $table->softDeletes();
+
 
 
 

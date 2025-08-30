@@ -18,6 +18,7 @@ $table->uuid('id')->primary();
            $table->uuid('note_id');
         $table->uuid('shared_by_user_id');
                 $table->uuid('shared_with_user_id');
+             $table->softDeletes();
 
 
          $table->foreign('note_id')

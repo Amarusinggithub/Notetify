@@ -5,18 +5,15 @@ namespace App\Http\Controllers;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
-use Illuminate\Support\Arr;
+use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rules;
-use Illuminate\Auth\Events\PasswordReset;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Support\Str;
-use Illuminate\Routing\Controller;
-
-
+use Illuminate\Validation\Rules;
 
 class AuthController extends Controller
 {
@@ -31,65 +28,49 @@ class AuthController extends Controller
             'password'   => bcrypt($data['password']),
         ]);
 
-         $remember = $request->has('remember');
-Auth::login($user);
+        Auth::login($user);
 
-return response()->json([
-            'message' => 'Registration successful!',
-            'user' => $user->only(['id', 'first_name', 'last_name', 'email']),
-        ], 201);
-
+        return response()->json($user, 201);
     }
 
     public function login(LoginRequest $request)
-    {
-        $data = $request->validated();
-        $credentials = Arr::only($data, ['email', 'password']);
-         $remember = $request->has('remember');
-if (Auth::attempt($credentials,$remember)) {
-    //  prevent session fixation attacks
-            $request->session()->regenerate();
+{
+    $credentials = $request->only('email', 'password');
 
-        $user = Auth::user();
+    $remember = $request->boolean('remember');
 
-            return response()->json([
-                'message' => 'Login successful!',
-                'user' => $user->only(['id', 'first_name', 'last_name', 'email']),
-            ]);
-        } else {
-            return response()->json([
-                'message' => 'Invalid login credentials!',
-            ], 401);
-        }
+    if (Auth::attempt($credentials, $remember)) {
+        $request->session()->regenerate();
+
+        return response()->json(Auth::user());
     }
+
+    return response()->json([
+        'message' => 'Invalid login credentials!',
+    ], 401);
+}
 
     public function me(Request $request)
     {
-  return response()->json([
-            'user' => $request->user()->only(['id', 'first_name', 'last_name', 'email']),
-        ]);
+        return response()->json($request->user());
     }
 
     public function logout(Request $request)
     {
-
- Auth::logout();
+        Auth::guard('web')->logout();
 
         // Invalidate the session
         $request->session()->invalidate();
 
-        // Regenerate the CSRF token
+        // Regenerate the CSRF token for the next guest session.
         $request->session()->regenerateToken();
 
         return response()->json([
             'message' => 'Logged out successfully!',
         ]);
+    }
 
-}
-
-
-
-public function forgotPassword(Request $request)
+    public function forgotPassword(Request $request)
     {
         $request->validate([
             'email' => ['required', 'email'],
@@ -152,7 +133,7 @@ public function forgotPassword(Request $request)
         ], 400);
     }
 
-      public function verifyEmailNotice(Request $request)
+    public function verifyEmailNotice(Request $request)
     {
         return $request->user()->hasVerifiedEmail()
             ? response()->json(['message' => 'Email already verified.'])
@@ -183,3 +164,4 @@ public function forgotPassword(Request $request)
         ]);
     }
 }
+

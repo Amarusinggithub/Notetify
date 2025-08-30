@@ -34,6 +34,7 @@ $table->uuid('id')->primary();
 
     $table->timestamp('expires_at')->nullable();
     $table->boolean('accepted')->default(false);
+             $table->softDeletes();
 
 
             $table->timestamps();

@@ -6,10 +6,6 @@ use App\Http\Controllers\TagController;
 use App\Http\Controllers\NotebookController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/sanctum/csrf-cookie', function () {
-    return response()->json(['message' => 'CSRF cookie set']);
-});
-
 Route::prefix('auth')->group(function () {
     Route::post('register', [AuthController::class, 'register'])
              ->name('register');

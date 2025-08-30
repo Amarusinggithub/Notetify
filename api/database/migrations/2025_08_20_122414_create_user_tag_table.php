@@ -19,6 +19,7 @@ $table->uuid('id')->primary();
          $table->foreign('user_id')
               ->references('id')->on('users')
               ->cascadeOnDelete();
+             $table->softDeletes();
 
         $table->foreign('tag_id')
               ->references('id')->on('tags')

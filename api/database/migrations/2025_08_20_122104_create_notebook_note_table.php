@@ -15,6 +15,8 @@ return new class extends Migration
 $table->uuid('id')->primary();
             $table->uuid('note_id');
         $table->uuid('notebook_id');
+                     $table->softDeletes();
+
 
          $table->foreign('note_id')
               ->references('id')->on('notes')
