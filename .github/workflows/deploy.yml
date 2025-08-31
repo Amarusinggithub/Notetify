@@ -1,0 +1,90 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CD Pipeline
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Configure AWS credentials
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      # Login to Amazon ECR
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: latest
+        run: |
+          docker-compose -f docker-compose.prod.yaml build
+          docker tag notetify-client-prod:latest $ECR_REGISTRY/notetify-client-prod:$IMAGE_TAG
+          docker tag notetify-api-prod:latest $ECR_REGISTRY/notetify-api-prod:$IMAGE_TAG
+
+          docker push $ECR_REGISTRY/notetify-client-prod:$IMAGE_TAG
+          docker push $ECR_REGISTRY/notetify-api-prod:$IMAGE_TAG
+
+          echo "Setting output values..."
+          echo "apiimage=$ECR_REGISTRY/notetify-api-prod:$IMAGE_TAG" >> $GITHUB_OUTPUT
+          echo "clientimage=$ECR_REGISTRY/notetify-client-prod:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+      # Download the latest active task definition
+      - name: Download task definition
+        run: |
+          aws ecs describe-task-definition --task-definition ${{ secrets.ECS_CONTAINER_DEFINITION }} \
+          --query taskDefinition > task-definition.json
+
+
+      - name: Fill in the new api image ID in the Amazon ECS task definition
+        id: api-task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: ${{ secrets.ECS_API_CONTAINER_NAME }}
+          image: ${{ steps.build-image.outputs.apiimage }}
+
+      - name: Fill in the new client image ID in the Amazon ECS task definition
+        id: client-task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ${{ steps.api-task-def.outputs.task-definition }}
+          container-name: ${{ secrets.ECS_CLIENT_CONTAINER_NAME }}
+          image: ${{ steps.build-image.outputs.clientimage }}
+
+
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.client-task-def.outputs.task-definition }}
+          service: testserviceelb
+          cluster: testelb
+          wait-for-service-stability: true

@@ -143,7 +143,7 @@ function NotesSidebar({
 			<div
 				data-slot="notes-sidebar"
 				className={cn(
-					'bg-sidebar text-sidebar-foreground flex h-full w-(--sidebar-width) flex-col',
+					'bg-sidebar text-sidebar-foreground flex h-full w-[var(--notes-sidebar-width)] flex-col',
 					className,
 				)}
 				{...props}
@@ -162,11 +162,11 @@ function NotesSidebar({
 			data-side={side}
 			data-slot="notes-sidebar"
 		>
-			{/* This is what handles the sidebar gap on desktop */}
+			{/* This is what handles the note-sidebar gap on desktop */}
 			<div
 				data-slot="notes-sidebar-gap"
 				className={cn(
-					'relative w-(--sidebar-width) bg-transparent transition-[width] duration-200 ease-linear',
+					'relative w-[var(--notes-sidebar-width)] bg-transparent transition-[width] duration-200 ease-linear',
 					'group-data-[collapsible=offcanvas]:w-0',
 					'group-data-[side=right]:rotate-180',
 					variant === 'floating' || variant === 'inset'
@@ -264,7 +264,7 @@ function NotesSidebarInset({
 			data-slot="notes-sidebar-inset"
 			className={cn(
 				'bg-background relative flex w-full flex-1 flex-col',
-				'md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow-sm md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-2',
+				'md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow-sm md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-0',
 				className,
 			)}
 			{...props}
@@ -300,7 +300,7 @@ function NotesSidebarFooter({
 	);
 }
 
-function SidebarSeparator({
+function NotesSidebarSeparator({
 	className,
 	...props
 }: React.ComponentProps<typeof Separator>) {
@@ -341,4 +341,5 @@ export {
 	NotesSidebarRail,
 	NotesSidebarTrigger,
 	useNotesSidebar,
+	NotesSidebarSeparator,
 };

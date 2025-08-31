@@ -23,7 +23,7 @@ services:
     ports:
       - "5432:5432"
     env_file:
-      - .env.development
+      - .env.production
 
   api_prod:
     networks:
@@ -51,7 +51,7 @@ services:
     networks:
       - notetify-net-prod
     image: redis:8.0.1-alpine
-    container_name: notetify-redis-cache-prod
+    container_name: notetify-redis-prod
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -68,7 +68,6 @@ services:
       - .env.production
 
 
-
   client_prod:
     networks:
       - notetify-net-prod
@@ -80,7 +79,7 @@ services:
       - VITE_BASE_URL= http://localhost:80/api/
       - VITE_WS_ORIGIN= ws://localhost:80
       - VITE_APP_NAME= Notetify
-      - VITE_client_URL= http://localhost:80/
+      - VITE_CLIENT_URL= http://localhost:80/
     container_name: notetify-client-prod
     restart: always
     ports:
@@ -90,6 +89,7 @@ services:
           condition: service_started
     env_file:
       - .env.production
+
 networks:
   notetify-net-prod:
     driver: bridge
@@ -97,4 +97,9 @@ networks:
 volumes:
   db-data-prod: {}
   redis-data-prod: {}
+
+
+# secrets:
+#   db-password:
+#     file: db/password.txt
 

@@ -80,7 +80,7 @@ const mainNavItems: NavItem[] = [
 
 export function AppSidebar() {
 	return (
-		<Sidebar collapsible="offcanvas" variant="floating">
+		<Sidebar collapsible="offcanvas" variant="inset">
 			<SidebarHeader>
 				<SidebarMenu>
 					<SidebarMenuItem>

@@ -28,7 +28,7 @@ export default function Notes() {
 		>
 			<RoomProvider id={`my-room-${params.id}`}>
 				<ClientSideSuspense fallback={<div>Loading…</div>}>
-					<NotesSidebarProvider defaultOpen={true}>
+					<NotesSidebarProvider   defaultOpen={true}>
 						<EditorNotesSidebar />
 						<NotesSidebarInset>
 							<Editor />
