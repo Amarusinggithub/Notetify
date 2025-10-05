@@ -1,121 +1,46 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import React, {
-	createContext,
-	type PropsWithChildren,
-	useContext,
-	useState,
-} from 'react';
-import axiosInstance from '../lib/axios.ts';
-import {
-	type CreateNote,
-	noteQueryKeys,
-	type UserNote,
-} from '../types/index.ts';
+import { useMutation } from '@tanstack/react-query';
+import {type CreateNote, type UserNote } from '../types';
+import { useRevalidator } from 'react-router';
+import axiosInstance from 'lib/axios';
 
-interface NoteContextType {
-	selectedNote: UserNote | null;
-
-	addNote: (note: CreateNote) => Promise<void>;
-	editNote: (newNote: UserNote) => Promise<void>;
-	removeNote: (note: UserNote) => Promise<void>;
-	handleFavorite: (note: UserNote) => void;
-	handleTrash: (note: UserNote) => void;
-	handlePin: (note: UserNote) => void;
-	setSelectedNote: React.Dispatch<React.SetStateAction<UserNote | null>>;
+export function useCreateNote() {
+	const revalidator = useRevalidator();
+	return useMutation({
+		mutationFn: (newNote: CreateNote) => createNote(newNote),
+		onSuccess: () => {
+			revalidator.revalidate();
+		},
+		onError: (error) => {
+			console.error('Failed to create note:', error);
+		},
+	});
 }
 
-type NoteProviderProps = PropsWithChildren;
-
-const NoteContext = createContext<NoteContextType | undefined>(undefined);
-
-const NoteProvider = ({ children }: NoteProviderProps) => {
-	const queryClient = useQueryClient();
-
-	const [selectedNote, setSelectedNote] = useState<UserNote | null>(null);
-
-	const addNoteMutation = useMutation({
-		mutationFn: createNote,
-		onSuccess() {
-			queryClient.invalidateQueries({
-				queryKey: [noteQueryKeys.all],
-			});
-		},
-	});
-
-	const addNote = async (note: CreateNote) => {
-		if (
-			note.note_data.content!.trim().length != 0 &&
-			note.note_data.title!.trim().length != 0
-		)
-			addNoteMutation.mutate(note);
-	};
-
-	const editNoteMutation = useMutation({
-		mutationFn: updateNote,
-		onSuccess() {
-			queryClient.invalidateQueries({
-				queryKey: [noteQueryKeys.all],
-			});
-		},
-	});
-
-	const editNote = async (note: UserNote) => {
-		if (
-			note.note.content!.trim().length != 0 &&
-			note.note.title!.trim().length != 0
-		)
-			editNoteMutation.mutate(note);
-	};
-
-	const removeNoteMutation = useMutation({
-		mutationFn: deleteNote,
+export function useUpdateNote() {
+	const revalidator = useRevalidator();
+	return useMutation({
+		mutationFn: (note: UserNote) => updateNote(note),
 		onSuccess: () => {
-			queryClient.invalidateQueries({
-				queryKey: [noteQueryKeys.all],
-			});
+			revalidator.revalidate();
+		},
+		onError: (error) => {
+			console.error('Failed to update note:', error);
 		},
 	});
+}
 
-	const removeNote = async (note: UserNote) => {
-		removeNoteMutation.mutate(note);
-	};
-
-	const handleToggle = (
-		note: UserNote,
-		field: keyof Pick<UserNote, 'is_favorite' | 'is_trashed' | 'is_pinned'>,
-	) => {
-		const updated = { ...note, [field]: !note[field] };
-		editNote(updated);
-	};
-
-	return (
-		<NoteContext.Provider
-			value={{
-				selectedNote,
-				addNote,
-				editNote,
-				removeNote,
-				handleFavorite: (note) => handleToggle(note, 'is_favorite'),
-				handleTrash: (note) => handleToggle(note, 'is_trashed'),
-				handlePin: (note) => handleToggle(note, 'is_pinned'),
-				setSelectedNote,
-			}}
-		>
-			{children}
-		</NoteContext.Provider>
-	);
-};
-
-const useMutateNote = () => {
-	const context = useContext(NoteContext);
-	if (!context) {
-		throw new Error('useMutateNote must be used within a NoteProvider');
-	}
-	return context;
-};
-
-export { NoteContext, NoteProvider };
-export default useMutateNote;
+export function useDeleteNote() {
+	const revalidator = useRevalidator();
+	return useMutation({
+		mutationFn: (note: UserNote) => deleteNote(note),
+		onSuccess: () => {
+			revalidator.revalidate();
+		},
+		onError: (error) => {
+			console.error('Failed to delete note:', error);
+		},
+	});
+}
 
 export const getNotes = async () => {
 	try {

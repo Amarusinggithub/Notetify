@@ -4,13 +4,13 @@ import axiosInstance from '../lib/axios.ts';
 import { type UserNote, noteQueryKeys } from '../types';
 
 type FectchNotesProps = {
-	category?: string;
-	params?: string;
+	category: string;
+	params: string;
 };
 
 const useFetchNotes = ({
-	category: string,
-	params: string,
+	category,
+	params
 }: FectchNotesProps) => {
 	const key = noteQueryKeys.list(category, params);
 	const { data = [] } = useSuspenseQuery<UserNote[]>({

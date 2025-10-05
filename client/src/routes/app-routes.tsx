@@ -21,6 +21,7 @@ import VerifyEmail from '../pages/auth/verify-email';
 import Landing from '../pages/landing';
 import Authentication from '../pages/settings/authentication';
 import General from '../pages/settings/general';
+import { notesLoader } from '../lib/loaders.ts';
 
 function AppRoutes() {
 	const { isAuthenticated, checkingAuth } = useAuth();
@@ -41,6 +42,7 @@ function AppRoutes() {
 	const privateRoutes = [
 		{
 			path: '/',
+			loader: notesLoader,
 			Component: AppLayout,
 			children: [
 				{ index: true, Component: Home },
