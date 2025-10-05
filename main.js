@@ -3,7 +3,7 @@
 import apiLoadTest from "./api/scenarios/load-test.js";
 import frontendJourney from "./frontend/scenarios/user-journey.js";
 
-// 2. Configure the scenarios to run in parallel
+// Configure the scenarios to run in parallel
 export const options = {
     scenarios: {
         // Scenario name for the API test
@@ -36,7 +36,6 @@ export const options = {
     },
 };
 
-// 3. Export the functions with names that match the 'exec' properties above
 export function api() {
     apiLoadTest();
 }

@@ -97,7 +97,9 @@ export function EditorNotesSidebar() {
 			</NotesSidebarHeader>
 
 			<NotesSidebarContent>
-				<ScrollArea></ScrollArea>
+				<ScrollArea>
+                    
+                </ScrollArea>
 			</NotesSidebarContent>
 			<NotesSidebarFooter></NotesSidebarFooter>
 		</NotesSidebar>
