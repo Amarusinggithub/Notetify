@@ -78,7 +78,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 			localStorage.setItem(USERDATA_STORAGE_KEY, JSON.stringify(shared));
 		} catch (error) {
 			console.error('Error setting auth data:', error);
-			setErrors(['Error processing authentication data.']);
+			setErrors({ general: ['Error processing authentication data.'] });
 		}
 	};
 
@@ -125,7 +125,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 				setAuth(response.data);
 				return true;
 			} else {
-				setErrors(['Registration failed. Please try again.']);
+				setErrors({ general: ['Registration failed. Please try again.'] });
 				return false;
 			}
 		} catch (error: any) {

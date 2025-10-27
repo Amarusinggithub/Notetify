@@ -21,6 +21,8 @@ import VerifyEmail from '../pages/auth/verify-email';
 import Landing from '../pages/landing';
 import Authentication from '../pages/settings/authentication';
 import General from '../pages/settings/general';
+import Appearance from '../pages/settings/appearance';
+import Notification from '../pages/settings/notification';
 import { notesLoader } from '../lib/loaders.ts';
 
 function AppRoutes() {
@@ -61,8 +63,11 @@ function AppRoutes() {
 			path: 'settings',
 			Component: SettingsLayout,
 			children: [
+				{ index: true, Component: () => <Navigate to="/settings/general" replace /> },
 				{ path: 'general', Component: General },
 				{ path: 'authentication', Component: Authentication },
+				{ path: 'appearance', Component: Appearance },
+				{ path: 'notification', Component: Notification },
 			],
 		},
 
