@@ -7,7 +7,7 @@ import React, {
 	useState,
 } from 'react';
 import axiosInstance, { ensureCSRFToken } from '../lib/axios.ts';
-import { mapErrorToMessage } from '../utils/helpers.ts';
+import { mapAxiosErrorToFieldErrors, type FormErrors } from '../utils/helpers.ts';
 import { type SharedData, type User, USERDATA_STORAGE_KEY } from './../types';
 
 type AuthProviderProps = PropsWithChildren;
@@ -36,12 +36,12 @@ interface AuthContextType {
 	VerifyEmail: (email: string) => Promise<string | null>;
 	ConfirmPassword: (password: string) => Promise<boolean>;
 	setLoading: React.Dispatch<React.SetStateAction<boolean>>;
-	setErrors: React.Dispatch<React.SetStateAction<string[] | null>>;
+	setErrors: React.Dispatch<React.SetStateAction<FormErrors | null>>;
 	setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
 	setSharedData: React.Dispatch<React.SetStateAction<SharedData | null>>;
 	clearErrors: () => void;
 	sharedData: SharedData | null;
-	errors: string[] | null;
+	errors: FormErrors | null;
 	isLoading: boolean;
 	isAuthenticated: boolean;
 	checkingAuth: boolean;
@@ -53,7 +53,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 	const [isLoading, setLoading] = useState<boolean>(false);
 	const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 	const [checkingAuth, setCheckingAuth] = useState<boolean>(true);
-	const [errors, setErrors] = useState<string[] | null>(null);
+	const [errors, setErrors] = useState<FormErrors | null>(null);
 	const [sharedData, setSharedData] = useState<SharedData | null>(null);
 
 	const clearErrors = () => setErrors(null);
@@ -98,18 +98,17 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 			setLoading(true);
 			setErrors(null);
 
-			if (
-				!first_name?.trim() ||
-				!last_name?.trim() ||
-				!email?.trim() ||
-				!password?.trim()
-			) {
-				setErrors(['All fields are required.']);
-				return false;
-			}
 
-			if (password.length < 8) {
-				setErrors(['Password must be at least 8 characters long.']);
+			// Basic guard rails (UI does Zod validation too)
+			const fieldErrors: FormErrors = {};
+			if (!first_name?.trim()) fieldErrors.first_name = ['First name is required.'];
+			if (!last_name?.trim()) fieldErrors.last_name = ['Last name is required.'];
+			if (!email?.trim()) fieldErrors.email = ['Email is required.'];
+			if (!password?.trim()) fieldErrors.password = ['Password is required.'];
+			if (password && password.length > 0 && password.length < 8)
+				fieldErrors.password = ['Password must be at least 8 characters long.'];
+			if (Object.keys(fieldErrors).length) {
+				setErrors(fieldErrors);
 				return false;
 			}
 
@@ -131,7 +130,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 			}
 		} catch (error: any) {
 			console.error('Sign Up error:', error);
-			setErrors(mapErrorToMessage(error));
+			setErrors(mapAxiosErrorToFieldErrors(error));
 			return false;
 		} finally {
 			setLoading(false);
@@ -152,7 +151,10 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 			setErrors(null);
 
 			if (!email?.trim() || !password?.trim()) {
-				setErrors(['Email and password are required.']);
+				const fe: FormErrors = {};
+				if (!email?.trim()) fe.email = ['Email is required.'];
+				if (!password?.trim()) fe.password = ['Password is required.'];
+				setErrors(fe);
 				return false;
 			}
 
@@ -168,12 +170,12 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 				setAuth(response.data);
 				return true;
 			} else {
-				setErrors(['Login failed. Please try again.']);
+				setErrors({ password: ['Login failed. Please try again.'] });
 				return false;
 			}
 		} catch (error: any) {
 			console.error('Login error:', error);
-			setErrors(mapErrorToMessage(error));
+			setErrors(mapAxiosErrorToFieldErrors(error));
 			return false;
 		} finally {
 			setLoading(false);
@@ -186,7 +188,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 			setErrors(null);
 
 			if (!password?.trim()) {
-				setErrors(['Password is required.']);
+				setErrors({ password: ['Password is required.'] });
 				return false;
 			}
 
@@ -199,12 +201,12 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 			if (response.status >= 200 && response.status < 300) {
 				return true;
 			} else {
-				setErrors(['Password confirmation failed.']);
+				setErrors({ password: ['Password confirmation failed.'] });
 				return false;
 			}
 		} catch (error: any) {
 			console.error('ConfirmPassword error:', error);
-			setErrors(mapErrorToMessage(error));
+			setErrors(mapAxiosErrorToFieldErrors(error));
 			return false;
 		} finally {
 			setLoading(false);
@@ -220,12 +222,12 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 			setErrors(null);
 
 			if (!token || !password?.trim()) {
-				setErrors(['Invalid reset token or password.']);
+				setErrors({ password: ['Invalid reset token or password.'] });
 				return false;
 			}
 
 			if (password.length < 8) {
-				setErrors(['Password must be at least 8 characters long.']);
+				setErrors({ password: ['Password must be at least 8 characters long.'] });
 				return false;
 			}
 
@@ -242,12 +244,12 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 			if (response.status >= 200 && response.status < 300) {
 				return true;
 			} else {
-				setErrors(['Password reset failed. Please try again.']);
+				setErrors({ password: ['Password reset failed. Please try again.'] });
 				return false;
 			}
 		} catch (error: any) {
 			console.error('PasswordReset error:', error);
-			setErrors(mapErrorToMessage(error));
+			setErrors(mapAxiosErrorToFieldErrors(error));
 			return false;
 		} finally {
 			setLoading(false);
@@ -260,7 +262,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 			setErrors(null);
 
 			if (!email?.trim()) {
-				setErrors(['Email is required.']);
+				setErrors({ email: ['Email is required.'] });
 				return null;
 			}
 
@@ -273,12 +275,12 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 			if (response.status >= 200 && response.status < 300) {
 				return response.data.token || 'success';
 			} else {
-				setErrors(['Failed to send reset email. Please try again.']);
+				setErrors({ email: ['Failed to send reset email. Please try again.'] });
 				return null;
 			}
 		} catch (error: any) {
 			console.error('ForgotPassword error:', error);
-			setErrors(mapErrorToMessage(error));
+			setErrors(mapAxiosErrorToFieldErrors(error));
 			return null;
 		} finally {
 			setLoading(false);
@@ -291,7 +293,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 			setErrors(null);
 
 			if (!email?.trim()) {
-				setErrors(['Email is required.']);
+				setErrors({ email: ['Email is required.'] });
 				return null;
 			}
 
@@ -304,12 +306,12 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 			if (response.status >= 200 && response.status < 300) {
 				return response.data.token || 'success';
 			} else {
-				setErrors(['Failed to send verification email. Please try again.']);
+				setErrors({ email: ['Failed to send verification email. Please try again.'] });
 				return null;
 			}
 		} catch (error: any) {
 			console.error('VerifyEmail error:', error);
-			setErrors(mapErrorToMessage(error));
+			setErrors(mapAxiosErrorToFieldErrors(error));
 			return null;
 		} finally {
 			setLoading(false);

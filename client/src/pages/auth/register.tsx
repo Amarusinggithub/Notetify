@@ -53,8 +53,11 @@ const Register = () => {
 			title="Create an account"
 			description="Enter your details below to create your account"
 		>
-			<form className="flex flex-col gap-6" onSubmit={(e) => submit(e)}>
+			<form className="flex flex-col gap-6" onSubmit={(e) => submit(e)} noValidate>
 				<div className="grid gap-6">
+					{errors?.general && (
+						<InputError message={errors.general[0]} />
+					)}
 					<div className="grid gap-2">
 						<Label htmlFor="first-name">First Name</Label>
 						<Input
@@ -133,7 +136,7 @@ const Register = () => {
 					</div>
 
 					<div className="grid gap-2">
-						<Label htmlFor="password-confirmation">Confirm password</Label>
+						<Label htmlFor="password_confirmation">Confirm password</Label>
 						<Input
 							id="password_confirmation"
 							type="password"

@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import Login from '../../src/pages/auth/login.tsx';
+import { MemoryRouter } from 'react-router';
 
 const mockLogin = vi.fn();
 const mockSetErrors = vi.fn();
@@ -23,7 +24,11 @@ describe('Login page', () => {
         });
 
         it('submits valid credentials', async () => {
-                render(<Login />);
+                render(
+                        <MemoryRouter>
+                                <Login />
+                        </MemoryRouter>,
+                );
 
                 const emailInput = screen.getByLabelText(/Email address/i);
                 const passwordInput = screen.getByLabelText(/Password/i);
@@ -47,7 +52,11 @@ describe('Login page', () => {
         });
 
         it('prevents submission when validation fails', async () => {
-                render(<Login />);
+                render(
+                        <MemoryRouter>
+                                <Login />
+                        </MemoryRouter>,
+                );
 
                 const emailInput = screen.getByLabelText(/Email address/i);
                 const passwordInput = screen.getByLabelText(/^Password$/i);

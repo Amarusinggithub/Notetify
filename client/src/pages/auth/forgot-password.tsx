@@ -56,7 +56,7 @@ export default function ForgotPassword({ status }: ForgotPasswordProps) {
 			)}
 
 			<div className="space-y-6">
-				<form onSubmit={submit}>
+				<form onSubmit={submit} noValidate>
 					<div className="grid gap-2">
 						<Label htmlFor="email">Email address</Label>
 						<Input

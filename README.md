@@ -13,7 +13,7 @@ Built with a React frontend and a Laravel backend.
 * Create and manage notes with ease
 * Pin important notes for quick access
 * Use custom tags to categorize notes
-*  delete notes when no longer needed
+* delete notes when no longer needed
 * Modern UI with dark theme for comfort
 * Real-time collaboration: Share notes and notebooks and collaborate in real-time
 * Upload files ,documents and other medias and reference and preview them in your notes

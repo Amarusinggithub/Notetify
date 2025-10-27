@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import Register from '../../src/pages/auth/register.tsx';
+import { MemoryRouter } from 'react-router';
 
 const mockSignUp = vi.fn();
 const mockSetErrors = vi.fn();
@@ -23,7 +24,11 @@ describe('Register page', () => {
         });
 
         it('submits trimmed form data when validation succeeds', async () => {
-                render(<Register />);
+                render(
+                        <MemoryRouter>
+                                <Register />
+                        </MemoryRouter>,
+                );
 
                 fireEvent.change(screen.getByLabelText(/First Name/i), {
                         target: { name: 'first_name', value: '  Jane ' },
@@ -48,7 +53,11 @@ describe('Register page', () => {
         });
 
         it('prevents submission when passwords do not match', async () => {
-                render(<Register />);
+                render(
+                        <MemoryRouter>
+                                <Register />
+                        </MemoryRouter>,
+                );
 
                 fireEvent.change(screen.getByLabelText(/First Name/i), {
                         target: { name: 'first_name', value: 'John' },

@@ -23,7 +23,6 @@ export default async function () {
   try {
     await page.goto('http://localhost:3000');
 
-    // Example: Login
     page.locator('input[name="email"]').type('test@example.com');
     page.locator('input[name="password"]').type('password123');
     await Promise.all([

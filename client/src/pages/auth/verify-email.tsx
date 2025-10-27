@@ -7,23 +7,18 @@ import { useAuth } from '../../hooks/use-auth.tsx';
 import AuthLayout from '../../layouts/auth-layout';
 
 export default function VerifyEmail() {
-	const { isLoading, VerifyEmail } = useAuth();
-	const submit: FormEventHandler = async (e) => {
-		e.preventDefault();
-		await VerifyEmail('');
-	};
+    const { isLoading, VerifyEmail } = useAuth();
+    const submit: FormEventHandler = async (e) => {
+        e.preventDefault();
+        await VerifyEmail('');
+    };
 
 	return (
 		<AuthLayout
 			title="Verify email"
 			description="Please verify your email address by clicking on the link we just emailed to you."
 		>
-			{status === 'verification-link-sent' && (
-				<div className="mb-4 text-center text-sm font-medium text-green-600">
-					A new verification link has been sent to the email address you
-					provided during registration.
-				</div>
-			)}
+            {/* Status message handled elsewhere; removed undefined reference */}
 
 			<form onSubmit={submit} className="space-y-6 text-center">
 				<Button disabled={isLoading} variant="secondary">

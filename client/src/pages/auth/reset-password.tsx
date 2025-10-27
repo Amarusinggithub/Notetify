@@ -69,9 +69,9 @@ export default function ResetPassword() {
 					<div className="grid gap-2">
 						<Label htmlFor="confirmPassword">Confirm password</Label>
 						<Input
-							id="password_confirmation"
+							id="confirmPassword"
 							type="password"
-							name="password_confirmation"
+							name="confirmPassword"
 							autoComplete="new-password"
 							value={form.confirmPassword}
 							className="mt-1 block w-full"
