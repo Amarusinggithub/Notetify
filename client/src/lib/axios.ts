@@ -2,8 +2,14 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 import { CSRF_TOKEN_COOKIE_NAME } from '../types';
 
+// Normalize base URL to ensure it targets the Laravel API prefix.
+// If VITE_BASE_URL is "http://localhost:8000", we append "/api".
+// If it's empty, default to "/api" (same-origin API).
+const RAW_BASE = (import.meta as any).env?.VITE_BASE_URL?.toString()?.replace(/\/+$/,'') || '';
+const BASE_URL = RAW_BASE ? (RAW_BASE.endsWith('/api') ? RAW_BASE : `${RAW_BASE}/api`) : '/api';
+
 const axiosInstance = axios.create({
-	baseURL: `${import.meta.env.VITE_BASE_URL}`,
+	baseURL: BASE_URL,
 	headers: {
 		'Content-Type': 'application/json',
 		'X-Requested-With': 'XMLHttpRequest',

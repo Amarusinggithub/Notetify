@@ -1,7 +1,7 @@
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router';
-import { useAuth } from '../hooks/use-auth';
 import AppLayout from '../layouts/app-layout';
 import SettingsLayout from '../layouts/settings/layout';
+import { notesLoader } from '../lib/loaders.ts';
 import Calender from '../pages/app/calender';
 import Favorites from '../pages/app/favorites';
 import Files from '../pages/app/files';
@@ -19,14 +19,14 @@ import ResetPassword from '../pages/auth/reset-password';
 import { TwoFactorVerification } from '../pages/auth/two-factor-verification';
 import VerifyEmail from '../pages/auth/verify-email';
 import Landing from '../pages/landing';
+import Appearance from '../pages/settings/appearance';
 import Authentication from '../pages/settings/authentication';
 import General from '../pages/settings/general';
-import Appearance from '../pages/settings/appearance';
 import Notification from '../pages/settings/notification';
-import { notesLoader } from '../lib/loaders.ts';
+import { useAuthStore } from '../stores/use-auth-store.tsx';
 
 function AppRoutes() {
-	const { isAuthenticated, checkingAuth } = useAuth();
+	const { isAuthenticated, checkingAuth } = useAuthStore();
 	if (checkingAuth) return null;
 
 	const publicRoutes = [
@@ -44,6 +44,7 @@ function AppRoutes() {
 	const privateRoutes = [
 		{
 			path: '/',
+			id: 'root-notes',
 			loader: notesLoader,
 			Component: AppLayout,
 			children: [
@@ -63,7 +64,10 @@ function AppRoutes() {
 			path: 'settings',
 			Component: SettingsLayout,
 			children: [
-				{ index: true, Component: () => <Navigate to="/settings/general" replace /> },
+				{
+					index: true,
+					Component: () => <Navigate to="/settings/general" replace />,
+				},
 				{ path: 'general', Component: General },
 				{ path: 'authentication', Component: Authentication },
 				{ path: 'appearance', Component: Appearance },

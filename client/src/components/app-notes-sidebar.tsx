@@ -1,3 +1,4 @@
+import { useVirtualizer } from '@tanstack/react-virtual';
 import { ArrowDownWideNarrow, Ellipsis, FilterIcon } from 'lucide-react';
 import { Button } from './ui/button';
 import {
@@ -13,78 +14,72 @@ import {
 	NotesSidebarContent,
 	NotesSidebarFooter,
 	NotesSidebarHeader,
-    NotesSidebarSeparator,
+	NotesSidebarSeparator,
 } from './ui/notes-sidebar';
 import { ScrollArea } from './ui/scroll-area';
-import { useVirtualizer } from '@tanstack/react-virtual';
 
-import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
-import NoteCard from './note-card';
 import { useSuspenseInfiniteQuery } from '@tanstack/react-query';
-import axiosInstance from '../lib/axios';
-import type { PaginatedNotesResponse } from '../lib/loaders';
-import  { useEffect, useMemo, useRef } from 'react';
-import { useLoaderData } from 'react-router';
-
-const fetchNotesPage = async ({
-	pageParam = 1,
-}): Promise<PaginatedNotesResponse> => {
-	const response = await axiosInstance.get(`/notes/?page=${pageParam}`);
-	return response.data;
-};
+import { useEffect, useMemo, useRef } from 'react';
+import { useRouteLoaderData } from 'react-router';
+import { fetchNotesPage } from '../lib/notes';
+import { useNotesStore } from '../stores/use-notes-store';
+import NoteCard from './note-card';
+import { Input } from './ui/input';
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
 export function EditorNotesSidebar() {
+	const initialData = useRouteLoaderData('root-notes');
+	const search = useNotesStore((s) => s.search);
+	const sortBy = useNotesStore((s) => s.sortBy);
 
-     const initialData = useLoaderData();
+	const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+		useSuspenseInfiniteQuery({
+			queryKey: ['notes', search, sortBy],
+			queryFn: fetchNotesPage,
+			initialPageParam: 1,
+			initialData: {
+				pages: [initialData],
+				pageParams: [1],
+			},
+			getNextPageParam: (lastPage) => lastPage.nextPage,
+		});
 
-			const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-				useSuspenseInfiniteQuery({
-					queryKey: ['notes'],
-					queryFn: fetchNotesPage,
-					initialPageParam: 1,
-					initialData: {
-						pages: [initialData],
-						pageParams: [1],
-					},
-					getNextPageParam: (lastPage) => lastPage.nextPage,
-				});
+	const allNotes = useMemo(
+		() => data?.pages.flatMap((page) => page.results) ?? [],
+		[data],
+	);
 
-			  const allNotes = useMemo(
-					() => data?.pages.flatMap((page) => page.results) ?? [],
-					[data],
-				);
+	const parentRef = useRef<HTMLDivElement>(null);
 
-				const parentRef = useRef<HTMLDivElement>(null);
+	const rowVirtualizer = useVirtualizer({
+		count: allNotes.length,
+		getScrollElement: () => parentRef.current,
+		estimateSize: () => 200,
+		overscan: 5,
+	});
 
-				const rowVirtualizer = useVirtualizer({
-					count: allNotes.length,
-					getScrollElement: () => parentRef.current,
-					estimateSize: () => 200,
-					overscan: 5,
-				});
+	const virtualItems = rowVirtualizer.getVirtualItems();
 
-				const virtualItems = rowVirtualizer.getVirtualItems();
+	useEffect(() => {
+		const lastItem = virtualItems[virtualItems.length - 1];
+		if (!lastItem) {
+			return;
+		}
 
-				useEffect(() => {
-					const lastItem = virtualItems[virtualItems.length - 1];
-					if (!lastItem) {
-						return;
-					}
-
-					if (
-						lastItem.index >= allNotes.length - 1 &&
-						hasNextPage &&
-						!isFetchingNextPage
-					) {
-						fetchNextPage();
-					}
-				}, [
-					hasNextPage,
-					fetchNextPage,
-					allNotes.length,
-					isFetchingNextPage,
-					virtualItems,
-				]);
+		if (
+			lastItem.index >= allNotes.length - 1 &&
+			hasNextPage &&
+			!isFetchingNextPage
+		) {
+			fetchNextPage();
+		}
+	}, [
+		hasNextPage,
+		fetchNextPage,
+		allNotes.length,
+		isFetchingNextPage,
+		virtualItems,
+	]);
 	return (
 		<NotesSidebar collapsible="offcanvas" variant="inset">
 			<NotesSidebarHeader>
@@ -93,11 +88,17 @@ export function EditorNotesSidebar() {
 						Notes
 					</Label>{' '}
 					<h3 className="muted-foreground scroll-m-20 text-xl font-semibold tracking-tight">
-						21
+						{allNotes.length}
 					</h3>
 				</div>
 
-				<div className="flex justify-end">
+				<div className="flex flex-1 items-center justify-end gap-2">
+					<Input
+						value={search}
+						onChange={(e) => useNotesStore.getState().setSearch(e.target.value)}
+						placeholder="Search notes..."
+						className="max-w-xs"
+					/>
 					<DropdownMenu>
 						<DropdownMenuTrigger>
 							<Tooltip>
@@ -203,5 +204,3 @@ export function EditorNotesSidebar() {
 		</NotesSidebar>
 	);
 }
-
-

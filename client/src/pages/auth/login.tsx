@@ -6,8 +6,8 @@ import { Button } from '../../components/ui/button.tsx';
 import { Checkbox } from '../../components/ui/checkbox.tsx';
 import { Input } from '../../components/ui/input.tsx';
 import { Label } from '../../components/ui/label.tsx';
-import { useAuth } from '../../hooks/use-auth.tsx';
 import AuthLayout from '../../layouts/auth-layout.tsx';
+import { useAuthStore } from '../../stores/use-auth-store.tsx';
 import { loginSchema } from '../../utils/validators.ts';
 
 type LoginForm = {
@@ -22,7 +22,7 @@ const Login = () => {
 		password: '',
 		remember: false,
 	});
-	const { Login, isLoading, errors, setErrors } = useAuth();
+	const { Login, isLoading, errors, setErrors } = useAuthStore();
 
 	const change = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setForm({ ...form, [e.target.name]: e.target.value.trim() });
@@ -49,9 +49,7 @@ const Login = () => {
 		>
 			<form className="flex flex-col gap-6" onSubmit={submit} noValidate>
 				<div className="grid gap-6">
-					{errors?.general && (
-						<InputError message={errors.general[0]} />
-					)}
+					{errors?.general && <InputError message={errors.general[0]} />}
 					<div className="grid gap-2">
 						<Label htmlFor="email">Email address</Label>
 						<Input

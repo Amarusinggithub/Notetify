@@ -5,8 +5,8 @@ import TextLink from '../../components/text-link.tsx';
 import { Button } from '../../components/ui/button.tsx';
 import { Input } from '../../components/ui/input.tsx';
 import { Label } from '../../components/ui/label.tsx';
-import { useAuth } from '../../hooks/use-auth.tsx';
 import AuthLayout from '../../layouts/auth-layout.tsx';
+import { useAuthStore } from '../../stores/use-auth-store.tsx';
 import { registerSchema } from '../../utils/validators.ts';
 
 type RegisterForm = {
@@ -26,7 +26,7 @@ const Register = () => {
 		confirmPassword: '',
 	});
 
-	const { SignUp, isLoading, errors, setErrors } = useAuth();
+	const { SignUp, isLoading, errors, setErrors } = useAuthStore();
 
 	function change(e: React.ChangeEvent<HTMLInputElement>) {
 		setForm({ ...form, [e.target.name]: e.target.value.trim() });
@@ -53,11 +53,13 @@ const Register = () => {
 			title="Create an account"
 			description="Enter your details below to create your account"
 		>
-			<form className="flex flex-col gap-6" onSubmit={(e) => submit(e)} noValidate>
+			<form
+				className="flex flex-col gap-6"
+				onSubmit={(e) => submit(e)}
+				noValidate
+			>
 				<div className="grid gap-6">
-					{errors?.general && (
-						<InputError message={errors.general[0]} />
-					)}
+					{errors?.general && <InputError message={errors.general[0]} />}
 					<div className="grid gap-2">
 						<Label htmlFor="first-name">First Name</Label>
 						<Input

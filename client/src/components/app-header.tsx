@@ -16,7 +16,7 @@ import {
 	DropdownMenuTrigger,
 } from './ui/dropdown-menu';
 
-import { useAuth } from '../hooks/use-auth';
+import { useAuth } from '../stores/use-auth-store';
 import {
 	NavigationMenu,
 	NavigationMenuItem,

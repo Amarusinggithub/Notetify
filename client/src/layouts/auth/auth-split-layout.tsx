@@ -1,6 +1,6 @@
-import useAuth from 'hooks/use-auth.tsx';
 import { type PropsWithChildren } from 'react';
 import { Link } from 'react-router';
+import useAuth from 'stores/use-auth-store';
 import AppLogoIcon from '../../components/app-logo-icon';
 
 interface AuthLayoutProps {

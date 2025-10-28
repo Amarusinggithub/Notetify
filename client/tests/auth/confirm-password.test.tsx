@@ -14,7 +14,7 @@ const mockUseAuth = vi.fn();
 
 // Replace the real hook with our stub so the component under test
 // receives predictable functions/state.
-vi.mock('../../src/hooks/use-auth.tsx', () => ({
+vi.mock('../../src/stores/use-auth-store.tsx', () => ({
   useAuth: () => mockUseAuth(),
 }));
 

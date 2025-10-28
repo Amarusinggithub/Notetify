@@ -3,16 +3,11 @@ on:
   push:
     branches:
       - main
-      - dev
-      - prod
-      - qa
+
 
   pull_request:
     branches:
       - main
-      - dev
-      - prod
-      - qa
 
 jobs:
   build:
@@ -49,7 +44,7 @@ jobs:
 
       - name: Test coverage Client
         run: npm run coverage
-        
+
       - name: Build Client
         run: npm run build
 

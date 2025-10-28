@@ -11,7 +11,7 @@ import {
 	UnderlineIcon,
 	UndoIcon,
 } from 'lucide-react';
-import useEditorStore from '../hooks/use-editor-store';
+import useEditorStore from '../stores/use-editor-store';
 import {
 	Toolbar,
 	ToolbarButton,

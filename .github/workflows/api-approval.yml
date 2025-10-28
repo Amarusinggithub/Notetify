@@ -3,16 +3,11 @@ on:
   push:
     branches:
       - main
-      - dev
-      - prod
-      - qa
+
 
   pull_request:
     branches:
       - main
-      - dev
-      - prod
-      - qa
 
 jobs:
   lint:

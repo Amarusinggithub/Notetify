@@ -7,7 +7,7 @@ const mockPasswordReset = vi.fn();
 const mockSetErrors = vi.fn();
 const mockUseAuth = vi.fn();
 
-vi.mock('../../src/hooks/use-auth.tsx', () => ({
+vi.mock('../../src/stores/use-auth-store.tsx', () => ({
   useAuth: () => mockUseAuth(),
 }));
 

@@ -23,8 +23,15 @@ import Youtube from '@tiptap/extension-youtube';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 
-import useEditorStore from '../hooks/use-editor-store';
+import {
+	useMutation,
+	useQueryClient,
+	useSuspenseInfiniteQuery,
+} from '@tanstack/react-query';
+import { fetchNotesPage, updateNote } from '../lib/notes';
 import { cn } from '../lib/utils';
+import useEditorStore from '../stores/use-editor-store';
+import { useNotesStore } from '../stores/use-notes-store';
 import EditorFooter from './editor-footer';
 import { EditorHeader } from './editor-header';
 import EditorToolbar from './editor-toolbar';
@@ -34,6 +41,52 @@ export const Editor = () => {
 	const liveblocks = useLiveblocksExtension();
 
 	const { setEditor } = useEditorStore();
+	const selectedNoteId = useNotesStore((s) => s.selectedNoteId);
+	const setSelectedNote = useNotesStore((s) => s.setSelectedNote);
+	const queryClient = useQueryClient();
+
+	const { data } = useSuspenseInfiniteQuery({
+		queryKey: [
+			'notes',
+			useNotesStore.getState().search,
+			useNotesStore.getState().sortBy,
+		],
+		queryFn: fetchNotesPage,
+		initialPageParam: 1,
+		getNextPageParam: (lastPage) => lastPage.nextPage,
+	});
+
+	const allNotes = (data?.pages ?? []).flatMap((p: any) => p.results ?? []);
+	const current =
+		allNotes.find((n: any) => n.id === selectedNoteId) ?? allNotes[0];
+	// Ensure a selection exists
+	if (!selectedNoteId && current?.id) {
+		setSelectedNote(current.id);
+	}
+
+	const mutation = useMutation({
+		mutationFn: (content: string) => updateNote(current.id, { content }),
+		onSuccess: (updated) => {
+			// Update cache so readers stay in sync
+			queryClient.setQueryData(
+				[
+					'notes',
+					useNotesStore.getState().search,
+					useNotesStore.getState().sortBy,
+				],
+				(old: any) => {
+					if (!old) return old;
+					const pages = old.pages.map((pg: any) => ({
+						...pg,
+						results: pg.results.map((u: any) =>
+							u.id === updated.id ? updated : u,
+						),
+					}));
+					return { ...old, pages };
+				},
+			);
+		},
+	});
 
 	const editor = useEditor({
 		editorProps: {
@@ -56,6 +109,16 @@ export const Editor = () => {
 		},
 		onUpdate: ({ editor: currentEditor }) => {
 			setEditor(currentEditor);
+			// Debounced auto-save
+			if (current) {
+				if ((window as any).__ntf_saveTimer) {
+					clearTimeout((window as any).__ntf_saveTimer);
+				}
+				(window as any).__ntf_saveTimer = setTimeout(() => {
+					const html = currentEditor.getHTML();
+					mutation.mutate(html);
+				}, 600);
+			}
 		},
 		onSelectionUpdate: ({ editor: currentEditor }) => {
 			setEditor(currentEditor);
@@ -207,6 +270,11 @@ export const Editor = () => {
 				<div className="text-lg">Loading editor...</div>
 			</div>
 		);
+	}
+
+	// Keep editor content in sync with selected note
+	if (current?.note?.content && editor.getHTML() !== current.note.content) {
+		editor.commands.setContent(current.note.content);
 	}
 
 	/* const toggleEditable = () => {

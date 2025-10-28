@@ -1,6 +1,6 @@
 import { ChevronsUpDown } from 'lucide-react';
-import { useAuth } from '../hooks/use-auth';
 import { useIsMobile } from '../hooks/use-mobile';
+import { useAuthStore } from '../stores/use-auth-store';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -16,7 +16,7 @@ import { UserInfo } from './user-info';
 import { UserMenuContent } from './user-menu-content';
 
 export function NavUser() {
-	const { sharedData } = useAuth();
+	const { sharedData } = useAuthStore();
 	const { state } = useSidebar();
 	const isMobile = useIsMobile();
 

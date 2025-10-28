@@ -6,7 +6,7 @@ import VerifyEmail from '../../src/pages/auth/verify-email.tsx';
 const mockVerifyEmail = vi.fn();
 const mockUseAuth = vi.fn();
 
-vi.mock('../../src/hooks/use-auth.tsx', () => ({
+vi.mock('../../src/stores/use-auth-store.tsx', () => ({
   useAuth: () => mockUseAuth(),
 }));
 

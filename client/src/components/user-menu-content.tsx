@@ -8,8 +8,8 @@ import {
 	Settings,
 	Sparkles,
 } from 'lucide-react';
-import { useAuth } from '../hooks/use-auth';
 import { useMobileNavigation } from '../hooks/use-mobile-navigation';
+import { useAuthStore } from '../stores/use-auth-store';
 import { type User } from '../types';
 import {
 	AlertDialog,
@@ -38,7 +38,7 @@ interface UserMenuContentProps {
 
 export function UserMenuContent({ user }: UserMenuContentProps) {
 	const cleanup = useMobileNavigation();
-	const { Logout } = useAuth();
+	const { Logout } = useAuthStore();
 
 	const handleLogout = async () => {
 		await Logout();

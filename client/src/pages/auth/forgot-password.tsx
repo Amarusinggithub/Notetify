@@ -5,8 +5,8 @@ import TextLink from '../../components/text-link';
 import { Button } from '../../components/ui/button.tsx';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
-import { useAuth } from '../../hooks/use-auth.tsx';
 import AuthLayout from '../../layouts/auth-layout';
+import { useAuthStore } from '../../stores/use-auth-store.tsx';
 import { forgatPasswordSchema } from '../../utils/validators.ts';
 
 type ForgotPasswordProps = {
@@ -22,7 +22,7 @@ export default function ForgotPassword({ status }: ForgotPasswordProps) {
 		email: '',
 	});
 
-	const { isLoading, errors, setErrors, ForgotPassword } = useAuth();
+	const { isLoading, errors, setErrors, ForgotPassword } = useAuthStore();
 
 	const change = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setForm({ ...form, [e.target.name]: e.target.value.trim() });
