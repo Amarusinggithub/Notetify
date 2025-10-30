@@ -12,24 +12,24 @@ import {
 
 import { ScrollArea } from '@radix-ui/react-scroll-area';
 import {
+	CalendarDays,
+	CalendarPlus,
+	CheckCircle2,
+	CheckSquare,
 	Ellipsis,
 	File as FileIcon,
 	Home,
 	Image as ImageIcon,
-	CalendarDays,
-	CheckSquare,
-	Paperclip,
 	Mic,
 	Newspaper,
 	Notebook,
 	NotebookPen,
+	Paperclip,
 	Box,
 	Star,
 	Tag,
 	Trash2,
 	UsersRound,
-    NotepadText,
-    CircleCheckBig,
 } from 'lucide-react';
 import { useCreateNote } from '../hooks/use-mutate-note';
 import { useAuthStore } from '../stores/use-auth-store';
@@ -110,7 +110,7 @@ const mainNavItems: NavItem[] = [
 	{
 		title: 'Spaces',
 		href: '/spaces',
-		icon:Box ,
+		icon: Box,
 	},
 
 	{
@@ -175,15 +175,15 @@ export function AppSidebar() {
 						</SidebarMenuButton>
 					</SidebarMenuItem>
 
-					<SidebarMenuItem>
+					<SidebarMenuItem className="my-1">
 						<div className="flex items-center gap-2 px-2">
 							<Button
 								size="lg"
 								onClick={handleCreateNote}
-								className="h-10 w-40 px-3"
+								className="h-10 w-40 bg-[#00a82d] px-3 text-white hover:bg-[#009325]"
 							>
-								<NotepadText />
-								Note
+								<NotebookPen className="size-4" />
+								<span>Note</span>
 							</Button>
 							<DropdownMenu>
 								<Tooltip>
@@ -224,22 +224,22 @@ export function AppSidebar() {
 						<div className="flex items-center gap-2 px-2">
 							<Button
 								size="lg"
-								variant={'outline'}
+								variant="outline"
 								onClick={handleCreateNote}
-								className="h-10 w-26 px-3"
+								className="h-10 w-26 border-[#c9bff5] px-4 hover:bg-[#f5f1ff]"
 							>
-								<CircleCheckBig />
-								Task
+								<CheckCircle2 className="size-4 text-[#6d4df0]" />
+								<span>Task</span>
 							</Button>
 
 							<Button
 								size="lg"
-								variant={'outline'}
+								variant="outline"
 								onClick={handleCreateNote}
-								className="h-10 w-26 px-3"
+								className="h-10 w-26 border-[#ffd8bf] px-4 hover:bg-[#fff4ee]"
 							>
-								<CalendarDays />
-								Event
+								<CalendarPlus className="size-4 text-[#f0642d]" />
+								<span>Event</span>
 							</Button>
 						</div>
 					</SidebarMenuItem>
