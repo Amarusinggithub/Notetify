@@ -289,7 +289,7 @@ export const Editor = () => {
 			{/*<div>
 				<button onClick={toggleEditable}>Toggle editable</button>
 			</div>*/}
-			<div className="flex-1 overflow-auto">
+			<div className="flex-1 overflow-hidden">
 				<DragHandle editor={editor}>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -308,7 +308,7 @@ export const Editor = () => {
 				<EditorContent
 					editor={editor}
 					className={cn(
-						'bg-editor text-editor-foreground mx-auto h-full min-h-full w-full border-0 shadow-lg',
+						'bg-editor text-editor-foreground mx-auto h-full min-h-full w-full border-0 shadow-lg overflow-hidden',
 					)}
 				/>
 			</div>

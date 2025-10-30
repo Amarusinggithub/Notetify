@@ -9,6 +9,7 @@ import Home from '../pages/app/home';
 import Notebooks from '../pages/app/notebook';
 import Notes from '../pages/app/notes';
 import Shared from '../pages/app/shared-with-me';
+import Spaces from '../pages/app/spaces';
 import Tags from '../pages/app/tags';
 import Tasks from '../pages/app/tasks';
 import Trash from '../pages/app/trash';
@@ -23,6 +24,8 @@ import Appearance from '../pages/settings/appearance';
 import Authentication from '../pages/settings/authentication';
 import General from '../pages/settings/general';
 import Notification from '../pages/settings/notification';
+import Account from '../pages/settings/account';
+import Billing from '../pages/settings/billing';
 import { useAuthStore } from '../stores/use-auth-store.tsx';
 
 function AppRoutes() {
@@ -56,6 +59,7 @@ function AppRoutes() {
 				{ path: 'calender', Component: Calender },
 				{ path: 'tags', Component: Tags },
 				{ path: 'notebooks', Component: Notebooks },
+				{ path: 'spaces', Component: Spaces },
 				{ path: 'notes', Component: Notes },
 				{ path: 'tasks', Component: Tasks },
 			],
@@ -69,9 +73,11 @@ function AppRoutes() {
 					Component: () => <Navigate to="/settings/general" replace />,
 				},
 				{ path: 'general', Component: General },
+				{ path: 'account', Component: Account },
 				{ path: 'authentication', Component: Authentication },
 				{ path: 'appearance', Component: Appearance },
 				{ path: 'notification', Component: Notification },
+				{ path: 'billing', Component: Billing },
 			],
 		},
 

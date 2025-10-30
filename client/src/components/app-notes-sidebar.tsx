@@ -93,12 +93,7 @@ export function EditorNotesSidebar() {
 				</div>
 
 				<div className="flex flex-1 items-center justify-end gap-2">
-					<Input
-						value={search}
-						onChange={(e) => useNotesStore.getState().setSearch(e.target.value)}
-						placeholder="Search notes..."
-						className="max-w-xs"
-					/>
+				
 					<DropdownMenu>
 						<DropdownMenuTrigger>
 							<Tooltip>

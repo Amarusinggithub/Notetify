@@ -1,14 +1,15 @@
-export default function Calender() {
+export default function Spaces() {
 	return (
 		<section className="bg-background text-foreground flex min-h-full flex-col gap-4 p-6">
 			<header>
-				<h1 className="text-2xl font-semibold">Calendar</h1>
+				<h1 className="text-2xl font-semibold">Spaces</h1>
 				<p className="text-muted-foreground">
-					Plan upcoming work and see tasks alongside scheduled events.
+					Organize collaborative areas for your team. Create a new space to
+					get started.
 				</p>
 			</header>
 			<div className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
-				Calendar integrations coming soon.
+				No spaces yet. Come back soon!
 			</div>
 		</section>
 	);

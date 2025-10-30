@@ -8,7 +8,7 @@ import { Separator } from './separator';
 import { TooltipProvider } from './tooltip';
 const NOTES_SIDEBAR_COOKIE_NAME = 'sidebar_state';
 const NOTES_SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
-const NOTES_SIDEBAR_WIDTH = '16rem';
+const NOTES_SIDEBAR_WIDTH = '20rem';
 const NOTES_SIDEBAR_WIDTH_MOBILE = '18rem';
 const NOTES_SIDEBAR_WIDTH_ICON = '3rem';
 
@@ -170,21 +170,22 @@ function NotesSidebar({
 					'group-data-[collapsible=offcanvas]:w-0',
 					'group-data-[side=right]:rotate-180',
 					variant === 'floating' || variant === 'inset'
-						? 'group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4)))]'
-						: 'group-data-[collapsible=icon]:w-(--sidebar-width-icon)',
+						? 'group-data-[collapsible=icon]:w-[calc(var(--notes-sidebar-width-icon)+(--spacing(4)))]'
+						: 'group-data-[collapsible=icon]:w-[var(--notes-sidebar-width-icon)]',
 				)}
 			/>
 			<div
 				data-slot="notes-sidebar-container"
 				className={cn(
-					'relative z-10 hidden h-svh w-(--sidebar-width) transition-[left,right,width] duration-200 ease-linear md:flex',
+					'relative z-10 hidden h-svh w-[var(--notes-sidebar-width)] transition-[left,right,width] duration-200 ease-linear md:flex',
 					side === 'left'
-						? 'left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]'
-						: 'right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]',
+						? 'left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--notes-sidebar-width)*-1)]'
+						: 'right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--notes-sidebar-width)*-1)]',
+					'group-data-[collapsible=offcanvas]:w-0',
 					// Adjust the padding for floating and inset variants.
 					variant === 'floating' || variant === 'inset'
-						? 'p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4))+2px)]'
-						: 'group-data-[collapsible=icon]:w-(--sidebar-width-icon) group-data-[side=left]:border-r group-data-[side=right]:border-l',
+						? 'p-2 group-data-[collapsible=icon]:w-[calc(var(--notes-sidebar-width-icon)+(--spacing(4))+2px)]'
+						: 'group-data-[collapsible=icon]:w-[var(--notes-sidebar-width-icon)] group-data-[side=left]:border-r group-data-[side=right]:border-l',
 					className,
 				)}
 				{...props}
@@ -256,20 +257,23 @@ function NotesSidebarRail({
 }
 
 function NotesSidebarInset({
-	className,
-	...props
+    className,
+    ...props
 }: React.ComponentProps<'main'>) {
-	return (
-		<main
-			data-slot="notes-sidebar-inset"
-			className={cn(
-				'bg-background relative flex w-full flex-1 flex-col',
-				'md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow-sm md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-0',
-				className,
-			)}
-			{...props}
-		/>
-	);
+    return (
+        <main
+            data-slot="notes-sidebar-inset"
+            className={cn(
+                'bg-background relative flex w-full flex-1 flex-col',
+                // Inset styling when notes list is open
+                'md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow-sm',
+                // When the notes sidebar is collapsed, remove the inset gap entirely
+                'md:peer-data-[variant=inset]:peer-data-[state=collapsed]:m-0 md:peer-data-[variant=inset]:peer-data-[state=collapsed]:rounded-none md:peer-data-[variant=inset]:peer-data-[state=collapsed]:shadow-none',
+                className,
+            )}
+            {...props}
+        />
+    );
 }
 
 function NotesSidebarHeader({

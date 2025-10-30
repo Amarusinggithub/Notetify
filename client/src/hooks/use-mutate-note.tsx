@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import {type CreateNote, type UserNote } from '../types';
 import { useRevalidator } from 'react-router';
-import axiosInstance from 'lib/axios';
+import axiosInstance from '../lib/axios';
 
 export function useCreateNote() {
 	const revalidator = useRevalidator();

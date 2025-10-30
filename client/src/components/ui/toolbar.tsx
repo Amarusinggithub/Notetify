@@ -53,9 +53,9 @@ function ToolbarFontSizeMenuButton() {
 
 	return (
 		<DropdownMenu>
-			<DropdownMenuTrigger asChild>
-				<Tooltip>
-					<TooltipTrigger asChild>
+			<Tooltip>
+				<TooltipTrigger asChild>
+					<DropdownMenuTrigger asChild>
 						<button
 							className={cn(
 								'hover:bg-editor-accent hover:text-editor-accent-foreground flex h-7 min-w-7 shrink-0 items-center justify-center overflow-hidden rounded-sm px-1.5 text-sm transition-colors',
@@ -63,10 +63,10 @@ function ToolbarFontSizeMenuButton() {
 						>
 							<ListIcon className="size-4" />
 						</button>
-					</TooltipTrigger>
-					<TooltipContent>Font size</TooltipContent>
-				</Tooltip>
-			</DropdownMenuTrigger>
+					</DropdownMenuTrigger>
+				</TooltipTrigger>
+				<TooltipContent>Font size</TooltipContent>
+			</Tooltip>
 
 			<DropdownMenuContent className="max-h-64 overflow-y-auto p-0">
 				{sizes.map(({ label, value, isActive, onClick }) => (
@@ -106,9 +106,9 @@ function ToolbarListButton() {
 
 	return (
 		<DropdownMenu>
-			<DropdownMenuTrigger asChild>
-				<Tooltip>
-					<TooltipTrigger asChild>
+			<Tooltip>
+				<TooltipTrigger asChild>
+					<DropdownMenuTrigger asChild>
 						<button
 							className={cn(
 								'hover:bg-editor-accent hover:text-editor-accent-foreground flex h-7 min-w-7 shrink-0 items-center justify-center overflow-hidden rounded-sm px-1.5 text-sm transition-colors',
@@ -116,10 +116,10 @@ function ToolbarListButton() {
 						>
 							<ListIcon className="size-4" />
 						</button>
-					</TooltipTrigger>
-					<TooltipContent>Lists</TooltipContent>
-				</Tooltip>
-			</DropdownMenuTrigger>
+					</DropdownMenuTrigger>
+				</TooltipTrigger>
+				<TooltipContent>Lists</TooltipContent>
+			</Tooltip>
 
 			<DropdownMenuContent className="p-0">
 				{lists.map(({ label, icon: Icon, isActive, onClick }) => (
@@ -293,9 +293,9 @@ function ToolbarLinkButton() {
 				}
 			}}
 		>
-			<DropdownMenuTrigger asChild>
-				<Tooltip>
-					<TooltipTrigger asChild>
+			<Tooltip>
+				<TooltipTrigger asChild>
+					<DropdownMenuTrigger asChild>
 						<button
 							className={cn(
 								'hover:bg-editor-accent hover:text-editor-accent-foreground flex h-7 min-w-7 shrink-0 items-center justify-center overflow-hidden rounded-sm px-1.5 text-sm transition-colors',
@@ -303,10 +303,10 @@ function ToolbarLinkButton() {
 						>
 							<Link2Icon className="size-4" />
 						</button>
-					</TooltipTrigger>
-					<TooltipContent>Insert link</TooltipContent>
-				</Tooltip>
-			</DropdownMenuTrigger>
+					</DropdownMenuTrigger>
+				</TooltipTrigger>
+				<TooltipContent>Insert link</TooltipContent>
+			</Tooltip>
 
 			<DropdownMenuContent className="flex items-center gap-x-2 p-2.5">
 				<Input
@@ -336,9 +336,9 @@ function ToolbarTextHighlightButton() {
 
 	return (
 		<DropdownMenu>
-			<DropdownMenuTrigger asChild>
-				<Tooltip>
-					<TooltipTrigger asChild>
+			<Tooltip>
+				<TooltipTrigger asChild>
+					<DropdownMenuTrigger asChild>
 						<button
 							className={cn(
 								'hover:bg-editor-accent hover:text-editor-accent-foreground flex h-7 min-w-7 shrink-0 items-center justify-center overflow-hidden rounded-sm px-1.5 text-sm transition-colors',
@@ -346,10 +346,10 @@ function ToolbarTextHighlightButton() {
 						>
 							<HighlighterIcon className="size-4" />
 						</button>
-					</TooltipTrigger>
-					<TooltipContent>Highlight color</TooltipContent>
-				</Tooltip>
-			</DropdownMenuTrigger>
+					</DropdownMenuTrigger>
+				</TooltipTrigger>
+				<TooltipContent>Highlight color</TooltipContent>
+			</Tooltip>
 
 			<DropdownMenuContent className="p-0">
 				<CompactPicker color={value} onChange={onChange} />
@@ -367,9 +367,9 @@ function ToolbarTextColorButton() {
 
 	return (
 		<DropdownMenu>
-			<DropdownMenuTrigger asChild>
-				<Tooltip>
-					<TooltipTrigger asChild>
+			<Tooltip>
+				<TooltipTrigger asChild>
+					<DropdownMenuTrigger asChild>
 						<button
 							className={cn(
 								'hover:bg-editor-accent hover:text-editor-accent-foreground flex h-7 min-w-7 shrink-0 items-center justify-center overflow-hidden rounded-sm px-1.5 text-sm transition-colors',
@@ -381,10 +381,10 @@ function ToolbarTextColorButton() {
 								style={{ backgroundColor: value }}
 							/>
 						</button>
-					</TooltipTrigger>
-					<TooltipContent>Text color</TooltipContent>
-				</Tooltip>
-			</DropdownMenuTrigger>
+					</DropdownMenuTrigger>
+				</TooltipTrigger>
+				<TooltipContent>Text color</TooltipContent>
+			</Tooltip>
 
 			<DropdownMenuContent className="p-0">
 				<CompactPicker color={value} onChange={onChange} />
@@ -394,7 +394,7 @@ function ToolbarTextColorButton() {
 }
 
 interface ToolbarButtonProps {
-	label?: string; // Used for tooltip text
+	label?: string;
 	onClick?: () => void;
 	isActive?: boolean;
 	icon: LucideIcon;
@@ -480,9 +480,9 @@ function ToolbarFontFamilyMenuButton() {
 
 	return (
 		<DropdownMenu>
-			<DropdownMenuTrigger asChild>
-				<Tooltip>
-					<TooltipTrigger asChild>
+			<Tooltip>
+				<TooltipTrigger asChild>
+					<DropdownMenuTrigger asChild>
 						<button
 							className={cn(
 								'hover:bg-editor-accent hover:text-editor-accent-foreground flex h-7 w-[120px] shrink-0 items-center justify-between overflow-hidden rounded-sm px-1.5 text-sm transition-colors',
@@ -493,10 +493,10 @@ function ToolbarFontFamilyMenuButton() {
 							</span>
 							<ChevronDownIcon className="ml-2 size-4 shrink-0" />
 						</button>
-					</TooltipTrigger>
-					<TooltipContent>Font family</TooltipContent>
-				</Tooltip>
-			</DropdownMenuTrigger>
+					</DropdownMenuTrigger>
+				</TooltipTrigger>
+				<TooltipContent>Font family</TooltipContent>
+			</Tooltip>
 
 			<DropdownMenuContent className="flex flex-col gap-y-1 p-1">
 				{fonts.map(({ label, value }) => (
@@ -542,9 +542,9 @@ function ToolbarHeadingLevelMenuButton() {
 
 	return (
 		<DropdownMenu>
-			<DropdownMenuTrigger asChild>
-				<Tooltip>
-					<TooltipTrigger asChild>
+			<Tooltip>
+				<TooltipTrigger asChild>
+					<DropdownMenuTrigger asChild>
 						<button
 							className={cn(
 								'hover:bg-editor-accent hover:text-editor-accent-foreground flex h-7 min-w-7 shrink-0 items-center justify-center overflow-hidden rounded-sm px-1.5 text-sm transition-colors',
@@ -553,10 +553,10 @@ function ToolbarHeadingLevelMenuButton() {
 							<span className="truncate">{getCurrentHeading()}</span>
 							<ChevronDownIcon className="ml-2 size-4 shrink-0" />
 						</button>
-					</TooltipTrigger>
-					<TooltipContent>Heading level</TooltipContent>
-				</Tooltip>
-			</DropdownMenuTrigger>
+					</DropdownMenuTrigger>
+				</TooltipTrigger>
+				<TooltipContent>Heading level</TooltipContent>
+			</Tooltip>
 
 			<DropdownMenuContent className="flex flex-col gap-y-1 p-1">
 				{headings.map(({ label, value, fontSize }) => (

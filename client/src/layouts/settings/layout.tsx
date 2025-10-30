@@ -14,6 +14,16 @@ const sidebarNavItems: NavItem[] = [
 		icon: null,
 	},
 	{
+		title: 'Account',
+		href: '/settings/account',
+		icon: null,
+	},
+	{
+		title: 'Billing',
+		href: '/settings/billing',
+		icon: null,
+	},
+	{
 		title: 'Authentication',
 		href: '/settings/authentication',
 		icon: null,

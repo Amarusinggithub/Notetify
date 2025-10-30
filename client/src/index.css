@@ -516,6 +516,17 @@ html {
 	scroll-behavior: smooth;
 }
 
+/* Lock page scrolling and hide outer scrollbar */
+html,
+body,
+#root {
+  height: 100%;
+  overflow: hidden;
+}
+/* Cross-browser scrollbar hide for the page */
+html { scrollbar-width: none; -ms-overflow-style: none; }
+html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; }
+
 /* For mobile */
 .floating-threads {
 	display: none;
