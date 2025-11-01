@@ -32,7 +32,6 @@ export const updateNotebook = async (userNotebook: UserNotebook) => {
 
 			notebook_data: {
 				name: userNotebook.notebook.name,
-				users: userNotebook.notebook.users,
 			},
 			user: userNotebook.user,
 			is_pinned: userNotebook.is_pinned,

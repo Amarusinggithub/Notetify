@@ -35,6 +35,21 @@ class NoteController extends Controller
             });
         }
 
+        // Optional boolean filters on user-note flags
+        $boolFilters = [
+            'is_favorited' => 'is_favorited',
+            'is_trashed' => 'is_trashed',
+            'is_pinned' => 'is_pinned',
+        ];
+        foreach ($boolFilters as $param => $column) {
+            if ($request->has($param)) {
+                $value = filter_var($request->query($param), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+                if ($value !== null) {
+                    $query->where($column, $value);
+                }
+            }
+        }
+
         // Optional sorting; allow only a limited set of columns
         $allowedSortColumns = ['created_at', 'updated_at'];
         $sortBy = $request->string('sort_by')->toString();

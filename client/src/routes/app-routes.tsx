@@ -61,6 +61,7 @@ function AppRoutes() {
 				{ path: 'notebooks', Component: Notebooks },
 				{ path: 'spaces', Component: Spaces },
 				{ path: 'notes', Component: Notes },
+				{ path: 'notes/:noteId', Component: Notes },
 				{ path: 'tasks', Component: Tasks },
 			],
 		},
