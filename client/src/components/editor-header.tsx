@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+﻿import { useEffect, useMemo, useState } from 'react';
 import type { BreadcrumbItem } from 'types';
 import { Breadcrumbs } from './breadcrumbs';
 import { NotesSidebarTrigger, useNotesSidebar } from './ui/notes-sidebar';
@@ -6,6 +6,8 @@ import { useSidebar } from './ui/sidebar';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { Badge } from './ui/badge';
+import { useOthers } from '@liveblocks/react/suspense';
 import {
 	ArrowRightLeft,
 	Copy,
@@ -47,6 +49,8 @@ import {
 } from './ui/dropdown-menu';
 import { useNotesStore } from '../stores/use-notes-store';
 import { useAuthStore } from '../stores/use-auth-store';
+import { useDeleteNote, useUpdateNote } from '../hooks/use-mutate-note';
+import { cn } from '../lib/utils';
 
 export function EditorHeader({
 	breadcrumbs = [],
@@ -76,6 +80,48 @@ export function EditorHeader({
 	const noteUrl = selectedNoteId
 		? `${window.location.origin}/notes/${selectedNoteId}`
 		: window.location.href;
+
+	const notes = useNotesStore((s) => s.notes);
+	const currentNote = useMemo(
+		() => notes.find((note) => note.id === selectedNoteId) ?? null,
+		[notes, selectedNoteId],
+	);
+	const [title, setTitle] = useState(currentNote?.note.title ?? '');
+	useEffect(() => {
+		setTitle(currentNote?.note.title ?? '');
+	}, [currentNote?.id]);
+
+	const updateNoteMutation = useUpdateNote();
+	const deleteNoteMutation = useDeleteNote();
+	const others = useOthers();
+	const collaborators = others.slice(0, 3);
+
+	const handleTitleBlur = () => {
+		if (!currentNote) return;
+		const trimmed = title.trim() || 'Untitled';
+		if (trimmed === currentNote.note.title) return;
+		updateNoteMutation.mutate({
+			id: currentNote.id,
+			payload: { title: trimmed },
+		});
+	};
+
+	const handleFavoriteToggle = () => {
+		if (!currentNote) return;
+		updateNoteMutation.mutate({
+			id: currentNote.id,
+			payload: { is_favorited: !currentNote.is_favorited },
+		});
+	};
+
+	const handleDeleteNote = () => {
+		if (!currentNote) return;
+		deleteNoteMutation.mutate(currentNote.id);
+	};
+
+	const collaboratorsLabel = collaborators.length
+		? `${collaborators.length} collaborator${collaborators.length > 1 ? 's' : ''}`
+		: 'Only you here';
 
 	const handleFullscreenToggle = () => {
 		const anyOpen = appOpen || appOpenMobile || notesOpen || notesOpenMobile;
@@ -142,7 +188,79 @@ export function EditorHeader({
 				<Breadcrumbs breadcrumbs={breadcrumbs} />
 			</div>
 
+			<div className="flex flex-1 items-center justify-center gap-3 px-4">
+				<Input
+					value={title}
+					onChange={(event) => setTitle(event.target.value)}
+					onBlur={handleTitleBlur}
+					onKeyDown={(event) => {
+						if (event.key === 'Enter') {
+							event.currentTarget.blur();
+						}
+					}}
+					placeholder="Untitled note"
+					disabled={!currentNote}
+					className="h-10 max-w-2xl rounded-xl border-none bg-transparent text-center text-lg font-semibold focus-visible:ring-0 disabled:opacity-60"
+				/>
+				<div className="flex items-center gap-2">
+					{collaborators.map((other) => (
+						<Avatar
+							key={other.connectionId}
+							className="size-8 border border-border"
+						>
+							<AvatarImage src={other.info?.avatar} alt={other.info?.name} />
+							<AvatarFallback>
+								{other.info?.name?.charAt(0) ?? '?'}
+							</AvatarFallback>
+						</Avatar>
+					))}
+					<Badge variant="secondary" className="rounded-full px-3 py-1 text-xs">
+						{collaboratorsLabel}
+					</Badge>
+				</div>
+			</div>
+
 			<div className="ml-auto flex items-center gap-3">
+				<div className="flex items-center gap-2">
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<Button
+								variant="ghost"
+								size="icon"
+								disabled={!currentNote || updateNoteMutation.isPending}
+								onClick={handleFavoriteToggle}
+								aria-label={
+									currentNote?.is_favorited ? 'Unfavorite note' : 'Favorite note'
+								}
+							>
+								<Star
+									className={cn(
+										'size-4',
+										currentNote?.is_favorited ? 'text-yellow-400' : '',
+									)}
+									fill={currentNote?.is_favorited ? 'currentColor' : 'none'}
+								/>
+							</Button>
+						</TooltipTrigger>
+						<TooltipContent sideOffset={6}>
+							{currentNote?.is_favorited ? 'Remove favorite' : 'Mark as favorite'}
+						</TooltipContent>
+					</Tooltip>
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<Button
+								variant="ghost"
+								size="icon"
+								disabled={!currentNote || deleteNoteMutation.isPending}
+								onClick={handleDeleteNote}
+								aria-label="Delete note"
+							>
+								<Trash2 />
+							</Button>
+						</TooltipTrigger>
+						<TooltipContent sideOffset={6}>Delete note</TooltipContent>
+					</Tooltip>
+				</div>
 				<div className="flex divide-x divide-[#7b8efb]/60 overflow-hidden rounded-full bg-[#4f6ef9] text-white shadow-sm">
 					<DropdownMenu>
 						<Tooltip>

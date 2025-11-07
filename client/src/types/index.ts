@@ -32,7 +32,7 @@ export type CreateUser = {
 };
 
 export interface User extends Omit<CreateUser, 'password'> {
-	id: number;
+	id: string;
 	remember?: boolean;
 	avatar?: string;
 	is_active: boolean;
@@ -76,38 +76,48 @@ export type CreateNote = {
 	note_data: {
 		title: string;
 		content: string;
-		users: number[];
+		users: string[];
 	};
 	tags: number[];
 	is_pinned: boolean;
 	is_trashed: boolean;
-	is_favorite: boolean;
+	is_favorited: boolean;
 };
 
 export interface UserNote extends Omit<CreateNote, 'note_data'> {
-	id: number;
+	id: string;
 	note: Note;
-	user: number;
+	user: string;
 	role: Role;
-	shared_from?: number;
-	shared_at?: Date;
-	removed_at?: Date;
-	archived_at?: Date;
-	trashed_at?: Date;
-	favorite_at?: Date;
-	created_at: Date;
-	updated_at: Date;
+	shared_from?: string;
+	shared_at?: string;
+	removed_at?: string;
+	archived_at?: string;
+	trashed_at?: string;
+	favorited_at?: string;
+	pinned_at?: string;
+	created_at: string;
+	updated_at: string;
 }
 
+export type UpdateUserNotePayload = Partial<{
+	title: string;
+	content: string | null;
+	is_favorited: boolean;
+	is_pinned: boolean;
+	is_trashed: boolean;
+	tags: number[];
+}>;
+
 export interface Note {
-	id: number;
+	id: string;
 	title: string;
 	content: string;
-	users: number[];
+	users: string[];
 	is_shared: boolean;
-	created_at: Date;
-	updated_at: Date;
-	schedule_delete_at?: Date;
+	created_at: string;
+	updated_at: string;
+	schedule_delete_at?: string;
 }
 
 export type CreateNoteBook = {
@@ -124,12 +134,12 @@ export interface UserNotebook {
 	removed_at?: Date;
 	archived_at?: Date;
 	trashed_at?: Date;
-	favorite_at?: Date;
+	favorited_at?: Date;
 	created_at: Date;
 	updated_at: Date;
 	is_pinned: boolean;
 	is_trashed: boolean;
-	is_favorite: boolean;
+	is_favorited: boolean;
 }
 
 export interface Notebook {
@@ -154,11 +164,11 @@ export interface UserNoteBook {
 	user: number;
 	note_book: Notebook;
 	is_pinned: boolean;
-	is_favorite: boolean;
+	is_favorited: boolean;
 	is_trashed: boolean;
 	archived_at?: Date;
 	trashed_at?: Date;
-	favorite_at?: Date;
+	favorited_at?: Date;
 	removed_at?: Date;
 	created_at: Date;
 }

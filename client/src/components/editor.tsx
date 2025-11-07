@@ -22,6 +22,9 @@ import Underline from '@tiptap/extension-underline';
 import Youtube from '@tiptap/extension-youtube';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
+import { useEffect, useMemo } from 'react';
+
+import { useRouteLoaderData } from 'react-router';
 
 import {
 	useMutation,
@@ -29,12 +32,15 @@ import {
 	useSuspenseInfiniteQuery,
 } from '@tanstack/react-query';
 import { fetchNotesPage, updateNote } from '../lib/notes';
+import type { PaginatedNotesResponse } from '../lib/loaders';
+import type { UserNote } from '../types';
 import { cn } from '../lib/utils';
 import useEditorStore from '../stores/use-editor-store';
 import { useNotesStore } from '../stores/use-notes-store';
 import EditorFooter from './editor-footer';
 import { EditorHeader } from './editor-header';
 import EditorToolbar from './editor-toolbar';
+import { Threads } from './editor-threads';
 import suggestion from './suggestion';
 
 export const Editor = () => {
@@ -43,39 +49,57 @@ export const Editor = () => {
 	const { setEditor } = useEditorStore();
 	const selectedNoteId = useNotesStore((s) => s.selectedNoteId);
 	const setSelectedNote = useNotesStore((s) => s.setSelectedNote);
+	const search = useNotesStore((s) => s.search);
+	const sortBy = useNotesStore((s) => s.sortBy);
+	const setNotes = useNotesStore((s) => s.setNotes);
+	const initialData = useRouteLoaderData('root-notes') as
+		| PaginatedNotesResponse
+		| undefined;
 	const queryClient = useQueryClient();
 
+	const notesQueryKey = ['notes', search, sortBy] as const;
 	const { data } = useSuspenseInfiniteQuery({
-		queryKey: [
-			'notes',
-			useNotesStore.getState().search,
-			useNotesStore.getState().sortBy,
-		],
+		queryKey: notesQueryKey,
 		queryFn: fetchNotesPage,
 		initialPageParam: 1,
+		initialData: initialData
+			? { pages: [initialData], pageParams: [1] }
+			: undefined,
 		getNextPageParam: (lastPage) => lastPage.nextPage,
 	});
 
-	const allNotes = (data?.pages ?? []).flatMap((p: any) => p.results ?? []);
-	const current =
-		allNotes.find((n: any) => n.id === selectedNoteId) ?? allNotes[0];
-	// Ensure a selection exists
-	if (!selectedNoteId && current?.id) {
-		setSelectedNote(current.id);
-	}
+	const allNotes = useMemo(
+		() => (data?.pages ?? []).flatMap((p: any) => p?.results ?? []),
+		[data],
+	);
+	const current = useMemo(
+		() =>
+			allNotes.find((n: UserNote) => n.id === selectedNoteId) ?? allNotes[0],
+		[allNotes, selectedNoteId],
+	);
+
+	useEffect(() => {
+		setNotes(allNotes as UserNote[]);
+	}, [allNotes, setNotes]);
+
+	useEffect(() => {
+		if (!selectedNoteId && current?.id) {
+			setSelectedNote(current.id);
+		}
+	}, [current, selectedNoteId, setSelectedNote]);
 
 	const mutation = useMutation({
-		mutationFn: (content: string) => updateNote(current.id, { content }),
+		mutationFn: (content: string) => {
+			if (!current?.id) {
+				return Promise.resolve(current as any);
+			}
+			return updateNote(current.id, { content });
+		},
 		onSuccess: (updated) => {
-			// Update cache so readers stay in sync
-			queryClient.setQueryData(
-				[
-					'notes',
-					useNotesStore.getState().search,
-					useNotesStore.getState().sortBy,
-				],
-				(old: any) => {
-					if (!old) return old;
+			if (!updated) return;
+			queryClient.setQueryData(notesQueryKey, (old: any) => {
+				if (!old) return old;
+				if (old.pages) {
 					const pages = old.pages.map((pg: any) => ({
 						...pg,
 						results: pg.results.map((u: any) =>
@@ -83,8 +107,20 @@ export const Editor = () => {
 						),
 					}));
 					return { ...old, pages };
-				},
-			);
+				}
+				if (old.results) {
+					return {
+						...old,
+						results: old.results.map((n: any) =>
+							n.id === updated.id ? updated : n,
+						),
+					};
+				}
+				return old;
+			});
+			try {
+				useNotesStore.getState().upsertNote(updated);
+			} catch {}
 		},
 	});
 
@@ -264,17 +300,25 @@ export const Editor = () => {
 		],
 	});
 
+	useEffect(() => {
+		if (!editor) return;
+		editor.setEditable(Boolean(current));
+		if (!current) {
+			editor.commands.clearContent(true, { emitUpdate: false });
+			return;
+		}
+		const currentContent = current.note?.content ?? '';
+		if (editor.getHTML() !== currentContent) {
+			editor.commands.setContent(currentContent);
+		}
+	}, [editor, current]);
+
 	if (!editor) {
 		return (
 			<div className="bg-editor text-editor-foreground flex h-screen items-center justify-center">
 				<div className="text-lg">Loading editor...</div>
 			</div>
 		);
-	}
-
-	// Keep editor content in sync with selected note
-	if (current?.note?.content && editor.getHTML() !== current.note.content) {
-		editor.commands.setContent(current.note.content);
 	}
 
 	/* const toggleEditable = () => {
@@ -290,27 +334,38 @@ export const Editor = () => {
 				<button onClick={toggleEditable}>Toggle editable</button>
 			</div>*/}
 			<div className="flex-1 overflow-auto">
-				<DragHandle editor={editor}>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						fill="none"
-						viewBox="0 0 24 24"
-						strokeWidth="1.5"
-						stroke="currentColor"
-					>
-						<path
-							strokeLinecap="round"
-							strokeLinejoin="round"
-							d="M3.75 9h16.5m-16.5 6.75h16.5"
-						/>
-					</svg>
-				</DragHandle>
-				<EditorContent
-					editor={editor}
-					className={cn(
-						'bg-editor text-editor-foreground mx-auto h-full min-h-full w-full border-0 shadow-lg',
-					)}
-				/>
+				{current ? (
+					<>
+						<DragHandle editor={editor}>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								fill="none"
+								viewBox="0 0 24 24"
+								strokeWidth="1.5"
+								stroke="currentColor"
+							>
+								<path
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									d="M3.75 9h16.5m-16.5 6.75h16.5"
+								/>
+							</svg>
+						</DragHandle>
+						<div className="relative">
+							<EditorContent
+								editor={editor}
+								className={cn(
+									'bg-editor text-editor-foreground mx-auto h-full min-h-full w-full border-0 shadow-lg',
+								)}
+							/>
+							<Threads editor={editor} />
+						</div>
+					</>
+				) : (
+					<div className="text-muted-foreground flex h-full items-center justify-center text-sm">
+						Select or create a note to get started.
+					</div>
+				)}
 			</div>
 			<EditorFooter />
 		</div>

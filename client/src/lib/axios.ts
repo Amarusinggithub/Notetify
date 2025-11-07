@@ -8,6 +8,8 @@ import { CSRF_TOKEN_COOKIE_NAME } from '../types';
 const RAW_BASE = (import.meta as any).env?.VITE_BASE_URL?.toString()?.replace(/\/+$/,'') || '';
 const BASE_URL = RAW_BASE ? (RAW_BASE.endsWith('/api') ? RAW_BASE : `${RAW_BASE}/api`) : '/api';
 
+export const API_BASE_URL = BASE_URL;
+
 const axiosInstance = axios.create({
 	baseURL: BASE_URL,
 	headers: {
@@ -29,29 +31,20 @@ axiosInstance.interceptors.request.use(
 			await ensureCSRFToken();
 		}
 
-		console.log('Request config:', config);
 		return config;
 	},
 	(error) => Promise.reject(error),
 );
 
 axiosInstance.interceptors.response.use(
-	(response) => {
-		console.log('Response received:', response);
-		return response;
-	},
-	(error) => {
-		console.error('Response error:', error.toJSON());
-		return Promise.reject(error);
-	},
+	(response) => response,
+	(error) => Promise.reject(error),
 );
 
 export async function ensureCSRFToken() {
 	if (!Cookies.get(CSRF_TOKEN_COOKIE_NAME)) {
 		try {
-			console.log('Fetching CSRF token...');
 			await axiosInstance.get('/sanctum/csrf-cookie');
-			console.log('CSRF token fetched successfully');
 		} catch (error) {
 			console.error('Failed to get CSRF token:', error);
 		}

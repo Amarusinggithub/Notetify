@@ -3,7 +3,7 @@ import {
 	LiveblocksProvider,
 	RoomProvider,
 } from '@liveblocks/react/suspense';
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useNavigate, useParams, useRouteLoaderData } from 'react-router';
 import { EditorNotesSidebar } from '../../components/app-notes-sidebar';
 import { Editor } from '../../components/editor';
@@ -13,70 +13,92 @@ import {
 } from '../../components/ui/notes-sidebar';
 import { useCreateNote } from '../../hooks/use-mutate-note';
 import { useNotesStore } from '../../stores/use-notes-store';
+import { useAuthStore } from '../../stores/use-auth-store';
 import type { PaginatedNotesResponse } from '../../lib/loaders';
+import axiosInstance from '../../lib/axios';
 
 export default function Notes() {
-    const { noteId } = useParams();
-    const navigate = useNavigate();
-    const initialData = useRouteLoaderData('root-notes') as PaginatedNotesResponse | undefined;
-    const selectedId = useNotesStore((s) => s.selectedNoteId);
-    const setSelected = useNotesStore((s) => s.setSelectedNote);
-    const createNoteMutation = useCreateNote();
+	const { noteId } = useParams();
+	const navigate = useNavigate();
+	const initialData =
+		useRouteLoaderData('root-notes') as PaginatedNotesResponse | undefined;
+	const selectedId = useNotesStore((s) => s.selectedNoteId);
+	const setSelected = useNotesStore((s) => s.setSelectedNote);
+	const { mutate: createNote, isPending: isCreating } = useCreateNote();
+	const currentUser = useAuthStore((s) => s.sharedData?.auth.user);
 
-    // Ensure a note is selected and URL reflects it. If none exists, create one.
-    useEffect(() => {
-        const numericFromRoute = noteId ? Number(noteId) : undefined;
-        if (numericFromRoute && !Number.isNaN(numericFromRoute)) {
-            setSelected(numericFromRoute);
-            return;
-        }
+	useEffect(() => {
+		const routeNoteId = noteId ?? null;
 
-        if (selectedId) {
-            navigate(`/notes/${selectedId}`, { replace: true });
-            return;
-        }
+		if (routeNoteId && routeNoteId !== selectedId) {
+			setSelected(routeNoteId);
+			return;
+		}
 
-        const firstFromInitial = initialData?.results?.[0];
-        if (firstFromInitial) {
-            setSelected(firstFromInitial.id);
-            navigate(`/notes/${firstFromInitial.id}`, { replace: true });
-            return;
-        }
+		if (selectedId && routeNoteId !== selectedId) {
+			navigate(`/notes/${selectedId}`, { replace: true });
+			return;
+		}
 
-        if (!createNoteMutation.isPending) {
-            createNoteMutation.mutate(
-                {
-                    note_data: { title: 'Untitled', content: '', users: [] },
-                    tags: [],
-                    is_favorite: false,
-                    is_pinned: false,
-                    is_trashed: false,
-                },
-                {
-                    onSuccess: (created) => {
-                        setSelected(created.id);
-                        navigate(`/notes/${created.id}`, { replace: true });
-                    },
-                },
-            );
-        }
-    }, [noteId, selectedId, initialData, navigate]);
+		const firstFromInitial = initialData?.results?.[0];
+		if (!selectedId && firstFromInitial) {
+			setSelected(firstFromInitial.id);
+			navigate(`/notes/${firstFromInitial.id}`, { replace: true });
+			return;
+		}
+
+		if (!selectedId && !isCreating) {
+			createNote(
+				{
+					note_data: { title: 'Untitled', content: '', users: [] },
+					tags: [],
+					is_favorited: false,
+					is_pinned: false,
+					is_trashed: false,
+				},
+				{
+					onSuccess: (created) => {
+						setSelected(created.id);
+						navigate(`/notes/${created.id}`, { replace: true });
+					},
+				},
+			);
+		}
+	}, [noteId, selectedId, initialData, navigate, setSelected, createNote, isCreating]);
+
+	const resolveUsers = useCallback(
+		async ({ userIds }: { userIds: string[] }) => {
+			if (!currentUser) return undefined;
+			return userIds.map((id) => {
+				if (String(currentUser.id) !== id) {
+					return undefined;
+				}
+				const name = `${currentUser.first_name ?? ''} ${
+					currentUser.last_name ?? ''
+				}`.trim();
+				return {
+					name: name || currentUser.email,
+					avatar: currentUser.avatar ?? '',
+					email: currentUser.email,
+				};
+			});
+		},
+		[currentUser],
+	);
+
+	const authEndpoint = useCallback(async (room?: string) => {
+		if (!room) {
+			throw new Error('Room id is required to authorize collaboration.');
+		}
+		const response = await axiosInstance.post('/liveblocks/auth', { room });
+		return response.data;
+	}, []);
+
 	return (
-		<LiveblocksProvider
-			resolveUsers={async ({ userIds }) => {
-				// ["marc@example.com", ...]
-				console.log(userIds);
-				return undefined;
-				// Return a list of users
-				// ...
-			}}
-			publicApiKey={
-				'pk_dev_-jCBKl4-AWCtRQRkEgoS3IGyZTb7G1kfkVuX20cPxJrz4RjDA2ttgGR1EuGkX6z1'
-			}
-		>
+		<LiveblocksProvider resolveUsers={resolveUsers} authEndpoint={authEndpoint}>
 			<RoomProvider id={`note-${noteId ?? selectedId ?? 'new'}`}>
-				<ClientSideSuspense fallback={<div>Loading…</div>}>
-					<NotesSidebarProvider   defaultOpen={true}>
+				<ClientSideSuspense fallback={<div>Loading...</div>}>
+					<NotesSidebarProvider defaultOpen={true}>
 						<EditorNotesSidebar />
 						<NotesSidebarInset>
 							<Editor />

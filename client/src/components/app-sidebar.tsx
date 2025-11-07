@@ -65,7 +65,7 @@ const mainNavItems: NavItem[] = [
 		title: 'Favorites',
 		href: '/favorites',
 		icon: Star,
-		params: 'is_favorite=True&is_trashed=False',
+		params: 'is_favorited=true&is_trashed=false',
 	},
 	{
 		title: 'Notes',
@@ -136,7 +136,7 @@ export function AppSidebar() {
 			tags: [],
 			is_pinned: false,
 			is_trashed: false,
-			is_favorite: false,
+			is_favorited: false,
 		});
 	}
 

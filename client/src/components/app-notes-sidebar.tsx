@@ -1,5 +1,5 @@
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { ArrowUpDown, Ellipsis, FilterIcon, Grid3x3, Calendar, Notebook, Tag as TagIcon } from 'lucide-react';
+import { ArrowUpDown, Ellipsis, FilterIcon, Grid3x3, Calendar, Notebook, Tag as TagIcon, Search as SearchIcon } from 'lucide-react';
 import { Button } from './ui/button';
 import {
     DropdownMenu,
@@ -31,12 +31,27 @@ import NoteCard from './note-card';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Switch } from './ui/switch';
+import { Input } from './ui/input';
+import useDebounce from '../hooks/use-debounce';
 
 export function EditorNotesSidebar() {
 	const initialData = useRouteLoaderData('root-notes');
 	const search = useNotesStore((s) => s.search);
 	const sortBy = useNotesStore((s) => s.sortBy);
 	const setSortBy = useNotesStore((s) => s.setSortBy);
+	const setSearch = useNotesStore((s) => s.setSearch);
+	const [searchInput, setSearchInput] = useState(search);
+	const debouncedSearch = useDebounce(searchInput, 300);
+
+	useEffect(() => {
+		if (debouncedSearch !== undefined) {
+			setSearch(debouncedSearch);
+		}
+	}, [debouncedSearch, setSearch]);
+
+	useEffect(() => {
+		setSearchInput(search);
+	}, [search]);
 
 	// Local-only filter UI state (not yet applied to API)
 	const [filters, setFilters] = useState({
@@ -109,6 +124,15 @@ export function EditorNotesSidebar() {
 				</div>
 
 				<div className="flex flex-1 items-center justify-end gap-2">
+					<div className="relative mr-auto hidden w-full max-w-sm md:flex">
+						<SearchIcon className="text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
+						<Input
+							value={searchInput}
+							onChange={(event) => setSearchInput(event.target.value)}
+							placeholder="Search notes"
+							className="pl-9"
+						/>
+					</div>
 
 					<DropdownMenu>
 						<DropdownMenuTrigger>
@@ -281,39 +305,47 @@ export function EditorNotesSidebar() {
 
 			<NotesSidebarContent>
 				<ScrollArea ref={parentRef} className="h-full w-full">
-					<div
-						style={{
-							height: `${rowVirtualizer.getTotalSize()}px`,
-							width: '100%',
-							position: 'relative',
-						}}
-					>
-						{virtualItems.map((virtualItem) => {
-							const note = allNotes[virtualItem.index];
-							return (
-								<div
-									key={virtualItem.key}
-									style={{
-										position: 'absolute',
-										top: 0,
-										left: 0,
-										width: '100%',
-										height: `${virtualItem.size}px`,
-										transform: `translateY(${virtualItem.start}px)`,
-									}}
-								>
-									<NoteCard key={note.id} userNote={note} />
-								</div>
-							);
-						})}
-					</div>
-					<div>
-						{isFetchingNextPage
-							? 'Loading more...'
-							: !hasNextPage
-								? 'Nothing more to load'
-								: ''}
-					</div>
+					{allNotes.length === 0 ? (
+						<div className="text-muted-foreground flex h-full items-center justify-center text-sm">
+							No notes yet. Create one to get started.
+						</div>
+					) : (
+						<>
+							<div
+								style={{
+									height: `${rowVirtualizer.getTotalSize()}px`,
+									width: '100%',
+									position: 'relative',
+								}}
+							>
+								{virtualItems.map((virtualItem) => {
+									const note = allNotes[virtualItem.index];
+									return (
+										<div
+											key={virtualItem.key}
+											style={{
+												position: 'absolute',
+												top: 0,
+												left: 0,
+												width: '100%',
+												height: `${virtualItem.size}px`,
+												transform: `translateY(${virtualItem.start}px)`,
+											}}
+										>
+											<NoteCard key={note.id} userNote={note} />
+										</div>
+									);
+								})}
+							</div>
+							<div>
+								{isFetchingNextPage
+									? 'Loading more...'
+									: !hasNextPage
+										? 'Nothing more to load'
+										: ''}
+							</div>
+						</>
+					)}
 				</ScrollArea>
 			</NotesSidebarContent>
 			<NotesSidebarFooter></NotesSidebarFooter>
