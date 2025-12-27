@@ -10,19 +10,14 @@ import { Mathematics } from '@tiptap/extension-mathematics';
 import Placeholder from '@tiptap/extension-placeholder';
 import Subscript from '@tiptap/extension-subscript';
 import Superscript from '@tiptap/extension-superscript';
-import Table from '@tiptap/extension-table';
-import TableCell from '@tiptap/extension-table-cell';
-import TableHeader from '@tiptap/extension-table-header';
-import TableRow from '@tiptap/extension-table-row';
-import TaskItem from '@tiptap/extension-task-item';
-import TaskList from '@tiptap/extension-task-list';
+import { Table } from '@tiptap/extension-table'
+import { TaskItem, TaskList } from '@tiptap/extension-list';
 import TextAlign from '@tiptap/extension-text-align';
-import { TextStyle } from '@tiptap/extension-text-style';
 import Underline from '@tiptap/extension-underline';
 import Youtube from '@tiptap/extension-youtube';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-
+import { TextStyleKit } from '@tiptap/extension-text-style'
 import {
 	useMutation,
 	useQueryClient,
@@ -135,7 +130,7 @@ export const Editor = () => {
 
 		extensions: [
 			liveblocks,
-			StarterKit.configure({ history: false }),
+			StarterKit,
 			Color,
 			Highlight,
 			Mathematics.configure({
@@ -147,16 +142,32 @@ export const Editor = () => {
 				},
 			}),
 			Underline,
-			Table,
-			TableRow,
-			TableHeader,
-			TableCell,
+			Table.configure({
+				resizable: true,
+			}),
+
 			FontFamily,
 			TextAlign.configure({
 				defaultAlignment: 'left',
 				types: ['heading', 'paragraph'],
 			}),
-			TextStyle.configure({ mergeNestedSpanStyles: true }),
+			TextStyleKit.configure({
+				backgroundColor: {
+					types: ['textStyle'],
+				},
+				color: {
+					types: ['textStyle'],
+				},
+				fontFamily: {
+					types: ['textStyle'],
+				},
+				fontSize: {
+					types: ['textStyle'],
+				},
+				lineHeight: {
+					types: ['textStyle'],
+				},
+			}),
 			Superscript,
 			Subscript,
 

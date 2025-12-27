@@ -105,7 +105,7 @@ export default function EditorToolbar() {
 			{
 				label: 'List Todo',
 				icon: ListTodoIcon,
-				isActive: editor?.isActive('tasklist'),
+				isActive: editor?.isActive('taskList'),
 				onClick: () => {
 					editor?.chain().focus().toggleTaskList().run();
 				},

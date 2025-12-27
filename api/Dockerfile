@@ -76,6 +76,8 @@ RUN set -eux; \
     apk del .build-deps; \
     rm -rf /tmp/* /var/cache/apk/*
 
+COPY entrypoint.dev.sh entrypoint.prod.sh ./
+
 RUN mkdir -p \
         bootstrap/cache \
         storage/framework/cache \

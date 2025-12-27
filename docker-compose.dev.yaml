@@ -1,12 +1,11 @@
-
 services:
   db_dev:
-    image: postgres:latest
+    image: postgres:17-alpine
     container_name: notetify-db-dev
     networks:
       notetify-net-dev:
     healthcheck:
-      test: [ "CMD", "pg_isready" ]
+      test: ["CMD", "pg_isready"]
       interval: 10s
       retries: 10
     restart: always
@@ -14,10 +13,12 @@ services:
     secrets:
       - db-password
     volumes:
-      - db-data:/var/lib/postgresql/data
+      - db-data-dev:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=notetify_db
       - POSTGRES_PASSWORD_FILE=/run/secrets/db-password
+      - DB_PORT=5432
+      - DB_HOST=db_dev
     expose:
       - 5432
     ports:
@@ -44,7 +45,6 @@ services:
       - "6379:6379"
     env_file:
       - .env.development
-
 
   api_dev:
     build:
@@ -73,10 +73,10 @@ services:
       dockerfile: Dockerfile
       target: development
       args:
-      - VITE_BASE_URL= http://0.0.0.0:8000/api/
-      - VITE_WS_ORIGIN= ws://0.0.0.0:8000
-      - VITE_APP_NAME= Notetify
-      - VITE_CLIENT_URL= http://0.0.0.0:5173/
+        - VITE_BASE_URL= http://0.0.0.0:8000/api/
+        - VITE_WS_ORIGIN= ws://0.0.0.0:8000
+        - VITE_APP_NAME= Notetify
+        - VITE_CLIENT_URL= http://0.0.0.0:5173/
     container_name: notetify-client-dev
     networks:
       - notetify-net-dev
@@ -106,7 +106,6 @@ volumes:
   db-data-dev: {}
   node_modules_client-dev: {}
 
-
-# secrets:
-#   db-password:
-#     file: db/password.txt
+secrets:
+  db-password:
+    file: db/password.txt
