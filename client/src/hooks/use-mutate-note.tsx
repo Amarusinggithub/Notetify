@@ -1,56 +1,10 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { type CreateNote, type UserNote } from '../types';
 import { useRevalidator } from 'react-router';
-import axiosInstance from '../lib/axios';
-import { deleteNote as deleteNoteRequest, updateNote as updateNoteRequest } from '../lib/notes';
-import { type CreateNote, type UpdateUserNotePayload, type UserNote } from '../types';
 import { useNotesStore } from '../stores/use-notes-store';
+import { createNote, deleteNote, updateNote } from '../services/note-services';
+import axiosInstance from '../lib/axios.ts';
 
-const NOTES_QUERY_KEY = ['notes'] as const;
-
-type NotesQuerySnapshot = Array<[unknown, unknown]>;
-
-type UpdateNoteInput = {
-	id: string;
-	payload: UpdateUserNotePayload;
-};
-
-function snapshotNotes(queryClient: ReturnType<typeof useQueryClient>): NotesQuerySnapshot {
-	return queryClient.getQueriesData({ queryKey: NOTES_QUERY_KEY });
-}
-
-function restoreNotes(
-	queryClient: ReturnType<typeof useQueryClient>,
-	snapshot?: NotesQuerySnapshot,
-) {
-	snapshot?.forEach(([key, data]) => {
-		queryClient.setQueryData(key, data);
-	});
-}
-
-function updateNotesCaches(
-	queryClient: ReturnType<typeof useQueryClient>,
-	mapper: (notes: UserNote[], pageIndex?: number) => UserNote[],
-) {
-	const queries = queryClient.getQueriesData({ queryKey: NOTES_QUERY_KEY });
-	queries.forEach(([key, data]: [unknown, any]) => {
-		if (!data) return;
-		if (Array.isArray(data.pages)) {
-			const pages = data.pages.map((page: any, index: number) => {
-				if (!page?.results) return page;
-				return {
-					...page,
-					results: mapper(page.results as UserNote[], index),
-				};
-			});
-			queryClient.setQueryData(key, { ...data, pages });
-		} else if (Array.isArray(data.results)) {
-			queryClient.setQueryData(key, {
-				...data,
-				results: mapper(data.results as UserNote[]),
-			});
-		}
-	});
-}
 
 export function useCreateNote() {
 	const revalidator = useRevalidator();
@@ -217,18 +171,19 @@ export function useDeleteNote() {
 	});
 }
 
-const createNote = async (note: CreateNote): Promise<UserNote> => {
-	try {
-		const response = await axiosInstance.post('/notes', {
-			title: note.note_data?.title ?? '',
-			content: note.note_data?.content ?? '',
-			is_favorited: note.is_favorited,
-			is_pinned: note.is_pinned,
-			is_trashed: note.is_trashed,
-		});
-		return response.data as UserNote;
-	} catch (error) {
-		console.error('Failed to create note:', error);
-		throw error;
-	}
+
+
+
+
+export const useSearchNotes = (query: string, params: string) => {
+	const { data = [] } = useSuspenseQuery<UserNote[]>({
+		queryKey: [`search`],
+		queryFn: async () =>
+			await axiosInstance
+				.get(`notes/?search=${query}&${params}`)
+				.then((res) => res.data.results),
+	});
+	return data;
 };
+
+

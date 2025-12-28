@@ -77,6 +77,7 @@ RUN set -eux; \
     rm -rf /tmp/* /var/cache/apk/*
 
 COPY entrypoint.dev.sh entrypoint.prod.sh ./
+
 RUN mkdir -p \
         bootstrap/cache \
         storage/framework/cache \

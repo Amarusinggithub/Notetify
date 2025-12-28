@@ -182,3 +182,4 @@ For production:
 ```bash
 docker-compose -f docker-compose.prod.yaml up --build
 ```
+# tsc -b &&

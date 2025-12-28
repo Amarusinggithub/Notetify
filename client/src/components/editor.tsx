@@ -1,42 +1,30 @@
 import { useLiveblocksExtension } from '@liveblocks/react-tiptap';
-import { Color } from '@tiptap/extension-color';
-import DragHandle from '@tiptap/extension-drag-handle-react';
-import Emoji, { gitHubEmojis } from '@tiptap/extension-emoji';
-import { FontFamily } from '@tiptap/extension-font-family';
-import Highlight from '@tiptap/extension-highlight';
-import Image from '@tiptap/extension-image';
-import Link from '@tiptap/extension-link';
-import { Mathematics } from '@tiptap/extension-mathematics';
-import Placeholder from '@tiptap/extension-placeholder';
-import Subscript from '@tiptap/extension-subscript';
-import Superscript from '@tiptap/extension-superscript';
-import Table from '@tiptap/extension-table';
-import TableCell from '@tiptap/extension-table-cell';
-import TableHeader from '@tiptap/extension-table-header';
-import TableRow from '@tiptap/extension-table-row';
-import TaskItem from '@tiptap/extension-task-item';
-import TaskList from '@tiptap/extension-task-list';
-import TextAlign from '@tiptap/extension-text-align';
-import { TextStyle } from '@tiptap/extension-text-style';
-import Underline from '@tiptap/extension-underline';
-import Youtube from '@tiptap/extension-youtube';
-import { EditorContent, useEditor } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
-import { useEffect, useMemo } from 'react';
-
-import { useRouteLoaderData } from 'react-router';
-
 import {
 	useMutation,
 	useQueryClient,
 	useSuspenseInfiniteQuery,
 } from '@tanstack/react-query';
+import DragHandle from '@tiptap/extension-drag-handle-react';
+import Emoji, { gitHubEmojis } from '@tiptap/extension-emoji';
+import Highlight from '@tiptap/extension-highlight';
+import Image from '@tiptap/extension-image';
+import { TaskItem, TaskList } from '@tiptap/extension-list';
+import { Mathematics } from '@tiptap/extension-mathematics';
+import Placeholder from '@tiptap/extension-placeholder';
+import Subscript from '@tiptap/extension-subscript';
+import Superscript from '@tiptap/extension-superscript';
+import { TableKit } from '@tiptap/extension-table';
+import TextAlign from '@tiptap/extension-text-align';
+import { TextStyleKit } from '@tiptap/extension-text-style';
+import Youtube from '@tiptap/extension-youtube';
+import { EditorContent, useEditor } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
 import { fetchNotesPage, updateNote } from '../lib/notes';
 import type { PaginatedNotesResponse } from '../lib/loaders';
 import type { UserNote } from '../types';
 import { cn } from '../lib/utils';
-import useEditorStore from '../stores/use-editor-store';
 import { useNotesStore } from '../stores/use-notes-store';
+
 import EditorFooter from './editor-footer';
 import { EditorHeader } from './editor-header';
 import EditorToolbar from './editor-toolbar';
@@ -46,7 +34,7 @@ import suggestion from './suggestion';
 export const Editor = () => {
 	const liveblocks = useLiveblocksExtension();
 
-	const { setEditor } = useEditorStore();
+	const { setEditor } = useNotesStore();
 	const selectedNoteId = useNotesStore((s) => s.selectedNoteId);
 	const setSelectedNote = useNotesStore((s) => s.setSelectedNote);
 	const search = useNotesStore((s) => s.search);
@@ -171,28 +159,83 @@ export const Editor = () => {
 
 		extensions: [
 			liveblocks,
-			StarterKit.configure({ history: false }),
-			Color,
-			Highlight,
-			Mathematics.configure({
-				shouldRender: (state, pos, node) => {
-					const $pos = state.doc.resolve(pos);
-					return (
-						node.type.name === 'text' && $pos.parent.type.name !== 'codeBlock'
-					);
+			StarterKit.configure({
+				undoRedo: false,
+				heading: {
+					levels: [1, 2, 3, 4, 5],
 				},
 			}),
-			Underline,
-			Table,
-			TableRow,
-			TableHeader,
-			TableCell,
-			FontFamily,
+			//Color,
+			Highlight,
+			Mathematics.configure({
+				// Options for the inline math node
+				inlineOptions: {
+					onClick: (node, pos) => {
+						// you can do anything on click, e.g. open a dialog to edit the math node
+						// or just a prompt to edit the LaTeX code for a quick prototype
+						const katex = prompt('Enter new calculation:', node.attrs.latex);
+						if (katex) {
+							editor
+								.chain()
+								.setNodeSelection(pos)
+								.updateInlineMath({ latex: katex })
+								.focus()
+								.run();
+						}
+					},
+				},
+
+				// Options for the block math node
+				blockOptions: {
+					onClick: (node, pos) => {
+						// you can do anything on click, e.g. open a dialog to edit the math node
+						// or just a prompt to edit the LaTeX code for a quick prototype
+						const katex = prompt('Enter new calculation:', node.attrs.latex);
+						if (katex) {
+							editor
+								.chain()
+								.setNodeSelection(pos)
+								.updateBlockMath({ latex: katex })
+								.focus()
+								.run();
+						}
+					},
+				},
+
+				// Options for the KaTeX renderer. See here: https://katex.org/docs/options.html
+				katexOptions: {
+					throwOnError: false, // don't throw an error if the LaTeX code is invalid
+					macros: {
+						'\\R': '\\mathbb{R}', // add a macro for the real numbers
+						'\\N': '\\mathbb{N}', // add a macro for the natural numbers
+					},
+				},
+			}),
+			//Underline,
+			TableKit,
+
+			//FontFamily,
 			TextAlign.configure({
 				defaultAlignment: 'left',
 				types: ['heading', 'paragraph'],
 			}),
-			TextStyle.configure({ mergeNestedSpanStyles: true }),
+			TextStyleKit.configure({
+				backgroundColor: {
+					types: ['textStyle'],
+				},
+				color: {
+					types: ['textStyle'],
+				},
+				fontFamily: {
+					types: ['textStyle'],
+				},
+				fontSize: {
+					types: ['textStyle'],
+				},
+				lineHeight: {
+					types: ['textStyle'],
+				},
+			}),
 			Superscript,
 			Subscript,
 
@@ -219,7 +262,7 @@ export const Editor = () => {
 				nested: true,
 			}),
 
-			Link.configure({
+			/*Link.configure({
 				openOnClick: false,
 				autolink: true,
 				defaultProtocol: 'https',
@@ -281,7 +324,7 @@ export const Editor = () => {
 						return false;
 					}
 				},
-			}),
+			}),*/
 			Youtube.configure({
 				controls: false,
 				nocookie: true,
