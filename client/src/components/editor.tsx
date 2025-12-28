@@ -10,8 +10,7 @@ import { Mathematics } from '@tiptap/extension-mathematics';
 import Placeholder from '@tiptap/extension-placeholder';
 import Subscript from '@tiptap/extension-subscript';
 import Superscript from '@tiptap/extension-superscript';
-import { Table } from '@tiptap/extension-table'
-import { TaskItem, TaskList } from '@tiptap/extension-list';
+import { TableKit } from '@tiptap/extension-table';import { TaskItem, TaskList } from '@tiptap/extension-list';
 import TextAlign from '@tiptap/extension-text-align';
 import Underline from '@tiptap/extension-underline';
 import Youtube from '@tiptap/extension-youtube';
@@ -130,8 +129,13 @@ export const Editor = () => {
 
 		extensions: [
 			liveblocks,
-			StarterKit,
-			Color,
+			StarterKit.configure({
+				undoRedo: false,
+				heading: {
+					levels: [1, 2,3,4,5],
+				},
+			}),
+			//Color,
 			Highlight,
 			Mathematics.configure({
 				shouldRender: (state, pos, node) => {
@@ -141,12 +145,10 @@ export const Editor = () => {
 					);
 				},
 			}),
-			Underline,
-			Table.configure({
-				resizable: true,
-			}),
+			//Underline,
+			TableKit,
 
-			FontFamily,
+			//FontFamily,
 			TextAlign.configure({
 				defaultAlignment: 'left',
 				types: ['heading', 'paragraph'],
@@ -194,7 +196,7 @@ export const Editor = () => {
 				nested: true,
 			}),
 
-			Link.configure({
+			/*Link.configure({
 				openOnClick: false,
 				autolink: true,
 				defaultProtocol: 'https',
@@ -256,7 +258,7 @@ export const Editor = () => {
 						return false;
 					}
 				},
-			}),
+			}),*/
 			Youtube.configure({
 				controls: false,
 				nocookie: true,
