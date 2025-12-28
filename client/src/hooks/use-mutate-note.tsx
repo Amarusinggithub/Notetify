@@ -1,8 +1,10 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { type CreateNote, type UserNote } from '../types';
 import { useRevalidator } from 'react-router';
 import { useNotesStore } from '../stores/use-notes-store';
 import { createNote, deleteNote, updateNote } from '../services/note-services';
+import axiosInstance from '../lib/axios.ts';
+
 
 export function useCreateNote() {
 	const revalidator = useRevalidator();
@@ -121,4 +123,20 @@ export function useDeleteNote() {
 		},
 	});
 }
+
+
+
+
+
+export const useSearchNotes = (query: string, params: string) => {
+	const { data = [] } = useSuspenseQuery<UserNote[]>({
+		queryKey: [`search`],
+		queryFn: async () =>
+			await axiosInstance
+				.get(`notes/?search=${query}&${params}`)
+				.then((res) => res.data.results),
+	});
+	return data;
+};
+
 

@@ -9,26 +9,36 @@ import { mapAxiosErrorToFieldErrors } from '../utils/helpers';
 type LoginParams = { email: string; password: string; remember?: boolean };
 
 type AuthState = {
-  // State
-  isLoading: boolean;
-  isAuthenticated: boolean;
-  checkingAuth: boolean;
-  errors: FormErrors | null;
-  sharedData: SharedData | null;
+	// State
+	isLoading: boolean;
+	isAuthenticated: boolean;
+	checkingAuth: boolean;
+	errors: FormErrors | null;
+	sharedData: SharedData | null;
+	url: string;
+    
+	// Actions
+	setErrors: (e: FormErrors | null) => void;
+	setSharedData: (s: SharedData | null) => void;
+	clearErrors: () => void;
 
-  // Actions
-  setErrors: (e: FormErrors | null) => void;
-  setSharedData: (s: SharedData | null) => void;
-  clearErrors: () => void;
-
-  SignUp: (first_name: string, last_name: string, email: string, password: string) => Promise<boolean>;
-  Login: (params: LoginParams) => Promise<boolean>;
-  Logout: () => Promise<void>;
-  PasswordReset: (token: string | undefined, password: string) => Promise<boolean>;
-  ForgotPassword: (email: string) => Promise<string | null>;
-  VerifyEmail: (email: string) => Promise<string | null>;
-  ConfirmPassword: (password: string) => Promise<boolean>;
-  confirmAuth: () => Promise<void>;
+	SignUp: (
+		first_name: string,
+		last_name: string,
+		email: string,
+		password: string,
+	) => Promise<boolean>;
+	Login: (params: LoginParams) => Promise<boolean>;
+	Logout: () => Promise<void>;
+	PasswordReset: (
+		token: string | undefined,
+		password: string,
+	) => Promise<boolean>;
+	ForgotPassword: (email: string) => Promise<string | null>;
+	VerifyEmail: (email: string) => Promise<string | null>;
+	ConfirmPassword: (password: string) => Promise<boolean>;
+	confirmAuth: () => Promise<void>;
+	setUrl: (url: string) => void;
 };
 
 function buildShared(apiResponse: any): SharedData {
@@ -54,7 +64,8 @@ export const useAuthStore = create<AuthState>()(
       checkingAuth: true,
       errors: null,
       sharedData: null,
-
+        url: '',
+      setUrl: (url) => set({ url }),
       setErrors: (e) => set({ errors: e }),
       clearErrors: () => set({ errors: null }),
       setSharedData: (s) => set({ sharedData: s }),
