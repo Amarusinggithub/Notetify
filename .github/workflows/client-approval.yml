@@ -26,21 +26,21 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: "npm"
+          cache: "pnpm"
           cache-dependency-path: "**/package-lock.json"
 
       - name: Recreate .env from secret
         run: echo "${{ secrets.PROD_ENV_FILE }}" > .env
-      - run: npm ci
+      - run: pnpm install --frozen-lockfile
 
       - name: Format Client
-        run: npm run format
+        run: pnpm run format
 
       - name: Lint Client
-        run: npm run lint
+        run: pnpm run lint
 
       - name: Test Client
-        run: npm run test
+        run: pnpm run test
 
       - name: Test coverage Client
         run: npm run coverage
