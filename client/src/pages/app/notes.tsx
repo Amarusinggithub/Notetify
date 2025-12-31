@@ -100,17 +100,21 @@ export default function Notes() {
 	}, []);
 
 	return (
-		<LiveblocksProvider resolveUsers={resolveUsers} authEndpoint={authEndpoint}>
-			<RoomProvider id={`note-${noteId ?? selectedId ?? 'new'}`}>
-				<ClientSideSuspense fallback={<div>Loading...</div>}>
-					<NotesSidebarProvider defaultOpen={true}>
-						<EditorNotesSidebar />
-						<NotesSidebarInset>
+		<NotesSidebarProvider defaultOpen={true}>
+			<EditorNotesSidebar />
+
+			<NotesSidebarInset>
+				<LiveblocksProvider
+					resolveUsers={resolveUsers}
+					authEndpoint={authEndpoint}
+				>
+					<RoomProvider id={`note-${noteId ?? selectedId ?? 'new'}`}>
+						<ClientSideSuspense fallback={<div>Loading...</div>}>
 							<Editor />
-						</NotesSidebarInset>
-					</NotesSidebarProvider>
-				</ClientSideSuspense>
-			</RoomProvider>
-		</LiveblocksProvider>
+						</ClientSideSuspense>
+					</RoomProvider>
+				</LiveblocksProvider>
+			</NotesSidebarInset>
+		</NotesSidebarProvider>
 	);
 }
