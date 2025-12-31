@@ -16,7 +16,7 @@ class UserNote extends Model
     protected $fillable = [
         'note_id',
         'user_id',
-        'is_favorited',
+        'is_favorite',
         'is_pinned',
         'is_trashed',
         'favorited_at',
@@ -26,7 +26,7 @@ class UserNote extends Model
     ];
 
     protected $casts = [
-        'is_favorited' => 'boolean',
+        'is_favorite' => 'boolean',
         'is_pinned' => 'boolean',
         'is_trashed' => 'boolean',
         'favorited_at' => 'datetime',

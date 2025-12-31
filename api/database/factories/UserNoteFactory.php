@@ -19,7 +19,7 @@ class UserNoteFactory extends Factory
         return [
             'user_id' => User::factory(),
             'note_id' => Note::factory(),
-            'is_favorited' => false,
+            'is_favorite' => false,
             'is_pinned' => false,
             'is_trashed' => false,
             'favorited_at' => null,
@@ -31,7 +31,7 @@ class UserNoteFactory extends Factory
     public function favorited(): static
     {
         return $this->state(fn () => [
-            'is_favorited' => true,
+            'is_favorite' => true,
             'favorited_at' => now(),
         ]);
     }

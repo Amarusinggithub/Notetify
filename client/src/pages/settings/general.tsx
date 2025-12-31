@@ -3,7 +3,7 @@ import { toast } from 'sonner';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
-import { useAuthStore } from '../../stores/use-auth-store';
+import { useAuthStore } from '../../stores/slices/auth-slice';
 
 const General = () => {
 	const { sharedData, setSharedData } = useAuthStore();

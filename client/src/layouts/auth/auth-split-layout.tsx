@@ -1,6 +1,6 @@
 import { type PropsWithChildren } from 'react';
 import { Link } from 'react-router';
-import useAuth from 'stores/use-auth-store';
+import useAuth from 'stores/slices/auth-slice';
 import AppLogoIcon from '../../components/app-logo-icon';
 
 interface AuthLayoutProps {

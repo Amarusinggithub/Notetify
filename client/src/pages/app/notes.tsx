@@ -12,20 +12,21 @@ import {
 	NotesSidebarProvider,
 } from '../../components/ui/notes-sidebar';
 import { useCreateNote } from '../../hooks/use-mutate-note';
-import { useNotesStore } from '../../stores/use-notes-store';
-import { useAuthStore } from '../../stores/use-auth-store';
-import type { PaginatedNotesResponse } from '../../lib/loaders';
 import axiosInstance from '../../lib/axios';
+import type { PaginatedNotesResponse } from '../../lib/loaders';
+import { useStore } from '../../stores/index.ts';
+
 
 export default function Notes() {
 	const { noteId } = useParams();
 	const navigate = useNavigate();
-	const initialData =
-		useRouteLoaderData('root-notes') as PaginatedNotesResponse | undefined;
-	const selectedId = useNotesStore((s) => s.selectedNoteId);
-	const setSelected = useNotesStore((s) => s.setSelectedNote);
+	const initialData = useRouteLoaderData('root-notes') as
+		| PaginatedNotesResponse
+		| undefined;
+	const selectedId = useStore((s) => s.selectedNoteId);
+	const setSelected = useStore((s) => s.setSelectedNote);
 	const { mutate: createNote, isPending: isCreating } = useCreateNote();
-	const currentUser = useAuthStore((s) => s.sharedData?.auth.user);
+	const currentUser = useStore((s) => s.sharedData?.auth.user);
 
 	useEffect(() => {
 		const routeNoteId = noteId ?? null;
@@ -52,7 +53,7 @@ export default function Notes() {
 				{
 					note_data: { title: 'Untitled', content: '', users: [] },
 					tags: [],
-					is_favorited: false,
+					is_favorite: false,
 					is_pinned: false,
 					is_trashed: false,
 				},
@@ -64,7 +65,15 @@ export default function Notes() {
 				},
 			);
 		}
-	}, [noteId, selectedId, initialData, navigate, setSelected, createNote, isCreating]);
+	}, [
+		noteId,
+		selectedId,
+		initialData,
+		navigate,
+		setSelected,
+		createNote,
+		isCreating,
+	]);
 
 	const resolveUsers = useCallback(
 		async ({ userIds }: { userIds: string[] }) => {

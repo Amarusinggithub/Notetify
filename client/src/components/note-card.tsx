@@ -1,5 +1,7 @@
+import { formatDistanceToNow } from 'date-fns';
+import { Star } from 'lucide-react';
+import { useStore } from '../stores/index.ts';
 import type { UserNote } from '../types';
-import { useNotesStore } from '../stores/use-notes-store';
 import {
 	Card,
 	CardContent,
@@ -7,23 +9,21 @@ import {
 	CardHeader,
 	CardTitle,
 } from './ui/card';
-import { formatDistanceToNow } from 'date-fns';
-import { Star } from 'lucide-react';
 
 type NoteCardProp = {
 	userNote: UserNote;
 };
 
 const NoteCard = ({ userNote }: NoteCardProp) => {
-	const selectedId = useNotesStore((s) => s.selectedNoteId);
-	const setSelected = useNotesStore((s) => s.setSelectedNote);
+	const selectedId = useStore((s) => s.selectedNoteId);
+	const setSelected = useStore((s) => s.setSelectedNote);
 
 	const isActive = selectedId === userNote.id;
 	const preview = getPreview(userNote.note.content ?? '');
 	const updatedLabel = userNote.updated_at
 		? formatDistanceToNow(new Date(userNote.updated_at), {
 				addSuffix: true,
-		  })
+			})
 		: 'just now';
 
 	return (
@@ -35,7 +35,7 @@ const NoteCard = ({ userNote }: NoteCardProp) => {
 				<CardTitle className="text-base font-semibold">
 					{userNote.note.title || 'Untitled'}
 				</CardTitle>
-				{userNote.is_favorited && (
+				{userNote.is_favorite && (
 					<Star
 						data-testid="favorite-indicator"
 						className="size-4 text-yellow-400"
@@ -43,10 +43,10 @@ const NoteCard = ({ userNote }: NoteCardProp) => {
 					/>
 				)}
 			</CardHeader>
-			<CardContent className="text-sm text-muted-foreground line-clamp-3">
+			<CardContent className="text-muted-foreground line-clamp-3 text-sm">
 				{preview || 'No content yet.'}
 			</CardContent>
-			<CardFooter className="text-xs text-muted-foreground">
+			<CardFooter className="text-muted-foreground text-xs">
 				Updated {updatedLabel}
 			</CardFooter>
 		</Card>

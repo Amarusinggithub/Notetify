@@ -16,7 +16,7 @@ services:
     volumes:
       - db-data-prod:/var/lib/postgresql/data
     environment:
-      - POSTGRES_DB=example
+      - POSTGRES_DB=notetify
       - POSTGRES_PASSWORD_FILE=/run/secrets/db-password
     expose:
       - 5432

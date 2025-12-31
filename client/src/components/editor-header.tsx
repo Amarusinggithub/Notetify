@@ -1,30 +1,22 @@
-﻿import { useEffect, useMemo, useState } from 'react';
-import type { BreadcrumbItem } from 'types';
-import { Breadcrumbs } from './breadcrumbs';
-import { NotesSidebarTrigger, useNotesSidebar } from './ui/notes-sidebar';
-import { useSidebar } from './ui/sidebar';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { Badge } from './ui/badge';
-import { useOthers } from '@liveblocks/react/suspense';
+﻿import { useOthers } from '@liveblocks/react/suspense';
 import {
 	ArrowRightLeft,
+	ChevronDown,
 	Copy,
 	CopyPlus,
+	Eye,
 	FilePlus2,
 	Globe2,
 	History,
 	Home,
 	Info,
 	Link2,
-	PenLine,
-	Eye,
 	ListTree,
 	Lock,
 	Maximize2,
 	MoreHorizontal,
 	Notebook as NotebookIcon,
+	PenLine,
 	Printer,
 	Search,
 	Send,
@@ -32,10 +24,16 @@ import {
 	Star,
 	Tag,
 	Trash2,
-	ChevronDown,
 } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
-import { Separator } from './ui/separator';
+import { useEffect, useMemo, useState } from 'react';
+import type { BreadcrumbItem } from 'types';
+import { useDeleteNote, useUpdateNote } from '../hooks/use-mutate-note';
+import { cn } from '../lib/utils';
+import { useStore } from '../stores/index.ts';
+import { Breadcrumbs } from './breadcrumbs';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { Badge } from './ui/badge';
+import { Button } from './ui/button';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -47,10 +45,11 @@ import {
 	DropdownMenuSubTrigger,
 	DropdownMenuTrigger,
 } from './ui/dropdown-menu';
-import { useNotesStore } from '../stores/use-notes-store';
-import { useAuthStore } from '../stores/use-auth-store';
-import { useDeleteNote, useUpdateNote } from '../hooks/use-mutate-note';
-import { cn } from '../lib/utils';
+import { Input } from './ui/input';
+import { NotesSidebarTrigger, useNotesSidebar } from './ui/notes-sidebar';
+import { Separator } from './ui/separator';
+import { useSidebar } from './ui/sidebar';
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
 export function EditorHeader({
 	breadcrumbs = [],
@@ -70,18 +69,21 @@ export function EditorHeader({
 		setOpenMobile: setNotesOpenMobile,
 	} = useNotesSidebar();
 
-	const selectedNoteId = useNotesStore((s) => s.selectedNoteId);
-	const currentUser = useAuthStore((s) => s.sharedData?.auth.user);
+	const selectedNoteId = useStore((s) => s.selectedNoteId);
+	const currentUser = useStore((s) => s.sharedData?.auth.user);
 	const [inviteRole, setInviteRole] = useState<'editor' | 'viewer'>('editor');
 	const inviteRoleLabel = inviteRole === 'editor' ? 'Editor' : 'Viewer';
-	const [linkAccess, setLinkAccess] = useState<'restricted' | 'anyone'>('restricted');
-	const linkAccessLabel = linkAccess === 'restricted' ? 'Restricted' : 'Anyone with link';
+	const [linkAccess, setLinkAccess] = useState<'restricted' | 'anyone'>(
+		'restricted',
+	);
+	const linkAccessLabel =
+		linkAccess === 'restricted' ? 'Restricted' : 'Anyone with link';
 
 	const noteUrl = selectedNoteId
 		? `${window.location.origin}/notes/${selectedNoteId}`
 		: window.location.href;
 
-	const notes = useNotesStore((s) => s.notes);
+	const notes = useStore((s) => s.notes);
 	const currentNote = useMemo(
 		() => notes.find((note) => note.id === selectedNoteId) ?? null,
 		[notes, selectedNoteId],
@@ -110,7 +112,7 @@ export function EditorHeader({
 		if (!currentNote) return;
 		updateNoteMutation.mutate({
 			id: currentNote.id,
-			payload: { is_favorited: !currentNote.is_favorited },
+			payload: { is_favorite: !currentNote.is_favorite },
 		});
 	};
 
@@ -206,7 +208,7 @@ export function EditorHeader({
 					{collaborators.map((other) => (
 						<Avatar
 							key={other.connectionId}
-							className="size-8 border border-border"
+							className="border-border size-8 border"
 						>
 							<AvatarImage src={other.info?.avatar} alt={other.info?.name} />
 							<AvatarFallback>
@@ -230,20 +232,24 @@ export function EditorHeader({
 								disabled={!currentNote || updateNoteMutation.isPending}
 								onClick={handleFavoriteToggle}
 								aria-label={
-									currentNote?.is_favorited ? 'Unfavorite note' : 'Favorite note'
+									currentNote?.is_favorite
+										? 'Unfavorite note'
+										: 'Favorite note'
 								}
 							>
 								<Star
 									className={cn(
 										'size-4',
-										currentNote?.is_favorited ? 'text-yellow-400' : '',
+										currentNote?.is_favorite ? 'text-yellow-400' : '',
 									)}
-									fill={currentNote?.is_favorited ? 'currentColor' : 'none'}
+									fill={currentNote?.is_favorite ? 'currentColor' : 'none'}
 								/>
 							</Button>
 						</TooltipTrigger>
 						<TooltipContent sideOffset={6}>
-							{currentNote?.is_favorited ? 'Remove favorite' : 'Mark as favorite'}
+							{currentNote?.is_favorite
+								? 'Remove favorite'
+								: 'Mark as favorite'}
 						</TooltipContent>
 					</Tooltip>
 					<Tooltip>
@@ -301,14 +307,10 @@ export function EditorHeader({
 											</Button>
 										</DropdownMenuTrigger>
 										<DropdownMenuContent align="start" className="w-48">
-											<DropdownMenuItem
-												onClick={() => setInviteRole('editor')}
-											>
+											<DropdownMenuItem onClick={() => setInviteRole('editor')}>
 												<PenLine className="mr-2 size-4" /> Editor
 											</DropdownMenuItem>
-											<DropdownMenuItem
-												onClick={() => setInviteRole('viewer')}
-											>
+											<DropdownMenuItem onClick={() => setInviteRole('viewer')}>
 												<Eye className="mr-2 size-4" /> Viewer
 											</DropdownMenuItem>
 										</DropdownMenuContent>
@@ -376,9 +378,7 @@ export function EditorHeader({
 											>
 												<Lock className="mr-2 size-4" /> Restricted
 											</DropdownMenuItem>
-											<DropdownMenuItem
-												onClick={() => setLinkAccess('anyone')}
-											>
+											<DropdownMenuItem onClick={() => setLinkAccess('anyone')}>
 												<Globe2 className="mr-2 size-4" /> Anyone with link
 											</DropdownMenuItem>
 										</DropdownMenuContent>
@@ -518,9 +518,3 @@ export function EditorHeader({
 		</header>
 	);
 }
-
-
-
-
-
-

@@ -15,7 +15,7 @@ services:
     volumes:
       - db-data-dev:/var/lib/postgresql/data
     environment:
-      - POSTGRES_DB=notetify_db
+      - POSTGRES_DB=notetify
       - POSTGRES_PASSWORD_FILE=/run/secrets/db-password
       - DB_PORT=5432
       - DB_HOST=db_dev

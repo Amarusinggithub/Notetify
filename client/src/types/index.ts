@@ -15,7 +15,7 @@ export type CreateOAuthAccount = {
 };
 
 export interface OAuthAccount {
-	id: number;
+	id: string;
 	user: number;
 	OAuthProvider: OAuthProvider;
 	access_token?: string;
@@ -51,19 +51,19 @@ export interface Auth {
 export type CreateTag = {
 	tag_data: {
 		name: string;
-		users?: number[];
+		users?: string[];
 	};
 };
 
 export interface UserTag extends Omit<CreateTag, 'tag_data'> {
-	id: number;
+	id: string;
 	tag: Tag;
-	user: number;
+	user: string;
 	created_at: Date;
 }
 
 export interface Tag {
-	id: number;
+	id: string;
 	name: string;
 	users?: number[];
 	created_at: Date;
@@ -81,7 +81,7 @@ export type CreateNote = {
 	tags: number[];
 	is_pinned: boolean;
 	is_trashed: boolean;
-	is_favorited: boolean;
+	is_favorite: boolean;
 };
 
 export interface UserNote extends Omit<CreateNote, 'note_data'> {
@@ -98,15 +98,18 @@ export interface UserNote extends Omit<CreateNote, 'note_data'> {
 	pinned_at?: string;
 	created_at: string;
 	updated_at: string;
+	is_pinned: boolean;
+	is_trashed: boolean;
+	is_favorite: boolean;
 }
 
 export type UpdateUserNotePayload = Partial<{
 	title: string;
 	content: string | null;
-	is_favorited: boolean;
+	is_favorite: boolean;
 	is_pinned: boolean;
 	is_trashed: boolean;
-	tags: number[];
+	tags: string[];
 }>;
 
 export interface Note {
@@ -125,10 +128,10 @@ export type CreateNoteBook = {
 };
 
 export interface UserNotebook {
-	id: number;
+	id: string;
 	notebook: Notebook;
-	notes?: number[];
-	user: number;
+	notes?: string[];
+	user: string;
 	role: Role;
 
 	removed_at?: Date;
@@ -139,18 +142,18 @@ export interface UserNotebook {
 	updated_at: Date;
 	is_pinned: boolean;
 	is_trashed: boolean;
-	is_favorited: boolean;
+	is_favorite: boolean;
 }
 
 export interface Notebook {
-	id: number;
+	id: string;
 	name: string;
 	created_at: Date;
 	updated_at: Date;
 	schedule_delete_at?: Date;
 }
 export interface NoteBookNote {
-	id: number;
+	id: string;
 	note: UserNote;
 	note_book: Notebook;
 	created_at: Date;
@@ -159,12 +162,12 @@ export interface NoteBookNote {
 }
 
 export interface UserNoteBook {
-	id: number;
+	id: string;
 	role: Role;
-	user: number;
+	user: string;
 	note_book: Notebook;
 	is_pinned: boolean;
-	is_favorited: boolean;
+	is_favorite: boolean;
 	is_trashed: boolean;
 	archived_at?: Date;
 	trashed_at?: Date;
@@ -174,7 +177,7 @@ export interface UserNoteBook {
 }
 
 export interface NoteTag {
-	id: number;
+	id: string;
 	note: Note;
 	tag: Tag;
 	removed_at?: Date;

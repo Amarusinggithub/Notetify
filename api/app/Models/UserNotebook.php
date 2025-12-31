@@ -14,7 +14,7 @@ class UserNotebook extends Model
     protected $fillable = [
         'notebook_id',
         'user_id',
-        'is_favorited',
+        'is_favorite',
         'is_pinned',
         'is_trashed',
         'favorited_at',

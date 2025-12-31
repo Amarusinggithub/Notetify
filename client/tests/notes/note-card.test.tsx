@@ -1,13 +1,13 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 import NoteCard from '../../src/components/note-card';
-import { useNotesStore } from '../../src/stores/use-notes-store';
+import { useNotesStore } from '../../src/stores/slices/notes-slice';
 
 const userNote = {
 	id: 'usernote-1',
 	user: 'user-1',
 	is_pinned: false,
-	is_favorited: false,
+	is_favorite: false,
 	is_trashed: false,
 	note: {
 		id: 'note-1',
@@ -43,7 +43,7 @@ describe('NoteCard', () => {
 	});
 
 	it('shows favorite indicator when note is favorited', () => {
-		render(<NoteCard userNote={{ ...userNote, is_favorited: true } as any} />);
+		render(<NoteCard userNote={{ ...userNote, is_favorite: true } as any} />);
 		expect(screen.getByTestId('favorite-indicator')).toBeInTheDocument();
 	});
 });

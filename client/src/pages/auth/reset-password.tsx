@@ -6,7 +6,7 @@ import { Button } from '../../components/ui/button.tsx';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import AuthLayout from '../../layouts/auth-layout';
-import { useAuthStore } from '../../stores/use-auth-store.tsx';
+import { useStore } from '../../stores/index.ts';
 import { resetPasswordSchema } from '../../utils/validators.ts';
 
 type ResetPasswordForm = {
@@ -22,7 +22,7 @@ export default function ResetPassword() {
 		confirmPassword: '',
 	});
 
-	const { isLoading, errors, PasswordReset, setErrors } = useAuthStore();
+	const { isLoading, errors, PasswordReset, setErrors } = useStore();
 
 	const submit: FormEventHandler = async (e) => {
 		e.preventDefault();

@@ -1,16 +1,23 @@
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { ArrowUpDown, Ellipsis, FilterIcon, Grid3x3, Calendar, Notebook, Tag as TagIcon, Search as SearchIcon } from 'lucide-react';
+import {
+	ArrowUpDown,
+	Calendar,
+	FilterIcon,
+	Notebook,
+	Search as SearchIcon,
+	Tag as TagIcon,
+} from 'lucide-react';
 import { Button } from './ui/button';
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuGroup,
-    DropdownMenuTrigger,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuRadioGroup,
-    DropdownMenuRadioItem,
-    DropdownMenuCheckboxItem,
+	DropdownMenu,
+	DropdownMenuCheckboxItem,
+	DropdownMenuContent,
+	DropdownMenuGroup,
+	DropdownMenuLabel,
+	DropdownMenuRadioGroup,
+	DropdownMenuRadioItem,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
 } from './ui/dropdown-menu';
 import { Label } from './ui/label';
 import {
@@ -25,21 +32,27 @@ import { ScrollArea } from './ui/scroll-area';
 import { useSuspenseInfiniteQuery } from '@tanstack/react-query';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouteLoaderData } from 'react-router';
-import { fetchNotesPage } from '../lib/notes';
-import { useNotesStore } from '../stores/use-notes-store';
-import NoteCard from './note-card';
-import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { Switch } from './ui/switch';
-import { Input } from './ui/input';
 import useDebounce from '../hooks/use-debounce';
+import { fetchNotesPage } from '../lib/notes';
+import { useStore } from '../stores/index.ts';
+import NoteCard from './note-card';
+import { Input } from './ui/input';
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from './ui/select';
+import { Switch } from './ui/switch';
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
 export function EditorNotesSidebar() {
 	const initialData = useRouteLoaderData('root-notes');
-	const search = useNotesStore((s) => s.search);
-	const sortBy = useNotesStore((s) => s.sortBy);
-	const setSortBy = useNotesStore((s) => s.setSortBy);
-	const setSearch = useNotesStore((s) => s.setSearch);
+	const search = useStore((s) => s.search);
+	const sortBy = useStore((s) => s.sortBy);
+	const setSortBy = useStore((s) => s.setSortBy);
+	const setSearch = useStore((s) => s.setSearch);
 	const [searchInput, setSearchInput] = useState(search);
 	const debouncedSearch = useDebounce(searchInput, 300);
 
@@ -125,7 +138,7 @@ export function EditorNotesSidebar() {
 
 				<div className="flex flex-1 items-center justify-end gap-2">
 					<div className="relative mr-auto hidden w-full max-w-sm md:flex">
-						<SearchIcon className="text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
+						<SearchIcon className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
 						<Input
 							value={searchInput}
 							onChange={(event) => setSearchInput(event.target.value)}
@@ -151,7 +164,7 @@ export function EditorNotesSidebar() {
 							<div className="flex items-center justify-between px-4 py-3">
 								<h4 className="text-sm font-semibold">Add Filters</h4>
 								<button
-									className="text-xs font-medium text-primary hover:underline"
+									className="text-primary text-xs font-medium hover:underline"
 									onClick={(e) => {
 										e.preventDefault();
 										setFilters({
@@ -167,13 +180,18 @@ export function EditorNotesSidebar() {
 									Clear all
 								</button>
 							</div>
-							<DropdownMenuGroup className="px-4 pb-3 space-y-3">
+							<DropdownMenuGroup className="space-y-3 px-4 pb-3">
 								<div className="flex items-center justify-between gap-4">
 									<div className="flex items-center gap-2 text-sm">
 										<TagIcon className="size-4" />
 										<span>Tags</span>
 									</div>
-									<Select value={filters.tags} onValueChange={(v) => setFilters((s) => ({ ...s, tags: v }))}>
+									<Select
+										value={filters.tags}
+										onValueChange={(v) =>
+											setFilters((s) => ({ ...s, tags: v }))
+										}
+									>
 										<SelectTrigger size="sm" className="w-48">
 											<SelectValue placeholder="Select" />
 										</SelectTrigger>
@@ -182,7 +200,6 @@ export function EditorNotesSidebar() {
 											<SelectItem value="personal">Personal</SelectItem>
 											<SelectItem value="ideas">Ideas</SelectItem>
 										</SelectContent>
-
 									</Select>
 								</div>
 
@@ -191,7 +208,12 @@ export function EditorNotesSidebar() {
 										<Notebook className="size-4" />
 										<span>Located in</span>
 									</div>
-									<Select value={filters.notebook} onValueChange={(v) => setFilters((s) => ({ ...s, notebook: v }))}>
+									<Select
+										value={filters.notebook}
+										onValueChange={(v) =>
+											setFilters((s) => ({ ...s, notebook: v }))
+										}
+									>
 										<SelectTrigger size="sm" className="w-48">
 											<SelectValue placeholder="Notebook" />
 										</SelectTrigger>
@@ -208,7 +230,12 @@ export function EditorNotesSidebar() {
 										<Calendar className="size-4" />
 										<span>Created</span>
 									</div>
-									<Select value={filters.created} onValueChange={(v) => setFilters((s) => ({ ...s, created: v }))}>
+									<Select
+										value={filters.created}
+										onValueChange={(v) =>
+											setFilters((s) => ({ ...s, created: v }))
+										}
+									>
 										<SelectTrigger size="sm" className="w-48">
 											<SelectValue placeholder="Date" />
 										</SelectTrigger>
@@ -226,7 +253,12 @@ export function EditorNotesSidebar() {
 										<Calendar className="size-4" />
 										<span>Updated</span>
 									</div>
-									<Select value={filters.updated} onValueChange={(v) => setFilters((s) => ({ ...s, updated: v }))}>
+									<Select
+										value={filters.updated}
+										onValueChange={(v) =>
+											setFilters((s) => ({ ...s, updated: v }))
+										}
+									>
 										<SelectTrigger size="sm" className="w-48">
 											<SelectValue placeholder="Date" />
 										</SelectTrigger>
@@ -240,17 +272,30 @@ export function EditorNotesSidebar() {
 								</div>
 							</DropdownMenuGroup>
 
-							<div className="border-t px-4 py-3 space-y-3">
+							<div className="space-y-3 border-t px-4 py-3">
 								<div className="flex items-center justify-between">
-									<button className="text-primary text-sm font-medium">Show notes shared with me</button>
-									<Switch checked={filters.showShared} onCheckedChange={(v) => setFilters((s) => ({ ...s, showShared: Boolean(v) }))} />
+									<button className="text-primary text-sm font-medium">
+										Show notes shared with me
+									</button>
+									<Switch
+										checked={filters.showShared}
+										onCheckedChange={(v) =>
+											setFilters((s) => ({ ...s, showShared: Boolean(v) }))
+										}
+									/>
 								</div>
 								<div className="flex items-center justify-between">
-									<button className="text-primary text-sm font-medium">Show notes in Spaces</button>
-									<Switch checked={filters.showSpaces} onCheckedChange={(v) => setFilters((s) => ({ ...s, showSpaces: Boolean(v) }))} />
+									<button className="text-primary text-sm font-medium">
+										Show notes in Spaces
+									</button>
+									<Switch
+										checked={filters.showSpaces}
+										onCheckedChange={(v) =>
+											setFilters((s) => ({ ...s, showSpaces: Boolean(v) }))
+										}
+									/>
 								</div>
 							</div>
-
 						</DropdownMenuContent>
 					</DropdownMenu>
 
@@ -277,7 +322,7 @@ export function EditorNotesSidebar() {
 									}
 								}}
 							>
-								<DropdownMenuRadioItem  value="title">
+								<DropdownMenuRadioItem value="title">
 									Title
 								</DropdownMenuRadioItem>
 								<DropdownMenuRadioItem value="updated_at">
@@ -296,8 +341,6 @@ export function EditorNotesSidebar() {
 							</DropdownMenuGroup>
 						</DropdownMenuContent>
 					</DropdownMenu>
-
-
 				</div>
 
 				<NotesSidebarSeparator />

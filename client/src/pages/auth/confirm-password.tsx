@@ -7,7 +7,7 @@ import { Button } from '../../components/ui/button.tsx';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import AuthLayout from '../../layouts/auth-layout';
-import { useAuthStore } from '../../stores/use-auth-store.tsx';
+import { useStore } from '../../stores/index.ts';
 import { confirmPasswordSchema } from '../../utils/validators.ts';
 
 type ConfirmPasswordType = { password: string };
@@ -16,7 +16,7 @@ export default function ConfirmPassword() {
 	const [form, setForm] = useState<ConfirmPasswordType>({
 		password: '',
 	});
-	const { isLoading, setErrors, errors, ConfirmPassword } = useAuthStore();
+	const { isLoading, setErrors, errors, ConfirmPassword } = useStore();
 
 	const submit: FormEventHandler = async (e) => {
 		e.preventDefault();

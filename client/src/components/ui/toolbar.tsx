@@ -18,7 +18,7 @@ import {
 import React, { useState } from 'react';
 import { CompactPicker, type ColorResult } from 'react-color';
 import { cn } from '../../lib/utils';
-import useEditorStore from '../../stores/use-editor-store';
+import { useNotesStore } from '../../stores/slices/notes-slice';
 import { Button } from './button';
 import {
 	DropdownMenu,
@@ -39,7 +39,7 @@ import {
 } from './dialog';
 
 function ToolbarFontSizeMenuButton() {
-	const { editor } = useEditorStore();
+	const { editor } = useNotesStore();
 
 	const sizes = [
 		8, 9, 10, 12, 14, 15, 16, 18, 20, 24, 30, 36, 48, 64, 72, 96,
@@ -88,7 +88,7 @@ function ToolbarFontSizeMenuButton() {
 }
 
 function ToolbarListButton() {
-	const { editor } = useEditorStore();
+	const { editor } = useNotesStore();
 	const lists = [
 		{
 			label: 'Bullet list',
@@ -141,7 +141,7 @@ function ToolbarListButton() {
 }
 
 function ToolbarAlignButton() {
-	const { editor } = useEditorStore();
+	const { editor } = useNotesStore();
 	const alignments = [
 		{
 			label: 'Align left',
@@ -198,7 +198,7 @@ function ToolbarAlignButton() {
 }
 
 function ToolbarImageButton() {
-	const { editor } = useEditorStore();
+	const { editor } = useNotesStore();
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const [imageUrl, setImageUrl] = useState('');
 	const onChange = (src: string) => {
@@ -278,7 +278,7 @@ function ToolbarImageButton() {
 }
 
 function ToolbarLinkButton() {
-	const { editor } = useEditorStore();
+	const { editor } = useNotesStore();
 	const [value, setValue] = useState(editor?.getAttributes('link').href || '');
 	const onChange = (href: string) => {
 		editor?.chain().focus().extendMarkRange('link').setLink({ href }).run();
@@ -327,7 +327,7 @@ function ToolbarLinkButton() {
 }
 
 function ToolbarTextHighlightButton() {
-	const { editor } = useEditorStore();
+	const { editor } = useNotesStore();
 	const value = editor?.getAttributes('highlight').color || '#000000';
 
 	const onChange = (color: ColorResult) => {
@@ -359,7 +359,7 @@ function ToolbarTextHighlightButton() {
 }
 
 function ToolbarTextColorButton() {
-	const { editor } = useEditorStore();
+	const { editor } = useNotesStore();
 	const value = editor?.getAttributes('textStyle').color || '#000000';
 	const onChange = (color: ColorResult) => {
 		editor?.commands.setColor(color.hex);
@@ -468,7 +468,7 @@ const ToolbarButton = ({
 };
 
 function ToolbarFontFamilyMenuButton() {
-	const { editor } = useEditorStore();
+	const { editor } = useNotesStore();
 
 	const fonts = [
 		{ label: 'Arial', value: 'Arial' },
@@ -520,7 +520,7 @@ function ToolbarFontFamilyMenuButton() {
 }
 
 function ToolbarHeadingLevelMenuButton() {
-	const { editor } = useEditorStore();
+	const { editor } = useNotesStore();
 
 	const headings = [
 		{ label: 'Normal text', value: 0, fontSize: '16px' },

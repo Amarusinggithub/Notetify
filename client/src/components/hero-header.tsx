@@ -16,7 +16,7 @@ const menuItems = [
 export const HeroHeader = () => {
 	const [menuState, setMenuState] = React.useState(false);
 	const [scrolled, setScrolled] = React.useState(false);
-	const scrollToSection = (href) => {
+	const scrollToSection = (href:string) => {
 		const element = document.querySelector(href);
 		if (element) {
 			element.scrollIntoView({ behavior: 'smooth' });

@@ -30,7 +30,7 @@ class NoteControllerTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $response = $this->getJson('/api/notes?search=Favorite&is_favorited=true');
+        $response = $this->getJson('/api/notes?search=Favorite&is_favorite=true');
 
         $response->assertOk()
             ->assertJsonCount(1, 'results')
@@ -46,14 +46,14 @@ class NoteControllerTest extends TestCase
         $payload = [
             'title' => 'API created',
             'content' => '<p>Hello world</p>',
-            'is_favorited' => true,
+            'is_favorite' => true,
         ];
 
         $response = $this->postJson('/api/notes', $payload);
 
         $response->assertCreated()
             ->assertJsonFragment([
-                'is_favorited' => true,
+                'is_favorite' => true,
             ])
             ->assertJsonPath('note.title', 'API created')
             ->assertJsonPath('note.content', '<p>Hello world</p>');
@@ -75,13 +75,13 @@ class NoteControllerTest extends TestCase
         $response = $this->putJson("/api/notes/{$userNote->id}", [
             'title' => 'Updated title',
             'content' => 'Updated content',
-            'is_favorited' => true,
+            'is_favorite' => true,
         ]);
 
         $response->assertOk()
             ->assertJsonPath('note.title', 'Updated title')
             ->assertJsonPath('note.content', 'Updated content')
-            ->assertJsonPath('is_favorited', true)
+            ->assertJsonPath('is_favorite', true)
             ->assertJsonStructure(['favorited_at']);
     }
 

@@ -4,10 +4,10 @@ import { type FormEventHandler } from 'react';
 import TextLink from '../../components/text-link';
 import { Button } from '../../components/ui/button.tsx';
 import AuthLayout from '../../layouts/auth-layout';
-import { useAuthStore } from '../../stores/use-auth-store.tsx';
+import { useStore } from '../../stores/index.ts';
 
 export default function VerifyEmail() {
-	const { isLoading, VerifyEmail } = useAuthStore();
+	const { isLoading, VerifyEmail } = useStore();
 	const submit: FormEventHandler = async (e) => {
 		e.preventDefault();
 		await VerifyEmail('');

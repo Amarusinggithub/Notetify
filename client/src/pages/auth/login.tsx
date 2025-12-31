@@ -7,7 +7,7 @@ import { Checkbox } from '../../components/ui/checkbox.tsx';
 import { Input } from '../../components/ui/input.tsx';
 import { Label } from '../../components/ui/label.tsx';
 import AuthLayout from '../../layouts/auth-layout.tsx';
-import { useAuthStore } from '../../stores/use-auth-store.tsx';
+import { useStore } from '../../stores/index.ts';
 import { loginSchema } from '../../utils/validators.ts';
 
 type LoginForm = {
@@ -22,7 +22,7 @@ const Login = () => {
 		password: '',
 		remember: false,
 	});
-	const { Login, isLoading, errors, setErrors } = useAuthStore();
+	const { Login, isLoading, errors, setErrors } = useStore();
 
 	const change = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setForm({ ...form, [e.target.name]: e.target.value.trim() });

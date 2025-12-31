@@ -11,7 +11,7 @@ import {
 	UnderlineIcon,
 	UndoIcon,
 } from 'lucide-react';
-import { useNotesStore } from '../stores/use-notes-store';
+import { useStore } from '../stores/index.ts';
 import {
 	Toolbar,
 	ToolbarButton,
@@ -25,7 +25,7 @@ import {
 } from './ui/toolbar';
 
 export default function EditorToolbar() {
-	const { editor } = useNotesStore();
+	const { editor } = useStore();
 
 	const sections: {
 		label: string;

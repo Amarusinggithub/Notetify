@@ -1,14 +1,17 @@
-import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
+import { useStore, type StoreState } from 'stores';
+import { type StateCreator } from 'zustand';
 
 export type Theme = 'dark' | 'light' | 'system';
 
-type ThemeState = {
+type ThemeSliceState = {
   theme: Theme;
+};
+
+type ThemeSliceAction = {
   setTheme: (theme: Theme) => void;
 };
 
-function applyTheme(theme: Theme) {
+export function applyTheme(theme: Theme) {
   const root = document.documentElement;
   root.classList.remove('light', 'dark');
   if (theme === 'system') {
@@ -19,32 +22,23 @@ function applyTheme(theme: Theme) {
   }
 }
 
-export const useTheme = create<ThemeState>()(
-  persist(
-    (set, get) => ({
+export type ThemeSlice = ThemeSliceState & ThemeSliceAction;
+
+
+export const createThemeSlice : StateCreator<StoreState,[],[],ThemeSlice> = (set, get) => ({
       theme: 'system',
       setTheme: (t) => {
         set({ theme: t });
         applyTheme(t);
       },
-    }),
-    {
-      name: 'vite-ui-theme',
-      storage: createJSONStorage(() => localStorage),
-      onRehydrateStorage: () => (state) => {
-        // After hydration, ensure DOM reflects persisted theme
-        const t = state?.theme ?? 'system';
-        applyTheme(t);
-      },
-      partialize: (s) => ({ theme: s.theme }),
-    },
-  ),
-);
+    });
+  
+
 
 // Apply theme immediately on first import in the browser
 if (typeof globalThis.window !== 'undefined') {
   try {
-    const t = (useTheme.getState().theme ) || 'system';
+    const t = (useStore.getState().theme ) || 'system';
     applyTheme(t);
   } catch {}
 }

@@ -20,16 +20,16 @@ import ResetPassword from '../pages/auth/reset-password';
 import { TwoFactorVerification } from '../pages/auth/two-factor-verification';
 import VerifyEmail from '../pages/auth/verify-email';
 import Landing from '../pages/landing';
+import Account from '../pages/settings/account';
 import Appearance from '../pages/settings/appearance';
 import Authentication from '../pages/settings/authentication';
+import Billing from '../pages/settings/billing';
 import General from '../pages/settings/general';
 import Notification from '../pages/settings/notification';
-import Account from '../pages/settings/account';
-import Billing from '../pages/settings/billing';
-import { useAuthStore } from '../stores/use-auth-store.tsx';
+import { useStore } from '../stores/index.ts';
 
 function AppRoutes() {
-	const { isAuthenticated, checkingAuth } = useAuthStore();
+	const { isAuthenticated, checkingAuth } = useStore();
 	if (checkingAuth) return null;
 
 	const publicRoutes = [

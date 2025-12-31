@@ -16,7 +16,7 @@ import {
 	DropdownMenuTrigger,
 } from './ui/dropdown-menu';
 
-import { useAuth } from '../stores/use-auth-store';
+import { useStore } from '../stores/index.ts';
 import {
 	NavigationMenu,
 	NavigationMenuItem,
@@ -72,7 +72,7 @@ interface AppHeaderProps {
 }
 
 export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
-	const { sharedData } = useAuth();
+	const { sharedData } = useStore();
 	const { auth } = sharedData!;
 	const page = useLocation();
 	const getInitials = useInitials();

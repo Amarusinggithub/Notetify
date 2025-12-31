@@ -12,6 +12,7 @@ import {
 
 import { ScrollArea } from '@radix-ui/react-scroll-area';
 import {
+	Box,
 	CalendarDays,
 	CalendarPlus,
 	CheckCircle2,
@@ -25,14 +26,13 @@ import {
 	Notebook,
 	NotebookPen,
 	Paperclip,
-	Box,
 	Star,
 	Tag,
 	Trash2,
 	UsersRound,
 } from 'lucide-react';
 import { useCreateNote } from '../hooks/use-mutate-note';
-import { useAuthStore } from '../stores/use-auth-store';
+import { useStore } from '../stores/index.ts';
 import { type NavItem } from '../types';
 import AppLogo from './app-logo';
 import { NavMain } from './nav-main';
@@ -65,7 +65,7 @@ const mainNavItems: NavItem[] = [
 		title: 'Favorites',
 		href: '/favorites',
 		icon: Star,
-		params: 'is_favorited=true&is_trashed=false',
+		params: 'is_favorite=true&is_trashed=false',
 	},
 	{
 		title: 'Notes',
@@ -123,7 +123,7 @@ const mainNavItems: NavItem[] = [
 
 export function AppSidebar() {
 	const createNoteMutation = useCreateNote();
-	const currentUserId = useAuthStore.getState().sharedData?.auth.user.id;
+	const currentUserId = useStore.getState().sharedData?.auth.user.id;
 
 	function handleCreateNote() {
 		if (!currentUserId) return;
@@ -136,7 +136,7 @@ export function AppSidebar() {
 			tags: [],
 			is_pinned: false,
 			is_trashed: false,
-			is_favorited: false,
+			is_favorite: false,
 		});
 	}
 

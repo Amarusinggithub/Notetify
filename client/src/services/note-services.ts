@@ -1,5 +1,5 @@
 import axiosInstance from '../lib/axios';
-import { type CreateNote, type UserNote } from '../types';
+import { type CreateNote, type UpdateUserNotePayload, type UserNote } from '../types';
 
 export const getNotes = async () => {
 	try {
@@ -26,35 +26,27 @@ export const createNote = async (note: CreateNote): Promise<UserNote> => {
 	}
 };
 
-export const updateNote = async (note: UserNote) => {
-	console.log('this');
+export const updateNote = async ({
+	id,
+	payload,
+}: {
+	id: string;
+	payload: UpdateUserNotePayload;
+}) => {
+	console.log('update user request triggered');
 	try {
-		const response = await axiosInstance.put(`notes/${note.id}/`, {
-			id: note.id,
-			note: note.note.id,
+		const response = await axiosInstance.put(`notes/${id}/`, payload);
 
-			note_data: {
-				title: note.note.title,
-				content: note.note.content,
-				users: note.note.users,
-			},
-			user: note.user,
-			tags: note.tags,
-			is_pinned: note.is_pinned,
-			is_trashed: note.is_trashed,
-			is_favorite: note.is_favorite,
-		});
-
-		return response.status;
+		return response.data as UserNote;
 	} catch (error) {
 		console.error(error);
 		throw error;
 	}
 };
 
-export const deleteNote = async (note: UserNote) => {
+export const deleteNote = async (id: string) => {
 	try {
-		const response = await axiosInstance.delete(`notes/${note.id}/`);
+		const response = await axiosInstance.delete(`notes/${id}/`);
 		return response.status;
 	} catch (e) {
 		console.error(e);

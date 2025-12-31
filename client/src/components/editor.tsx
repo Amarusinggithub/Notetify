@@ -19,27 +19,29 @@ import { TextStyleKit } from '@tiptap/extension-text-style';
 import Youtube from '@tiptap/extension-youtube';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { fetchNotesPage, updateNote } from '../lib/notes';
 import type { PaginatedNotesResponse } from '../lib/loaders';
-import type { UserNote } from '../types';
+import { fetchNotesPage, updateNote } from '../lib/notes';
 import { cn } from '../lib/utils';
-import { useNotesStore } from '../stores/use-notes-store';
+import { useStore } from '../stores/index.ts';
+import type { UserNote } from '../types';
 
+import { useEffect, useMemo } from 'react';
+import { useRouteLoaderData } from 'react-router';
 import EditorFooter from './editor-footer';
 import { EditorHeader } from './editor-header';
-import EditorToolbar from './editor-toolbar';
 import { Threads } from './editor-threads';
+import EditorToolbar from './editor-toolbar';
 import suggestion from './suggestion';
 
 export const Editor = () => {
 	const liveblocks = useLiveblocksExtension();
 
-	const { setEditor } = useNotesStore();
-	const selectedNoteId = useNotesStore((s) => s.selectedNoteId);
-	const setSelectedNote = useNotesStore((s) => s.setSelectedNote);
-	const search = useNotesStore((s) => s.search);
-	const sortBy = useNotesStore((s) => s.sortBy);
-	const setNotes = useNotesStore((s) => s.setNotes);
+	const { setEditor } = useStore();
+	const selectedNoteId = useStore((s) => s.selectedNoteId);
+	const setSelectedNote = useStore((s) => s.setSelectedNote);
+	const search = useStore((s) => s.search);
+	const sortBy = useStore((s) => s.sortBy);
+	const setNotes = useStore((s) => s.setNotes);
 	const initialData = useRouteLoaderData('root-notes') as
 		| PaginatedNotesResponse
 		| undefined;
@@ -107,7 +109,7 @@ export const Editor = () => {
 				return old;
 			});
 			try {
-				useNotesStore.getState().upsertNote(updated);
+				useStore.getState().upsertNote(updated);
 			} catch {}
 		},
 	});

@@ -1,17 +1,17 @@
-import { useTheme, type Theme } from '../../stores/use-theme-store';
+import { toast } from 'sonner';
 import { Label } from '../../components/ui/label';
 import { RadioGroup, RadioGroupItem } from '../../components/ui/radio-group';
-import { toast } from 'sonner';
+import { useTheme, type Theme } from '../../stores/slices/theme-slice';
 
 export default function Appearance() {
-  const {theme ,setTheme } = useTheme();
+	const { theme, setTheme } = useTheme();
 
-  const onChange = (value: string) => {
-    setTheme(value as Theme);
-    toast.success(`Theme set to ${value}`);
-  };
+	const onChange = (value: string) => {
+		setTheme(value as Theme);
+		toast.success(`Theme set to ${value}`);
+	};
 
-  return (
+	return (
 		<div className="space-y-4">
 			<Label className="text-sm">Theme</Label>
 			<RadioGroup
@@ -35,4 +35,3 @@ export default function Appearance() {
 		</div>
 	);
 }
-

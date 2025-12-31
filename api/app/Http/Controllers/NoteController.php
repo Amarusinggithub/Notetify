@@ -16,7 +16,7 @@ class NoteController extends Controller
      * @var array<string, string>
      */
     private array $flagColumns = [
-        'is_favorited' => 'favorited_at',
+        'is_favorite' => 'favorited_at',
         'is_pinned' => 'pinned_at',
         'is_trashed' => 'trashed_at',
     ];
@@ -88,7 +88,7 @@ class NoteController extends Controller
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'content' => ['nullable', 'string'],
-            'is_favorited' => ['sometimes', 'boolean'],
+            'is_favorite' => ['sometimes', 'boolean'],
             'is_pinned' => ['sometimes', 'boolean'],
             'is_trashed' => ['sometimes', 'boolean'],
         ]);
@@ -119,7 +119,7 @@ class NoteController extends Controller
         $validated = $request->validate([
             'title' => ['sometimes', 'string', 'max:255'],
             'content' => ['sometimes', 'string', 'nullable'],
-            'is_favorited' => ['sometimes', 'boolean'],
+            'is_favorite' => ['sometimes', 'boolean'],
             'is_pinned' => ['sometimes', 'boolean'],
             'is_trashed' => ['sometimes', 'boolean'],
         ]);
