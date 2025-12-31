@@ -363,41 +363,44 @@ export const Editor = () => {
 				<EditorHeader />
 				<EditorToolbar />
 
-				<div className="flex-1 overflow-auto">
-					{current ? (
-						<div>
-							<DragHandle editor={editor}>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									fill="none"
-									viewBox="0 0 24 24"
-									strokeWidth="1.5"
-									stroke="currentColor"
-								>
-									<path
-										strokeLinecap="round"
-										strokeLinejoin="round"
-										d="M3.75 9h16.5m-16.5 6.75h16.5"
-									/>
-								</svg>
-							</DragHandle>
-							<div className="relative">
-								<EditorContent
-									editor={editor}
-									className={cn(
-										'bg-editor text-editor-foreground mx-auto h-full min-h-full w-full overflow-hidden border-0 shadow-lg',
+				                <div className="flex-1 overflow-auto relative">
+									<div
+										className={cn(
+											'h-full w-full',
+											!current && 'absolute top-0 left-0 invisible h-0 overflow-hidden',
+										)}
+									>
+										<DragHandle editor={editor}>
+											<svg
+												xmlns="http://www.w3.org/2000/svg"
+												fill="none"
+												viewBox="0 0 24 24"
+												strokeWidth="1.5"
+												stroke="currentColor"
+											>
+												<path
+													strokeLinecap="round"
+													strokeLinejoin="round"
+													d="M3.75 9h16.5m-16.5 6.75h16.5"
+												/>
+											</svg>
+										</DragHandle>
+										<div className="relative h-full">
+											<EditorContent
+												editor={editor}
+												className={cn(
+													'bg-editor text-editor-foreground mx-auto h-full min-h-full w-full overflow-hidden border-0 shadow-lg',
+												)}
+											/>
+											{current && <Threads  />}
+										</div>
+									</div>
+									{!current && (
+										<div className="text-muted-foreground flex h-full items-center justify-center text-sm">
+											Select or create a note to get started.
+										</div>
 									)}
-								/>
-								<Threads/>
-							</div>
-						</div>
-					) : (
-						<div className="text-muted-foreground flex h-full items-center justify-center text-sm">
-							Select or create a note to get started.
-						</div>
-					)}
-				</div>
-				<EditorFooter />
+								</div>				<EditorFooter />
 			</div>
 		</NoteEditorProvider>
 	);
