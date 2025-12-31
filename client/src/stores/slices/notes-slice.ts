@@ -55,10 +55,10 @@ export const createNotesSlice: StateCreator<StoreState, [], [], NotesSlice> = (
 		payload?: UpdateUserNotePayload,
 		id?: string
 	) => {
-               
+
 		const existing = get().notes;
 		const idx = existing.findIndex((n: UserNote) => n.id === (note!=null && note!= undefined?note?.id:id));
-		
+
  if (note != null && note != undefined) {
 		if (idx >= 0) {
 			const next = existing.slice();
@@ -70,7 +70,7 @@ export const createNotesSlice: StateCreator<StoreState, [], [], NotesSlice> = (
  }
 
  if(payload != null && payload != undefined && id != null && id != undefined){
-    
+    if (payload)
  }
 
 

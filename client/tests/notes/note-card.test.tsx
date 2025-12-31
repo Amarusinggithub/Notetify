@@ -21,7 +21,7 @@ const userNote = {
 	tags: [],
 	is_pinned_at: null,
 	is_trashed_at: null,
-	favorited_at: null,
+	favorite_at: null,
 	created_at: new Date().toISOString(),
 	updated_at: new Date().toISOString(),
 };

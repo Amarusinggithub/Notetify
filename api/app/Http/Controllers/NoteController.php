@@ -16,7 +16,7 @@ class NoteController extends Controller
      * @var array<string, string>
      */
     private array $flagColumns = [
-        'is_favorite' => 'favorited_at',
+        'is_favorite' => 'favorite_at',
         'is_pinned' => 'pinned_at',
         'is_trashed' => 'trashed_at',
     ];

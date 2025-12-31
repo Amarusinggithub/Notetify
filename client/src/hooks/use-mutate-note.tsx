@@ -7,7 +7,11 @@ import { useRevalidator } from 'react-router';
 import axiosInstance from '../lib/axios.ts';
 import { createNote, deleteNote, updateNote } from '../services/note-services';
 import { useStore } from '../stores/index.ts';
-import { type CreateNote, type UpdateUserNotePayload, type UserNote } from '../types';
+import {
+	type CreateNote,
+	type UpdateUserNotePayload,
+	type UserNote,
+} from '../types';
 
 export const NOTES_QUERY_KEY = ['notes'];
 
@@ -15,7 +19,6 @@ type UpdateNoteInput = {
 	id: string;
 	payload: UpdateUserNotePayload;
 };
-
 
 export function useCreateNote() {
 	const revalidator = useRevalidator();
@@ -52,7 +55,7 @@ export function useCreateNote() {
 				removed_at: undefined,
 				archived_at: undefined,
 				trashed_at: undefined,
-				favorited_at: undefined,
+				favorite_at: undefined,
 				pinned_at: undefined,
 			};
 
@@ -94,7 +97,7 @@ export function useUpdateNote() {
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: ({ id, payload }: UpdateNoteInput) =>
-			updateNote({id, payload}as UpdateNoteInput),
+			updateNote({ id, payload } as UpdateNoteInput),
 		onMutate: async ({ id, payload }: UpdateNoteInput) => {
 			await queryClient.cancelQueries({ queryKey: NOTES_QUERY_KEY });
 			const previous = snapshotNotes(queryClient);
@@ -121,7 +124,7 @@ export function useUpdateNote() {
 				const store = useStore.getState();
 				const existing = store.notes.find((note) => note.id === id);
 				if (existing) {
-					store.upsertNote(undefined , payload, id);
+					store.upsertNote(undefined, payload, id);
 				}
 			} catch {}
 			return { previous };
@@ -149,7 +152,7 @@ export function useDeleteNote() {
 	const revalidator = useRevalidator();
 	const queryClient = useQueryClient();
 	return useMutation({
-		mutationFn: (noteId: string ) => deleteNote(noteId),
+		mutationFn: (noteId: string) => deleteNote(noteId),
 		onMutate: async (noteId) => {
 			await queryClient.cancelQueries({ queryKey: NOTES_QUERY_KEY });
 			const previous = snapshotNotes(queryClient);

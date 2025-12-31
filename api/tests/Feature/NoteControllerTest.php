@@ -82,7 +82,7 @@ class NoteControllerTest extends TestCase
             ->assertJsonPath('note.title', 'Updated title')
             ->assertJsonPath('note.content', 'Updated content')
             ->assertJsonPath('is_favorite', true)
-            ->assertJsonStructure(['favorited_at']);
+            ->assertJsonStructure(['favorite_at']);
     }
 
     public function test_deleting_last_link_removes_note(): void

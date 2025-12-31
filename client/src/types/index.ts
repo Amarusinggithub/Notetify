@@ -94,7 +94,7 @@ export interface UserNote extends Omit<CreateNote, 'note_data'> {
 	removed_at?: string;
 	archived_at?: string;
 	trashed_at?: string;
-	favorited_at?: string;
+	favorite_at?: string;
 	pinned_at?: string;
 	created_at: string;
 	updated_at: string;
@@ -137,7 +137,7 @@ export interface UserNotebook {
 	removed_at?: Date;
 	archived_at?: Date;
 	trashed_at?: Date;
-	favorited_at?: Date;
+	favorite_at?: Date;
 	created_at: Date;
 	updated_at: Date;
 	is_pinned: boolean;
@@ -171,7 +171,7 @@ export interface UserNoteBook {
 	is_trashed: boolean;
 	archived_at?: Date;
 	trashed_at?: Date;
-	favorited_at?: Date;
+	favorite_at?: Date;
 	removed_at?: Date;
 	created_at: Date;
 }

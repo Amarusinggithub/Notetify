@@ -11,14 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Rename column for UserNote table
-        Schema::table('user_note', function (Blueprint $table) {
-            $table->renameColumn('is_favorited', 'is_favorite');
-        });
+        // rename for UserNote table
 
-        // Rename column for UserNotebook table 
+        Schema::table('user_note', function (Blueprint $table) {
+            $table->renameColumn('favorited_at', 'favorite_at');
+
+        });
+        // rename for UserNotebook table
+
         Schema::table('user_notebook', function (Blueprint $table) {
-            $table->renameColumn('is_favorited', 'is_favorite');
+            $table->renameColumn('favorited_at', 'favorite_at');
         });
     }
 
@@ -27,14 +29,16 @@ return new class extends Migration
      */
     public function down(): void
     {
-       // Reverse the rename for UserNote table
-        Schema::table('user_note', function (Blueprint $table) {
-            $table->renameColumn('is_favorite', 'is_favorited');
-        });
+    // Reverse the rename for UserNote table
 
-        // Reverse the rename for UserNotebook table
+        Schema::table('user_note', function (Blueprint $table) {
+            $table->renameColumn( 'favorite_at','favorited_at');
+
+        });
+       // Reverse the rename for UserNotebook table
+
         Schema::table('user_notebook', function (Blueprint $table) {
-            $table->renameColumn('is_favorite', 'is_favorited');
+            $table->renameColumn( 'favorite_at','favorited_at');
         });
     }
 };

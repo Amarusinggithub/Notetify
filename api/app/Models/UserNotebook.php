@@ -17,7 +17,7 @@ class UserNotebook extends Model
         'is_favorite',
         'is_pinned',
         'is_trashed',
-        'favorited_at',
+        'favorite_at',
         'pinned_at',
         'trashed_at'
 

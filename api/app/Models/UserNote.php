@@ -19,7 +19,7 @@ class UserNote extends Model
         'is_favorite',
         'is_pinned',
         'is_trashed',
-        'favorited_at',
+        'favorite_at',
         'pinned_at',
         'trashed_at',
         'order',
@@ -29,7 +29,7 @@ class UserNote extends Model
         'is_favorite' => 'boolean',
         'is_pinned' => 'boolean',
         'is_trashed' => 'boolean',
-        'favorited_at' => 'datetime',
+        'favorite_at' => 'datetime',
         'pinned_at' => 'datetime',
         'trashed_at' => 'datetime',
     ];

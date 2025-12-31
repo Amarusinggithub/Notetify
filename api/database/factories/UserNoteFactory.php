@@ -22,7 +22,7 @@ class UserNoteFactory extends Factory
             'is_favorite' => false,
             'is_pinned' => false,
             'is_trashed' => false,
-            'favorited_at' => null,
+            'favorite_at' => null,
             'pinned_at' => null,
             'trashed_at' => null,
         ];
@@ -32,7 +32,7 @@ class UserNoteFactory extends Factory
     {
         return $this->state(fn () => [
             'is_favorite' => true,
-            'favorited_at' => now(),
+            'favorite_at' => now(),
         ]);
     }
 }
