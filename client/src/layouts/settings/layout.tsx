@@ -28,16 +28,6 @@ const sidebarNavItems: NavItem[] = [
 		href: '/settings/authentication',
 		icon: null,
 	},
-	{
-		title: 'Appearance',
-		href: '/settings/appearance',
-		icon: null,
-	},
-	{
-		title: 'Notifications',
-		href: '/settings/notification',
-		icon: null,
-	},
 ];
 
 export default function SettingsLayout() {
