@@ -50,7 +50,11 @@ out/
 secrets.dev.yaml
 values.dev.yaml
 
-
+# SSL Certificates
+certs/
+*.pem
+*.key
+*.crt
 
 *.log
 .DS_Store

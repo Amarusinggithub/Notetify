@@ -1,25 +1,28 @@
 # syntax=docker/dockerfile:1
 
 ARG NODE_VERSION=22.17.1
+
+
+# Stage 1: Base (Builder)
+
 FROM node:${NODE_VERSION}-alpine AS base
 
-# 1. Enable pnpm (Corepack is included in Node 16+)
+# 1. Enable pnpm
 RUN corepack enable
 
 WORKDIR /usr/src/app
 
 # 2. Copy only package files first for better caching
-COPY package.json package-lock.json pnpm-lock.yam[l] ./
+COPY package.json package-lock.json pnpm-lock.yaml ./
 
 # 3. Install dependencies
-# Using --frozen-lockfile ensures reproducible builds
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
     pnpm install --frozen-lockfile
 
 # 4. Copy the rest of the source code
 COPY . .
 
-# 5. Define Build Arguments (These are required for the Build Step)
+# 5. Define Build Arguments
 ARG VITE_BASE_URL
 ARG VITE_WS_ORIGIN
 ARG VITE_APP_NAME
@@ -31,7 +34,7 @@ ENV VITE_BASE_URL=${VITE_BASE_URL}
 ENV VITE_WS_ORIGIN=${VITE_WS_ORIGIN}
 ENV VITE_APP_NAME=${VITE_APP_NAME}
 
-# Build the application
+# Build the application (Creates /usr/src/app/dist)
 RUN pnpm build
 
 
@@ -40,9 +43,7 @@ RUN pnpm build
 FROM node:${NODE_VERSION}-alpine AS development
 ENV NODE_ENV=development
 
-# Enable pnpm in dev stage too
 RUN corepack enable
-
 WORKDIR /usr/src/app
 
 # Copy dependencies and source from base
@@ -52,17 +53,14 @@ COPY --from=base /usr/src/app .
 COPY entrypoint.sh .
 RUN chmod +x ./entrypoint.sh
 
-# Switch to non-root user
-USER node
-
 EXPOSE 3000
 
 # Use array syntax for better signal handling
-ENTRYPOINT ["sh", "entrypoint.sh"]
+ENTRYPOINT ["/bin/sh", "./entrypoint.sh"]
 
 
 
-# Production Stage
+# Stage 3: Production environment (Nginx)
 
 FROM nginx:stable-alpine AS production
 ENV NODE_ENV=production
@@ -71,20 +69,13 @@ ENV NODE_ENV=production
 RUN rm -rf /usr/share/nginx/html/*
 
 # Copy custom Nginx config
-# (Optimized: Copied directly from source, not passed through 'base')
 COPY ./nginx/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copy built artifacts from the 'base' stage
 COPY --from=base /usr/src/app/dist /usr/share/nginx/html
 
 
-RUN chown -R nginx:nginx /usr/share/nginx/html && \
-    chown -R nginx:nginx /var/cache/nginx && \
-    chown -R nginx:nginx /var/log/nginx && \
-    chown -R nginx:nginx /etc/nginx/conf.d
-
-USER nginx
 
 EXPOSE 80
 
-ENTRYPOINT ["nginx", "-g", "daemon off;"]
+CMD ["nginx", "-g", "daemon off;"]
