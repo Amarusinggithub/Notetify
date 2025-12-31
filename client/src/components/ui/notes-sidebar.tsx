@@ -112,7 +112,7 @@ function NotesSidebarProvider({
 						} as React.CSSProperties
 					}
 					className={cn(
-						'group/sidebar-wrapper has-data-[variant=inset]:bg-sidebar flex min-h-svh w-full',
+						'group/sidebar-wrapper has-data-[variant=inset]:bg-sidebar flex h-full w-full overflow-hidden',
 						className,
 					)}
 					{...props}
@@ -177,7 +177,7 @@ function NotesSidebar({
 			<div
 				data-slot="notes-sidebar-container"
 				className={cn(
-					'relative z-10 hidden h-svh w-[var(--notes-sidebar-width)] transition-[left,right,width] duration-200 ease-linear md:flex',
+					'relative z-10 hidden h-full w-[var(--notes-sidebar-width)] transition-[left,right,width] duration-200 ease-linear md:flex',
 					side === 'left'
 						? 'left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--notes-sidebar-width)*-1)]'
 						: 'right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--notes-sidebar-width)*-1)]',

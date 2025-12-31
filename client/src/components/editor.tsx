@@ -359,7 +359,7 @@ export const Editor = () => {
 
 	return (
 		<NoteEditorProvider editor={editor}>
-			<div className="bg-editor flex h-screen flex-col">
+			<div className="bg-editor flex h-full flex-col">
 				<EditorHeader />
 				<EditorToolbar />
 
@@ -385,7 +385,7 @@ export const Editor = () => {
 								<EditorContent
 									editor={editor}
 									className={cn(
-										'bg-editor text-editor-foreground mx-auto h-full min-h-full w-full border-0 shadow-lg',
+										'bg-editor text-editor-foreground mx-auto h-full min-h-full w-full overflow-hidden border-0 shadow-lg',
 									)}
 								/>
 								<Threads editor={editor} />
