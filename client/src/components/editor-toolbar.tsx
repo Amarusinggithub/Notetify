@@ -11,7 +11,6 @@ import {
 	UnderlineIcon,
 	UndoIcon,
 } from 'lucide-react';
-import { useStore } from '../stores/index.ts';
 import {
 	Toolbar,
 	ToolbarButton,
@@ -23,9 +22,10 @@ import {
 	ToolbarTextColorButton,
 	ToolbarTextHighlightButton,
 } from './ui/toolbar';
+import { useNoteEditor } from '../context/editor-context.tsx';
 
 export default function EditorToolbar() {
-	const { editor } = useStore();
+	const  editor  = useNoteEditor();
 
 	const sections: {
 		label: string;

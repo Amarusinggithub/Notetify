@@ -8,7 +8,6 @@ type SortBy = 'updated_at' | 'created_at' | 'title';
 export type NotesSliceState = {
 	selectedNoteId: string | null;
 	notes: UserNote[];
-	editor: Editor | null;
 	search: string;
 	sortBy: SortBy;
 };
@@ -26,7 +25,6 @@ export type NotesSliceActions = {
 
 	setSearch: (q: string) => void;
 	setSortBy: (s: SortBy) => void;
-	setEditor: (e: Editor | null) => void;
 };
 
 export type NotesSlice = NotesSliceState & NotesSliceActions;
@@ -39,8 +37,6 @@ export const createNotesSlice: StateCreator<StoreState, [], [], NotesSlice> = (
 	notes: [],
 	search: '',
 	sortBy: 'updated_at',
-	editor: null,
-	setEditor: (e: Editor | null) => set({ editor: e }),
 	setSelectedNote: (id: string | null) => set({ selectedNoteId: id }),
 	setNotes: (notes: UserNote[]) => set({ notes }),
 	removeNote: (noteId: string) => {

@@ -27,6 +27,7 @@ import type { UserNote } from '../types';
 
 import { useEffect, useMemo } from 'react';
 import { useRouteLoaderData } from 'react-router';
+import { NoteEditorProvider } from '../context/editor-context.tsx';
 import EditorFooter from './editor-footer';
 import { EditorHeader } from './editor-header';
 import { Threads } from './editor-threads';
@@ -36,7 +37,6 @@ import suggestion from './suggestion';
 export const Editor = () => {
 	const liveblocks = useLiveblocksExtension();
 
-	const { setEditor } = useStore();
 	const selectedNoteId = useStore((s) => s.selectedNoteId);
 	const setSelectedNote = useStore((s) => s.setSelectedNote);
 	const search = useStore((s) => s.search);
@@ -125,16 +125,10 @@ export const Editor = () => {
 		enableContentCheck: true,
 		onContentError: ({ disableCollaboration, editor: currentEditor }) => {
 			disableCollaboration();
-			setEditor(currentEditor);
 		},
-		onCreate: ({ editor: currentEditor }) => {
-			setEditor(currentEditor);
-		},
-		onDestroy: () => {
-			setEditor(null);
-		},
+		onCreate: ({ editor: currentEditor }) => {},
+		onDestroy: () => {},
 		onUpdate: ({ editor: currentEditor }) => {
-			setEditor(currentEditor);
 			// Debounced auto-save
 			if (current) {
 				if ((window as any).__ntf_saveTimer) {
@@ -146,18 +140,10 @@ export const Editor = () => {
 				}, 600);
 			}
 		},
-		onSelectionUpdate: ({ editor: currentEditor }) => {
-			setEditor(currentEditor);
-		},
-		onTransaction: ({ editor: currentEditor }) => {
-			setEditor(currentEditor);
-		},
-		onFocus: ({ editor: currentEditor }) => {
-			setEditor(currentEditor);
-		},
-		onBlur: ({ editor: currentEditor }) => {
-			setEditor(currentEditor);
-		},
+		onSelectionUpdate: ({ editor: currentEditor }) => {},
+		onTransaction: ({ editor: currentEditor }) => {},
+		onFocus: ({ editor: currentEditor }) => {},
+		onBlur: ({ editor: currentEditor }) => {},
 
 		extensions: [
 			liveblocks,
@@ -372,47 +358,47 @@ export const Editor = () => {
 			};*/
 
 	return (
-		<div className="bg-editor flex h-screen flex-col">
-			<EditorHeader />
-			<EditorToolbar />
-			{/*<div>
-				<button onClick={toggleEditable}>Toggle editable</button>
-			</div>*/}
-			<div className="flex-1 overflow-auto">
-				{current ? (
-					<>
-						<DragHandle editor={editor}>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								fill="none"
-								viewBox="0 0 24 24"
-								strokeWidth="1.5"
-								stroke="currentColor"
-							>
-								<path
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									d="M3.75 9h16.5m-16.5 6.75h16.5"
+		<NoteEditorProvider editor={editor}>
+			<div className="bg-editor flex h-screen flex-col">
+				<EditorHeader />
+				<EditorToolbar />
+
+				<div className="flex-1 overflow-auto">
+					{current ? (
+						<div>
+							<DragHandle editor={editor}>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									fill="none"
+									viewBox="0 0 24 24"
+									strokeWidth="1.5"
+									stroke="currentColor"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										d="M3.75 9h16.5m-16.5 6.75h16.5"
+									/>
+								</svg>
+							</DragHandle>
+							<div className="relative">
+								<EditorContent
+									editor={editor}
+									className={cn(
+										'bg-editor text-editor-foreground mx-auto h-full min-h-full w-full border-0 shadow-lg',
+									)}
 								/>
-							</svg>
-						</DragHandle>
-						<div className="relative">
-							<EditorContent
-								editor={editor}
-								className={cn(
-									'bg-editor text-editor-foreground mx-auto h-full min-h-full w-full border-0 shadow-lg',
-								)}
-							/>
-							<Threads editor={editor} />
+								<Threads editor={editor} />
+							</div>
 						</div>
-					</>
-				) : (
-					<div className="text-muted-foreground flex h-full items-center justify-center text-sm">
-						Select or create a note to get started.
-					</div>
-				)}
+					) : (
+						<div className="text-muted-foreground flex h-full items-center justify-center text-sm">
+							Select or create a note to get started.
+						</div>
+					)}
+				</div>
+				<EditorFooter />
 			</div>
-			<EditorFooter />
-		</div>
+		</NoteEditorProvider>
 	);
 };

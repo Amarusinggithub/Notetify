@@ -107,6 +107,7 @@ export default function Notes() {
 		<LiveblocksProvider resolveUsers={resolveUsers} authEndpoint={authEndpoint}>
 			<RoomProvider id={`note-${noteId ?? selectedId ?? 'new'}`}>
 				<ClientSideSuspense fallback={<div>Loading...</div>}>
+                
 					<NotesSidebarProvider defaultOpen={true}>
 						<EditorNotesSidebar />
 						<NotesSidebarInset>
