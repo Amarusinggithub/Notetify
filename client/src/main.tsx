@@ -6,9 +6,10 @@ import 'katex/dist/katex.min.css';
 import './index.css';
 
 import App from './App.tsx';
+import { StrictMode } from 'react';
 
 createRoot(document.getElementById('root')!).render(
-	//<StrictMode>
+	<StrictMode>
 	<App />,
-	//</StrictMode>
+	</StrictMode>
 );

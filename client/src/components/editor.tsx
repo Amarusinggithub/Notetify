@@ -388,7 +388,7 @@ export const Editor = () => {
 										'bg-editor text-editor-foreground mx-auto h-full min-h-full w-full overflow-hidden border-0 shadow-lg',
 									)}
 								/>
-								<Threads editor={editor} />
+								<Threads/>
 							</div>
 						</div>
 					) : (

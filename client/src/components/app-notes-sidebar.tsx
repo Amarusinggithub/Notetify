@@ -176,18 +176,18 @@ export function EditorNotesSidebar() {
 					</div>
 
 					<DropdownMenu>
-						<DropdownMenuTrigger>
-							<Tooltip>
-								<TooltipTrigger asChild>
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<DropdownMenuTrigger asChild>
 									<Button size={'sm'} variant="ghost">
 										<FilterIcon />
 									</Button>
-								</TooltipTrigger>
-								<TooltipContent>
-									<p>Add Filters</p>
-								</TooltipContent>
-							</Tooltip>
-						</DropdownMenuTrigger>
+								</DropdownMenuTrigger>
+							</TooltipTrigger>
+							<TooltipContent>
+								<p>Add Filters</p>
+							</TooltipContent>
+						</Tooltip>
 						<DropdownMenuContent className="min-w-110 p-0">
 							<div className="flex items-center justify-between px-4 py-3">
 								<h4 className="text-sm font-semibold">Add Filters</h4>
@@ -328,18 +328,18 @@ export function EditorNotesSidebar() {
 					</DropdownMenu>
 
 					<DropdownMenu>
-						<DropdownMenuTrigger>
-							<Tooltip>
-								<TooltipTrigger asChild>
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<DropdownMenuTrigger asChild>
 									<Button size={'sm'} variant="ghost">
 										<ArrowUpDown />
 									</Button>
-								</TooltipTrigger>
-								<TooltipContent>
-									<p>Sort Options</p>
-								</TooltipContent>
-							</Tooltip>
-						</DropdownMenuTrigger>
+								</DropdownMenuTrigger>
+							</TooltipTrigger>
+							<TooltipContent>
+								<p>Sort Options</p>
+							</TooltipContent>
+						</Tooltip>
 						<DropdownMenuContent className="min-w-56">
 							<DropdownMenuLabel>Sort by</DropdownMenuLabel>
 							<DropdownMenuRadioGroup

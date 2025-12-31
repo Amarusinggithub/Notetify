@@ -4,9 +4,11 @@ import {
 	FloatingThreads,
 } from '@liveblocks/react-tiptap';
 import { useThreads } from '@liveblocks/react/suspense';
-import { Editor } from '@tiptap/react';
+import { useNoteEditor } from '../context/editor-context';
 
-export function Threads({ editor }: { editor: Editor | null }) {
+export function Threads() {
+	const editor = useNoteEditor();
+
 	const { threads } = useThreads({ query: { resolved: false } });
 
 	return (

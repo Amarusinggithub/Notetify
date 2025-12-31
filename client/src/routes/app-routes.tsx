@@ -50,6 +50,11 @@ function AppRoutes() {
 			id: 'root-notes',
 			loader: notesLoader,
 			Component: AppLayout,
+			HydrateFallback: () => (
+				<div className="flex h-screen items-center justify-center">
+					Loading...
+				</div>
+			),
 			children: [
 				{ index: true, Component: Home },
 				{ path: 'favorites', Component: Favorites },
