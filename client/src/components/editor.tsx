@@ -6,6 +6,7 @@ import {
 } from '@tanstack/react-query';
 import DragHandle from '@tiptap/extension-drag-handle-react';
 import Emoji, { gitHubEmojis } from '@tiptap/extension-emoji';
+import FontFamily from '@tiptap/extension-font-family';
 import Highlight from '@tiptap/extension-highlight';
 import Image from '@tiptap/extension-image';
 import { TaskItem, TaskList } from '@tiptap/extension-list';
@@ -15,7 +16,7 @@ import Subscript from '@tiptap/extension-subscript';
 import Superscript from '@tiptap/extension-superscript';
 import { TableKit } from '@tiptap/extension-table';
 import TextAlign from '@tiptap/extension-text-align';
-import { TextStyleKit } from '@tiptap/extension-text-style';
+import {TextStyle} from '@tiptap/extension-text-style';
 import Youtube from '@tiptap/extension-youtube';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
@@ -37,6 +38,7 @@ import suggestion from './suggestion';
 export const Editor = () => {
 	const liveblocks = useLiveblocksExtension();
 	const isMounted = useRef(false);
+	const lastLoadedId = useRef<string | null>(null);
 
 	useEffect(() => {
 		isMounted.current = true;
@@ -219,23 +221,8 @@ export const Editor = () => {
 				defaultAlignment: 'left',
 				types: ['heading', 'paragraph'],
 			}),
-			TextStyleKit.configure({
-				backgroundColor: {
-					types: ['textStyle'],
-				},
-				color: {
-					types: ['textStyle'],
-				},
-				fontFamily: {
-					types: ['textStyle'],
-				},
-				fontSize: {
-					types: ['textStyle'],
-				},
-				lineHeight: {
-					types: ['textStyle'],
-				},
-			}),
+			TextStyle,
+			FontFamily,
 			Superscript,
 			Subscript,
 
@@ -345,16 +332,22 @@ export const Editor = () => {
 
 	useEffect(() => {
 		if (!editor) return;
-		editor.setEditable(Boolean(current));
-		if (!current) {
+
+		const noteId = current?.id;
+		editor.setEditable(Boolean(noteId));
+
+		if (!noteId) {
 			editor.commands.clearContent(true);
+			lastLoadedId.current = null;
 			return;
 		}
-		const currentContent = current.note?.content ?? '';
-		if (editor.getHTML() !== currentContent) {
+
+		if (lastLoadedId.current !== noteId) {
+			lastLoadedId.current = noteId;
+			const currentContent = current.note?.content ?? '';
 			editor.commands.setContent(currentContent);
 		}
-	}, [editor, current]);
+	}, [editor, current?.id]);
 
 	if (!editor) {
 		return (
