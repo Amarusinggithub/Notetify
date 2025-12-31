@@ -1,4 +1,4 @@
-import { useStore, type StoreState } from 'stores';
+import { useStore, type StoreState } from '../index';
 import { type StateCreator } from 'zustand';
 
 export type Theme = 'dark' | 'light' | 'system';
@@ -32,7 +32,7 @@ export const createThemeSlice : StateCreator<StoreState,[],[],ThemeSlice> = (set
         applyTheme(t);
       },
     });
-  
+
 
 
 // Apply theme immediately on first import in the browser

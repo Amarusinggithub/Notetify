@@ -13,7 +13,7 @@ beforeEach(() => {
 
 	cy.intercept('GET', '/api/notes/', {
 		statusCode: 200,
-	}).as('getNotes');
+	}).as('fetchNotesPage');
 });
 
 describe('this is a test to test data fetching', () => {
@@ -21,7 +21,7 @@ describe('this is a test to test data fetching', () => {
 		cy.visit('http://localhost:5173/');
 		cy.location('pathname').should('equal', '/');
 
-		cy.wait('@getNotes').its('response.statusCode').should('eq', 200);
+		cy.wait('@fetchNotesPage').its('response.statusCode').should('eq', 200);
 		cy.wait('@getTags').its('response.statusCode').should('eq', 200);
 
 		cy.location('pathname').should('equal', '/');

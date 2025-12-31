@@ -19,8 +19,8 @@ import { TextStyleKit } from '@tiptap/extension-text-style';
 import Youtube from '@tiptap/extension-youtube';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import type { PaginatedNotesResponse } from '../lib/loaders';
-import { fetchNotesPage, updateNote } from '../lib/notes';
+import type { PaginatedNotesResponse } from '../components/app-notes-sidebar.tsx';
+import { fetchNotesPage, updateNote } from '../services/note-service.ts';
 import { cn } from '../lib/utils';
 import { useStore } from '../stores/index.ts';
 import type { UserNote } from '../types';
@@ -64,7 +64,7 @@ export const Editor = () => {
 	);
 	const current = useMemo(
 		() =>
-			allNotes.find((n: UserNote) => n.id === selectedNoteId) ?? allNotes[0],
+			allNotes.find((n: UserNote) => n.id === selectedNoteId) ?? allNotes[-1],
 		[allNotes, selectedNoteId],
 	);
 
@@ -83,7 +83,7 @@ export const Editor = () => {
 			if (!current?.id) {
 				return Promise.resolve(current as any);
 			}
-			return updateNote(current.id, { content });
+			return updateNote(current.id, { content:content });
 		},
 		onSuccess: (updated) => {
 			if (!updated) return;
@@ -126,7 +126,9 @@ export const Editor = () => {
 		onContentError: ({ disableCollaboration, editor: currentEditor }) => {
 			disableCollaboration();
 		},
-		onCreate: ({ editor: currentEditor }) => {},
+		onCreate: ({ editor: currentEditor }) => {
+
+        },
 		onDestroy: () => {},
 		onUpdate: ({ editor: currentEditor }) => {
 			// Debounced auto-save

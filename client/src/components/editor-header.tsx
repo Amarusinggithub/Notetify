@@ -287,7 +287,7 @@ export function EditorHeader({
 						<DropdownMenuContent
 							align="end"
 							sideOffset={8}
-							className="w-[360px] border-none bg-transparent p-0 shadow-none"
+							className="w-90 border-none bg-transparent p-0 shadow-none"
 						>
 							<div className="border-border rounded-2xl border bg-white p-4 shadow-xl">
 								<Input
@@ -300,7 +300,7 @@ export function EditorHeader({
 											<Button
 												variant="outline"
 												size="sm"
-												className="h-10 min-w-[160px] justify-between rounded-lg px-3 text-sm font-medium"
+												className="h-10 min-w-40 justify-between rounded-lg px-3 text-sm font-medium"
 											>
 												<span>{inviteRoleLabel}</span>
 												<ChevronDown className="size-4" />
@@ -366,7 +366,7 @@ export function EditorHeader({
 											<Button
 												variant="outline"
 												size="sm"
-												className="h-10 min-w-[160px] justify-between rounded-lg px-3 text-sm font-medium"
+												className="h-10 min-w-40 justify-between rounded-lg px-3 text-sm font-medium"
 											>
 												<span>{linkAccessLabel}</span>
 												<ChevronDown className="size-4" />

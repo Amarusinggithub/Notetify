@@ -1,4 +1,3 @@
-import type { Editor } from '@tiptap/react';
 import type { StoreState } from 'stores';
 import type { StateCreator } from 'zustand';
 import type { UpdateUserNotePayload, UserNote } from '../../types';

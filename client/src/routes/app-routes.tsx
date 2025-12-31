@@ -1,7 +1,6 @@
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router';
 import AppLayout from '../layouts/app-layout';
 import SettingsLayout from '../layouts/settings/layout';
-import { notesLoader } from '../lib/loaders.ts';
 import Calender from '../pages/app/calender';
 import Favorites from '../pages/app/favorites';
 import Files from '../pages/app/files';
@@ -27,6 +26,7 @@ import Billing from '../pages/settings/billing';
 import General from '../pages/settings/general';
 import Notification from '../pages/settings/notification';
 import { useStore } from '../stores/index.ts';
+import { notesLoader } from '../components/app-notes-sidebar.tsx';
 
 function AppRoutes() {
 	const { isAuthenticated, checkingAuth } = useStore();

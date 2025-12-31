@@ -3,10 +3,10 @@ import { toast } from 'sonner';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
-import { useAuthStore } from '../../stores/slices/auth-slice';
+import { useStore } from '../../stores/index';
 
 export default function Account() {
-	const { sharedData, setSharedData } = useAuthStore();
+	const { sharedData, setSharedData } = useStore();
 	const user = sharedData?.auth.user;
 
 	const [firstName, setFirstName] = useState(user?.first_name || '');

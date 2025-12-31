@@ -1,10 +1,11 @@
 import { toast } from 'sonner';
 import { Label } from '../../components/ui/label';
 import { RadioGroup, RadioGroupItem } from '../../components/ui/radio-group';
-import { useTheme, type Theme } from '../../stores/slices/theme-slice';
+import {  type Theme } from '../../stores/slices/theme-slice';
+import { useStore } from '../../stores/index';
 
 export default function Appearance() {
-	const { theme, setTheme } = useTheme();
+	const { theme, setTheme } = useStore();
 
 	const onChange = (value: string) => {
 		setTheme(value as Theme);

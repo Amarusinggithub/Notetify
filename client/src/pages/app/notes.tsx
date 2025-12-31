@@ -13,16 +13,13 @@ import {
 } from '../../components/ui/notes-sidebar';
 import { useCreateNote } from '../../hooks/use-mutate-note';
 import axiosInstance from '../../lib/axios';
-import type { PaginatedNotesResponse } from '../../lib/loaders';
 import { useStore } from '../../stores/index.ts';
 
 
 export default function Notes() {
 	const { noteId } = useParams();
 	const navigate = useNavigate();
-	const initialData = useRouteLoaderData('root-notes') as
-		| PaginatedNotesResponse
-		| undefined;
+	const initialData = useRouteLoaderData('root-notes');
 	const selectedId = useStore((s) => s.selectedNoteId);
 	const setSelected = useStore((s) => s.setSelectedNote);
 	const { mutate: createNote, isPending: isCreating } = useCreateNote();
@@ -107,7 +104,7 @@ export default function Notes() {
 		<LiveblocksProvider resolveUsers={resolveUsers} authEndpoint={authEndpoint}>
 			<RoomProvider id={`note-${noteId ?? selectedId ?? 'new'}`}>
 				<ClientSideSuspense fallback={<div>Loading...</div>}>
-                
+
 					<NotesSidebarProvider defaultOpen={true}>
 						<EditorNotesSidebar />
 						<NotesSidebarInset>

@@ -33,7 +33,7 @@ import { useSuspenseInfiniteQuery } from '@tanstack/react-query';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouteLoaderData } from 'react-router';
 import useDebounce from '../hooks/use-debounce';
-import { fetchNotesPage } from '../lib/notes';
+import { fetchNotesPage } from '../services/note-service.ts';
 import { useStore } from '../stores/index.ts';
 import NoteCard from './note-card';
 import { Input } from './ui/input';
@@ -46,6 +46,34 @@ import {
 } from './ui/select';
 import { Switch } from './ui/switch';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
+
+import { type LoaderFunctionArgs } from 'react-router';
+import axiosInstance from '../lib/axios';
+import { type UserNote } from '../types';
+
+export interface PaginatedNotesResponse {
+	results: UserNote[];
+	nextPage: number | null;
+	hasNextPage: boolean;
+}
+
+export async function notesLoader({
+	request,
+}: LoaderFunctionArgs): Promise<PaginatedNotesResponse> {
+	const url = new URL(request.url);
+	const params = new URLSearchParams(url.search);
+	if (!params.get('page')) {
+		params.set('page', '1');
+	}
+
+	try {
+		const response = await axiosInstance.get(`/notes?${params.toString()}`);
+		return response.data;
+	} catch (error) {
+		console.error('Failed to fetch notes:', error);
+		return { results: [], nextPage: null, hasNextPage: false };
+	}
+}
 
 export function EditorNotesSidebar() {
 	const initialData = useRouteLoaderData('root-notes');
@@ -78,7 +106,7 @@ export function EditorNotesSidebar() {
 
 	const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
 		useSuspenseInfiniteQuery({
-			queryKey: ['notes', search, sortBy],
+			queryKey: ['notes', search, sortBy] as const,
 			queryFn: fetchNotesPage,
 			initialPageParam: 1,
 			initialData: {
@@ -160,7 +188,7 @@ export function EditorNotesSidebar() {
 								</TooltipContent>
 							</Tooltip>
 						</DropdownMenuTrigger>
-						<DropdownMenuContent className="min-w-[440px] p-0">
+						<DropdownMenuContent className="min-w-110 p-0">
 							<div className="flex items-center justify-between px-4 py-3">
 								<h4 className="text-sm font-semibold">Add Filters</h4>
 								<button

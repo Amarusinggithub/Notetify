@@ -14,7 +14,7 @@ beforeEach(() => {
 	cy.intercept('GET', '/api/notes/', {
 		statusCode: 200,
 		body: [{ id: 'n1', title: 'Test', isPinned: true }],
-	}).as('getNotes');
+	}).as('fetchNotesPage');
 	cy.intercept('GET', '/api/tags/', { statusCode: 200 }).as('getTags');
 
 	cy.visit('http://localhost:5173/login');
@@ -29,7 +29,7 @@ describe('Authentication flow', () => {
 
 		cy.wait('@doLogin').its('response.statusCode').should('eq', 200);
 		cy.wait('@getMe');
-		cy.wait('@getNotes');
+		cy.wait('@fetchNotesPage');
 		cy.wait('@getTags');
 
 		cy.location('pathname').should('equal', '/');
