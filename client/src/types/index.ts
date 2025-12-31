@@ -78,7 +78,7 @@ export type CreateNote = {
 		content: string;
 		users: string[];
 	};
-	tags: number[];
+	tags: string[];
 	is_pinned: boolean;
 	is_trashed: boolean;
 	is_favorite: boolean;

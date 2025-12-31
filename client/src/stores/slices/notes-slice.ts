@@ -16,7 +16,11 @@ export type NotesSliceState = {
 export type NotesSliceActions = {
 	setSelectedNote: (id: string | null) => void;
 	setNotes: (notes: UserNote[]) => void;
-	upsertNote: (note?: UserNote, payload?: UpdateUserNotePayload,id?:string)=> void;
+	upsertNote: (
+		note?: UserNote,
+		payload?: UpdateUserNotePayload,
+		id?: string,
+	) => void;
 
 	removeNote: (noteId: string) => void;
 
@@ -53,27 +57,49 @@ export const createNotesSlice: StateCreator<StoreState, [], [], NotesSlice> = (
 	upsertNote: (
 		note?: UserNote,
 		payload?: UpdateUserNotePayload,
-		id?: string
+		id?: string,
 	) => {
-
 		const existing = get().notes;
-		const idx = existing.findIndex((n: UserNote) => n.id === (note!=null && note!= undefined?note?.id:id));
+		const idx = existing.findIndex(
+			(n: UserNote) =>
+				n.id === (note != null && note != undefined ? note?.id : id),
+		);
 
- if (note != null && note != undefined) {
-		if (idx >= 0) {
-			const next = existing.slice();
-			next[idx] = note;
-			set({ notes: next });
-		} else {
-			set({ notes: [note, ...existing] });
+		if (note != null && note != undefined) {
+			if (idx >= 0) {
+				const next = existing.slice();
+				next[idx] = note;
+				set({ notes: next });
+			} else {
+				set({ notes: [note, ...existing] });
+			}
 		}
- }
 
- if(payload != null && payload != undefined && id != null && id != undefined){
-    if (payload)
- }
+		if (
+			payload != null &&
+			payload != undefined &&
+			id != null &&
+			id != undefined
+		) {
+			if (idx >= 0) {
+				const next = existing.slice();
+				let existingNote = next[idx];
 
+				const { title, content, ...rootPayload } = payload;
 
+				next[idx] = {
+					...existingNote,
+					...rootPayload, // Updates is_favorite, is_pinned, tags, etc.
+					note: {
+						...existingNote.note,
+						...(title !== undefined && { title:title ??''}),
+						...(content !== undefined && {content: content ??''}),
+					},
+				};
+
+				set({ notes: next });
+			}
+		}
 	},
 	setSearch: (q: string) => set({ search: q }),
 	setSortBy: (s: SortBy) => set({ sortBy: s }),
