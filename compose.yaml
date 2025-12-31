@@ -2,7 +2,7 @@ services:
   db:
     networks:
       - notetify-net
-    image: postgres:latest
+    image: postgres:17-alpine
     container_name: notetify-db
     healthcheck:
       test: [ "CMD", "pg_isready" ]
@@ -54,11 +54,11 @@ services:
       context: ./api
       dockerfile: Dockerfile
       target: development
-    command: sh ./entrypoint.dev.sh
     container_name: notetify-api
     restart: always
+    command: ["/usr/local/bin/entrypoint.dev.sh", "apache2-foreground"]
     ports:
-      - "8000:8000"
+      - "8000:80"
     depends_on:
       db:
         condition: service_healthy
@@ -66,6 +66,26 @@ services:
         condition: service_healthy
     env_file:
       - .env.development
+    volumes:
+      - ./api:/var/www/html
+
+  queue:
+    networks:
+      - notetify-net
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+      target: development
+    container_name: notetify-queue
+    restart: always
+    command: ["/usr/local/bin/entrypoint.dev.sh", "php", "artisan", "queue:work", "--tries=3", "--timeout=90"]
+    depends_on:
+      api:
+        condition: service_started
+    env_file:
+      - .env.development
+    volumes:
+      - ./api:/var/www/html
 
   client:
     networks:
@@ -75,10 +95,11 @@ services:
       dockerfile: Dockerfile
       target: development
       args:
-      - VITE_BASE_URL= http://0.0.0.0:8000/api/
-      - VITE_WS_ORIGIN= ws://0.0.0.0:8000
-      - VITE_APP_NAME= Notetify
-      - VITE_CLIENT_URL= http://0.0.0.0:5173/
+      # Use localhost for browser access
+      - VITE_BASE_URL=http://localhost:8000/api/
+      - VITE_WS_ORIGIN=ws://localhost:8000
+      - VITE_APP_NAME=Notetify
+      - VITE_CLIENT_URL=http://localhost:3000/
     container_name: notetify-client
     ports:
       - "3000:3000"
@@ -92,12 +113,12 @@ services:
       - node_modules_client:/usr/src/app/node_modules
     stdin_open: true
     tty: true
-    command: ["sh", "entrypoint.sh"]
+    command: ["/bin/sh", "./entrypoint.sh"]
     environment:
-      VITE_BASE_URL: ${VITE_BASE_URL}
-      VITE_WS_ORIGIN: ${VITE_WS_ORIGIN}
-      VITE_APP_NAME: ${VITE_APP_NAME}
-      VITE_CLIENT_URL: ${VITE_CLIENT_URL}
+      - VITE_BASE_URL=http://localhost:8000/api/
+      - VITE_WS_ORIGIN=ws://localhost:8000
+      - VITE_APP_NAME=Notetify
+      - VITE_CLIENT_URL=http://localhost:3000/
     env_file:
       - .env.development
 
@@ -110,7 +131,6 @@ volumes:
   db-data: {}
   node_modules_client: {}
 
-
-# secrets:
-#   db-password:
-#     file: db/password.txt
+secrets:
+  db-password:
+    file: db/password.txt

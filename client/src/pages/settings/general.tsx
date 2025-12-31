@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
@@ -34,21 +34,19 @@ const General = () => {
 	const email = user?.email || '';
 
 	// Notification State
-	const [notifPrefs, setNotifPrefs] = useState<NotificationPrefs>({
-		email: true,
-		push: false,
-		marketing: false,
+	const [notifPrefs, setNotifPrefs] = useState<NotificationPrefs>(() => {
+		try {
+			const raw = localStorage.getItem(STORAGE_KEY_NOTIFICATIONS);
+			if (raw) return JSON.parse(raw);
+		} catch {}
+		return {
+			email: true,
+			push: false,
+			marketing: false,
+		};
 	});
 
 	// Preferences State
-	const [language, setLanguage] = useState('en');
-
-	useEffect(() => {
-		try {
-			const raw = localStorage.getItem(STORAGE_KEY_NOTIFICATIONS);
-			if (raw) setNotifPrefs(JSON.parse(raw));
-		} catch {}
-	}, []);
 
 	const onSaveProfile = (e: React.FormEvent) => {
 		e.preventDefault();

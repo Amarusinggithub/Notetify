@@ -2,7 +2,7 @@ services:
   db_prod:
     networks:
       - notetify-net-prod
-    image: postgres:latest
+    image: postgres:17-alpine
     container_name: notetify-db-prod
     healthcheck:
       test: [ "CMD", "pg_isready" ]

@@ -3,7 +3,7 @@ services:
     image: postgres:17-alpine
     container_name: notetify-db-dev
     networks:
-      notetify-net-dev:
+      - notetify-net-dev
     healthcheck:
       test: ["CMD", "pg_isready"]
       interval: 10s
@@ -30,7 +30,7 @@ services:
     image: redis:8.0.1-alpine
     container_name: notetify-redis-cache-dev
     networks:
-      notetify-net-dev:
+      - notetify-net-dev
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -60,12 +60,29 @@ services:
       redis_dev:
         condition: service_healthy
     volumes:
-      - ./api:/app
+      - ./api:/var/www/html
     ports:
-      - "8000:8000"
+      - "8000:80"
     env_file:
       - .env.development
-    command: sh ./entrypoint.dev.sh
+    command: ["/usr/local/bin/entrypoint.dev.sh", "apache2-foreground"]
+
+  queue_dev:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+      target: development
+    container_name: notetify-queue-dev
+    networks:
+      - notetify-net-dev
+    depends_on:
+      api_dev:
+        condition: service_started
+    volumes:
+      - ./api:/var/www/html
+    env_file:
+      - .env.development
+    command: ["/usr/local/bin/entrypoint.dev.sh", "php", "artisan", "queue:work", "--tries=3", "--timeout=90"]
 
   client_dev:
     build:
@@ -73,10 +90,10 @@ services:
       dockerfile: Dockerfile
       target: development
       args:
-        - VITE_BASE_URL= http://0.0.0.0:8000/api/
-        - VITE_WS_ORIGIN= ws://0.0.0.0:8000
-        - VITE_APP_NAME= Notetify
-        - VITE_CLIENT_URL= http://0.0.0.0:5173/
+        - VITE_BASE_URL=http://localhost:8000/api/
+        - VITE_WS_ORIGIN=ws://localhost:8000
+        - VITE_APP_NAME=Notetify
+        - VITE_CLIENT_URL=http://localhost:3000/
     container_name: notetify-client-dev
     networks:
       - notetify-net-dev
@@ -89,13 +106,13 @@ services:
     ports:
       - "3000:3000"
     environment:
-      VITE_BASE_URL: ${VITE_BASE_URL}
-      VITE_WS_ORIGIN: ${VITE_WS_ORIGIN}
-      VITE_APP_NAME: ${VITE_APP_NAME}
-      VITE_CLIENT_URL: ${VITE_CLIENT_URL}
+      - VITE_BASE_URL=http://localhost:8000/api/
+      - VITE_WS_ORIGIN=ws://localhost:8000
+      - VITE_APP_NAME=Notetify
+      - VITE_CLIENT_URL=http://localhost:3000/
     env_file:
       - .env.development
-    command: ["sh", "entrypoint.sh"]
+    command: ["/bin/sh", "./entrypoint.sh"]
 
 networks:
   notetify-net-dev:
