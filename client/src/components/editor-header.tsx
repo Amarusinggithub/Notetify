@@ -232,9 +232,7 @@ export function EditorHeader({
 								disabled={!currentNote || updateNoteMutation.isPending}
 								onClick={handleFavoriteToggle}
 								aria-label={
-									currentNote?.is_favorite
-										? 'Unfavorite note'
-										: 'Favorite note'
+									currentNote?.is_favorite ? 'Unfavorite note' : 'Favorite note'
 								}
 							>
 								<Star

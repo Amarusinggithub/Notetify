@@ -15,7 +15,6 @@ import { useCreateNote } from '../../hooks/use-mutate-note';
 import axiosInstance from '../../lib/axios';
 import { useStore } from '../../stores/index.ts';
 
-
 export default function Notes() {
 	const { noteId } = useParams();
 	const navigate = useNavigate();
@@ -104,7 +103,6 @@ export default function Notes() {
 		<LiveblocksProvider resolveUsers={resolveUsers} authEndpoint={authEndpoint}>
 			<RoomProvider id={`note-${noteId ?? selectedId ?? 'new'}`}>
 				<ClientSideSuspense fallback={<div>Loading...</div>}>
-
 					<NotesSidebarProvider defaultOpen={true}>
 						<EditorNotesSidebar />
 						<NotesSidebarInset>

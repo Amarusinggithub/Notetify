@@ -520,7 +520,7 @@ html {
 html,
 body,
 #root {
-  height: 100%;
+	height: 100%;
 }
 /* Cross-browser scrollbar hide for the page
 html { scrollbar-width: none; -ms-overflow-style: none; }

@@ -1,14 +1,9 @@
+import { Bell, Plus } from 'lucide-react';
 import { Button } from './ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
-import {
-  Bell,
-
-
-  Plus,
-} from 'lucide-react';
 
 export default function EditorFooter() {
-  return (
+	return (
 		<footer className="bg-editor text-editor-foreground border-editor-border sticky bottom-0 z-10 w-full border-t">
 			<div className="mx-auto flex max-w-5xl items-center justify-between gap-2 px-4 py-2">
 				<div className="flex items-center gap-1">

@@ -1,5 +1,6 @@
 import { formatDistanceToNow } from 'date-fns';
 import { Star } from 'lucide-react';
+import { useNavigate } from 'react-router';
 import { useStore } from '../stores/index.ts';
 import type { UserNote } from '../types';
 import {
@@ -15,8 +16,8 @@ type NoteCardProp = {
 };
 
 const NoteCard = ({ userNote }: NoteCardProp) => {
+	const navigate = useNavigate();
 	const selectedId = useStore((s) => s.selectedNoteId);
-	const setSelected = useStore((s) => s.setSelectedNote);
 
 	const isActive = selectedId === userNote.id;
 	const preview = getPreview(userNote.note.content ?? '');
@@ -28,7 +29,7 @@ const NoteCard = ({ userNote }: NoteCardProp) => {
 
 	return (
 		<Card
-			onClick={() => setSelected(userNote.id)}
+			onClick={() => navigate(`/notes/${userNote.id}`)}
 			className={isActive ? 'border-ring' : undefined}
 		>
 			<CardHeader className="flex flex-row items-center justify-between">

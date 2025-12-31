@@ -1,9 +1,14 @@
 import type { QueryFunctionContext } from '@tanstack/react-query';
-import type { CreateNote, UpdateUserNotePayload, UserNote } from '../types';
-import axiosInstance from '../lib/axios';
 import type { PaginatedNotesResponse } from '../components/app-notes-sidebar';
+import axiosInstance from '../lib/axios';
+import type { CreateNote, UpdateUserNotePayload, UserNote } from '../types';
 
-export type SortBy = 'updated_at' | 'created_at' | 'title' | 'is_favorite'| 'is_pinned';
+export type SortBy =
+	| 'updated_at'
+	| 'created_at'
+	| 'title'
+	| 'is_favorite'
+	| 'is_pinned';
 
 /*
 type NotesQueryContext =

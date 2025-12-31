@@ -1,8 +1,8 @@
 import { toast } from 'sonner';
 import { Label } from '../../components/ui/label';
 import { RadioGroup, RadioGroupItem } from '../../components/ui/radio-group';
-import {  type Theme } from '../../stores/slices/theme-slice';
 import { useStore } from '../../stores/index';
+import { type Theme } from '../../stores/slices/theme-slice';
 
 export default function Appearance() {
 	const { theme, setTheme } = useStore();

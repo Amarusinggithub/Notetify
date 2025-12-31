@@ -87,8 +87,8 @@ export const createNotesSlice: StateCreator<StoreState, [], [], NotesSlice> = (
 					...rootPayload, // Updates is_favorite, is_pinned, tags, etc.
 					note: {
 						...existingNote.note,
-						...(title !== undefined && { title:title ??''}),
-						...(content !== undefined && {content: content ??''}),
+						...(title !== undefined && { title: title ?? '' }),
+						...(content !== undefined && { content: content ?? '' }),
 					},
 				};
 

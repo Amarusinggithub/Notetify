@@ -7,7 +7,7 @@ export default function Tasks() {
 					Track upcoming todos and assign actions to keep work moving.
 				</p>
 			</header>
-			<div className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
+			<div className="text-muted-foreground rounded-lg border border-dashed p-6 text-center text-sm">
 				You don&apos;t have any tasks yet.
 			</div>
 		</section>

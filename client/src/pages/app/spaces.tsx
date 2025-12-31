@@ -4,11 +4,11 @@ export default function Spaces() {
 			<header>
 				<h1 className="text-2xl font-semibold">Spaces</h1>
 				<p className="text-muted-foreground">
-					Organize collaborative areas for your team. Create a new space to
-					get started.
+					Organize collaborative areas for your team. Create a new space to get
+					started.
 				</p>
 			</header>
-			<div className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
+			<div className="text-muted-foreground rounded-lg border border-dashed p-6 text-center text-sm">
 				No spaces yet. Come back soon!
 			</div>
 		</section>

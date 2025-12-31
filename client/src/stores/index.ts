@@ -1,11 +1,18 @@
 import { create } from 'zustand';
-import { createJSONStorage, devtools, persist, subscribeWithSelector } from 'zustand/middleware';
+import {
+	createJSONStorage,
+	devtools,
+	persist,
+	subscribeWithSelector,
+} from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import {applyTheme} from './slices/theme-slice';
-import { createNotesSlice, type NotesSlice } from './slices/notes-slice';
 import { createAuthSlice, type AuthSlice } from './slices/auth-slice';
-import { createThemeSlice, type ThemeSlice } from './slices/theme-slice';
-
+import { createNotesSlice, type NotesSlice } from './slices/notes-slice';
+import {
+	applyTheme,
+	createThemeSlice,
+	type ThemeSlice,
+} from './slices/theme-slice';
 
 export type StoreState = NotesSlice & AuthSlice & ThemeSlice;
 

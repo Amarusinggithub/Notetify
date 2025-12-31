@@ -7,7 +7,7 @@ export default function Calender() {
 					Plan upcoming work and see tasks alongside scheduled events.
 				</p>
 			</header>
-			<div className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
+			<div className="text-muted-foreground rounded-lg border border-dashed p-6 text-center text-sm">
 				Calendar integrations coming soon.
 			</div>
 		</section>

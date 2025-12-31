@@ -7,17 +7,16 @@ import { TagProvider } from './hooks/use-mutate-tag.tsx';
 import ErrorFallback from './pages/error.tsx';
 import AppRoutes from './routes/app-routes.tsx';
 
-
 export default function App() {
-    const queryClient = new QueryClient();
+	const queryClient = new QueryClient();
 
-    return (
-            <ErrorBoundary FallbackComponent={ErrorFallback}>
-                <QueryClientProvider client={queryClient}>
-                            <TagProvider>
-                                <AppRoutes />
-                            </TagProvider>
-                </QueryClientProvider>
-            </ErrorBoundary>
-    );
+	return (
+		<ErrorBoundary FallbackComponent={ErrorFallback}>
+			<QueryClientProvider client={queryClient}>
+				<TagProvider>
+					<AppRoutes />
+				</TagProvider>
+			</QueryClientProvider>
+		</ErrorBoundary>
+	);
 }

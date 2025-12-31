@@ -17,8 +17,8 @@ import {
 } from 'lucide-react';
 import React, { useState } from 'react';
 import { CompactPicker, type ColorResult } from 'react-color';
-import { cn } from '../../lib/utils';
 import { useNoteEditor } from '../../context/editor-context.tsx';
+import { cn } from '../../lib/utils';
 import { Button } from './button';
 import {
 	DropdownMenu,

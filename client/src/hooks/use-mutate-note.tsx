@@ -5,7 +5,11 @@ import {
 } from '@tanstack/react-query';
 import { useRevalidator } from 'react-router';
 import axiosInstance from '../lib/axios.ts';
-import { createNote, deleteNote, updateNote } from '../services/note-service.ts';
+import {
+	createNote,
+	deleteNote,
+	updateNote,
+} from '../services/note-service.ts';
 import { useStore } from '../stores/index.ts';
 import {
 	type CreateNote,
@@ -96,8 +100,7 @@ export function useUpdateNote() {
 	const revalidator = useRevalidator();
 	const queryClient = useQueryClient();
 	return useMutation({
-		mutationFn: ({ id, payload }: UpdateNoteInput) =>
-			updateNote( id, payload  ),
+		mutationFn: ({ id, payload }: UpdateNoteInput) => updateNote(id, payload),
 		onMutate: async ({ id, payload }: UpdateNoteInput) => {
 			await queryClient.cancelQueries({ queryKey: NOTES_QUERY_KEY });
 			const previous = snapshotNotes(queryClient);

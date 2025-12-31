@@ -1,4 +1,5 @@
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router';
+import { notesLoader } from '../components/app-notes-sidebar.tsx';
 import AppLayout from '../layouts/app-layout';
 import SettingsLayout from '../layouts/settings/layout';
 import Calender from '../pages/app/calender';
@@ -26,7 +27,6 @@ import Billing from '../pages/settings/billing';
 import General from '../pages/settings/general';
 import Notification from '../pages/settings/notification';
 import { useStore } from '../stores/index.ts';
-import { notesLoader } from '../components/app-notes-sidebar.tsx';
 
 function AppRoutes() {
 	const { isAuthenticated, checkingAuth } = useStore();

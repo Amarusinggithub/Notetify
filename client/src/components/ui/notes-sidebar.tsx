@@ -257,23 +257,23 @@ function NotesSidebarRail({
 }
 
 function NotesSidebarInset({
-    className,
-    ...props
+	className,
+	...props
 }: React.ComponentProps<'main'>) {
-    return (
-        <main
-            data-slot="notes-sidebar-inset"
-            className={cn(
-                'bg-background relative flex w-full flex-1 flex-col',
-                // Inset styling when notes list is open
-                'md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow-sm',
-                // When the notes sidebar is collapsed, remove the inset gap entirely
-                'md:peer-data-[variant=inset]:peer-data-[state=collapsed]:m-0 md:peer-data-[variant=inset]:peer-data-[state=collapsed]:rounded-none md:peer-data-[variant=inset]:peer-data-[state=collapsed]:shadow-none',
-                className,
-            )}
-            {...props}
-        />
-    );
+	return (
+		<main
+			data-slot="notes-sidebar-inset"
+			className={cn(
+				'bg-background relative flex w-full flex-1 flex-col',
+				// Inset styling when notes list is open
+				'md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow-sm',
+				// When the notes sidebar is collapsed, remove the inset gap entirely
+				'md:peer-data-[variant=inset]:peer-data-[state=collapsed]:m-0 md:peer-data-[variant=inset]:peer-data-[state=collapsed]:rounded-none md:peer-data-[variant=inset]:peer-data-[state=collapsed]:shadow-none',
+				className,
+			)}
+			{...props}
+		/>
+	);
 }
 
 function NotesSidebarHeader({
@@ -343,7 +343,7 @@ export {
 	NotesSidebarInset,
 	NotesSidebarProvider,
 	NotesSidebarRail,
+	NotesSidebarSeparator,
 	NotesSidebarTrigger,
 	useNotesSidebar,
-	NotesSidebarSeparator,
 };
