@@ -485,7 +485,7 @@ function ToolbarFontFamilyMenuButton() {
 					<DropdownMenuTrigger asChild>
 						<button
 							className={cn(
-								'hover:bg-editor-accent hover:text-editor-accent-foreground flex h-7 w-[120px] shrink-0 items-center justify-between overflow-hidden rounded-sm px-1.5 text-sm transition-colors',
+								'hover:bg-editor-accent hover:text-editor-accent-foreground flex h-7 w-30 shrink-0 items-center justify-between overflow-hidden rounded-sm px-1.5 text-sm transition-colors',
 							)}
 						>
 							<span className="truncate">

@@ -25,7 +25,7 @@ import { fetchNotesPage, updateNote } from '../services/note-service.ts';
 import { useStore } from '../stores/index.ts';
 import type { UserNote } from '../types';
 
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useRouteLoaderData } from 'react-router';
 import { NoteEditorProvider } from '../context/editor-context.tsx';
 import EditorFooter from './editor-footer';
@@ -36,6 +36,14 @@ import suggestion from './suggestion';
 
 export const Editor = () => {
 	const liveblocks = useLiveblocksExtension();
+	const isMounted = useRef(false);
+
+	useEffect(() => {
+		isMounted.current = true;
+		return () => {
+			isMounted.current = false;
+		};
+	}, []);
 
 	const selectedNoteId = useStore((s) => s.selectedNoteId);
 	const setSelectedNote = useStore((s) => s.setSelectedNote);
@@ -126,8 +134,12 @@ export const Editor = () => {
 		onContentError: ({ disableCollaboration, editor: currentEditor }) => {
 			disableCollaboration();
 		},
-		onCreate: ({ editor: currentEditor }) => {},
-		onDestroy: () => {},
+		onCreate: ({ editor: currentEditor }) => {
+			isMounted.current = true;
+		},
+		onDestroy: () => {
+			isMounted.current = false;
+		},
 		onUpdate: ({ editor: currentEditor }) => {
 			// Debounced auto-save
 			if (current) {
@@ -335,7 +347,7 @@ export const Editor = () => {
 		if (!editor) return;
 		editor.setEditable(Boolean(current));
 		if (!current) {
-			editor.commands.clearContent(true, { emitUpdate: false });
+			editor.commands.clearContent(true);
 			return;
 		}
 		const currentContent = current.note?.content ?? '';
@@ -362,45 +374,45 @@ export const Editor = () => {
 			<div className="bg-editor flex h-full flex-col">
 				<EditorHeader />
 				<EditorToolbar />
-
-				                <div className="flex-1 overflow-auto relative">
-									<div
-										className={cn(
-											'h-full w-full',
-											!current && 'absolute top-0 left-0 invisible h-0 overflow-hidden',
-										)}
-									>
-										<DragHandle editor={editor}>
-											<svg
-												xmlns="http://www.w3.org/2000/svg"
-												fill="none"
-												viewBox="0 0 24 24"
-												strokeWidth="1.5"
-												stroke="currentColor"
-											>
-												<path
-													strokeLinecap="round"
-													strokeLinejoin="round"
-													d="M3.75 9h16.5m-16.5 6.75h16.5"
-												/>
-											</svg>
-										</DragHandle>
-										<div className="relative h-full">
-											<EditorContent
-												editor={editor}
-												className={cn(
-													'bg-editor text-editor-foreground mx-auto h-full min-h-full w-full overflow-hidden border-0 shadow-lg',
-												)}
-											/>
-											{current && <Threads  />}
-										</div>
-									</div>
-									{!current && (
-										<div className="text-muted-foreground flex h-full items-center justify-center text-sm">
-											Select or create a note to get started.
-										</div>
-									)}
-								</div>				<EditorFooter />
+				<div className="relative flex-1 overflow-auto">
+					<div
+						className={cn(
+							'h-full w-full',
+							!current && 'invisible absolute top-0 left-0 h-0 overflow-hidden',
+						)}
+					>
+						<DragHandle editor={editor}>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								fill="none"
+								viewBox="0 0 24 24"
+								strokeWidth="1.5"
+								stroke="currentColor"
+							>
+								<path
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									d="M3.75 9h16.5m-16.5 6.75h16.5"
+								/>
+							</svg>
+						</DragHandle>
+						<div className="relative h-full">
+							<EditorContent
+								editor={editor}
+								className={cn(
+									'bg-editor text-editor-foreground mx-auto h-full min-h-full w-full overflow-hidden border-0 shadow-lg',
+								)}
+							/>
+							{current && isMounted.current && <Threads />}
+						</div>{' '}
+					</div>
+					{!current && (
+						<div className="text-muted-foreground flex h-full items-center justify-center text-sm">
+							Select or create a note to get started.
+						</div>
+					)}
+				</div>{' '}
+				<EditorFooter />
 			</div>
 		</NoteEditorProvider>
 	);

@@ -9,7 +9,7 @@ import { TooltipProvider } from './tooltip';
 const NOTES_SIDEBAR_COOKIE_NAME = 'sidebar_state';
 const NOTES_SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 const NOTES_SIDEBAR_WIDTH = '20rem';
-const NOTES_SIDEBAR_WIDTH_MOBILE = '18rem';
+//const NOTES_SIDEBAR_WIDTH_MOBILE = '18rem';
 const NOTES_SIDEBAR_WIDTH_ICON = '3rem';
 
 type NotesSidebarContextProps = {
@@ -112,7 +112,7 @@ function NotesSidebarProvider({
 						} as React.CSSProperties
 					}
 					className={cn(
-						'group/sidebar-wrapper has-data-[variant=inset]:bg-sidebar flex h-full w-full overflow-hidden',
+						'group/sidebar-wrapper has-data-[variant=inset]:bg-sidebar flex h-svh w-full overflow-hidden',
 						className,
 					)}
 					{...props}
@@ -143,7 +143,7 @@ function NotesSidebar({
 			<div
 				data-slot="notes-sidebar"
 				className={cn(
-					'bg-sidebar text-sidebar-foreground flex h-full w-[var(--notes-sidebar-width)] flex-col',
+					'bg-sidebar text-sidebar-foreground flex h-full w-(--notes-sidebar-width) flex-col',
 					className,
 				)}
 				{...props}
@@ -166,18 +166,18 @@ function NotesSidebar({
 			<div
 				data-slot="notes-sidebar-gap"
 				className={cn(
-					'relative w-[var(--notes-sidebar-width)] bg-transparent transition-[width] duration-200 ease-linear',
+					'relative w-(--notes-sidebar-width) bg-transparent transition-[width] duration-200 ease-linear',
 					'group-data-[collapsible=offcanvas]:w-0',
 					'group-data-[side=right]:rotate-180',
 					variant === 'floating' || variant === 'inset'
 						? 'group-data-[collapsible=icon]:w-[calc(var(--notes-sidebar-width-icon)+(--spacing(4)))]'
-						: 'group-data-[collapsible=icon]:w-[var(--notes-sidebar-width-icon)]',
+						: 'group-data-[collapsible=icon]:w-(--notes-sidebar-width-icon)',
 				)}
 			/>
 			<div
 				data-slot="notes-sidebar-container"
 				className={cn(
-					'relative z-10 hidden h-full w-[var(--notes-sidebar-width)] transition-[left,right,width] duration-200 ease-linear md:flex',
+					'relative z-10 hidden h-svh w-(--notes-sidebar-width) transition-[left,right,width] duration-200 ease-linear md:flex',
 					side === 'left'
 						? 'left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--notes-sidebar-width)*-1)]'
 						: 'right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--notes-sidebar-width)*-1)]',
@@ -185,7 +185,7 @@ function NotesSidebar({
 					// Adjust the padding for floating and inset variants.
 					variant === 'floating' || variant === 'inset'
 						? 'p-2 group-data-[collapsible=icon]:w-[calc(var(--notes-sidebar-width-icon)+(--spacing(4))+2px)]'
-						: 'group-data-[collapsible=icon]:w-[var(--notes-sidebar-width-icon)] group-data-[side=left]:border-r group-data-[side=right]:border-l',
+						: 'group-data-[collapsible=icon]:w-(--notes-sidebar-width-icon) group-data-[side=left]:border-r group-data-[side=right]:border-l',
 					className,
 				)}
 				{...props}
@@ -243,7 +243,7 @@ function NotesSidebarRail({
 			onClick={toggleSidebar}
 			title="Toggle Sidebar"
 			className={cn(
-				'hover:after:bg-sidebar-border absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-linear group-data-[side=left]:-right-4 group-data-[side=right]:left-0 after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] sm:flex',
+				'hover:after:bg-sidebar-border absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-linear group-data-[side=left]:-right-4 group-data-[side=right]:left-0 after:absolute after:inset-y-0 after:left-1/2 after:w-0.5 sm:flex',
 				'in-data-[side=left]:cursor-w-resize in-data-[side=right]:cursor-e-resize',
 				'[[data-side=left][data-state=collapsed]_&]:cursor-e-resize [[data-side=right][data-state=collapsed]_&]:cursor-w-resize',
 				'hover:group-data-[collapsible=offcanvas]:bg-sidebar group-data-[collapsible=offcanvas]:translate-x-0 group-data-[collapsible=offcanvas]:after:left-full',
