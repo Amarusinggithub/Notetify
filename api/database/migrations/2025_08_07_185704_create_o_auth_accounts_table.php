@@ -11,9 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('o_auth_accounts', function (Blueprint $table) {
-$table->uuid('id')->primary();
+        Schema::create('oauth_accounts', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->foreignUuid('user_id')->constrained()->cascadeOnDelete();
+            $table->string('provider');
+            $table->string('provider_user_id');
+            $table->text('access_token')->nullable();
+            $table->text('refresh_token')->nullable();
+            $table->timestamp('token_expires_at')->nullable();
+            $table->string('name')->nullable();
+            $table->string('email')->nullable();
+            $table->string('avatar')->nullable();
             $table->timestamps();
+
+            $table->unique(['provider', 'provider_user_id']);
+            $table->index(['user_id', 'provider']);
         });
     }
 
@@ -22,6 +34,6 @@ $table->uuid('id')->primary();
      */
     public function down(): void
     {
-        Schema::dropIfExists('o_auth_accounts');
+        Schema::dropIfExists('oauth_accounts');
     }
 };

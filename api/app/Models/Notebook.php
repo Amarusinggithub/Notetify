@@ -38,4 +38,11 @@ class Notebook extends Model
         ->withTimestamps();
     }
 
+    // spaces
+    public function spaces()
+    {
+        return $this->belongsToMany(Space::class, 'space_notebook')
+            ->withPivot('order')
+            ->withTimestamps();
+    }
 }

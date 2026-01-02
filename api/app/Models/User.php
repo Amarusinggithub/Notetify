@@ -115,4 +115,28 @@ public function sharedNotebooks()
                 ->withPivot('permission', 'expires_at', 'accepted')
                 ->withTimestamps();
 }
+
+    // spaces
+    public function spaces()
+    {
+        return $this->hasMany(Space::class);
+    }
+
+    // tasks
+    public function tasks()
+    {
+        return $this->hasMany(Task::class);
+    }
+
+    // oauth_accounts
+    public function oauthAccounts()
+    {
+        return $this->hasMany(OAuthAccount::class);
+    }
+
+    // files
+    public function files()
+    {
+        return $this->hasMany(File::class);
+    }
 }

@@ -49,4 +49,17 @@ class Note extends Model
 ->withTimestamps();
     }
 
+    // tasks
+    public function tasks()
+    {
+        return $this->hasMany(Task::class);
+    }
+
+    // files
+    public function files()
+    {
+        return $this->belongsToMany(File::class, 'file_note')
+            ->withPivot('order')
+            ->withTimestamps();
+    }
 }
