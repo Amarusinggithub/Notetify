@@ -67,7 +67,7 @@ jobs:
             ${{ runner.os }}-php-${{ matrix.php-version }}-composer-
 
       - name: Create .env from secret
-        run: echo "${{ vars.ENV_FILE }}" > .env
+        run: echo "${{ vars.ENV_FILE }}" > ../.env
 
       - name: Install Dependencies
         run: composer install --prefer-dist --no-progress --no-interaction
