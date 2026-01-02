@@ -1,6 +1,6 @@
-#!/bin/sh
-set -e
+#!/usr/bin/env sh
+set -eu
+#chown -R node:node /usr/src/app/
 
-echo "Starting Client in Development Mode..."
 
-exec pnpm dev --host
+exec pnpm preview

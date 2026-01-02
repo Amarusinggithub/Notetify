@@ -25,3 +25,19 @@ Then, push it to your registry, e.g. `docker push myregistry.com/myapp`.
 
 Consult Docker's [getting started](https://docs.docker.com/go/get-started-sharing/)
 docs for more detail on building and pushing.
+
+# Development
+docker-compose -f docker-compose.dev.yaml up --build
+
+# Production
+docker-compose -f docker-compose.prod.yaml up --build -d
+
+# View logs
+docker-compose -f docker-compose.dev.yaml logs -f api_dev
+docker-compose -f docker-compose.dev.yaml logs -f client_dev
+
+# Stop services
+docker-compose -f docker-compose.dev.yaml down
+
+# Clean up (removes volumes too)
+docker-compose -f docker-compose.dev.yaml down -v

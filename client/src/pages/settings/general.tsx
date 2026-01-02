@@ -229,7 +229,7 @@ const General = () => {
 					<div className="flex flex-col gap-2">
 						<Label htmlFor="language">Language</Label>
 						<Select value={language} onValueChange={setLanguage}>
-							<SelectTrigger id="language" className="w-[200px]">
+							<SelectTrigger id="language" className="w-50">
 								<SelectValue placeholder="Select language" />
 							</SelectTrigger>
 							<SelectContent>

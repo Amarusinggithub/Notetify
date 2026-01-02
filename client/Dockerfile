@@ -2,80 +2,106 @@
 
 ARG NODE_VERSION=22.17.1
 
-
-# Stage 1: Base (Builder)
-
+################################################################################
+# Base stage - Install dependencies only
+################################################################################
 FROM node:${NODE_VERSION}-alpine AS base
 
-# 1. Enable pnpm
 RUN corepack enable
 
 WORKDIR /usr/src/app
 
-# 2. Copy only package files first for better caching
-COPY package.json package-lock.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml ./
 
-# 3. Install dependencies
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
     pnpm install --frozen-lockfile
 
-# 4. Copy the rest of the source code
+################################################################################
+# Build stage - Build the application
+################################################################################
+FROM base AS build
+
+WORKDIR /usr/src/app
+
 COPY . .
 
-# 5. Define Build Arguments
 ARG VITE_BASE_URL
 ARG VITE_WS_ORIGIN
 ARG VITE_APP_NAME
-ARG VITE_FRONTEND_URL
+ARG VITE_CLIENT_URL
 
-# 6. Map ARGs to ENVs so Vite can see them during build
-ENV VITE_FRONTEND_URL=${VITE_FRONTEND_URL}
 ENV VITE_BASE_URL=${VITE_BASE_URL}
 ENV VITE_WS_ORIGIN=${VITE_WS_ORIGIN}
 ENV VITE_APP_NAME=${VITE_APP_NAME}
+ENV VITE_CLIENT_URL=${VITE_CLIENT_URL}
 
-# Build the application (Creates /usr/src/app/dist)
 RUN pnpm build
 
-
-# Stage 2: Development environment
-
+################################################################################
+# Development stage
+################################################################################
 FROM node:${NODE_VERSION}-alpine AS development
+
 ENV NODE_ENV=development
 
 RUN corepack enable
+
 WORKDIR /usr/src/app
 
-# Copy dependencies and source from base
 COPY --from=base /usr/src/app/node_modules ./node_modules
-COPY --from=base /usr/src/app .
+COPY --from=base /usr/src/app/package.json ./package.json
+
+COPY . .
 
 COPY entrypoint.sh .
 RUN chmod +x ./entrypoint.sh
 
+USER node
+
 EXPOSE 3000
 
-# Use array syntax for better signal handling
-ENTRYPOINT ["/bin/sh", "./entrypoint.sh"]
+ENTRYPOINT ["sh", "entrypoint.sh"]
 
-
-
-# Stage 3: Production environment (Nginx)
-
+################################################################################
+# Production stage
+################################################################################
 FROM nginx:stable-alpine AS production
+
 ENV NODE_ENV=production
 
-# Remove default nginx static assets
-RUN rm -rf /usr/share/nginx/html/*
+# Install wget for health checks
+RUN apk add --no-cache wget
 
-# Copy custom Nginx config
-COPY ./nginx/nginx.conf /etc/nginx/conf.d/default.conf
+# Remove default nginx configuration
+RUN rm -rf /usr/share/nginx/html/* && \
+    rm -f /etc/nginx/conf.d/default.conf
 
-# Copy built artifacts from the 'base' stage
-COPY --from=base /usr/src/app/dist /usr/share/nginx/html
+# Copy custom Nginx configuration
+COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
+COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
+
+# Copy built artifacts from the build stage
+COPY --from=build /usr/src/app/dist /usr/share/nginx/html
+
+# Set proper permissions
+RUN chown -R nginx:nginx /usr/share/nginx/html && \
+    chown -R nginx:nginx /var/cache/nginx && \
+    chown -R nginx:nginx /var/log/nginx && \
+    chown -R nginx:nginx /etc/nginx && \
+    chmod -R 755 /usr/share/nginx/html
+
+# Create directory for Let's Encrypt challenges
+RUN mkdir -p /usr/share/nginx/html/.well-known/acme-challenge && \
+    chown -R nginx:nginx /usr/share/nginx/html/.well-known
+
+USER nginx
+
+EXPOSE 80 443
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD wget --quiet --tries=1 --spider http://localhost:80/ || exit 1
+
+ENTRYPOINT ["nginx", "-g", "daemon off;"]
 
 
-
-EXPOSE 80
-
-CMD ["nginx", "-g", "daemon off;"]

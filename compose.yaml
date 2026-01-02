@@ -5,10 +5,11 @@ services:
     image: postgres:17-alpine
     container_name: notetify-db
     healthcheck:
-      test: [ "CMD", "pg_isready" ]
+      test: ["CMD", "pg_isready", "-U", "postgres"]
       interval: 10s
       timeout: 10s
       retries: 10
+      start_period: 10s
     restart: always
     user: postgres
     secrets:
@@ -33,13 +34,15 @@ services:
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
+      timeout: 5s
       retries: 10
+      start_period: 5s
     restart: always
     depends_on:
       db:
         condition: service_healthy
     volumes:
-      - "redis-data:/data"
+      - redis-data:/data
     expose:
       - 6379
     ports:
@@ -56,7 +59,12 @@ services:
       target: development
     container_name: notetify-api
     restart: always
-    command: ["/usr/local/bin/entrypoint.dev.sh", "apache2-foreground"]
+    healthcheck:
+      test: ["CMD", "php", "artisan", "health:check"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     ports:
       - "8000:80"
     depends_on:
@@ -64,28 +72,21 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    secrets:
+      - db-password
     env_file:
       - .env.development
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_DATABASE=notetify
+      - DB_USERNAME=postgres
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     volumes:
-      - ./api:/var/www/html
-
-  queue:
-    networks:
-      - notetify-net
-    build:
-      context: ./api
-      dockerfile: Dockerfile
-      target: development
-    container_name: notetify-queue
-    restart: always
-    command: ["/usr/local/bin/entrypoint.dev.sh", "php", "artisan", "queue:work", "--tries=3", "--timeout=90"]
-    depends_on:
-      api:
-        condition: service_started
-    env_file:
-      - .env.development
-    volumes:
-      - ./api:/var/www/html
+      - ./api:/app
+      - api_vendor:/app/vendor
+      - api_storage:/app/storage
 
   client:
     networks:
@@ -95,25 +96,22 @@ services:
       dockerfile: Dockerfile
       target: development
       args:
-      # Use localhost for browser access
-      - VITE_BASE_URL=http://localhost:8000/api/
-      - VITE_WS_ORIGIN=ws://localhost:8000
-      - VITE_APP_NAME=Notetify
-      - VITE_CLIENT_URL=http://localhost:3000/
+        - VITE_BASE_URL=http://localhost:8000/api/
+        - VITE_WS_ORIGIN=ws://localhost:8000
+        - VITE_APP_NAME=Notetify
+        - VITE_CLIENT_URL=http://localhost:3000/
     container_name: notetify-client
+    restart: always
     ports:
       - "3000:3000"
     depends_on:
       api:
-        condition: service_started
-      db:
         condition: service_healthy
     volumes:
       - ./client:/usr/src/app
       - node_modules_client:/usr/src/app/node_modules
     stdin_open: true
     tty: true
-    command: ["/bin/sh", "./entrypoint.sh"]
     environment:
       - VITE_BASE_URL=http://localhost:8000/api/
       - VITE_WS_ORIGIN=ws://localhost:8000
@@ -127,9 +125,11 @@ networks:
     driver: bridge
 
 volumes:
-  redis-data: {}
-  db-data: {}
-  node_modules_client: {}
+  redis-data:
+  db-data:
+  node_modules_client:
+  api_vendor:
+  api_storage:
 
 secrets:
   db-password:

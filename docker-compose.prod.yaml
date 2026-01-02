@@ -5,10 +5,12 @@ services:
     image: postgres:17-alpine
     container_name: notetify-db-prod
     healthcheck:
-      test: [ "CMD", "pg_isready" ]
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 10s
       timeout: 10s
       retries: 10
-    restart: always
+      start_period: 10s
+    restart: unless-stopped
     user: postgres
     secrets:
       - db-password
@@ -22,28 +24,6 @@ services:
     env_file:
       - .env.production
 
-  api_prod:
-    networks:
-      - notetify-net-prod
-    build:
-      context: ./api
-      dockerfile: Dockerfile
-      target: production
-    container_name: notetify-api-prod
-    restart: always
-    command: ["/usr/local/bin/entrypoint.prod.sh", "apache2-foreground"]
-    ports:
-      - "8000:80"
-    depends_on:
-      db_prod:
-        condition: service_healthy
-      redis_prod:
-        condition: service_healthy
-    env_file:
-      - .env.production
-    volumes:
-      - api-storage:/var/www/html/storage
-
   redis_prod:
     networks:
       - notetify-net-prod
@@ -52,36 +32,55 @@ services:
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
+      timeout: 5s
       retries: 10
-    restart: always
+      start_period: 5s
+    restart: unless-stopped
     depends_on:
       db_prod:
         condition: service_healthy
     volumes:
-      - "redis-data-prod:/data"
+      - redis-data-prod:/data
     expose:
       - 6379
     env_file:
       - .env.production
 
-  queue_prod:
+  api_prod:
     networks:
       - notetify-net-prod
     build:
       context: ./api
       dockerfile: Dockerfile
       target: production
-    container_name: notetify-queue-prod
-    restart: always
-    # Command runs the queue worker
-    command: ["/usr/local/bin/entrypoint.prod.sh", "php", "artisan", "queue:work", "--tries=3", "--timeout=90"]
+    container_name: notetify-api-prod
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    expose:
+      - 80
     depends_on:
-      api_prod:
-        condition: service_started
+      db_prod:
+        condition: service_healthy
+      redis_prod:
+        condition: service_healthy
+    secrets:
+      - db-password
     env_file:
       - .env.production
+    environment:
+      - DB_HOST=db_prod
+      - DB_PORT=5432
+      - DB_DATABASE=notetify
+      - DB_USERNAME=postgres
+      - REDIS_HOST=redis_prod
+      - REDIS_PORT=6379
     volumes:
-      - api-storage:/var/www/html/storage
+      - api-storage-prod:/app/storage
 
   client_prod:
     networks:
@@ -90,27 +89,48 @@ services:
       context: ./client
       dockerfile: Dockerfile
       target: production
+      args:
+        # Use localhost for local testing, change to domain for production
+        - VITE_BASE_URL=${CLIENT_BASE_URL:-https://localhost/api/}
+        - VITE_WS_ORIGIN=${CLIENT_WS_ORIGIN:-wss://localhost}
+        - VITE_APP_NAME=Notetify
+        - VITE_CLIENT_URL=${CLIENT_URL:-https://localhost/}
     container_name: notetify-client-prod
-    restart: always
+    restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
     depends_on:
       api_prod:
-        condition: service_started
+        condition: service_healthy
     env_file:
       - .env.production
+    environment:
+      # Set DOMAIN=localhost for local testing
+      - DOMAIN=${DOMAIN:-localhost}
     volumes:
-      - ./certs:/etc/nginx/certs:ro
+      - ./certbot/conf:/etc/nginx/certs:ro
+      - ./certbot/www:/var/www/certbot:ro
+
+  # Optional: Only needed for real production with auto-renewal
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    profiles:
+      - production
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
 
 networks:
   notetify-net-prod:
     driver: bridge
 
 volumes:
-  db-data-prod: {}
-  redis-data-prod: {}
-  api-storage: {}
+  db-data-prod:
+  redis-data-prod:
+  api-storage-prod:
 
 secrets:
   db-password:

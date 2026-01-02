@@ -1,128 +1,207 @@
 # syntax=docker/dockerfile:1
-ARG PHP_VERSION=8.3.11
 
-# Stage 1: Install production dependencies (Composer)
+ARG PHP_VERSION=8.2
 
+################################################################################
+# Composer dependencies stage - Production
+################################################################################
 FROM composer:lts AS vendor
+
 WORKDIR /app
+
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
 COPY composer.json composer.lock ./
+
 RUN --mount=type=cache,target=/tmp/cache \
     composer install \
         --no-dev \
         --no-interaction \
-        --prefer-dist \
-        --no-progress \
-        --optimize-autoloader \
-        --no-scripts
+        --no-scripts \
+        --no-autoloader \
+        --prefer-dist
 
 COPY . .
+
 RUN composer dump-autoload \
-        --no-dev \
         --optimize \
-        --no-interaction \
-        --no-scripts
+        --classmap-authoritative \
+        --no-dev
 
-
-# Stage 2: Install development dependencies
-
+################################################################################
+# Composer dependencies stage - Development
+################################################################################
 FROM composer:lts AS vendor_dev
+
 WORKDIR /app
+
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
 COPY composer.json composer.lock ./
+
 RUN --mount=type=cache,target=/tmp/cache \
     composer install \
         --no-interaction \
-        --prefer-dist \
-        --no-progress \
-        --no-scripts
+        --no-scripts \
+        --no-autoloader \
+        --prefer-dist
 
 COPY . .
+
 RUN composer dump-autoload \
         --no-interaction \
         --no-scripts
 
+################################################################################
+# Base PHP runtime stage
+################################################################################
+FROM php:${PHP_VERSION}-fpm-alpine AS base
 
-# Stage 3: Shared PHP Runtime (SWITCHED TO APACHE)
+WORKDIR /app
 
-FROM php:${PHP_VERSION}-apache AS base
-WORKDIR /var/www/html
+ENV PATH="/app/vendor/bin:${PATH}"
 
-# 1. Install System Dependencies & Redis
-# We use 'apt-get' here because the Apache image is Debian-based, not Alpine.
-RUN apt-get update && apt-get install -y \
-    libzip-dev \
-    libpng-dev \
-    libpq-dev \
-    libicu-dev \
-    git \
-    unzip \
-    # Install Redis extension via PECL
-    && pecl install redis \
-    && docker-php-ext-enable redis \
-    # Install standard Laravel extensions
-    && docker-php-ext-install -j$(nproc) \
+# Install required system packages and PHP extensions
+RUN set -eux; \
+    apk add --no-cache \
+        bash \
+        busybox-extras \
+        curl \
+        git \
+        icu-libs \
+        libpq \
+        libzip \
+        nginx \
+        shadow \
+        supervisor \
+        tzdata \
+        unzip; \
+    apk add --no-cache --virtual .build-deps \
+        $PHPIZE_DEPS \
+        icu-dev \
+        libzip-dev \
+        postgresql-dev; \
+    docker-php-ext-configure intl; \
+    docker-php-ext-install -j"$(nproc)" \
         bcmath \
         intl \
         opcache \
         pcntl \
         pdo_pgsql \
-        zip \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+        zip; \
+    pecl install redis; \
+    docker-php-ext-enable redis; \
+    apk del .build-deps; \
+    rm -rf /tmp/* /var/cache/apk/*
 
-# 2. Configure Apache to point to /public (Laravel standard)
-ENV APACHE_DOCUMENT_ROOT /var/www/html/public
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
-RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+# Copy PHP configuration
+COPY docker/php/php.ini /usr/local/etc/php/conf.d/app.ini
 
-# 3. Enable Apache mod_rewrite
-RUN a2enmod rewrite
+# Copy Nginx configuration
+COPY docker/nginx/nginx.conf /etc/nginx/nginx.conf
+COPY docker/nginx/default.conf /etc/nginx/http.d/default.conf
 
-# 4. Copy Entrypoint Scripts
-COPY entrypoint.dev.sh entrypoint.prod.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/entrypoint.dev.sh /usr/local/bin/entrypoint.prod.sh
+# Copy Supervisor configuration
+COPY docker/supervisor/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# 5. Create Storage Dirs & Permissions (Apache runs as www-data)
+# Create Laravel directories
 RUN mkdir -p \
         bootstrap/cache \
-        storage/framework/cache \
+        storage/framework/cache/data \
         storage/framework/sessions \
         storage/framework/views \
         storage/logs \
-    && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+    && chown -R www-data:www-data \
+        bootstrap/cache \
+        storage
 
-# Expose HTTP Port 80 (Standard for Apache)
 EXPOSE 80
 
-
-# Stage 4: Development Image
-
+################################################################################
+# Development stage
+################################################################################
 FROM base AS development
-ENV APP_ENV=local
-ENV APP_DEBUG=true
 
-# Copy all dependencies (including dev tools) from Stage 2
-COPY --from=vendor_dev /app/vendor /var/www/html/vendor
-COPY . /var/www/html
+ENV APP_ENV=local \
+    APP_DEBUG=true \
+    COMPOSER_ALLOW_SUPERUSER=1
 
-# Ensure permissions are correct after copy
-RUN chown -R www-data:www-data /var/www/html
+# Copy entrypoint script
+COPY docker/entrypoint.dev.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
+# Copy vendor from dev stage
+COPY --from=vendor_dev --chown=www-data:www-data /app/vendor ./vendor
 
-# Stage 5: Production Image
+# Copy application code
+COPY --chown=www-data:www-data . .
 
+# Ensure proper permissions
+RUN chown -R www-data:www-data \
+        bootstrap/cache \
+        storage
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+
+################################################################################
+# Production build stage
+################################################################################
+FROM base AS production_build
+
+WORKDIR /app
+
+COPY --from=vendor --chown=www-data:www-data /app/vendor ./vendor
+
+COPY --chown=www-data:www-data . .
+
+RUN php artisan config:cache && \
+    php artisan route:cache && \
+    php artisan view:cache && \
+    php artisan event:cache
+
+################################################################################
+# Production stage
+################################################################################
 FROM base AS production
-ENV APP_ENV=production
-ENV APP_DEBUG=false
-ENV PHP_OPCACHE_VALIDATE_TIMESTAMPS=0
-ENV PHP_OPCACHE_MAX_ACCELERATED_FILES=20000
-ENV PHP_OPCACHE_MEMORY_CONSUMPTION=192
 
-# Copy only production dependencies from Stage 1
-COPY --from=vendor /app/vendor /var/www/html/vendor
-COPY . /var/www/html
+ENV APP_ENV=production \
+    APP_DEBUG=false \
+    PHP_OPCACHE_ENABLE=1 \
+    PHP_OPCACHE_VALIDATE_TIMESTAMPS=0 \
+    PHP_OPCACHE_MAX_ACCELERATED_FILES=20000 \
+    PHP_OPCACHE_MEMORY_CONSUMPTION=192 \
+    PHP_OPCACHE_INTERNED_STRINGS_BUFFER=16
 
-# Final Permission Fix
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+# Copy PHP production configuration
+COPY docker/php/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
+
+# Copy entrypoint script
+COPY docker/entrypoint.prod.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Copy optimized application from build stage
+COPY --from=production_build --chown=www-data:www-data /app ./
+
+# Remove unnecessary files
+RUN rm -rf \
+        tests \
+        .git \
+        .github \
+        .env.example \
+        phpunit.xml \
+        README.md
+
+# Ensure proper permissions
+RUN chown -R www-data:www-data \
+        bootstrap/cache \
+        storage
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
+    CMD php artisan health:check || exit 1
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

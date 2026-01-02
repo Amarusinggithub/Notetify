@@ -5,10 +5,12 @@ services:
     networks:
       - notetify-net-dev
     healthcheck:
-      test: ["CMD", "pg_isready"]
+      test: ["CMD", "pg_isready", "-U", "postgres"]
       interval: 10s
+      timeout: 10s
       retries: 10
-    restart: always
+      start_period: 10s
+    restart: unless-stopped
     user: postgres
     secrets:
       - db-password
@@ -17,8 +19,6 @@ services:
     environment:
       - POSTGRES_DB=notetify
       - POSTGRES_PASSWORD_FILE=/run/secrets/db-password
-      - DB_PORT=5432
-      - DB_HOST=db_dev
     expose:
       - 5432
     ports:
@@ -34,13 +34,17 @@ services:
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
+      timeout: 5s
       retries: 10
-    restart: always
+      start_period: 5s
+    restart: unless-stopped
     depends_on:
       db_dev:
         condition: service_healthy
     volumes:
       - redis-data-dev:/data
+    expose:
+      - 6379
     ports:
       - "6379:6379"
     env_file:
@@ -54,35 +58,37 @@ services:
     container_name: notetify-api-dev
     networks:
       - notetify-net-dev
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     depends_on:
       db_dev:
         condition: service_healthy
       redis_dev:
         condition: service_healthy
+    secrets:
+      - db-password
     volumes:
-      - ./api:/var/www/html
+      - ./api:/app
+      - api_vendor_dev:/app/vendor
+      - api_storage_dev:/app/storage
     ports:
       - "8000:80"
+    environment:
+      - DB_HOST=db_dev
+      - DB_PORT=5432
+      - DB_DATABASE=notetify
+      - DB_USERNAME=postgres
+      - REDIS_HOST=redis_dev
+      - REDIS_PORT=6379
+      - APP_ENV=local
+      - APP_DEBUG=true
     env_file:
       - .env.development
-    command: ["/usr/local/bin/entrypoint.dev.sh", "apache2-foreground"]
-
-  queue_dev:
-    build:
-      context: ./api
-      dockerfile: Dockerfile
-      target: development
-    container_name: notetify-queue-dev
-    networks:
-      - notetify-net-dev
-    depends_on:
-      api_dev:
-        condition: service_started
-    volumes:
-      - ./api:/var/www/html
-    env_file:
-      - .env.development
-    command: ["/usr/local/bin/entrypoint.dev.sh", "php", "artisan", "queue:work", "--tries=3", "--timeout=90"]
 
   client_dev:
     build:
@@ -97,12 +103,13 @@ services:
     container_name: notetify-client-dev
     networks:
       - notetify-net-dev
+    restart: unless-stopped
     depends_on:
       api_dev:
-        condition: service_started
+        condition: service_healthy
     volumes:
       - ./client:/usr/src/app
-      - node_modules_client-dev:/usr/src/app/node_modules
+      - node_modules_client_dev:/usr/src/app/node_modules
     ports:
       - "3000:3000"
     environment:
@@ -112,16 +119,19 @@ services:
       - VITE_CLIENT_URL=http://localhost:3000/
     env_file:
       - .env.development
-    command: ["/bin/sh", "./entrypoint.sh"]
+    stdin_open: true
+    tty: true
 
 networks:
   notetify-net-dev:
     driver: bridge
 
 volumes:
-  redis-data-dev: {}
-  db-data-dev: {}
-  node_modules_client-dev: {}
+  redis-data-dev:
+  db-data-dev:
+  node_modules_client_dev:
+  api_vendor_dev:
+  api_storage_dev:
 
 secrets:
   db-password:
