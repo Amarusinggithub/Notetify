@@ -112,6 +112,16 @@ export type UpdateUserNotePayload = Partial<{
 	tags: string[];
 }>;
 
+export type UpdateUserNotebookPayload = Partial<{
+	name: string;
+
+	is_favorite: boolean;
+	is_pinned: boolean;
+	is_trashed: boolean;
+	tags: string[];
+}>;
+
+
 export interface Note {
 	id: string;
 	title: string;

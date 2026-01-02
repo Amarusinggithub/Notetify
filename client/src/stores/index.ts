@@ -8,13 +8,15 @@ import {
 import { immer } from 'zustand/middleware/immer';
 import { createAuthSlice, type AuthSlice } from './slices/auth-slice';
 import { createNotesSlice, type NotesSlice } from './slices/notes-slice';
+
 import {
 	applyTheme,
 	createThemeSlice,
 	type ThemeSlice,
 } from './slices/theme-slice';
+import { type NotebookSlice, createNotebookSlice } from './slices/notebooks-slice';
 
-export type StoreState = NotesSlice & AuthSlice & ThemeSlice;
+export type StoreState = NotesSlice & AuthSlice & ThemeSlice & NotebookSlice;
 
 export const useStore = create<StoreState>()(
 	subscribeWithSelector(
@@ -24,6 +26,7 @@ export const useStore = create<StoreState>()(
 					...createNotesSlice(...args),
 					...createAuthSlice(...args),
 					...createThemeSlice(...args),
+					...createNotebookSlice(...args),
 				})),
 				{
 					name: 'notetify-store',
@@ -36,9 +39,13 @@ export const useStore = create<StoreState>()(
 					},
 					partialize: (state) => ({
 						notes: state.notes,
+						notebooks: state.notebooks,
 						selectedNoteId: state.selectedNoteId,
-						search: state.search,
-						sortBy: state.sortBy,
+						selectedNotebookId: state.selectedNotebookId,
+						searchNotes: state.searchNotes,
+						sortNotesBy: state.sortNotesBy,
+						searchNotebooks: state.searchNotebooks,
+						sortNotebooksBy: state.sortNotebooksBy,
 						theme: state.theme,
 					}),
 				},

@@ -7,8 +7,8 @@ type SortBy = 'updated_at' | 'created_at' | 'title';
 export type NotesSliceState = {
 	selectedNoteId: string | null;
 	notes: UserNote[];
-	search: string;
-	sortBy: SortBy;
+	searchNotes: string;
+	sortNotesBy: SortBy;
 };
 
 export type NotesSliceActions = {
@@ -34,8 +34,8 @@ export const createNotesSlice: StateCreator<StoreState, [], [], NotesSlice> = (
 ) => ({
 	selectedNoteId: null,
 	notes: [],
-	search: '',
-	sortBy: 'updated_at',
+	searchNotes: '',
+	sortNotesBy: 'updated_at',
 	setSelectedNote: (id: string | null) => set({ selectedNoteId: id }),
 	setNotes: (notes: UserNote[]) => set({ notes }),
 	removeNote: (noteId: string) => {
@@ -78,7 +78,7 @@ export const createNotesSlice: StateCreator<StoreState, [], [], NotesSlice> = (
 		) {
 			if (idx >= 0) {
 				const next = existing.slice();
-				let existingNote = next[idx];
+				const existingNote = next[idx];
 
 				const { title, content, ...rootPayload } = payload;
 
@@ -96,6 +96,6 @@ export const createNotesSlice: StateCreator<StoreState, [], [], NotesSlice> = (
 			}
 		}
 	},
-	setSearch: (q: string) => set({ search: q }),
-	setSortBy: (s: SortBy) => set({ sortBy: s }),
+	setSearch: (q: string) => set({ searchNotes: q }),
+	setSortBy: (s: SortBy) => set({ sortNotesBy: s }),
 });
