@@ -1,0 +1,10 @@
+# Test results
+results/*.json
+results/*.html
+results/*.png
+
+# Keep the results folder
+!results/.gitkeep
+
+# Node modules (if any)
+node_modules/

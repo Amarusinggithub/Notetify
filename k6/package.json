@@ -1,0 +1,30 @@
+{
+  "name": "notetify-k6-tests",
+  "version": "1.0.0",
+  "description": "K6 load testing suite for Notetify",
+  "scripts": {
+    "test": "k6 run main.js",
+    "test:local": "k6 run main.js",
+    "test:remote": "k6 run -e K6_ENV=remote main.js",
+    "test:api:smoke": "k6 run tests/api/smoke-test.js",
+    "test:api:load": "k6 run tests/api/load-test.js",
+    "test:api:stress": "k6 run tests/api/stress-test.js",
+    "test:api:spike": "k6 run tests/api/spike-test.js",
+    "test:api:soak": "k6 run tests/api/soak-test.js",
+    "test:browser:journey": "k6 run tests/browser/user-journey.js",
+    "test:browser:login": "k6 run tests/browser/login-test.js",
+    "test:browser:pages": "k6 run tests/browser/page-load-test.js",
+    "test:api:smoke:remote": "k6 run -e K6_ENV=remote tests/api/smoke-test.js",
+    "test:api:load:remote": "k6 run -e K6_ENV=remote tests/api/load-test.js",
+    "test:api:stress:remote": "k6 run -e K6_ENV=remote tests/api/stress-test.js",
+    "test:browser:journey:remote": "k6 run -e K6_ENV=remote tests/browser/user-journey.js"
+  },
+  "keywords": [
+    "k6",
+    "load-testing",
+    "performance",
+    "notetify"
+  ],
+  "author": "",
+  "license": "ISC"
+}

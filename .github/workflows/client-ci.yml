@@ -1,9 +1,8 @@
-name: CLIENT CI/CD Pipeline
+name: CLIENT CI Pipeline
 on:
   push:
     branches:
       - main
-
 
   pull_request:
     branches:
@@ -22,16 +21,24 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.26.2
+
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
           cache: "pnpm"
-          cache-dependency-path: "**/package-lock.json"
+          cache-dependency-path: "client/pnpm-lock.yaml"
 
       - name: Recreate .env from secret
         run: echo "${{ secrets.PROD_ENV_FILE }}" > .env
-      - run: pnpm install --frozen-lockfile
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Format Client
         run: pnpm run format
@@ -47,4 +54,3 @@ jobs:
 
       - name: Build Client
         run: pnpm run build
-
