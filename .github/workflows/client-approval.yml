@@ -43,8 +43,8 @@ jobs:
         run: pnpm run test
 
       - name: Test coverage Client
-        run: npm run coverage
+        run: pnpm run coverage
 
       - name: Build Client
-        run: npm run build
+        run: pnpm run build
 

@@ -3,11 +3,14 @@ on:
   push:
     branches:
       - main
-
+      - '*.x'
 
   pull_request:
     branches:
       - main
+
+  schedule:
+    - cron: '0 0 * * *'
 
 jobs:
   lint:
@@ -23,7 +26,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.1'
+          php-version: '8.2'
           extensions: dom, curl, libxml, mbstring, zip, pdo, sqlite, pdo_sqlite
           coverage: none
 
@@ -31,9 +34,9 @@ jobs:
         uses: actions/cache@v3
         with:
           path: api/vendor
-          key: ${{ runner.os }}-php-8.1-composer-${{ hashFiles('api/composer.lock') }}
+          key: ${{ runner.os }}-php-8.2-composer-${{ hashFiles('api/composer.lock') }}
           restore-keys: |
-            ${{ runner.os }}-php-8.1-composer-
+            ${{ runner.os }}-php-8.2-composer-
 
       - name: Install Dependencies
         run: composer install --prefer-dist --no-progress --no-interaction
@@ -45,7 +48,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-version: ['8.0', '8.1', '8.2']
+        php-version: ['8.2', '8.3', '8.4']
     defaults:
       run:
         working-directory: 'api'
