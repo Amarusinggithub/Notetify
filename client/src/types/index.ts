@@ -51,7 +51,6 @@ export interface Auth {
 export type CreateTag = {
 	tag_data: {
 		name: string;
-		users?: string[];
 	};
 };
 
@@ -65,26 +64,25 @@ export interface UserTag extends Omit<CreateTag, 'tag_data'> {
 export interface Tag {
 	id: string;
 	name: string;
-	users?: number[];
 	created_at: Date;
 	updated_at: Date;
 	schedule_delete_at?: Date;
 	removed_at?: Date;
 }
 
-export type CreateNote = {
+export type CreateUserNote = {
 	note_data: {
 		title: string;
 		content: string;
 		users: string[];
 	};
-	tags: string[];
+	tags: Tag[];
 	is_pinned: boolean;
 	is_trashed: boolean;
 	is_favorite: boolean;
 };
 
-export interface UserNote extends Omit<CreateNote, 'note_data'> {
+export interface UserNote extends Omit<CreateUserNote, 'note_data'> {
 	id: string;
 	note: Note;
 	user: string;
@@ -101,6 +99,7 @@ export interface UserNote extends Omit<CreateNote, 'note_data'> {
 	is_pinned: boolean;
 	is_trashed: boolean;
 	is_favorite: boolean;
+	tags: Tag[];
 }
 
 export type UpdateUserNotePayload = Partial<{
@@ -114,11 +113,9 @@ export type UpdateUserNotePayload = Partial<{
 
 export type UpdateUserNotebookPayload = Partial<{
 	name: string;
-
 	is_favorite: boolean;
 	is_pinned: boolean;
 	is_trashed: boolean;
-	tags: string[];
 }>;
 
 
@@ -219,19 +216,48 @@ export const noteQueryKeys = {
 		[...noteQueryKeys.lists(), category, params] as const,
 };
 
-export type NoteAction =
-	| { type: 'SET_TITLE'; payload: string }
-	| { type: 'SET_CONTENT'; payload: string }
-	| { type: 'TOGGLE_ARCHIVED' }
-	| { type: 'TOGGLE_TRASHED' }
-	| { type: 'TOGGLE_FAVORITE' }
-	| { type: 'TOGGLE_PINNED' }
-	| { type: 'RESET' };
+export const tagQueryKeys = {
+	all: ['tags'] as const,
+	lists: () => [...tagQueryKeys.all, 'lists'] as const,
+	list: (category: string, params: string) =>
+		[...tagQueryKeys.lists(), category, params] as const,
+};
 
-export type NotebookAction =
-	| { type: 'SET_TITLE'; payload: string }
-	| { type: 'TOGGLE_ARCHIVED' }
-	| { type: 'TOGGLE_TRASHED' }
-	| { type: 'TOGGLE_FAVORITE' }
-	| { type: 'TOGGLE_PINNED' }
-	| { type: 'RESET' };
+
+export const notebookQueryKeys = {
+	all: ['notebooks'] as const,
+	lists: () => [...notebookQueryKeys.all, 'lists'] as const,
+	list: (category: string, params: string) =>
+		[...notebookQueryKeys.lists(), category, params] as const,
+};
+
+
+export const spaceQueryKeys = {
+	all: ['spaces'] as const,
+	lists: () => [...spaceQueryKeys.all, 'lists'] as const,
+	list: (category: string, params: string) =>
+		[...spaceQueryKeys.lists(), category, params] as const,
+};
+
+export const fileQueryKeys = {
+	all: ['files'] as const,
+	lists: () => [...fileQueryKeys.all, 'lists'] as const,
+	list: (category: string, params: string) =>
+		[...fileQueryKeys.lists(), category, params] as const,
+};
+
+export const taskQueryKeys = {
+	all: ['tasks'] as const,
+	lists: () => [...taskQueryKeys.all, 'lists'] as const,
+	list: (category: string, params: string) =>
+		[...taskQueryKeys.lists(), category, params] as const,
+};
+
+export const calendarQueryKeys = {
+	all: ['calendar'] as const,
+	lists: () => [...calendarQueryKeys.all, 'lists'] as const,
+	list: (category: string, params: string) =>
+		[...calendarQueryKeys.lists(), category, params] as const,
+};
+
+

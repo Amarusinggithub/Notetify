@@ -22,9 +22,9 @@ class NoteTag extends Model
         return $this->belongsTo(Note::class,'note_id');
     }
 
-    public function tagBy()
+
+     public function tagBy()
     {
         return $this->belongsTo(Tag::class, 'tag_id');
     }
-
 }

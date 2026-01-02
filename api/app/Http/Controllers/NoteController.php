@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Note;
+use App\Models\Tag;
 use App\Models\UserNote;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -31,9 +32,18 @@ class NoteController extends Controller
 
         $query = UserNote::query()
             ->select('user_note.*')
-            ->with('note')
+            ->with(['note.tags'])
             ->where('user_note.user_id', $userId)
             ->leftJoin('notes', 'notes.id', '=', 'user_note.note_id');
+
+        if ($request->filled('tag')) {
+            $tagName = $request->string('tag')->toString();
+
+            // "Give me UserNotes where the related 'note' has a 'tag' with this name"
+            $query->whereHas('note.tags', function ($q) use ($tagName) {
+                $q->where('name', $tagName);
+            });
+        }
 
         if ($request->filled('search')) {
             $search = '%' . $request->string('search')->toString() . '%';
@@ -88,10 +98,14 @@ class NoteController extends Controller
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'content' => ['nullable', 'string'],
+            'tags' => ['sometimes', 'array'],
             'is_favorite' => ['sometimes', 'boolean'],
             'is_pinned' => ['sometimes', 'boolean'],
             'is_trashed' => ['sometimes', 'boolean'],
         ]);
+
+        $tags = $validated['tags'] ?? [];
+        unset($validated['tags']);
 
         $note = Note::create([
             'title' => $validated['title'],
@@ -103,8 +117,11 @@ class NoteController extends Controller
             'user_id' => Auth::id(),
         ], $this->buildFlagPayload($validated)));
 
-        $userNote->load('note');
+        if (!empty($tags)) {
+            $this->syncTags($note, $tags);
+        }
 
+            $userNote->load(['note.tags']);
         return response()->json($userNote, 201);
     }
 
@@ -140,8 +157,12 @@ class NoteController extends Controller
             $userNote->fill($flagPayload);
         }
 
+        if (array_key_exists('tags', $validated)) {
+            $this->syncTags($userNote->note, $validated['tags']);
+        }
+
         $userNote->save();
-        $userNote->load('note');
+        $userNote->load('note.tags');
 
         return response()->json($userNote);
     }
@@ -186,5 +207,23 @@ class NoteController extends Controller
         }
 
         return $payload;
+    }
+
+
+    /**
+     * Helper to find/create tags and sync them to the note.
+     * This handles both adding new tags and removing omitted ones.
+     */
+    private function syncTags(Note $note, array $tagNames): void
+    {
+        $tagIds = [];
+        foreach ($tagNames as $name) {
+            // Find the tag by name, or create it if it doesn't exist
+            $tag = Tag::firstOrCreate(['name' => $name]);
+            $tagIds[] = $tag->id;
+        }
+
+        // sync() removes any IDs not in $tagIds, and adds the new ones
+        $note->tags()->sync($tagIds);
     }
 }

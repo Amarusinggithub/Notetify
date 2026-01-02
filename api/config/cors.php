@@ -28,6 +28,7 @@ return [
         'http://127.0.0.1:3000',
          'https://localhost',
         'https://localhost:443',
+        'https://notetify.com'
     ],
 
     'allowed_origins_patterns' => [],
