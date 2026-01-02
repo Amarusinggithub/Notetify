@@ -14,6 +14,8 @@ const BASE_URL = RAW_BASE
 		: `${RAW_BASE}/api`
 	: '/api';
 
+const ROOT_URL = BASE_URL.replace(/\/api$/, '');
+
 export const API_BASE_URL = BASE_URL;
 
 const axiosInstance = axios.create({
@@ -50,7 +52,9 @@ axiosInstance.interceptors.response.use(
 export async function ensureCSRFToken() {
 	if (!Cookies.get(CSRF_TOKEN_COOKIE_NAME)) {
 		try {
-			await axiosInstance.get('/sanctum/csrf-cookie');
+			await axios.get(`${ROOT_URL}/sanctum/csrf-cookie`, {
+				withCredentials: true,
+			});
 		} catch (error) {
 			console.error('Failed to get CSRF token:', error);
 		}
