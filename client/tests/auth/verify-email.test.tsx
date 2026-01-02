@@ -4,19 +4,17 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import VerifyEmail from '../../src/pages/auth/verify-email.tsx';
 
 const mockVerifyEmail = vi.fn();
-const mockUseAuth = vi.fn();
 
-vi.mock('../../src/stores/use-auth-store.tsx', () => ({
-	useAuth: () => mockUseAuth(),
+vi.mock('../../src/stores/index.ts', () => ({
+	useStore: () => ({
+		VerifyEmail: mockVerifyEmail,
+		isLoading: false,
+	}),
 }));
 
 describe('VerifyEmail page', () => {
 	beforeEach(() => {
 		mockVerifyEmail.mockReset();
-		mockUseAuth.mockReturnValue({
-			VerifyEmail: mockVerifyEmail,
-			isLoading: false,
-		});
 	});
 
 	it('calls VerifyEmail on submit', async () => {

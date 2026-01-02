@@ -5,10 +5,14 @@ import ResetPassword from '../../src/pages/auth/reset-password.tsx';
 
 const mockPasswordReset = vi.fn();
 const mockSetErrors = vi.fn();
-const mockUseAuth = vi.fn();
 
-vi.mock('../../src/stores/use-auth-store.tsx', () => ({
-	useAuth: () => mockUseAuth(),
+vi.mock('../../src/stores/index.ts', () => ({
+	useStore: () => ({
+		PasswordReset: mockPasswordReset,
+		isLoading: false,
+		errors: null,
+		setErrors: mockSetErrors,
+	}),
 }));
 
 function renderWithRoute(path: string) {
@@ -25,12 +29,6 @@ describe('ResetPassword page', () => {
 	beforeEach(() => {
 		mockPasswordReset.mockReset();
 		mockSetErrors.mockReset();
-		mockUseAuth.mockReturnValue({
-			PasswordReset: mockPasswordReset,
-			isLoading: false,
-			errors: null,
-			setErrors: mockSetErrors,
-		});
 	});
 
 	it('submits when validation succeeds', async () => {

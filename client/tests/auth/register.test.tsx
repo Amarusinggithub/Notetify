@@ -5,22 +5,20 @@ import Register from '../../src/pages/auth/register.tsx';
 
 const mockSignUp = vi.fn();
 const mockSetErrors = vi.fn();
-const mockUseAuth = vi.fn();
 
-vi.mock('../../src/stores/use-auth-store.tsx', () => ({
-	useAuth: () => mockUseAuth(),
+vi.mock('../../src/stores/index.ts', () => ({
+	useStore: () => ({
+		SignUp: mockSignUp,
+		isLoading: false,
+		errors: null,
+		setErrors: mockSetErrors,
+	}),
 }));
 
 describe('Register page', () => {
 	beforeEach(() => {
 		mockSignUp.mockReset();
 		mockSetErrors.mockReset();
-		mockUseAuth.mockReturnValue({
-			SignUp: mockSignUp,
-			isLoading: false,
-			errors: null,
-			setErrors: mockSetErrors,
-		});
 	});
 
 	it('submits trimmed form data when validation succeeds', async () => {

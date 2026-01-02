@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import axiosInstance from '../../src/lib/axios';
-import * as notes from '../../src/lib/notes';
+import * as notes from '../../src/services/note-service';
 
 vi.mock('../../src/lib/axios', () => {
 	return {

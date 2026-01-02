@@ -5,22 +5,20 @@ import Login from '../../src/pages/auth/login.tsx';
 
 const mockLogin = vi.fn();
 const mockSetErrors = vi.fn();
-const mockUseAuth = vi.fn();
 
-vi.mock('../../src/stores/use-auth-store.tsx', () => ({
-	useAuth: () => mockUseAuth(),
+vi.mock('../../src/stores/index.ts', () => ({
+	useStore: () => ({
+		Login: mockLogin,
+		isLoading: false,
+		errors: null,
+		setErrors: mockSetErrors,
+	}),
 }));
 
 describe('Login page', () => {
 	beforeEach(() => {
 		mockLogin.mockReset();
 		mockSetErrors.mockReset();
-		mockUseAuth.mockReturnValue({
-			Login: mockLogin,
-			isLoading: false,
-			errors: null,
-			setErrors: mockSetErrors,
-		});
 	});
 
 	it('submits valid credentials', async () => {

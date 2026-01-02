@@ -5,22 +5,20 @@ import ForgotPassword from '../../src/pages/auth/forgot-password.tsx';
 
 const mockForgotPassword = vi.fn();
 const mockSetErrors = vi.fn();
-const mockUseAuth = vi.fn();
 
-vi.mock('../../src/stores/use-auth-store.tsx', () => ({
-	useAuth: () => mockUseAuth(),
+vi.mock('../../src/stores/index.ts', () => ({
+	useStore: () => ({
+		ForgotPassword: mockForgotPassword,
+		isLoading: false,
+		errors: null,
+		setErrors: mockSetErrors,
+	}),
 }));
 
 describe('ForgotPassword page', () => {
 	beforeEach(() => {
 		mockForgotPassword.mockReset();
 		mockSetErrors.mockReset();
-		mockUseAuth.mockReturnValue({
-			ForgotPassword: mockForgotPassword,
-			isLoading: false,
-			errors: null,
-			setErrors: mockSetErrors,
-		});
 	});
 
 	it('submits valid email', async () => {
