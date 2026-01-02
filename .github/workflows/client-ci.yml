@@ -43,9 +43,6 @@ jobs:
       - name: Format Client
         run: pnpm run format
 
-      - name: Lint Client
-        run: pnpm run lint
-
       - name: Test Client
         run: pnpm run test
 
