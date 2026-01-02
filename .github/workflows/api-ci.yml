@@ -66,8 +66,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-php-${{ matrix.php-version }}-composer-
 
-      - name: Create .env from secret
-        run: echo "${{ vars.ENV_FILE }}" > ../.env
+      - name: Create .env
+        run: |
+          if [ -z "${{ vars.ENV_FILE }}" ]; then
+            echo "ENV_FILE secret is not set. Copying .env.example..."
+            cp ../.env.example ../.env
+          else
+            echo "${{ vars.ENV_FILE }}" > ../.env
+          fi
+          ls -la ../.env
 
       - name: Install Dependencies
         run: composer install --prefer-dist --no-progress --no-interaction
