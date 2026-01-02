@@ -30,16 +30,11 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pdo, sqlite, pdo_sqlite
           coverage: none
 
-      - name: Cache Composer dependencies
-        uses: actions/cache@v3
-        with:
-          path: api/vendor
-          key: ${{ runner.os }}-php-8.2-composer-${{ hashFiles('api/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-php-8.2-composer-
-
       - name: Install Dependencies
         run: composer install --prefer-dist --no-progress --no-interaction
+
+      - name: Generate Application Key
+        run: php artisan key:generate
 
   laravel-tests:
     name: "Tests (PHP ${{ matrix.php-version }})"
