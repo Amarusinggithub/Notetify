@@ -38,8 +38,6 @@ export const useStore = create<StoreState>()(
 						state?.confirmAuth?.();
 					},
 					partialize: (state) => ({
-						notes: state.notes,
-						notebooks: state.notebooks,
 						selectedNoteId: state.selectedNoteId,
 						selectedNotebookId: state.selectedNotebookId,
 						searchNotes: state.searchNotes,

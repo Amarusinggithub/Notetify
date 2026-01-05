@@ -1,26 +1,17 @@
 import type { StoreState } from 'stores';
 import type { StateCreator } from 'zustand';
-import type { UpdateUserNotebookPayload, UserNotebook } from '../../types';
 
 type SortBy = 'updated_at' | 'created_at' | 'title';
 
 export type NotebookSliceState = {
 	selectedNotebookId: string | null;
-	notebooks: UserNotebook[];
 	searchNotebooks: string;
 	sortNotebooksBy: SortBy;
 };
 
 export type NotebookSliceActions = {
 	setSelectedNotebook: (id: string | null) => void;
-	setNotebooks: (notes: UserNotebook[]) => void;
-	upsertNotebook: (
-		notebook?: UserNotebook,
-		payload?: UpdateUserNotebookPayload,
-		id?: string,
-	) => void;
 
-	removeNotebook: (notebookId: string) => void;
 
 	setNotebookSearch: (q: string) => void;
 	setNotebookSortBy: (s: SortBy) => void;
@@ -33,25 +24,19 @@ export const createNotebookSlice: StateCreator<
 	[],
 	[],
 	NotebookSlice
-> = (set, get) => ({
+> = (set) => ({
 	selectedNotebookId: null,
-	notebooks: [],
 	searchNotebooks: '',
 	sortNotebooksBy: 'updated_at',
 	setSelectedNotebook: (id: string | null) => set({ selectedNotebookId: id }),
-	setNotebooks: (notebooks: UserNotebook[]) => set({ notebooks }),
-	removeNotebook: (notebookId: string) => {
-		const existing = get().notebooks;
-		const idx = existing.findIndex((n: UserNotebook) => n.id == notebookId);
-		if (idx >= 0) {
-			const newList = [
-				...existing.slice(0, idx), // Elements before the index
-				...existing.slice(idx + 1), // Elements after the index
-			];
-			set({ notebooks: newList });
-		}
-	},
-	upsertNotebook: (
+
+	setNotebookSearch: (q: string) => set({ searchNotebooks: q }),
+	setNotebookSortBy: (s: SortBy) => set({ sortNotebooksBy: s }),
+});
+
+
+/*
+upsertNotebook: (
 		notebook?: UserNotebook,
 		payload?: UpdateUserNotebookPayload,
 		id?: string,
@@ -92,6 +77,4 @@ export const createNotebookSlice: StateCreator<
 			}
 		}
 	},
-	setNotebookSearch: (q: string) => set({ searchNotebooks: q }),
-	setNotebookSortBy: (s: SortBy) => set({ sortNotebooksBy: s }),
-});
+*/

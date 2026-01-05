@@ -1,9 +1,5 @@
 import { useLiveblocksExtension } from '@liveblocks/react-tiptap';
-import {
-	useMutation,
-	useQueryClient,
-	useSuspenseInfiniteQuery,
-} from '@tanstack/react-query';
+import { useQueryClient, type InfiniteData } from '@tanstack/react-query';
 import DragHandle from '@tiptap/extension-drag-handle-react';
 import Emoji, { gitHubEmojis } from '@tiptap/extension-emoji';
 import FontFamily from '@tiptap/extension-font-family';
@@ -20,22 +16,21 @@ import { TextStyle } from '@tiptap/extension-text-style';
 import Youtube from '@tiptap/extension-youtube';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import type { PaginatedNotesResponse } from '../components/app-notes-sidebar.tsx';
 import { cn } from '../lib/utils';
-import { fetchNotesPage, updateNote } from '../services/note-service.ts';
 import { useStore } from '../stores/index.ts';
-import type { UserNote } from '../types';
-
-import { useEffect, useMemo, useRef } from 'react';
-import { useRouteLoaderData } from 'react-router';
+import type { PaginatedNotesResponse, UserNote } from '../types';
+import { useUpdateNote } from '../hooks/use-mutate-note.tsx';
+import { useEffect, useRef } from 'react';
 import { NoteEditorProvider } from '../context/editor-context.tsx';
 import EditorFooter from './editor-footer';
 import { EditorHeader } from './editor-header';
 import { Threads } from './editor-threads';
 import EditorToolbar from './editor-toolbar';
 import suggestion from './suggestion';
+import { noteQueryKeys } from '../utils/queryKeys.ts';
 
 export const Editor = () => {
+	const queryClient = useQueryClient();
 	const liveblocks = useLiveblocksExtension();
 	const isMounted = useRef(false);
 	const lastLoadedId = useRef<string | null>(null);
@@ -47,82 +42,21 @@ export const Editor = () => {
 		};
 	}, []);
 
+	const updateNoteMutation = useUpdateNote();
 	const selectedNoteId = useStore((s) => s.selectedNoteId);
-	const setSelectedNoteId = useStore((s) => s.setSelectedNoteId);
+	const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const search = useStore((s) => s.searchNotes);
 	const sortBy = useStore((s) => s.sortNotesBy);
-	const setNotes = useStore((s) => s.setNotes);
-	const initialData = useRouteLoaderData('root-notes') as
-		| PaginatedNotesResponse
-		| undefined;
-	const queryClient = useQueryClient();
 
-	const notesQueryKey = ['notes', search, sortBy] as const;
-	const { data } = useSuspenseInfiniteQuery({
-		queryKey: notesQueryKey,
-		queryFn: fetchNotesPage,
-		initialPageParam: 1,
-		initialData: initialData
-			? { pages: [initialData], pageParams: [1] }
-			: undefined,
-		getNextPageParam: (lastPage) => lastPage.nextPage,
-	});
+	const paginatedNotes =
+		queryClient.getQueryData<InfiniteData<PaginatedNotesResponse>>(
+			noteQueryKeys.list(search, sortBy )
+		);
 
-	const allNotes = useMemo(
-		() => (data?.pages ?? []).flatMap((p: any) => p?.results ?? []),
-		[data],
-	);
-	const current = useMemo(
-		() =>
-			allNotes.find((n: UserNote) => n.id === selectedNoteId) ?? allNotes[-1],
-		[allNotes, selectedNoteId],
-	);
+	const allNotes = paginatedNotes?.pages.flatMap((page) => page.results) ?? [];
 
-	useEffect(() => {
-		setNotes(allNotes as UserNote[]);
-	}, [allNotes, setNotes]);
-
-	useEffect(() => {
-		if (!selectedNoteId && current?.id) {
-			setSelectedNoteId(current.id);
-		}
-	}, [current, selectedNoteId, setSelectedNoteId]);
-
-	const mutation = useMutation({
-		mutationFn: (content: string) => {
-			if (!current?.id) {
-				return Promise.resolve(current as any);
-			}
-			return updateNote(current.id, { content: content });
-		},
-		onSuccess: (updated) => {
-			if (!updated) return;
-			queryClient.setQueryData(notesQueryKey, (old: any) => {
-				if (!old) return old;
-				if (old.pages) {
-					const pages = old.pages.map((pg: any) => ({
-						...pg,
-						results: pg.results.map((u: any) =>
-							u.id === updated.id ? updated : u,
-						),
-					}));
-					return { ...old, pages };
-				}
-				if (old.results) {
-					return {
-						...old,
-						results: old.results.map((n: any) =>
-							n.id === updated.id ? updated : n,
-						),
-					};
-				}
-				return old;
-			});
-			try {
-				useStore.getState().upsertNote(updated);
-			} catch {}
-		},
-	});
+	const currentUserNote =
+		allNotes.find((n: UserNote) => n.id === selectedNoteId) ?? allNotes[-1];
 
 	const editor = useEditor({
 		editorProps: {
@@ -133,10 +67,10 @@ export const Editor = () => {
 			},
 		},
 		enableContentCheck: true,
-		onContentError: ({ disableCollaboration, editor: currentEditor }) => {
+		onContentError: ({ disableCollaboration }) => {
 			disableCollaboration();
 		},
-		onCreate: ({ editor: currentEditor }) => {
+		onCreate: () => {
 			isMounted.current = true;
 		},
 		onDestroy: () => {
@@ -144,20 +78,23 @@ export const Editor = () => {
 		},
 		onUpdate: ({ editor: currentEditor }) => {
 			// Debounced auto-save
-			if (current) {
-				if ((window as any).__ntf_saveTimer) {
-					clearTimeout((window as any).__ntf_saveTimer);
+			if (currentUserNote) {
+				//Clear the previous timer if it exists
+				if (saveTimeoutRef.current) {
+					clearTimeout(saveTimeoutRef.current);
 				}
-				(window as any).__ntf_saveTimer = setTimeout(() => {
+
+				//Set the new timer
+				saveTimeoutRef.current = setTimeout(() => {
 					const html = currentEditor.getHTML();
-					mutation.mutate(html);
+
+					updateNoteMutation.mutate({
+						id: currentUserNote.id,
+						payload: { content: html },
+					});
 				}, 600);
 			}
 		},
-		onSelectionUpdate: ({ editor: currentEditor }) => {},
-		onTransaction: ({ editor: currentEditor }) => {},
-		onFocus: ({ editor: currentEditor }) => {},
-		onBlur: ({ editor: currentEditor }) => {},
 
 		extensions: [
 			liveblocks,
@@ -232,16 +169,14 @@ export const Editor = () => {
 				suggestion,
 			}),
 			Placeholder.configure({
-				// Use a placeholder:
-				placeholder: 'Write something …',
-				// Use different placeholders depending on the node type:
-				// placeholder: ({ node }) => {
-				//   if (node.type.name === 'heading') {
-				//     return 'What’s the title?'
-				//   }
 
-				//   return 'Can you add some further context?'
-				// },
+				placeholder: ({ node }) => {
+				if (node.type.name === 'heading') {
+				return 'What’s the title?'
+				}
+
+				return 'Can you add some further context?'
+				},
 			}),
 			Image,
 			TaskList,
@@ -324,7 +259,7 @@ export const Editor = () => {
 				ccLoadPolicy: true,
 				disableKBcontrols: true,
 				enableIFrameApi: true,
-				origin: 'yourdomain.com',
+				origin: 'notetify.com',
 				progressBarColor: 'white',
 			}),
 		],
@@ -333,7 +268,7 @@ export const Editor = () => {
 	useEffect(() => {
 		if (!editor) return;
 
-		const noteId = current?.id;
+		const noteId = currentUserNote?.id;
 		editor.setEditable(Boolean(noteId));
 
 		if (!noteId) {
@@ -344,10 +279,10 @@ export const Editor = () => {
 
 		if (lastLoadedId.current !== noteId) {
 			lastLoadedId.current = noteId;
-			const currentContent = current.note?.content ?? '';
+			const currentContent = currentUserNote.note?.content ?? '';
 			editor.commands.setContent(currentContent);
 		}
-	}, [editor, current?.id]);
+	}, [editor, currentUserNote?.id]);
 
 	if (!editor) {
 		return (
@@ -356,11 +291,6 @@ export const Editor = () => {
 			</div>
 		);
 	}
-
-	/* const toggleEditable = () => {
-				editor.setEditable(!editor.isEditable);
-				editor.view.dispatch(editor.view.state.tr);
-			};*/
 
 	return (
 		<NoteEditorProvider editor={editor}>
@@ -371,7 +301,8 @@ export const Editor = () => {
 					<div
 						className={cn(
 							'h-full w-full',
-							!current && 'invisible absolute top-0 left-0 h-0 overflow-hidden',
+							!currentUserNote &&
+								'invisible absolute top-0 left-0 h-0 overflow-hidden',
 						)}
 					>
 						<DragHandle editor={editor}>
@@ -396,10 +327,10 @@ export const Editor = () => {
 									'bg-editor text-editor-foreground mx-auto h-full min-h-full w-full overflow-hidden border-0 shadow-lg',
 								)}
 							/>
-							{current && isMounted.current && <Threads />}
+							{currentUserNote && <Threads />}
 						</div>{' '}
 					</div>
-					{!current && (
+					{!currentUserNote && (
 						<div className="text-muted-foreground flex h-full items-center justify-center text-sm">
 							Select or create a note to get started.
 						</div>

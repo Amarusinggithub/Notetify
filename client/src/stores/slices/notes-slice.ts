@@ -1,27 +1,18 @@
 import type { StoreState } from 'stores';
+import type { SortBy } from '../../types';
 import type { StateCreator } from 'zustand';
-import type { UpdateUserNotePayload, UserNote } from '../../types';
 
-type SortBy = 'updated_at' | 'created_at' | 'title';
+
 
 export type NotesSliceState = {
 	selectedNoteId: string | null;
-	notes: UserNote[];
+
 	searchNotes: string;
 	sortNotesBy: SortBy;
 };
 
 export type NotesSliceActions = {
 	setSelectedNoteId: (id: string | null) => void;
-	setNotes: (notes: UserNote[]) => void;
-	upsertNote: (
-		note?: UserNote,
-		payload?: UpdateUserNotePayload,
-		id?: string,
-	) => void;
-
-	removeNote: (noteId: string) => void;
-
 	setSearch: (q: string) => void;
 	setSortBy: (s: SortBy) => void;
 };
@@ -30,72 +21,12 @@ export type NotesSlice = NotesSliceState & NotesSliceActions;
 
 export const createNotesSlice: StateCreator<StoreState, [], [], NotesSlice> = (
 	set,
-	get,
 ) => ({
 	selectedNoteId: null,
 	notes: [],
 	searchNotes: '',
 	sortNotesBy: 'updated_at',
 	setSelectedNoteId: (id: string | null) => set({ selectedNoteId: id }),
-	setNotes: (notes: UserNote[]) => set({ notes }),
-	removeNote: (noteId: string) => {
-		const existing = get().notes;
-		const idx = existing.findIndex((n: UserNote) => n.id == noteId);
-		if (idx >= 0) {
-			const newList = [
-				...existing.slice(0, idx), // Elements before the index
-				...existing.slice(idx + 1), // Elements after the index
-			];
-			set({ notes: newList });
-		}
-	},
-	upsertNote: (
-		note?: UserNote,
-		payload?: UpdateUserNotePayload,
-		id?: string,
-	) => {
-		const existing = get().notes;
-		const idx = existing.findIndex(
-			(n: UserNote) =>
-				n.id === (note != null && note != undefined ? note?.id : id),
-		);
-
-		if (note != null && note != undefined) {
-			if (idx >= 0) {
-				const next = existing.slice();
-				next[idx] = note;
-				set({ notes: next });
-			} else {
-				set({ notes: [note, ...existing] });
-			}
-		}
-
-		if (
-			payload != null &&
-			payload != undefined &&
-			id != null &&
-			id != undefined
-		) {
-			if (idx >= 0) {
-				const next = existing.slice();
-				const existingNote = next[idx];
-
-				const { title, content, ...rootPayload } = payload;
-
-				next[idx] = {
-					...existingNote,
-					...rootPayload, // Updates is_favorite, is_pinned, tags, etc.
-					note: {
-						...existingNote.note,
-						...(title !== undefined && { title: title ?? '' }),
-						...(content !== undefined && { content: content ?? '' }),
-					},
-				};
-
-				set({ notes: next });
-			}
-		}
-	},
 	setSearch: (q: string) => set({ searchNotes: q }),
 	setSortBy: (s: SortBy) => set({ sortNotesBy: s }),
 });

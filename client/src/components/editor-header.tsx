@@ -1,4 +1,5 @@
 ﻿import { useOthers } from '@liveblocks/react/suspense';
+import { useQueryClient, type InfiniteData } from '@tanstack/react-query';
 import {
 	ArrowRightLeft,
 	ChevronDown,
@@ -25,8 +26,8 @@ import {
 	Tag,
 	Trash2,
 } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
-import type { BreadcrumbItem } from 'types';
+import {useState } from 'react';
+import type { BreadcrumbItem, PaginatedNotesResponse } from 'types';
 import { useDeleteNote, useUpdateNote } from '../hooks/use-mutate-note';
 import { cn } from '../lib/utils';
 import { useStore } from '../stores/index.ts';
@@ -50,6 +51,7 @@ import { NotesSidebarTrigger, useNotesSidebar } from './ui/notes-sidebar';
 import { Separator } from './ui/separator';
 import { useSidebar } from './ui/sidebar';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
+import { noteQueryKeys } from '../utils/queryKeys.ts';
 
 export function EditorHeader({
 	breadcrumbs = [],
@@ -68,6 +70,7 @@ export function EditorHeader({
 		setOpen: setNotesOpen,
 		setOpenMobile: setNotesOpenMobile,
 	} = useNotesSidebar();
+	const queryClient = useQueryClient();
 
 	const selectedNoteId = useStore((s) => s.selectedNoteId);
 	const currentUser = useStore((s) => s.sharedData?.auth.user);
@@ -80,25 +83,30 @@ export function EditorHeader({
 		linkAccess === 'restricted' ? 'Restricted' : 'Anyone with link';
 
 	const noteUrl = selectedNoteId
-		? `${window.location.origin}/notes/${selectedNoteId}`
-		: window.location.href;
+		? `${globalThis.window.location.origin}/notes/${selectedNoteId}`
+		: globalThis.window.location.href;
 
-	const notes = useStore((s) => s.notes);
-	const currentNote = useMemo(
-		() => notes.find((note) => note.id === selectedNoteId) ?? null,
-		[notes, selectedNoteId],
-	);
-	const [title, setTitle] = useState(currentNote?.note.title ?? '');
-	useEffect(() => {
-		setTitle(currentNote?.note.title ?? '');
-	}, [currentNote?.id]);
+	const search = useStore((s) => s.searchNotes);
+	const sortBy = useStore((s) => s.sortNotesBy);
+
+const paginatedNotes =
+		queryClient.getQueryData<InfiniteData<PaginatedNotesResponse>>(
+			noteQueryKeys.list(search, sortBy )
+		);
+
+	const allNotes = paginatedNotes?.pages.flatMap((page) => page.results) ?? [];	const currentNote =
+		allNotes!.find((note) => note.id === selectedNoteId) ?? null;
+
+	const title = currentNote?.note.title ?? '';
 
 	const updateNoteMutation = useUpdateNote();
 	const deleteNoteMutation = useDeleteNote();
 	const others = useOthers();
 	const collaborators = others.slice(0, 3);
 
-	const handleTitleBlur = () => {
+
+
+	const handleUpdateNoteTitle = () => {
 		if (!currentNote) return;
 		const trimmed = title.trim() || 'Untitled';
 		if (trimmed === currentNote.note.title) return;
@@ -193,8 +201,8 @@ export function EditorHeader({
 			<div className="flex flex-1 items-center justify-center gap-3 px-4">
 				<Input
 					value={title}
-					onChange={(event) => setTitle(event.target.value)}
-					onBlur={handleTitleBlur}
+					onChange={() => handleUpdateNoteTitle}
+					onBlur={handleUpdateNoteTitle}
 					onKeyDown={(event) => {
 						if (event.key === 'Enter') {
 							event.currentTarget.blur();

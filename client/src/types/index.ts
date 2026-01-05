@@ -7,6 +7,14 @@ export const USERDATA_STORAGE_KEY = 'userData';
 export type Role = 'OWNER' | 'EDITOR' | 'MEMBER';
 export type OAuthProvider = 'GOOGLE' | 'GITHUB' | 'FACEBOOK';
 
+
+export type SortBy =
+	| 'updated_at'
+	| 'created_at'
+	| 'title'
+	| 'is_favorite'
+	| 'is_pinned';
+
 export type CreateOAuthAccount = {
 	OAuthProvider: OAuthProvider;
 	access_token?: string;
@@ -102,6 +110,12 @@ export interface UserNote extends Omit<CreateUserNote, 'note_data'> {
 	tags: Tag[];
 }
 
+export interface PaginatedNotesResponse {
+	results: UserNote[];
+	nextPage: number | null;
+	hasNextPage: boolean;
+}
+
 export type UpdateUserNotePayload = Partial<{
 	title: string;
 	content: string | null;
@@ -117,7 +131,6 @@ export type UpdateUserNotebookPayload = Partial<{
 	is_pinned: boolean;
 	is_trashed: boolean;
 }>;
-
 
 export interface Note {
 	id: string;
@@ -208,56 +221,4 @@ export interface NavItem {
 	isActive?: boolean;
 	params?: string;
 }
-
-export const noteQueryKeys = {
-	all: ['notes'] as const,
-	lists: () => [...noteQueryKeys.all, 'lists'] as const,
-	list: (category: string, params: string) =>
-		[...noteQueryKeys.lists(), category, params] as const,
-};
-
-export const tagQueryKeys = {
-	all: ['tags'] as const,
-	lists: () => [...tagQueryKeys.all, 'lists'] as const,
-	list: (category: string, params: string) =>
-		[...tagQueryKeys.lists(), category, params] as const,
-};
-
-
-export const notebookQueryKeys = {
-	all: ['notebooks'] as const,
-	lists: () => [...notebookQueryKeys.all, 'lists'] as const,
-	list: (category: string, params: string) =>
-		[...notebookQueryKeys.lists(), category, params] as const,
-};
-
-
-export const spaceQueryKeys = {
-	all: ['spaces'] as const,
-	lists: () => [...spaceQueryKeys.all, 'lists'] as const,
-	list: (category: string, params: string) =>
-		[...spaceQueryKeys.lists(), category, params] as const,
-};
-
-export const fileQueryKeys = {
-	all: ['files'] as const,
-	lists: () => [...fileQueryKeys.all, 'lists'] as const,
-	list: (category: string, params: string) =>
-		[...fileQueryKeys.lists(), category, params] as const,
-};
-
-export const taskQueryKeys = {
-	all: ['tasks'] as const,
-	lists: () => [...taskQueryKeys.all, 'lists'] as const,
-	list: (category: string, params: string) =>
-		[...taskQueryKeys.lists(), category, params] as const,
-};
-
-export const calendarQueryKeys = {
-	all: ['calendar'] as const,
-	lists: () => [...calendarQueryKeys.all, 'lists'] as const,
-	list: (category: string, params: string) =>
-		[...calendarQueryKeys.lists(), category, params] as const,
-};
-
 

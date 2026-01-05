@@ -29,12 +29,17 @@ import {
 } from './ui/notes-sidebar';
 import { ScrollArea } from './ui/scroll-area';
 
-import { useSuspenseInfiniteQuery } from '@tanstack/react-query';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { useRouteLoaderData } from 'react-router';
+import {
+	useQueryClient,
+	useSuspenseInfiniteQuery,
+    type InfiniteData,
+} from '@tanstack/react-query';
+import { useEffect, useRef, useState } from 'react';
 import useDebounce from '../hooks/use-debounce';
 import { fetchNotesPage } from '../services/note-service.ts';
 import { useStore } from '../stores/index.ts';
+import { type PaginatedNotesResponse, type SortBy } from '../types';
+import { noteQueryKeys } from '../utils/queryKeys.ts';
 import NoteCard from './note-card';
 import { Input } from './ui/input';
 import {
@@ -47,41 +52,32 @@ import {
 import { Switch } from './ui/switch';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
-import { type LoaderFunctionArgs } from 'react-router';
-import axiosInstance from '../lib/axios';
-import { type UserNote } from '../types';
+export const notesQueryOptions = (
+	search: string = '',
+	sortby: SortBy = 'updated_at',
+) => ({
+	queryKey: noteQueryKeys.list(search,sortby),
+	queryFn: fetchNotesPage,
+	initialPageParam: 1,
+	getNextPageParam: (lastPage: PaginatedNotesResponse) => lastPage.nextPage,
+});
 
-export interface PaginatedNotesResponse {
-	results: UserNote[];
-	nextPage: number | null;
-	hasNextPage: boolean;
-}
-
-export async function notesLoader({
-	request,
-}: LoaderFunctionArgs): Promise<PaginatedNotesResponse> {
-	const url = new URL(request.url);
-	const params = new URLSearchParams(url.search);
-	if (!params.get('page')) {
-		params.set('page', '1');
-	}
-
-	try {
-		const response = await axiosInstance.get(`/notes?${params.toString()}`);
-		return response.data;
-	} catch (error) {
-		console.error('Failed to fetch notes:', error);
-		return { results: [], nextPage: null, hasNextPage: false };
-	}
+export  function useNotesLoader() {
+	const queryClient = useQueryClient();
+	return queryClient.ensureInfiniteQueryData<
+		PaginatedNotesResponse, //TQueryFnData (What the API returns per page)
+		Error, //TError
+		InfiniteData<PaginatedNotesResponse>, //TData (The full Infinite Query cache structure)
+		ReturnType<typeof noteQueryKeys.list> //TQueryKey (YOUR FIX: The specific key type)
+	>;
 }
 
 export function EditorNotesSidebar() {
-	const initialData = useRouteLoaderData('root-notes');
 	const search = useStore((s) => s.searchNotes);
 	const sortBy = useStore((s) => s.sortNotesBy);
 	const setSortBy = useStore((s) => s.setSortBy);
 	const setSearch = useStore((s) => s.setSearch);
-	const [searchInput, setSearchInput] = useState(search);
+    const [searchInput, setSearchInput] = useState(search);
 	const debouncedSearch = useDebounce(searchInput, 300);
 
 	useEffect(() => {
@@ -90,9 +86,10 @@ export function EditorNotesSidebar() {
 		}
 	}, [debouncedSearch, setSearch]);
 
-	useEffect(() => {
-		setSearchInput(search);
-	}, [search]);
+    useEffect(() => {
+			setSearchInput(search);
+		}, [search]);
+
 
 	// Local-only filter UI state (not yet applied to API)
 	const [filters, setFilters] = useState({
@@ -105,21 +102,9 @@ export function EditorNotesSidebar() {
 	});
 
 	const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-		useSuspenseInfiniteQuery({
-			queryKey: ['notes', search, sortBy] as const,
-			queryFn: fetchNotesPage,
-			initialPageParam: 1,
-			initialData: {
-				pages: [initialData],
-				pageParams: [1],
-			},
-			getNextPageParam: (lastPage) => lastPage.nextPage,
-		});
+		useSuspenseInfiniteQuery(notesQueryOptions(search, sortBy));
 
-	const allNotes = useMemo(
-		() => data?.pages.flatMap((page) => page.results) ?? [],
-		[data],
-	);
+	const allNotes = data?.pages.flatMap((page) => page.results) ?? [];
 
 	const parentRef = useRef<HTMLDivElement>(null);
 

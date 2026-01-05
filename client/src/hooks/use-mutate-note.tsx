@@ -16,8 +16,8 @@ import {
 	type UpdateUserNotePayload,
 	type UserNote,
 } from '../types';
+import { noteQueryKeys } from '../utils/queryKeys.ts';
 
-export const NOTES_QUERY_KEY = ['notes'];
 
 type UpdateNoteInput = {
 	id: string;
@@ -30,7 +30,7 @@ export function useCreateNote() {
 	return useMutation({
 		mutationFn: (newNote: CreateUserNote) => createNote(newNote),
 		onMutate: async (newNote) => {
-			await queryClient.cancelQueries({ queryKey: NOTES_QUERY_KEY });
+			await queryClient.cancelQueries({ queryKey: noteQueryKeys.all });
 			const previous = snapshotNotes(queryClient);
 			const tempId = `temp-${Date.now()}`;
 			const now = new Date().toISOString();
@@ -67,11 +67,9 @@ export function useCreateNote() {
 				pageIndex && pageIndex > 0 ? notes : [optimistic, ...notes],
 			);
 
-			try {
-				const store = useStore.getState();
-				store.upsertNote(optimistic);
-				store.setSelectedNoteId(tempId);
-			} catch {}
+
+            const store = useStore.getState();
+			store.setSelectedNoteId(tempId);
 
 			return { previous, tempId };
 		},
@@ -79,11 +77,10 @@ export function useCreateNote() {
 			updateNotesCaches(queryClient, (notes) =>
 				notes.map((item) => (item.id === context?.tempId ? created : item)),
 			);
-			try {
+
 				const store = useStore.getState();
-				store.upsertNote(created);
 				store.setSelectedNoteId(created.id);
-			} catch {}
+
 			revalidator.revalidate();
 		},
 		onError: (error, _input, context) => {
@@ -91,7 +88,7 @@ export function useCreateNote() {
 			restoreNotes(queryClient, context?.previous);
 		},
 		onSettled: () => {
-			queryClient.invalidateQueries({ queryKey: NOTES_QUERY_KEY });
+			queryClient.invalidateQueries({ queryKey: noteQueryKeys.all });
 		},
 	});
 }
@@ -102,7 +99,7 @@ export function useUpdateNote() {
 	return useMutation({
 		mutationFn: ({ id, payload }: UpdateNoteInput) => updateNote(id, payload),
 		onMutate: async ({ id, payload }: UpdateNoteInput) => {
-			await queryClient.cancelQueries({ queryKey: NOTES_QUERY_KEY });
+			await queryClient.cancelQueries({ queryKey: noteQueryKeys.all });
 			const previous = snapshotNotes(queryClient);
 			updateNotesCaches(queryClient, (notes) =>
 				notes.map((note) =>
@@ -123,22 +120,14 @@ export function useUpdateNote() {
 						: note,
 				),
 			);
-			try {
-				const store = useStore.getState();
-				const existing = store.notes.find((note) => note.id === id);
-				if (existing) {
-					store.upsertNote(undefined, payload, id);
-				}
-			} catch {}
+
 			return { previous };
 		},
 		onSuccess: (updated: UserNote) => {
 			updateNotesCaches(queryClient, (notes) =>
 				notes.map((note) => (note.id === updated.id ? updated : note)),
 			);
-			try {
-				useStore.getState().upsertNote(updated);
-			} catch {}
+
 			revalidator.revalidate();
 		},
 		onError: (error, _input, context) => {
@@ -146,7 +135,7 @@ export function useUpdateNote() {
 			restoreNotes(queryClient, context?.previous);
 		},
 		onSettled: () => {
-			queryClient.invalidateQueries({ queryKey: NOTES_QUERY_KEY });
+			queryClient.invalidateQueries({ queryKey: noteQueryKeys.all });
 		},
 	});
 }
@@ -157,14 +146,12 @@ export function useDeleteNote() {
 	return useMutation({
 		mutationFn: (noteId: string) => deleteNote(noteId),
 		onMutate: async (noteId) => {
-			await queryClient.cancelQueries({ queryKey: NOTES_QUERY_KEY });
+			await queryClient.cancelQueries({ queryKey: noteQueryKeys.all });
 			const previous = snapshotNotes(queryClient);
 			updateNotesCaches(queryClient, (notes) =>
 				notes.filter((note) => note.id !== noteId),
 			);
-			try {
-				useStore.getState().removeNote(noteId);
-			} catch {}
+
 			return { previous };
 		},
 		onSuccess: () => {
@@ -175,7 +162,7 @@ export function useDeleteNote() {
 			restoreNotes(queryClient, context?.previous);
 		},
 		onSettled: () => {
-			queryClient.invalidateQueries({ queryKey: NOTES_QUERY_KEY });
+			queryClient.invalidateQueries({ queryKey: noteQueryKeys.all });
 		},
 	});
 }
@@ -195,7 +182,9 @@ export const useSearchNotes = (query: string, params: string) => {
  Snapshot the current state of the cache so we can rollback if the mutation fails.
  */
 function snapshotNotes(queryClient: ReturnType<typeof useQueryClient>) {
-	return queryClient.getQueriesData<UserNote[]>({ queryKey: NOTES_QUERY_KEY });
+	return queryClient.getQueriesData<UserNote[]>({
+		queryKey: noteQueryKeys.all,
+	});
 }
 
 /**
@@ -220,7 +209,7 @@ function updateNotesCaches(
 	updater: (oldNotes: UserNote[], pageIndex?: number) => UserNote[],
 ) {
 	queryClient.setQueriesData<UserNote[] | { results: UserNote[] }>(
-		{ queryKey: NOTES_QUERY_KEY },
+		{ queryKey: noteQueryKeys.all },
 		(oldData) => {
 			if (!oldData) return [];
 

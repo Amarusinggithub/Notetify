@@ -4,7 +4,7 @@ function useDebounce<T>(value: T, delay: number) {
 	const [debounceValue, setDebounceValue] = useState<T>(value);
 
 	useEffect(() => {
-		const timeout = window.setTimeout(() => {
+		const timeout = globalThis.window.setTimeout(() => {
 			setDebounceValue(value);
 		}, delay);
 		return () => {

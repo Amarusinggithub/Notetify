@@ -1,24 +1,19 @@
 import type { QueryFunctionContext } from '@tanstack/react-query';
-import type { PaginatedNotesResponse } from '../components/app-notes-sidebar';
 import axiosInstance from '../lib/axios';
-import type { CreateUserNote, UpdateUserNotePayload, UserNote } from '../types';
+import type {
+	CreateUserNote,
+	PaginatedNotesResponse,
+	UpdateUserNotePayload,
+	UserNote,
+} from '../types';
+import type { noteQueryKeys } from '../utils/queryKeys';
 
-export type SortNoteBy =
-	| 'updated_at'
-	| 'created_at'
-	| 'title'
-	| 'is_favorite'
-	| 'is_pinned';
-
-
-
-type NotesQueryKey = readonly ['notes', string, SortNoteBy];
 
 export async function fetchNotesPage({
 	pageParam = 1,
 	queryKey,
 }: QueryFunctionContext<
-	NotesQueryKey,
+	ReturnType<typeof noteQueryKeys.list>,
 	number
 >): Promise<PaginatedNotesResponse> {
 	const [_key, search, sortBy] = queryKey;
@@ -34,6 +29,11 @@ export async function fetchNotesPage({
 
 	if (search) {
 		params.set('search', search);
+	}
+
+
+	if (!params.get('page')) {
+		params.set('page', '1');
 	}
 
 	try {
