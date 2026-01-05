@@ -12,7 +12,7 @@ export type NotesSliceState = {
 };
 
 export type NotesSliceActions = {
-	setSelectedNote: (id: string | null) => void;
+	setSelectedNoteId: (id: string | null) => void;
 	setNotes: (notes: UserNote[]) => void;
 	upsertNote: (
 		note?: UserNote,
@@ -36,7 +36,7 @@ export const createNotesSlice: StateCreator<StoreState, [], [], NotesSlice> = (
 	notes: [],
 	searchNotes: '',
 	sortNotesBy: 'updated_at',
-	setSelectedNote: (id: string | null) => set({ selectedNoteId: id }),
+	setSelectedNoteId: (id: string | null) => set({ selectedNoteId: id }),
 	setNotes: (notes: UserNote[]) => set({ notes }),
 	removeNote: (noteId: string) => {
 		const existing = get().notes;

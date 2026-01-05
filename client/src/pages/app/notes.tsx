@@ -20,7 +20,7 @@ export default function Notes() {
 	const navigate = useNavigate();
 	const initialData = useRouteLoaderData('root-notes');
 	const selectedId = useStore((s) => s.selectedNoteId);
-	const setSelected = useStore((s) => s.setSelectedNote);
+	const setSelected = useStore((s) => s.setSelectedNoteId);
 	const { mutate: createNote, isPending: isCreating } = useCreateNote();
 	const currentUser = useStore((s) => s.sharedData?.auth.user);
 

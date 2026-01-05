@@ -48,7 +48,7 @@ export const Editor = () => {
 	}, []);
 
 	const selectedNoteId = useStore((s) => s.selectedNoteId);
-	const setSelectedNote = useStore((s) => s.setSelectedNote);
+	const setSelectedNoteId = useStore((s) => s.setSelectedNoteId);
 	const search = useStore((s) => s.searchNotes);
 	const sortBy = useStore((s) => s.sortNotesBy);
 	const setNotes = useStore((s) => s.setNotes);
@@ -84,9 +84,9 @@ export const Editor = () => {
 
 	useEffect(() => {
 		if (!selectedNoteId && current?.id) {
-			setSelectedNote(current.id);
+			setSelectedNoteId(current.id);
 		}
-	}, [current, selectedNoteId, setSelectedNote]);
+	}, [current, selectedNoteId, setSelectedNoteId]);
 
 	const mutation = useMutation({
 		mutationFn: (content: string) => {

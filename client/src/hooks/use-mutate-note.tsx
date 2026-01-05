@@ -70,7 +70,7 @@ export function useCreateNote() {
 			try {
 				const store = useStore.getState();
 				store.upsertNote(optimistic);
-				store.setSelectedNote(tempId);
+				store.setSelectedNoteId(tempId);
 			} catch {}
 
 			return { previous, tempId };
@@ -82,7 +82,7 @@ export function useCreateNote() {
 			try {
 				const store = useStore.getState();
 				store.upsertNote(created);
-				store.setSelectedNote(created.id);
+				store.setSelectedNoteId(created.id);
 			} catch {}
 			revalidator.revalidate();
 		},
