@@ -1,5 +1,5 @@
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router';
-import { useNotesLoader } from '../components/app-notes-sidebar.tsx';
+import { notesLoader } from '../components/app-notes-sidebar.tsx';
 import AppLayout from '../layouts/app-layout';
 import SettingsLayout from '../layouts/settings/layout';
 import Calender from '../pages/app/calender';
@@ -46,7 +46,7 @@ function AppRoutes() {
 		{
 			path: '/',
 			id: 'root-notes',
-			loader: useNotesLoader,
+			loader: notesLoader,
 			Component: AppLayout,
 			HydrateFallback: () => (
 				<div className="flex h-screen items-center justify-center">

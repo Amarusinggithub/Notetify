@@ -30,11 +30,11 @@ import {
 import { ScrollArea } from './ui/scroll-area';
 
 import {
-	useQueryClient,
 	useSuspenseInfiniteQuery,
-    type InfiniteData,
+	type InfiniteData,
 } from '@tanstack/react-query';
 import { useEffect, useRef, useState } from 'react';
+import { queryClient } from '../App';
 import useDebounce from '../hooks/use-debounce';
 import { fetchNotesPage } from '../services/note-service.ts';
 import { useStore } from '../stores/index.ts';
@@ -56,20 +56,20 @@ export const notesQueryOptions = (
 	search: string = '',
 	sortby: SortBy = 'updated_at',
 ) => ({
-	queryKey: noteQueryKeys.list(search,sortby),
+	queryKey: noteQueryKeys.list(search, sortby),
 	queryFn: fetchNotesPage,
 	initialPageParam: 1,
 	getNextPageParam: (lastPage: PaginatedNotesResponse) => lastPage.nextPage,
 });
 
-export  function useNotesLoader() {
-	const queryClient = useQueryClient();
+export function notesLoader() {
 	return queryClient.ensureInfiniteQueryData<
-		PaginatedNotesResponse, //TQueryFnData (What the API returns per page)
-		Error, //TError
-		InfiniteData<PaginatedNotesResponse>, //TData (The full Infinite Query cache structure)
-		ReturnType<typeof noteQueryKeys.list> //TQueryKey (YOUR FIX: The specific key type)
-	>;
+		PaginatedNotesResponse,
+		Error,
+		InfiniteData<PaginatedNotesResponse>,
+		ReturnType<typeof noteQueryKeys.list>,
+        number
+	>(notesQueryOptions());
 }
 
 export function EditorNotesSidebar() {
