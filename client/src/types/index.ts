@@ -108,7 +108,7 @@ export type UpdateUserNotePayload = Partial<{
 	is_favorite: boolean;
 	is_pinned: boolean;
 	is_trashed: boolean;
-	tags: string[];
+	tags: Tag[];
 }>;
 
 export type UpdateUserNotebookPayload = Partial<{

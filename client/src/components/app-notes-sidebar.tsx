@@ -77,8 +77,8 @@ export async function notesLoader({
 
 export function EditorNotesSidebar() {
 	const initialData = useRouteLoaderData('root-notes');
-	const search = useStore((s) => s.search);
-	const sortBy = useStore((s) => s.sortBy);
+	const search = useStore((s) => s.searchNotes);
+	const sortBy = useStore((s) => s.sortNotesBy);
 	const setSortBy = useStore((s) => s.setSortBy);
 	const setSearch = useStore((s) => s.setSearch);
 	const [searchInput, setSearchInput] = useState(search);

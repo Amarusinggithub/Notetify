@@ -12,7 +12,7 @@ import {
 } from '../services/note-service.ts';
 import { useStore } from '../stores/index.ts';
 import {
-	type CreateNote,
+	type CreateUserNote,
 	type UpdateUserNotePayload,
 	type UserNote,
 } from '../types';
@@ -28,7 +28,7 @@ export function useCreateNote() {
 	const revalidator = useRevalidator();
 	const queryClient = useQueryClient();
 	return useMutation({
-		mutationFn: (newNote: CreateNote) => createNote(newNote),
+		mutationFn: (newNote: CreateUserNote) => createNote(newNote),
 		onMutate: async (newNote) => {
 			await queryClient.cancelQueries({ queryKey: NOTES_QUERY_KEY });
 			const previous = snapshotNotes(queryClient);

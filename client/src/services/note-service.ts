@@ -1,23 +1,18 @@
 import type { QueryFunctionContext } from '@tanstack/react-query';
 import type { PaginatedNotesResponse } from '../components/app-notes-sidebar';
 import axiosInstance from '../lib/axios';
-import type { CreateNote, UpdateUserNotePayload, UserNote } from '../types';
+import type { CreateUserNote, UpdateUserNotePayload, UserNote } from '../types';
 
-export type SortBy =
+export type SortNoteBy =
 	| 'updated_at'
 	| 'created_at'
 	| 'title'
 	| 'is_favorite'
 	| 'is_pinned';
 
-/*
-type NotesQueryContext =
-	| QueryFunctionContext<[string, string, string]>
-	| { pageParam?: number; queryKey?: any[] };
 
-*/
 
-type NotesQueryKey = readonly ['notes', string, SortBy];
+type NotesQueryKey = readonly ['notes', string, SortNoteBy];
 
 export async function fetchNotesPage({
 	pageParam = 1,
@@ -32,14 +27,24 @@ export async function fetchNotesPage({
 		sort_by: sortBy,
 		sort_direction: 'desc',
 	});
+
+	if (!params.get('page')) {
+		params.set('page', '1');
+	}
+
 	if (search) {
 		params.set('search', search);
 	}
 
-	const response = await axiosInstance.get<PaginatedNotesResponse>(
-		`/notes?${params.toString()}`,
-	);
-	return response.data;
+	try {
+		const response = await axiosInstance.get<PaginatedNotesResponse>(
+			`/notes?${params.toString()}`,
+		);
+		return response.data;
+	} catch (error) {
+		console.error('Failed to fetch notes:', error);
+		return { results: [], nextPage: null, hasNextPage: false };
+	}
 }
 
 export async function updateNote(
@@ -57,9 +62,9 @@ export async function deleteNote(userNoteId: string): Promise<void> {
 	await axiosInstance.delete(`/notes/${userNoteId}`);
 }
 
-export const createNote = async (note: CreateNote): Promise<UserNote> => {
+export const createNote = async (note: CreateUserNote): Promise<UserNote> => {
 	try {
-		// Map legacy CreateNote shape to API contract
+		// Map legacy CreateUserNote shape to API contract
 		const response = await axiosInstance.post('/notes/', {
 			title: note.note_data?.title ?? '',
 			content: note.note_data?.content ?? '',

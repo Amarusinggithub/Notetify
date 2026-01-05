@@ -49,8 +49,8 @@ export const Editor = () => {
 
 	const selectedNoteId = useStore((s) => s.selectedNoteId);
 	const setSelectedNote = useStore((s) => s.setSelectedNote);
-	const search = useStore((s) => s.search);
-	const sortBy = useStore((s) => s.sortBy);
+	const search = useStore((s) => s.searchNotes);
+	const sortBy = useStore((s) => s.sortNotesBy);
 	const setNotes = useStore((s) => s.setNotes);
 	const initialData = useRouteLoaderData('root-notes') as
 		| PaginatedNotesResponse

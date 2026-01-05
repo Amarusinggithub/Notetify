@@ -7,8 +7,16 @@ import { TagProvider } from './hooks/use-mutate-tag.tsx';
 import ErrorFallback from './pages/error.tsx';
 import AppRoutes from './routes/app-routes.tsx';
 
+export const queryClient = new QueryClient({
+	defaultOptions: {
+		queries: {
+			staleTime: 1000 * 60 * 5, // Data is considered "fresh" for 5 minutes
+		},
+	},
+});
+
+
 export default function App() {
-	const queryClient = new QueryClient();
 
 	return (
 		<ErrorBoundary FallbackComponent={ErrorFallback}>
