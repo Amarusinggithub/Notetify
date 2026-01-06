@@ -24,6 +24,8 @@
 		"@liveblocks/react": "^3.12.1",
 		"@liveblocks/react-tiptap": "^3.12.1",
 		"@liveblocks/react-ui": "^3.12.1",
+		"@lottiefiles/dotlottie-react": "^0.17.12",
+		"@lottiefiles/react-lottie-player": "^3.6.0",
 		"@radix-ui/react-accordion": "^1.2.12",
 		"@radix-ui/react-alert-dialog": "^1.1.15",
 		"@radix-ui/react-aspect-ratio": "^1.1.8",

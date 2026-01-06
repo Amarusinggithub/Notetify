@@ -1,4 +1,6 @@
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router';
+import NotesLottie from '../assets/note.lottie';
 import { notesLoader } from '../components/app-notes-sidebar.tsx';
 import AppLayout from '../layouts/app-layout';
 import SettingsLayout from '../layouts/settings/layout';
@@ -31,14 +33,126 @@ function AppRoutes() {
 	if (checkingAuth) return null;
 
 	const publicRoutes = [
-		{ index: true, Component: Landing },
-		{ path: 'login', Component: Login },
-		{ path: 'forgot-password', Component: ForgotPassword },
-		{ path: 'reset-password/:token', Component: ResetPassword },
-		{ path: 'verify-email', Component: VerifyEmail },
-		{ path: 'Two-factor-verification', Component: TwoFactorVerification },
-		{ path: 'register', Component: Register },
-		{ path: '*', Component: () => <Navigate to="/" replace /> },
+		{
+			index: true,
+			Component: Landing,
+			HydrateFallback: () => (
+				<div className="flex h-screen flex-col items-center justify-center gap-4">
+					<DotLottieReact
+						src={NotesLottie}
+						loop
+						autoplay
+						className="h-60 w-60"
+					/>
+					<p className="text-muted-foreground text-lg">Loading...</p>
+				</div>
+			),
+		},
+		{
+			path: 'login',
+			Component: Login,
+			HydrateFallback: () => (
+				<div className="flex h-screen flex-col items-center justify-center gap-4">
+					<DotLottieReact
+						src={NotesLottie}
+						loop
+						autoplay
+						className="h-60 w-60"
+					/>
+					<p className="text-muted-foreground text-lg">Loading...</p>
+				</div>
+			),
+		},
+		{
+			path: 'forgot-password',
+			Component: ForgotPassword,
+			HydrateFallback: () => (
+				<div className="flex h-screen flex-col items-center justify-center gap-4">
+					<DotLottieReact
+						src={NotesLottie}
+						loop
+						autoplay
+						className="h-60 w-60"
+					/>
+					<p className="text-muted-foreground text-lg">Loading...</p>
+				</div>
+			),
+		},
+		{
+			path: 'reset-password/:token',
+			Component: ResetPassword,
+			HydrateFallback: () => (
+				<div className="flex h-screen flex-col items-center justify-center gap-4">
+					<DotLottieReact
+						src={NotesLottie}
+						loop
+						autoplay
+						className="h-60 w-60"
+					/>
+					<p className="text-muted-foreground text-lg">Loading...</p>
+				</div>
+			),
+		},
+		{
+			path: 'verify-email',
+			Component: VerifyEmail,
+			HydrateFallback: () => (
+				<div className="flex h-screen flex-col items-center justify-center gap-4">
+					<DotLottieReact
+						src={NotesLottie}
+						loop
+						autoplay
+						className="h-60 w-60"
+					/>
+					<p className="text-muted-foreground text-lg">Loading...</p>
+				</div>
+			),
+		},
+		{
+			path: 'Two-factor-verification',
+			Component: TwoFactorVerification,
+			HydrateFallback: () => (
+				<div className="flex h-screen flex-col items-center justify-center gap-4">
+					<DotLottieReact
+						src={NotesLottie}
+						loop
+						autoplay
+						className="h-60 w-60"
+					/>
+					<p className="text-muted-foreground text-lg">Loading...</p>
+				</div>
+			),
+		},
+		{
+			path: 'register',
+			Component: Register,
+			HydrateFallback: () => (
+				<div className="flex h-screen flex-col items-center justify-center gap-4">
+					<DotLottieReact
+						src={NotesLottie}
+						loop
+						autoplay
+						className="h-60 w-60"
+					/>
+					<p className="text-muted-foreground text-lg">Loading...</p>
+				</div>
+			),
+		},
+		{
+			path: '*',
+			Component: () => <Navigate to="/" replace />,
+			HydrateFallback: () => (
+				<div className="flex h-screen flex-col items-center justify-center gap-4">
+					<DotLottieReact
+						src={NotesLottie}
+						loop
+						autoplay
+						className="h-60 w-60"
+					/>
+					<p className="text-muted-foreground text-lg">Loading...</p>
+				</div>
+			),
+		},
 	];
 
 	const privateRoutes = [
@@ -48,8 +162,14 @@ function AppRoutes() {
 			loader: notesLoader,
 			Component: AppLayout,
 			HydrateFallback: () => (
-				<div className="flex h-screen items-center justify-center">
-					Loading...
+				<div className="flex h-screen flex-col items-center justify-center gap-4">
+					<DotLottieReact
+						src={NotesLottie}
+						loop
+						autoplay
+						className="h-60 w-60"
+					/>
+					<p className="text-muted-foreground text-lg">Loading your notes...</p>
 				</div>
 			),
 			children: [
@@ -74,6 +194,19 @@ function AppRoutes() {
 				{
 					index: true,
 					Component: () => <Navigate to="/settings/general" replace />,
+					HydrateFallback: () => (
+						<div className="flex h-screen flex-col items-center justify-center gap-4">
+							<DotLottieReact
+								src={NotesLottie}
+								loop
+								autoplay
+								className="h-60 w-60"
+							/>
+							<p className="text-muted-foreground text-sm">
+								Loading Settings...
+							</p>
+						</div>
+					),
 				},
 				{ path: 'general', Component: General },
 				{ path: 'account', Component: Account },
