@@ -99,14 +99,17 @@ export function useUpdateNote() {
 		onMutate: async ({ id, payload }: UpdateNoteInput) => {
 			await queryClient.cancelQueries({ queryKey: noteQueryKeys.all });
 			const previous = snapshotNotes(queryClient);
+			const now = new Date().toISOString();
 			updateNotesCaches(queryClient, (notes) =>
 				notes.map((note) =>
 					note.id === id
 						? {
 								...note,
 								...payload,
+								updated_at: now,
 								note: {
 									...note.note,
+									updated_at: now,
 									...(payload.title !== undefined
 										? { title: payload.title }
 										: {}),
@@ -197,25 +200,46 @@ function updateNotesCaches(
 	queryClient: ReturnType<typeof useQueryClient>,
 	updater: (oldNotes: UserNote[], pageIndex?: number) => UserNote[],
 ) {
-	queryClient.setQueriesData<UserNote[] | { results: UserNote[] }>(
-		{ queryKey: noteQueryKeys.all },
-		(oldData) => {
-			if (!oldData) return [];
+	// Get all matching queries and update them individually
+	const queries = queryClient.getQueriesData<
+		| UserNote[]
+		| { results: UserNote[] }
+		| { pages: { results: UserNote[] }[]; pageParams: unknown[] }
+	>({ queryKey: noteQueryKeys.all });
 
-			// Handle if your API returns an Array directly
-			if (Array.isArray(oldData)) {
-				return updater(oldData);
-			}
+	for (const [queryKey, oldData] of queries) {
+		if (!oldData) continue;
 
-			// Handle if your API returns a paginated object (e.g. { results: [...] })
-			if ('results' in oldData && Array.isArray(oldData.results)) {
-				return {
-					...oldData,
-					results: updater(oldData.results),
-				};
-			}
+		let newData:
+			| UserNote[]
+			| { results: UserNote[] }
+			| { pages: { results: UserNote[] }[]; pageParams: unknown[] }
+			| undefined;
 
-			return oldData;
-		},
-	);
+		// Handle if your API returns an Array directly
+		if (Array.isArray(oldData)) {
+			newData = updater(oldData);
+		}
+		// Handle infinite query data (e.g. { pages: [...], pageParams: [...] })
+		else if ('pages' in oldData && Array.isArray(oldData.pages)) {
+			newData = {
+				...oldData,
+				pages: oldData.pages.map((page, index) => ({
+					...page,
+					results: updater(page.results, index),
+				})),
+			};
+		}
+		// Handle if your API returns a paginated object (e.g. { results: [...] })
+		else if ('results' in oldData && Array.isArray(oldData.results)) {
+			newData = {
+				...oldData,
+				results: updater(oldData.results),
+			};
+		}
+
+		if (newData) {
+			queryClient.setQueryData(queryKey, newData);
+		}
+	}
 }

@@ -1,4 +1,5 @@
 ﻿import { useOthers } from '@liveblocks/react/suspense';
+import { useQueryClient, type InfiniteData } from '@tanstack/react-query';
 import {
 	ArrowRightLeft,
 	ChevronDown,
@@ -26,11 +27,12 @@ import {
 	Tag,
 	Trash2,
 } from 'lucide-react';
-import { useState } from 'react';
-import type { BreadcrumbItem, UserNote } from 'types';
+import { useState, useSyncExternalStore } from 'react';
+import type { BreadcrumbItem, PaginatedNotesResponse, UserNote } from 'types';
 import { useDeleteNote, useUpdateNote } from '../hooks/use-mutate-note';
 import { cn } from '../lib/utils';
 import { useStore } from '../stores/index.ts';
+import { noteQueryKeys } from '../utils/queryKeys.ts';
 import { Breadcrumbs } from './breadcrumbs';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Badge } from './ui/badge';
@@ -52,15 +54,12 @@ import { Separator } from './ui/separator';
 import { useSidebar } from './ui/sidebar';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
-
-
 export function EditorHeader({
 	breadcrumbs = [],
-	currentNoteId = null,  currentNote= null
+	currentNoteId = null,
 }: {
 	breadcrumbs?: BreadcrumbItem[];
 	currentNoteId?: string | null;
-    currentNote?: UserNote | null;
 }) {
 	const {
 		open: appOpen,
@@ -74,7 +73,7 @@ export function EditorHeader({
 		setOpen: setNotesOpen,
 		setOpenMobile: setNotesOpenMobile,
 	} = useNotesSidebar();
-
+	const queryClient = useQueryClient();
 
 	const currentUser = useStore((s) => s.sharedData?.auth.user);
 	const [inviteRole, setInviteRole] = useState<'editor' | 'viewer'>('editor');
@@ -89,23 +88,41 @@ export function EditorHeader({
 		? `${globalThis.window.location.origin}/notes/${currentNoteId}`
 		: globalThis.window.location.href;
 
-
 	const updateNoteMutation = useUpdateNote();
 	const deleteNoteMutation = useDeleteNote();
 	const others = useOthers();
 	const collaborators = others.slice(0, 3);
+	const search = useStore((s) => s.searchNotes);
+	const sortBy = useStore((s) => s.sortNotesBy);
+
+	// Subscribe to cache changes so the component re-renders when notes are updated
+	const paginatedNotes = useSyncExternalStore(
+		(onStoreChange) => queryClient.getQueryCache().subscribe(onStoreChange),
+		() =>
+			queryClient.getQueryData<InfiniteData<PaginatedNotesResponse>>(
+				noteQueryKeys.list(search, sortBy),
+			),
+	);
+
+	const allNotes = paginatedNotes?.pages.flatMap((page) => page.results) ?? [];
+
+	const currentUserNote =
+		allNotes.find((n: UserNote) => n.id === currentNoteId) ?? allNotes[-1];
+
+	// Use cache value directly - mutation's onMutate handles optimistic updates
+	const isFavorite = currentUserNote?.is_favorite ?? false;
 
 	const handleFavoriteToggle = () => {
-		if (!currentNote) return;
+		if (!currentUserNote) return;
 		updateNoteMutation.mutate({
-			id: currentNote.id,
-			payload: { is_favorite: !currentNote.is_favorite },
+			id: currentUserNote.id,
+			payload: { is_favorite: !isFavorite },
 		});
 	};
 
 	const handleDeleteNote = () => {
-		if (!currentNote) return;
-		deleteNoteMutation.mutate(currentNote.id);
+		if (!currentUserNote) return;
+		deleteNoteMutation.mutate(currentUserNote.id);
 	};
 
 	const collaboratorsLabel = collaborators.length
@@ -113,8 +130,7 @@ export function EditorHeader({
 		: 'Only you here';
 
 	const handleFullscreenToggle = () => {
-        const anyOpen =
-					appOpen || appOpenMobile || notesOpen || notesOpenMobile;
+		const anyOpen = appOpen || appOpenMobile || notesOpen || notesOpenMobile;
 
 		if (anyOpen) {
 			setAppOpen(false);
@@ -209,25 +225,22 @@ export function EditorHeader({
 							<Button
 								variant="ghost"
 								size="icon"
-								disabled={!currentNote || updateNoteMutation.isPending}
+								disabled={!currentUserNote || updateNoteMutation.isPending}
 								onClick={handleFavoriteToggle}
 								aria-label={
-									currentNote?.is_favorite ? 'Unfavorite note' : 'Favorite note'
+									currentUserNote?.is_favorite
+										? 'Unfavorite note'
+										: 'Favorite note'
 								}
 							>
 								<Star
-									className={cn(
-										'size-4',
-										currentNote?.is_favorite ? 'text-yellow-400' : '',
-									)}
-									fill={currentNote?.is_favorite ? 'currentColor' : 'none'}
+									className={cn('size-4', isFavorite ? 'text-yellow-400' : '')}
+									fill={isFavorite ? 'currentColor' : 'none'}
 								/>
 							</Button>
 						</TooltipTrigger>
 						<TooltipContent sideOffset={6}>
-							{currentNote?.is_favorite
-								? 'Remove favorite'
-								: 'Mark as favorite'}
+							{isFavorite ? 'Remove favorite' : 'Mark as favorite'}
 						</TooltipContent>
 					</Tooltip>
 					<Tooltip>
@@ -235,7 +248,7 @@ export function EditorHeader({
 							<Button
 								variant="ghost"
 								size="icon"
-								disabled={!currentNote || deleteNoteMutation.isPending}
+								disabled={!currentUserNote || deleteNoteMutation.isPending}
 								onClick={handleDeleteNote}
 								aria-label="Delete note"
 							>
@@ -572,14 +585,19 @@ export function EditorHeaderSkeleton() {
 
 			<div className="ml-auto flex items-center gap-3">
 				<div className="flex items-center gap-2">
-					<Button variant="ghost" size="icon" disabled aria-label="Favorite note">
+					<Button
+						variant="ghost"
+						size="icon"
+						disabled
+						aria-label="Favorite note"
+					>
 						<Star className="size-4" />
 					</Button>
 					<Button variant="ghost" size="icon" disabled aria-label="Delete note">
 						<Trash2 />
 					</Button>
 				</div>
-				<div className="h-20px] flex divide-x divide-[#7b8efb]/60 overflow-hidden rounded-[10px] bg-[#4f6ef9] text-white shadow-sm opacity-50">
+				<div className="h-20px] flex divide-x divide-[#7b8efb]/60 overflow-hidden rounded-[10px] bg-[#4f6ef9] text-white opacity-50 shadow-sm">
 					<Button
 						size="sm"
 						className="rounded-none bg-transparent px-5 font-medium text-white"

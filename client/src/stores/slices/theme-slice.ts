@@ -9,7 +9,7 @@ type ThemeSliceState = {
 
 type ThemeSliceAction = {
 	setTheme: (theme: Theme) => void;
-    setLanguage: (language: Language) => void;
+	setLanguage: (language: Language) => void;
 };
 
 export function applyTheme(theme: Theme) {
@@ -36,18 +36,17 @@ export const createThemeSlice: StateCreator<StoreState, [], [], ThemeSlice> = (
 		set({ theme: t });
 		applyTheme(t);
 	},
-    setLanguage: (l) => {
+	setLanguage: (l) => {
 		set({ language: l });
 	},
 });
 
 // Apply theme immediately on first import in the browser
 if (typeof globalThis.window !== 'undefined') {
-    try{const t = useStore.getState().theme || 'system';
-		applyTheme(t);}catch{
-            console.error(
-							'there was an error apply the theme ',
-						);
-        }
-
+	try {
+		const t = useStore.getState().theme || 'system';
+		applyTheme(t);
+	} catch {
+		console.error('there was an error apply the theme ');
+	}
 }

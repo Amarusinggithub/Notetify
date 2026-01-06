@@ -11,7 +11,9 @@ import {
 	CardHeader,
 	CardTitle,
 } from './ui/card';
-
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip.tsx';
+import { Button } from './ui/button.tsx';
+import { useUpdateNote } from '../hooks/use-mutate-note.tsx';
 type NoteCardProp = {
 	userNote: UserNote;
 };
@@ -24,12 +26,24 @@ const NoteCard = ({ userNote }: NoteCardProp) => {
 	const isActive = selectedId === userNote.id;
 	const title = getTitleFromHtml(userNote.note.content);
 
-	const content = getContentPreview(userNote.note.content );
+	const content = getContentPreview(userNote.note.content);
 	const updatedLabel = userNote.updated_at
 		? formatDistanceToNow(new Date(userNote.updated_at), {
 				addSuffix: true,
 			})
 		: 'just now';
+	const updateNoteMutation = useUpdateNote();
+
+	const isFavorite = userNote.is_favorite ?? false;
+
+	const handleFavoriteToggle = (e: React.MouseEvent) => {
+		e.stopPropagation(); // Prevent card click navigation
+		if (!userNote) return;
+		updateNoteMutation.mutate({
+			id: userNote.id,
+			payload: { is_favorite: !isFavorite },
+		});
+	};
 
 	return (
 		<Card
@@ -37,16 +51,32 @@ const NoteCard = ({ userNote }: NoteCardProp) => {
 				setSelectedNoteId(userNote.id);
 				navigate(`/notes/${userNote.id}`);
 			}}
-			className={cn('gap-2 rounded-none border-x-0 border-t-0 py-3', isActive && 'border-ring')}
+			className={cn(
+				'gap-2 rounded-none border-x-0 border-t-0 py-3',
+				isActive && 'border-ring',
+			)}
 		>
 			<CardHeader className="flex flex-row items-center justify-between py-0">
 				<CardTitle className="text-base font-semibold">{title}</CardTitle>
-				{userNote.is_favorite && (
-					<Star
-						data-testid="favorite-indicator"
-						className="size-4 text-yellow-400"
-						fill="currentColor"
-					/>
+				{isFavorite && (
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<Button
+								variant="ghost"
+								size="icon"
+								disabled={!userNote || updateNoteMutation.isPending}
+								onClick={handleFavoriteToggle}
+								aria-label="Unfavorite note"
+							>
+								<Star
+									data-testid="favorite-indicator"
+									className="size-4 text-yellow-400"
+									fill="currentColor"
+								/>
+							</Button>
+						</TooltipTrigger>
+						<TooltipContent sideOffset={6}>Remove favorite</TooltipContent>
+					</Tooltip>
 				)}
 			</CardHeader>
 			<CardContent className="text-muted-foreground line-clamp-3 text-sm">

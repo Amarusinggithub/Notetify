@@ -20,7 +20,7 @@ import { cn } from '../lib/utils';
 import { useStore } from '../stores/index.ts';
 import type { PaginatedNotesResponse, UserNote } from '../types';
 import { useUpdateNote } from '../hooks/use-mutate-note.tsx';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useSyncExternalStore } from 'react';
 import { NoteEditorProvider } from '../context/editor-context.tsx';
 import EditorFooter from './editor-footer';
 import { EditorHeader, EditorHeaderSkeleton } from './editor-header';
@@ -36,7 +36,7 @@ import {Skeleton} from  '../components/ui/skeleton.tsx';
 export const Editor = () => {
 	const queryClient = useQueryClient();
 	const liveblocks = useLiveblocksExtension();
-    const lastLoadedId = useRef<string | null>(null);
+	const lastLoadedId = useRef<string | null>(null);
 
 	const isMounted = useRef(false);
 
@@ -53,10 +53,15 @@ export const Editor = () => {
 	const search = useStore((s) => s.searchNotes);
 	const sortBy = useStore((s) => s.sortNotesBy);
 
-	const paginatedNotes =
-		queryClient.getQueryData<InfiniteData<PaginatedNotesResponse>>(
-			noteQueryKeys.list(search, sortBy )
-		);
+
+	// Subscribe to cache changes so the component re-renders when notes are updated
+	const paginatedNotes = useSyncExternalStore(
+		(onStoreChange) => queryClient.getQueryCache().subscribe(onStoreChange),
+		() =>
+			queryClient.getQueryData<InfiniteData<PaginatedNotesResponse>>(
+				noteQueryKeys.list(search, sortBy),
+			),
+	);
 
 	const allNotes = paginatedNotes?.pages.flatMap((page) => page.results) ?? [];
 
@@ -299,7 +304,9 @@ export const Editor = () => {
 	return (
 		<NoteEditorProvider editor={editor}>
 			<div className="bg-editor flex h-full flex-col">
-				<EditorHeader currentNoteId={currentUserNote?.id} currentNote={currentUserNote} />
+				<EditorHeader
+					currentNoteId={currentUserNote?.id}
+				/>
 				<EditorToolbar />
 				<div className="relative flex-1 overflow-auto">
 					<div
