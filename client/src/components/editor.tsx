@@ -302,7 +302,7 @@ export const Editor = () => {
 	return (
 		<NoteEditorProvider editor={editor}>
 			<div className="bg-editor flex h-full flex-col">
-				<EditorHeader currentNoteId={currentUserNote?.id} />
+				<EditorHeader currentNoteId={currentUserNote?.id} currentNote={currentUserNote} />
 				<EditorToolbar />
 				<div className="relative flex-1 overflow-auto">
 					<div

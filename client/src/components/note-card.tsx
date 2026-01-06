@@ -58,19 +58,38 @@ const NoteCard = ({ userNote }: NoteCardProp) => {
 	);
 };
 
-function getContentPreview(html: string): string {
-	const preview = html
-		.replace(/<h1[^>]*>.*?<\/h1>/i, '') // Remove first h1
-		.replace(/<[^>]+>/g, ' ') // Strip remaining tags
-		.replace(/\s+/g, ' ')
-		.trim();
+function getContentPreview(html: string, maxLength = 119): string {
+  const preview = html
+    .replace(/<h1[^>]*>.*?<\/h1>/i, '')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
 
-	return preview || 'No content';
+  if (!preview) return 'No content';
+
+  if (preview.length <= maxLength) return preview;
+
+  // Cut at last space to avoid breaking words
+  const truncated = preview.slice(0, maxLength).trimEnd();
+  const lastSpace = truncated.lastIndexOf(' ');
+
+  return (lastSpace > 0 ? truncated.slice(0, lastSpace) : truncated) + '...';
 }
 
-const getTitleFromHtml = (html: string): string => {
+
+
+const getTitleFromHtml = (html: string, maxLength = 50): string => {
 	const match = html.match(/<h1[^>]*>(.*?)<\/h1>/i);
-	return match ? match[1].replace(/<[^>]*>/g, '') : 'Untitled'; // Strip inner tags
+	const title = match ? match[1].replace(/<[^>]*>/g, '').trim() : '';
+
+	if (!title) return 'Untitled';
+
+	if (title.length <= maxLength) return title;
+
+	const truncated = title.slice(0, maxLength).trimEnd();
+	const lastSpace = truncated.lastIndexOf(' ');
+
+	return (lastSpace > 0 ? truncated.slice(0, lastSpace) : truncated) + '...';
 };
 
 export default NoteCard;

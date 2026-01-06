@@ -15,6 +15,7 @@ import {
 	ListTree,
 	Lock,
 	Maximize2,
+	Minimize2,
 	MoreHorizontal,
 	Notebook as NotebookIcon,
 	PenLine,
@@ -26,12 +27,11 @@ import {
 	Tag,
 	Trash2,
 } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
-import type { BreadcrumbItem, PaginatedNotesResponse } from 'types';
+import { useState } from 'react';
+import type { BreadcrumbItem, UserNote } from 'types';
 import { useDeleteNote, useUpdateNote } from '../hooks/use-mutate-note';
 import { cn } from '../lib/utils';
 import { useStore } from '../stores/index.ts';
-import { noteQueryKeys } from '../utils/queryKeys.ts';
 import { Breadcrumbs } from './breadcrumbs';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Badge } from './ui/badge';
@@ -55,10 +55,11 @@ import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
 export function EditorHeader({
 	breadcrumbs = [],
-	currentNoteId = null,
+	currentNoteId = null,  currentNote= null
 }: {
 	breadcrumbs?: BreadcrumbItem[];
 	currentNoteId?: string | null;
+    currentNote?: UserNote | null;
 }) {
 	const {
 		open: appOpen,
@@ -72,7 +73,7 @@ export function EditorHeader({
 		setOpen: setNotesOpen,
 		setOpenMobile: setNotesOpenMobile,
 	} = useNotesSidebar();
-	const queryClient = useQueryClient();
+
 
 	const currentUser = useStore((s) => s.sharedData?.auth.user);
 	const [inviteRole, setInviteRole] = useState<'editor' | 'viewer'>('editor');
@@ -87,25 +88,6 @@ export function EditorHeader({
 		? `${globalThis.window.location.origin}/notes/${currentNoteId}`
 		: globalThis.window.location.href;
 
-	const search = useStore((s) => s.searchNotes);
-	const sortBy = useStore((s) => s.sortNotesBy);
-
-	const isMounted = useRef(false);
-
-	useEffect(() => {
-		isMounted.current = true;
-		return () => {
-			isMounted.current = false;
-		};
-	}, []);
-
-	const paginatedNotes = queryClient.getQueryData<
-		InfiniteData<PaginatedNotesResponse>
-	>(noteQueryKeys.list(search, sortBy));
-
-	const allNotes = paginatedNotes?.pages.flatMap((page) => page.results) ?? [];
-	const currentNote =
-		allNotes.find((note) => note.id === currentNoteId) ?? null;
 
 	const updateNoteMutation = useUpdateNote();
 	const deleteNoteMutation = useDeleteNote();
@@ -130,7 +112,9 @@ export function EditorHeader({
 		: 'Only you here';
 
 	const handleFullscreenToggle = () => {
-		const anyOpen = appOpen || appOpenMobile || notesOpen || notesOpenMobile;
+        const anyOpen =
+					appOpen || appOpenMobile || notesOpen || notesOpenMobile;
+
 		if (anyOpen) {
 			setAppOpen(false);
 			setAppOpenMobile(false);
@@ -183,7 +167,11 @@ export function EditorHeader({
 							onClick={handleFullscreenToggle}
 							aria-label="Toggle fullscreen (hide sidebars)"
 						>
-							<Maximize2 />
+							{appOpen || appOpenMobile || notesOpen || notesOpenMobile ? (
+								<Maximize2 />
+							) : (
+								<Minimize2 />
+							)}
 						</Button>
 					</TooltipTrigger>
 					<TooltipContent sideOffset={6}>Fullscreen</TooltipContent>
