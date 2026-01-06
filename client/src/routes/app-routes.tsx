@@ -37,7 +37,6 @@ function AppRoutes() {
 		{ path: 'reset-password/:token', Component: ResetPassword },
 		{ path: 'verify-email', Component: VerifyEmail },
 		{ path: 'Two-factor-verification', Component: TwoFactorVerification },
-
 		{ path: 'register', Component: Register },
 		{ path: '*', Component: () => <Navigate to="/" replace /> },
 	];

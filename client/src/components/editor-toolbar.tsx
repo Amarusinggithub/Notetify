@@ -16,6 +16,7 @@ import {
 	Toolbar,
 	ToolbarButton,
 	ToolbarFontFamilyMenuButton,
+	ToolbarFontSizeMenuButton,
 	ToolbarGroup,
 	ToolbarHeadingLevelMenuButton,
 	ToolbarLinkButton,
@@ -134,6 +135,8 @@ export default function EditorToolbar() {
 				<ToolbarSeparator />
 				<ToolbarHeadingLevelMenuButton />
 				<ToolbarSeparator />
+				<ToolbarFontSizeMenuButton />
+				<ToolbarSeparator />
 				<ToolbarTextColorButton />
 				<ToolbarSeparator />
 				<ToolbarTextHighlightButton />
@@ -166,24 +169,4 @@ export default function EditorToolbar() {
 	);
 }
 
-/*import {
-  AlignCenter,
-  AlignLeft,
-  AlignRight,
-  Bold,
-  Heading1,
-  Heading2,
-  Heading3,
-  ImageIcon,
-  Italic,
-  LinkIcon,
-  ListIcon,
-  ListOrderedIcon,
-  Pilcrow,
-  Redo,
-  Strikethrough,
-  Undo,
-  Underline,
-  Quote,
-  Highlighter,
-} from 'lucide-react';*/
+

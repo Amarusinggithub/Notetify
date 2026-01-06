@@ -1,6 +1,7 @@
 import type { Level } from '@tiptap/extension-heading';
 import { cva } from 'class-variance-authority';
 import {
+    ALargeSmall,
 	AlignCenterIcon,
 	AlignJustifyIcon,
 	AlignLeftIcon,
@@ -38,7 +39,7 @@ import {
 	DialogTitle,
 } from './dialog';
 
-function ToolbarFontSizeMenuButton() {
+ function ToolbarFontSizeMenuButton() {
 	const editor = useNoteEditor();
 
 	const sizes = [
@@ -48,7 +49,7 @@ function ToolbarFontSizeMenuButton() {
 		value: `${size}px`,
 		isActive: () => editor?.isActive({ fontSize: `${size}px` }),
 		onClick: () =>
-			/*editor?.commands.setFontSize(`${size}px`)*/ console.log(''),
+			editor?.commands.setFontSize(`${size}px`),
 	}));
 
 	return (
@@ -61,7 +62,8 @@ function ToolbarFontSizeMenuButton() {
 								'hover:bg-editor-accent hover:text-editor-accent-foreground flex h-7 min-w-7 shrink-0 items-center justify-center overflow-hidden rounded-sm px-1.5 text-sm transition-colors',
 							)}
 						>
-							<ListIcon className="size-4" />
+							<ALargeSmall className="size-4" />
+
 						</button>
 					</DropdownMenuTrigger>
 				</TooltipTrigger>

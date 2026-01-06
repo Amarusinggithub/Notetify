@@ -3,7 +3,7 @@ import {
 	LiveblocksProvider,
 	RoomProvider,
 } from '@liveblocks/react/suspense';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useNavigate, useParams, useRouteLoaderData } from 'react-router';
 import { EditorNotesSidebar } from '../../components/app-notes-sidebar';
 import { Editor } from '../../components/editor';
@@ -18,36 +18,47 @@ import { useStore } from '../../stores/index.ts';
 export default function Notes() {
 	const { noteId } = useParams();
 	const navigate = useNavigate();
-	const initialData = useRouteLoaderData('root-notes');
+	const initialData = useRouteLoaderData('notes');
 	const selectedId = useStore((s) => s.selectedNoteId);
 	const setSelected = useStore((s) => s.setSelectedNoteId);
 	const { mutate: createNote, isPending: isCreating } = useCreateNote();
 	const currentUser = useStore((s) => s.sharedData?.auth.user);
+	const isCreatingRef = useRef(false);
 
 	useEffect(() => {
 		const routeNoteId = noteId ?? null;
 
-		if (routeNoteId && routeNoteId !== selectedId) {
-			setSelected(routeNoteId);
+		// URL has a noteId - sync store to match
+		if (routeNoteId) {
+			if (routeNoteId !== selectedId) {
+				setSelected(routeNoteId);
+			}
 			return;
 		}
 
-		if (selectedId && routeNoteId !== selectedId) {
+		// No noteId in URL - try to navigate to selected or first note
+		if (selectedId) {
 			navigate(`/notes/${selectedId}`, { replace: true });
 			return;
 		}
 
 		const firstFromInitial = initialData?.results?.[0];
-		if (!selectedId && firstFromInitial) {
+		if (firstFromInitial) {
 			setSelected(firstFromInitial.id);
 			navigate(`/notes/${firstFromInitial.id}`, { replace: true });
 			return;
 		}
 
-		if (!selectedId && !isCreating) {
+		// No notes exist - create one (use ref to prevent double creation)
+		if (!isCreating && !isCreatingRef.current) {
+			isCreatingRef.current = true;
 			createNote(
 				{
-					note_data: { title: 'Untitled', content: '', users: [] },
+					note_data: {
+						title: `Agenda- ${new Date().toLocaleDateString()}`,
+						content: '',
+						users: [],
+					},
 					tags: [],
 					is_favorite: false,
 					is_pinned: false,
@@ -57,6 +68,9 @@ export default function Notes() {
 					onSuccess: (created) => {
 						setSelected(created.id);
 						navigate(`/notes/${created.id}`, { replace: true });
+					},
+					onSettled: () => {
+						isCreatingRef.current = false;
 					},
 				},
 			);

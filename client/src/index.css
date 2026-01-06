@@ -597,3 +597,17 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; }*/
 		height: 1.25rem;
 	}
 }
+
+.ProseMirror h1:first-child {
+  font-size: 28px !important;
+  font-weight: 700 !important;
+  font-style: normal !important;
+  text-decoration: none !important;
+}
+
+.ProseMirror h1:first-child * {
+  font-size: inherit !important;
+  font-weight: inherit !important;
+  font-style: inherit !important;
+  text-decoration: inherit !important;
+}
