@@ -28,12 +28,14 @@ import {
 	NotesSidebarSeparator,
 } from './ui/notes-sidebar';
 import { ScrollArea } from './ui/scroll-area';
+import { ErrorBoundary } from 'react-error-boundary'
 
 import {
 	useSuspenseInfiniteQuery,
 	type InfiniteData,
 } from '@tanstack/react-query';
-import { useEffect, useRef, useState } from 'react';
+import { AlertCircle, RefreshCw } from 'lucide-react';
+import { Suspense, useEffect, useRef, useState, useTransition } from 'react';
 import { queryClient } from '../App';
 import useDebounce from '../hooks/use-debounce';
 import { fetchNotesPage } from '../services/note-service.ts';
@@ -41,6 +43,7 @@ import { useStore } from '../stores/index.ts';
 import { type PaginatedNotesResponse, type SortBy } from '../types';
 import { noteQueryKeys } from '../utils/queryKeys.ts';
 import NoteCard from './note-card';
+import { Card, CardContent, CardFooter, CardHeader } from './ui/card';
 import { Input } from './ui/input';
 import {
 	Select,
@@ -49,6 +52,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from './ui/select';
+import { Skeleton } from './ui/skeleton';
 import { Switch } from './ui/switch';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
@@ -68,7 +72,7 @@ export function notesLoader() {
 		Error,
 		InfiniteData<PaginatedNotesResponse>,
 		ReturnType<typeof noteQueryKeys.list>,
-        number
+		number
 	>(notesQueryOptions());
 }
 
@@ -77,7 +81,7 @@ export function EditorNotesSidebar() {
 	const sortBy = useStore((s) => s.sortNotesBy);
 	const setSortBy = useStore((s) => s.setSortBy);
 	const setSearch = useStore((s) => s.setSearch);
-    const [searchInput, setSearchInput] = useState(search);
+	const [searchInput, setSearchInput] = useState(search);
 	const debouncedSearch = useDebounce(searchInput, 300);
 
 	useEffect(() => {
@@ -86,10 +90,9 @@ export function EditorNotesSidebar() {
 		}
 	}, [debouncedSearch, setSearch]);
 
-    useEffect(() => {
-			setSearchInput(search);
-		}, [search]);
-
+	useEffect(() => {
+		setSearchInput(search);
+	}, [search]);
 
 	// Local-only filter UI state (not yet applied to API)
 	const [filters, setFilters] = useState({
@@ -143,7 +146,7 @@ export function EditorNotesSidebar() {
 				<div className="flex flex-row items-center gap-x-1">
 					<Label className="scroll-m-20 text-2xl font-semibold tracking-tight">
 						Notes
-					</Label>{' '}
+					</Label>
 					<h3 className="muted-foreground scroll-m-20 text-xl font-semibold tracking-tight">
 						{allNotes.length}
 					</h3>
@@ -358,46 +361,51 @@ export function EditorNotesSidebar() {
 
 				<NotesSidebarSeparator />
 			</NotesSidebarHeader>
-
-			<NotesSidebarContent>
+			<ErrorBoundary
+				fallbackRender={({ error, resetErrorBoundary }) => (
+					<NotesError error={error} reset={resetErrorBoundary} />
+				)}
+			>
+				<Suspense fallback={<NotesSidebarSkeleton />}>
+					<NotesSidebarContent>
 				<ScrollArea ref={parentRef} className="h-full w-full">
 					{allNotes.length === 0 ? (
 						<div className="text-muted-foreground flex h-full items-center justify-center text-sm">
 							No notes yet. Create one to get started.
 						</div>
 					) : (
-						<>
-							<div
-								style={{
-									height: `${rowVirtualizer.getTotalSize()}px`,
-									width: '100%',
-									position: 'relative',
-								}}
-							>
-								{virtualItems.map((virtualItem) => {
-									const note = allNotes[virtualItem.index];
-									return (
+						<div
+							style={{
+								height: `${rowVirtualizer.getTotalSize()}px`,
+								width: '100%',
+								position: 'relative',
+							}}
+						>
+							{virtualItems.map((virtualItem) => {
+								const note = allNotes[virtualItem.index];
+								return (
 									<div
-											key={virtualItem.key}
-											data-index={virtualItem.index}
-											ref={rowVirtualizer.measureElement}
-											style={{
-												position: 'absolute',
-												top: 0,
-												left: 0,
-												width: '100%',
-												transform: `translateY(${virtualItem.start}px)`,
-											}}
-										>
-											<NoteCard key={note.id} userNote={note} />
-										</div>
-									);
-								})}
-							</div>
-						</>
+										key={virtualItem.key}
+										data-index={virtualItem.index}
+										ref={rowVirtualizer.measureElement}
+										style={{
+											position: 'absolute',
+											top: 0,
+											left: 0,
+											width: '100%',
+											transform: `translateY(${virtualItem.start}px)`,
+										}}
+									>
+										<NoteCard key={note.id} userNote={note} />
+									</div>
+								);
+							})}
+						</div>
 					)}
 				</ScrollArea>
 			</NotesSidebarContent>
+                </Suspense>
+                </ErrorBoundary>
 			<NotesSidebarFooter>
 				{allNotes.length > 0 && (
 					<div className="text-muted-foreground w-full text-center text-xs">
@@ -410,5 +418,150 @@ export function EditorNotesSidebar() {
 				)}
 			</NotesSidebarFooter>
 		</NotesSidebar>
+	);
+}
+
+function NoteCardSkeleton() {
+	return (
+		<Card className="gap-2 rounded-none border-x-0 border-t-0 py-3">
+			<CardHeader className="py-0">
+				<Skeleton className="h-5 w-3/4" />
+			</CardHeader>
+			<CardContent className="space-y-2">
+				<Skeleton className="h-4 w-full" />
+				<Skeleton className="h-4 w-full" />
+				<Skeleton className="h-4 w-2/3" />
+			</CardContent>
+			<CardFooter>
+				<Skeleton className="h-3 w-24" />
+			</CardFooter>
+		</Card>
+	);
+}
+
+export function NotesSkeleton() {
+	return (
+
+
+			<NotesSidebarContent>
+				<ScrollArea className="h-full w-full">
+					<div className="flex flex-col">
+						{Array.from({ length: 6 }).map((_, i) => (
+							<NoteCardSkeleton key={i} />
+						))}
+					</div>
+				</ScrollArea>
+			</NotesSidebarContent>
+
+
+	);
+}
+
+
+export function NotesSidebarSkeleton() {
+	return (
+<NotesSidebar collapsible="offcanvas" variant="inset">
+			<NotesSidebarHeader>
+				<div className="flex flex-row items-center gap-x-1">
+					<Label className="scroll-m-20 text-2xl font-semibold tracking-tight">
+						Notes
+					</Label>
+				</div>
+				<NotesSidebarSeparator />
+			</NotesSidebarHeader>
+
+			<NotesSidebarContent>
+				<ScrollArea className="h-full w-full">
+					<div className="flex flex-col">
+						{Array.from({ length: 6 }).map((_, i) => (
+							<NoteCardSkeleton key={i} />
+						))}
+					</div>
+				</ScrollArea>
+			</NotesSidebarContent>
+
+			<NotesSidebarFooter />
+		</NotesSidebar>
+
+	);
+}
+
+export function NotesSidebarError({
+	error,
+	reset,
+}: {
+	error?: Error;
+	reset?: () => void;
+}) {
+	return (
+		<NotesSidebar collapsible="offcanvas" variant="inset">
+			<NotesSidebarHeader>
+				<div className="flex flex-row items-center gap-x-1">
+					<Label className="scroll-m-20 text-2xl font-semibold tracking-tight">
+						Notes
+					</Label>
+				</div>
+				<NotesSidebarSeparator />
+			</NotesSidebarHeader>
+
+			<NotesSidebarContent>
+				<div className="flex h-full flex-col items-center justify-center gap-4 p-6 text-center">
+					<div className="bg-destructive/10 rounded-full p-3">
+						<AlertCircle className="text-destructive h-8 w-8" />
+					</div>
+					<div className="space-y-2">
+						<h3 className="text-lg font-semibold">Failed to load notes</h3>
+						<p className="text-muted-foreground text-sm">
+							{error?.message ||
+								'Something went wrong while loading your notes.'}
+						</p>
+					</div>
+					{reset && (
+						<Button variant="outline" onClick={reset} className="gap-2">
+							<RefreshCw className="h-4 w-4" />
+							Try again
+						</Button>
+					)}
+				</div>
+			</NotesSidebarContent>
+
+			<NotesSidebarFooter />
+		</NotesSidebar>
+	);
+}
+
+
+export function NotesError({
+	error,
+	reset,
+}: {
+	error?: Error;
+	reset?: () => void;
+}) {
+	return (
+
+
+			<NotesSidebarContent>
+				<div className="flex h-full flex-col items-center justify-center gap-4 p-6 text-center">
+					<div className="bg-destructive/10 rounded-full p-3">
+						<AlertCircle className="text-destructive h-8 w-8" />
+					</div>
+					<div className="space-y-2">
+						<h3 className="text-lg font-semibold">Failed to load notes</h3>
+						<p className="text-muted-foreground text-sm">
+							{error?.message ||
+								'Something went wrong while loading your notes.'}
+						</p>
+					</div>
+					{reset && (
+						<Button variant="outline" onClick={reset} className="gap-2">
+							<RefreshCw className="h-4 w-4" />
+							Try again
+						</Button>
+					)}
+				</div>
+			</NotesSidebarContent>
+
+
 	);
 }

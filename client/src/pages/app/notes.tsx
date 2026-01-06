@@ -3,10 +3,13 @@ import {
 	LiveblocksProvider,
 	RoomProvider,
 } from '@liveblocks/react/suspense';
-import { useCallback, useEffect, useRef } from 'react';
+import {  useCallback, useEffect, useRef } from 'react';
 import { useNavigate, useParams, useRouteLoaderData } from 'react-router';
-import { EditorNotesSidebar } from '../../components/app-notes-sidebar';
-import { Editor, EditorLoadingSkeleton } from '../../components/editor';
+import {
+	EditorNotesSidebar,
+
+} from '../../components/app-notes-sidebar';
+import { Editor, EditorLoadingSkeleton, EditorError } from '../../components/editor';
 import {
 	NotesSidebarInset,
 	NotesSidebarProvider,
@@ -14,6 +17,7 @@ import {
 import { useCreateNote } from '../../hooks/use-mutate-note';
 import axiosInstance from '../../lib/axios';
 import { useStore } from '../../stores/index.ts';
+import { ErrorBoundary } from 'react-error-boundary';
 
 export default function Notes() {
 	const { noteId } = useParams();
@@ -115,7 +119,8 @@ export default function Notes() {
 
 	return (
 		<NotesSidebarProvider defaultOpen={true}>
-			<EditorNotesSidebar />
+
+					<EditorNotesSidebar />
 
 			<NotesSidebarInset>
 				<LiveblocksProvider
@@ -123,9 +128,11 @@ export default function Notes() {
 					authEndpoint={authEndpoint}
 				>
 					<RoomProvider id={`note-${noteId ?? selectedId ?? 'new'}`}>
-						<ClientSideSuspense fallback={<EditorLoadingSkeleton />}>
-							<Editor />
-						</ClientSideSuspense>
+						<ErrorBoundary fallback={<EditorError/>}>
+							<ClientSideSuspense fallback={<EditorLoadingSkeleton />}>
+								<Editor />
+							</ClientSideSuspense>
+						</ErrorBoundary>
 					</RoomProvider>
 				</LiveblocksProvider>
 			</NotesSidebarInset>

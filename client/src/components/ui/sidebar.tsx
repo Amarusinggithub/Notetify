@@ -22,6 +22,7 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from './tooltip';
+import { useTransition } from 'react';
 
 const SIDEBAR_COOKIE_NAME = 'sidebar_state';
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
@@ -66,6 +67,7 @@ function SidebarProvider({
 }) {
 	const isMobile = useIsMobile();
 	const [openMobile, setOpenMobile] = React.useState(false);
+    const [isPending, startTransition] = useTransition();
 
 	// This is the internal state of the sidebar.
 	// We use openProp and setOpenProp for control from outside the component.
@@ -75,9 +77,15 @@ function SidebarProvider({
 		(value: boolean | ((value: boolean) => boolean)) => {
 			const openState = typeof value === 'function' ? value(open) : value;
 			if (setOpenProp) {
-				setOpenProp(openState);
+                startTransition(() => {
+                    setOpenProp(openState);
+                });
+
 			} else {
-				_setOpen(openState);
+
+                startTransition(() => {
+                    _setOpen(openState);
+                });
 			}
 
 			// This sets the cookie to keep the sidebar state.

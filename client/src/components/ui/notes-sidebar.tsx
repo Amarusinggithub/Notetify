@@ -1,6 +1,7 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import * as React from 'react';
 
+import { useTransition } from 'react';
 import { useIsMobile } from '../../hooks/use-mobile';
 import { cn } from '../../lib/utils';
 import { Button } from './button';
@@ -49,6 +50,7 @@ function NotesSidebarProvider({
 }) {
 	const isMobile = useIsMobile();
 	const [openMobile, setOpenMobile] = React.useState(false);
+	const [isPending, startTransition] = useTransition();
 
 	// This is the internal state of the sidebar.
 	// We use openProp and setOpenProp for control from outside the component.
@@ -58,9 +60,13 @@ function NotesSidebarProvider({
 		(value: boolean | ((value: boolean) => boolean)) => {
 			const openState = typeof value === 'function' ? value(open) : value;
 			if (setOpenProp) {
-				setOpenProp(openState);
+				startTransition(() => {
+					setOpenProp(openState);
+				});
 			} else {
-				_setOpen(openState);
+				startTransition(() => {
+					_setOpen(openState);
+				});
 			}
 
 			// This sets the cookie to keep the sidebar state.
@@ -222,7 +228,7 @@ function NotesSidebarTrigger({
 			}}
 			{...props}
 		>
-			{open ?<ChevronLeft />: <ChevronRight />}
+			{open ? <ChevronLeft /> : <ChevronRight />}
 			<span className="sr-only">Toggle Sidebar</span>
 		</Button>
 	);
