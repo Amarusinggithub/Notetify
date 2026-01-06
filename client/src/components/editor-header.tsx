@@ -52,6 +52,8 @@ import { Separator } from './ui/separator';
 import { useSidebar } from './ui/sidebar';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
+
+
 export function EditorHeader({
 	breadcrumbs = [],
 	currentNoteId = null,  currentNote= null
@@ -490,6 +492,122 @@ export function EditorHeader({
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>
+			</div>
+		</header>
+	);
+}
+
+// Loading version of header that doesn't use Liveblocks hooks
+export function EditorHeaderSkeleton() {
+	const {
+		open: appOpen,
+		openMobile: appOpenMobile,
+		setOpen: setAppOpen,
+		setOpenMobile: setAppOpenMobile,
+	} = useSidebar();
+	const {
+		open: notesOpen,
+		openMobile: notesOpenMobile,
+		setOpen: setNotesOpen,
+		setOpenMobile: setNotesOpenMobile,
+	} = useNotesSidebar();
+
+	const handleFullscreenToggle = () => {
+		const anyOpen = appOpen || appOpenMobile || notesOpen || notesOpenMobile;
+
+		if (anyOpen) {
+			setAppOpen(false);
+			setAppOpenMobile(false);
+			setNotesOpen(false);
+			setNotesOpenMobile(false);
+		} else {
+			setAppOpen(true);
+			setAppOpenMobile(true);
+			setNotesOpen(true);
+			setNotesOpenMobile(true);
+		}
+	};
+
+	return (
+		<header className="bg-editor border-editor-border/50 flex h-16 shrink-0 items-center justify-between gap-2 border-b px-6 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 md:px-4">
+			<div className="flex items-center gap-2">
+				<Tooltip>
+					<TooltipTrigger asChild>
+						<NotesSidebarTrigger className="-ml-1" />
+					</TooltipTrigger>
+					<TooltipContent sideOffset={6}>Toggle Notes</TooltipContent>
+				</Tooltip>
+
+				<Tooltip>
+					<TooltipTrigger asChild>
+						<Button
+							variant="ghost"
+							size="icon"
+							className="-ml-1 size-7"
+							onClick={handleFullscreenToggle}
+							aria-label="Toggle fullscreen (hide sidebars)"
+						>
+							{appOpen || appOpenMobile || notesOpen || notesOpenMobile ? (
+								<Maximize2 />
+							) : (
+								<Minimize2 />
+							)}
+						</Button>
+					</TooltipTrigger>
+					<TooltipContent sideOffset={6}>Fullscreen</TooltipContent>
+				</Tooltip>
+
+				<Separator orientation="vertical" />
+
+				<Breadcrumbs breadcrumbs={[]} />
+			</div>
+
+			<div className="flex flex-1 items-center justify-center gap-3 px-4">
+				<div className="flex items-center gap-2">
+					<Badge variant="secondary" className="rounded-full px-3 py-1 text-xs">
+						Loading...
+					</Badge>
+				</div>
+			</div>
+
+			<div className="ml-auto flex items-center gap-3">
+				<div className="flex items-center gap-2">
+					<Button variant="ghost" size="icon" disabled aria-label="Favorite note">
+						<Star className="size-4" />
+					</Button>
+					<Button variant="ghost" size="icon" disabled aria-label="Delete note">
+						<Trash2 />
+					</Button>
+				</div>
+				<div className="h-20px] flex divide-x divide-[#7b8efb]/60 overflow-hidden rounded-[10px] bg-[#4f6ef9] text-white shadow-sm opacity-50">
+					<Button
+						size="sm"
+						className="rounded-none bg-transparent px-5 font-medium text-white"
+						variant="ghost"
+						disabled
+					>
+						<Share2 className="size-4" />
+						<span>Share</span>
+					</Button>
+					<Button
+						size="sm"
+						className="rounded-none bg-transparent px-3 text-white"
+						variant="ghost"
+						disabled
+						aria-label="Copy note link"
+					>
+						<Link2 className="size-4" />
+					</Button>
+				</div>
+				<Button
+					size="icon"
+					variant="ghost"
+					className="hover:bg-editor-accent size-8 border border-transparent"
+					disabled
+					aria-label="More note actions"
+				>
+					<MoreHorizontal />
+				</Button>
 			</div>
 		</header>
 	);

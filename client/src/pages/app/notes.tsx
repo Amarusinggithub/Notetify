@@ -6,7 +6,7 @@ import {
 import { useCallback, useEffect, useRef } from 'react';
 import { useNavigate, useParams, useRouteLoaderData } from 'react-router';
 import { EditorNotesSidebar } from '../../components/app-notes-sidebar';
-import { Editor } from '../../components/editor';
+import { Editor, EditorLoadingSkeleton } from '../../components/editor';
 import {
 	NotesSidebarInset,
 	NotesSidebarProvider,
@@ -123,7 +123,7 @@ export default function Notes() {
 					authEndpoint={authEndpoint}
 				>
 					<RoomProvider id={`note-${noteId ?? selectedId ?? 'new'}`}>
-						<ClientSideSuspense fallback={<div>Loading...</div>}>
+						<ClientSideSuspense fallback={<EditorLoadingSkeleton />}>
 							<Editor />
 						</ClientSideSuspense>
 					</RoomProvider>
