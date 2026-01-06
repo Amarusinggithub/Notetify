@@ -18,11 +18,12 @@ type NoteCardProp = {
 const NoteCard = ({ userNote }: NoteCardProp) => {
 	const navigate = useNavigate();
 	const selectedId = useStore((s) => s.selectedNoteId);
-    const setSelectedNoteId = useStore((s) => s.setSelectedNoteId);
-
+	const setSelectedNoteId = useStore((s) => s.setSelectedNoteId);
 
 	const isActive = selectedId === userNote.id;
-	const preview = getPreview(userNote.note.content ?? '');
+	const title = getTitleFromHtml(userNote.note.content);
+
+	const content = getContentPreview(userNote.note.content );
 	const updatedLabel = userNote.updated_at
 		? formatDistanceToNow(new Date(userNote.updated_at), {
 				addSuffix: true,
@@ -33,13 +34,12 @@ const NoteCard = ({ userNote }: NoteCardProp) => {
 		<Card
 			onClick={() => {
 				setSelectedNoteId(userNote.id);
-				navigate(`/notes/${userNote.id}`)}}
+				navigate(`/notes/${userNote.id}`);
+			}}
 			className={isActive ? 'border-ring' : undefined}
 		>
 			<CardHeader className="flex flex-row items-center justify-between">
-				<CardTitle className="text-base font-semibold">
-					{userNote.note.title || 'Untitled'}
-				</CardTitle>
+				<CardTitle className="text-base font-semibold">{title}</CardTitle>
 				{userNote.is_favorite && (
 					<Star
 						data-testid="favorite-indicator"
@@ -49,7 +49,7 @@ const NoteCard = ({ userNote }: NoteCardProp) => {
 				)}
 			</CardHeader>
 			<CardContent className="text-muted-foreground line-clamp-3 text-sm">
-				{preview || 'No content yet.'}
+				{content || '<h2> No Content </h2>'}
 			</CardContent>
 			<CardFooter className="text-muted-foreground text-xs">
 				Updated {updatedLabel}
@@ -58,11 +58,19 @@ const NoteCard = ({ userNote }: NoteCardProp) => {
 	);
 };
 
-function getPreview(html: string): string {
-	return html
-		.replace(/<[^>]+>/g, ' ')
+function getContentPreview(html: string): string {
+	const preview = html
+		.replace(/<h1[^>]*>.*?<\/h1>/i, '') // Remove first h1
+		.replace(/<[^>]+>/g, ' ') // Strip remaining tags
 		.replace(/\s+/g, ' ')
 		.trim();
+
+	return preview || 'No content';
 }
+
+const getTitleFromHtml = (html: string): string => {
+	const match = html.match(/<h1[^>]*>(.*?)<\/h1>/i);
+	return match ? match[1].replace(/<[^>]*>/g, '') : 'Untitled'; // Strip inner tags
+};
 
 export default NoteCard;

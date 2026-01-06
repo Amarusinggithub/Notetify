@@ -54,10 +54,11 @@ import { useSidebar } from './ui/sidebar';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
 export function EditorHeader({
-	breadcrumbs = [], currentNoteId = null,
+	breadcrumbs = [],
+	currentNoteId = null,
 }: {
 	breadcrumbs?: BreadcrumbItem[];
-    currentNoteId?: string | null;
+	currentNoteId?: string | null;
 }) {
 	const {
 		open: appOpen,
@@ -89,21 +90,14 @@ export function EditorHeader({
 	const search = useStore((s) => s.searchNotes);
 	const sortBy = useStore((s) => s.sortNotesBy);
 
+	const isMounted = useRef(false);
 
-
-  const lastLoadedId = useRef<string | null>(null);
-
-    const isMounted = useRef(false);
-
-    useEffect(() => {
-        isMounted.current = true;
-        return () => {
-            isMounted.current = false;
-        };
-    }, []);
-
-
-
+	useEffect(() => {
+		isMounted.current = true;
+		return () => {
+			isMounted.current = false;
+		};
+	}, []);
 
 	const paginatedNotes = queryClient.getQueryData<
 		InfiniteData<PaginatedNotesResponse>
@@ -117,19 +111,6 @@ export function EditorHeader({
 	const deleteNoteMutation = useDeleteNote();
 	const others = useOthers();
 	const collaborators = others.slice(0, 3);
-
-    const [title, setTitle] = useState(currentNote?.note.title ?? '');
-
-
-	const handleUpdateNoteTitle = () => {
-		if (!currentNote) return;
-		const trimmed = title.trim() || 'Untitled';
-		if (trimmed === currentNote.note.title) return;
-		updateNoteMutation.mutate({
-			id: currentNote.id,
-			payload: { title: trimmed },
-		});
-	};
 
 	const handleFavoriteToggle = () => {
 		if (!currentNote) return;
@@ -183,27 +164,6 @@ export function EditorHeader({
 		}
 	};
 
-    useEffect(() => {
-
-           const noteId = currentNote?.id;
-						if (!noteId) return;
-
-						// Only update if the ID changed
-						if (lastLoadedId.current !== noteId) {
-							lastLoadedId.current = noteId;
-							const newTitle = currentNote.note?.title ?? '';
-
-							// OPTIMIZATION: Check if the title is actually different before setting
-							setTitle((prevTitle) => {
-								if (prevTitle !== newTitle) {
-									return newTitle;
-								}
-								return prevTitle; // Returning the same value skips the render
-							});
-						}
-        }, [ currentNote?.id]);
-
-
 	return (
 		<header className="bg-editor border-editor-border/50 flex h-16 shrink-0 items-center justify-between gap-2 border-b px-6 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 md:px-4">
 			<div className="flex items-center gap-2">
@@ -235,19 +195,6 @@ export function EditorHeader({
 			</div>
 
 			<div className="flex flex-1 items-center justify-center gap-3 px-4">
-				<Input
-					value={title}
-					onChange={(event) => setTitle(event.target.value)}
-					onBlur={handleUpdateNoteTitle}
-					onKeyDown={(event) => {
-						if (event.key === 'Enter') {
-							event.currentTarget.blur();
-						}
-					}}
-					placeholder="Untitled note"
-					disabled={!currentNote}
-					className="h-10 max-w-2xl rounded-xl border-none bg-transparent text-center text-lg font-semibold focus-visible:ring-0 disabled:opacity-60"
-				/>
 				<div className="flex items-center gap-2">
 					{collaborators.map((other) => (
 						<Avatar
