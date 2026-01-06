@@ -1,10 +1,8 @@
 import {
 	useMutation,
 	useQueryClient,
-	useSuspenseQuery,
 } from '@tanstack/react-query';
 import { useRevalidator } from 'react-router';
-import axiosInstance from '../lib/axios.ts';
 import {
 	createNote,
 	deleteNote,
@@ -167,16 +165,7 @@ export function useDeleteNote() {
 	});
 }
 
-export const useSearchNotes = (query: string, params: string) => {
-	const { data = [] } = useSuspenseQuery<UserNote[]>({
-		queryKey: [`search`],
-		queryFn: async () =>
-			await axiosInstance
-				.get(`notes/?search=${query}&${params}`)
-				.then((res) => res.data.results),
-	});
-	return data;
-};
+
 
 /*
  Snapshot the current state of the cache so we can rollback if the mutation fails.

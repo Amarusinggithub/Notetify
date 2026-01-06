@@ -258,6 +258,9 @@ export const createAuthSlice: StateCreator<StoreState, [], [], AuthSlice> = (
 			// local first
 			set({ isAuthenticated: false, sharedData: null });
 			localStorage.removeItem(USERDATA_STORAGE_KEY);
+            localStorage.removeItem('notetify-store');
+            console.info("Removed notetify local strorage")
+
 			try {
 				await axiosInstance.post('/auth/logout/');
 			} catch (e) {

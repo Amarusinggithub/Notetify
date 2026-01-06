@@ -377,7 +377,7 @@ export function EditorNotesSidebar() {
 								{virtualItems.map((virtualItem) => {
 									const note = allNotes[virtualItem.index];
 									return (
-										<div
+									<div
 											key={virtualItem.key}
 											style={{
 												position: 'absolute',

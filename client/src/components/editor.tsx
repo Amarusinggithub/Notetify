@@ -24,16 +24,18 @@ import { useEffect, useRef } from 'react';
 import { NoteEditorProvider } from '../context/editor-context.tsx';
 import EditorFooter from './editor-footer';
 import { EditorHeader } from './editor-header';
-import { Threads } from './editor-threads';
+//import { Threads } from './editor-threads';
 import EditorToolbar from './editor-toolbar';
 import suggestion from './suggestion';
 import { noteQueryKeys } from '../utils/queryKeys.ts';
+import { GripVertical } from 'lucide-react';
 
 export const Editor = () => {
 	const queryClient = useQueryClient();
 	const liveblocks = useLiveblocksExtension();
+    const lastLoadedId = useRef<string | null>(null);
+
 	const isMounted = useRef(false);
-	const lastLoadedId = useRef<string | null>(null);
 
 	useEffect(() => {
 		isMounted.current = true;
@@ -286,7 +288,8 @@ export const Editor = () => {
 
 	if (!editor) {
 		return (
-			<div className="bg-editor text-editor-foreground flex h-screen items-center justify-center">
+			<div className="bg-editor flex-col flex h-full">
+				<EditorHeader />
 				<div className="text-lg">Loading editor...</div>
 			</div>
 		);
@@ -295,7 +298,7 @@ export const Editor = () => {
 	return (
 		<NoteEditorProvider editor={editor}>
 			<div className="bg-editor flex h-full flex-col">
-				<EditorHeader />
+				<EditorHeader currentNoteId={currentUserNote?.id} />
 				<EditorToolbar />
 				<div className="relative flex-1 overflow-auto">
 					<div
@@ -306,19 +309,7 @@ export const Editor = () => {
 						)}
 					>
 						<DragHandle editor={editor}>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								fill="none"
-								viewBox="0 0 24 24"
-								strokeWidth="1.5"
-								stroke="currentColor"
-							>
-								<path
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									d="M3.75 9h16.5m-16.5 6.75h16.5"
-								/>
-							</svg>
+							<GripVertical className="h-4 w-4" />
 						</DragHandle>
 						<div className="relative h-full">
 							<EditorContent
@@ -327,7 +318,7 @@ export const Editor = () => {
 									'bg-editor text-editor-foreground mx-auto h-full min-h-full w-full overflow-hidden border-0 shadow-lg',
 								)}
 							/>
-							{currentUserNote && <Threads />}
+							{/*currentUserNote&& <Threads />*/}
 						</div>{' '}
 					</div>
 					{!currentUserNote && (

@@ -26,11 +26,12 @@ import {
 	Tag,
 	Trash2,
 } from 'lucide-react';
-import {useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { BreadcrumbItem, PaginatedNotesResponse } from 'types';
 import { useDeleteNote, useUpdateNote } from '../hooks/use-mutate-note';
 import { cn } from '../lib/utils';
 import { useStore } from '../stores/index.ts';
+import { noteQueryKeys } from '../utils/queryKeys.ts';
 import { Breadcrumbs } from './breadcrumbs';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Badge } from './ui/badge';
@@ -51,12 +52,12 @@ import { NotesSidebarTrigger, useNotesSidebar } from './ui/notes-sidebar';
 import { Separator } from './ui/separator';
 import { useSidebar } from './ui/sidebar';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
-import { noteQueryKeys } from '../utils/queryKeys.ts';
 
 export function EditorHeader({
-	breadcrumbs = [],
+	breadcrumbs = [], currentNoteId = null,
 }: {
 	breadcrumbs?: BreadcrumbItem[];
+    currentNoteId?: string | null;
 }) {
 	const {
 		open: appOpen,
@@ -72,7 +73,6 @@ export function EditorHeader({
 	} = useNotesSidebar();
 	const queryClient = useQueryClient();
 
-	const selectedNoteId = useStore((s) => s.selectedNoteId);
 	const currentUser = useStore((s) => s.sharedData?.auth.user);
 	const [inviteRole, setInviteRole] = useState<'editor' | 'viewer'>('editor');
 	const inviteRoleLabel = inviteRole === 'editor' ? 'Editor' : 'Viewer';
@@ -82,28 +82,43 @@ export function EditorHeader({
 	const linkAccessLabel =
 		linkAccess === 'restricted' ? 'Restricted' : 'Anyone with link';
 
-	const noteUrl = selectedNoteId
-		? `${globalThis.window.location.origin}/notes/${selectedNoteId}`
+	const noteUrl = currentNoteId
+		? `${globalThis.window.location.origin}/notes/${currentNoteId}`
 		: globalThis.window.location.href;
 
 	const search = useStore((s) => s.searchNotes);
 	const sortBy = useStore((s) => s.sortNotesBy);
 
-const paginatedNotes =
-		queryClient.getQueryData<InfiniteData<PaginatedNotesResponse>>(
-			noteQueryKeys.list(search, sortBy )
-		);
 
-	const allNotes = paginatedNotes?.pages.flatMap((page) => page.results) ?? [];	const currentNote =
-		allNotes!.find((note) => note.id === selectedNoteId) ?? null;
 
-	const title = currentNote?.note.title ?? '';
+  const lastLoadedId = useRef<string | null>(null);
+
+    const isMounted = useRef(false);
+
+    useEffect(() => {
+        isMounted.current = true;
+        return () => {
+            isMounted.current = false;
+        };
+    }, []);
+
+
+
+
+	const paginatedNotes = queryClient.getQueryData<
+		InfiniteData<PaginatedNotesResponse>
+	>(noteQueryKeys.list(search, sortBy));
+
+	const allNotes = paginatedNotes?.pages.flatMap((page) => page.results) ?? [];
+	const currentNote =
+		allNotes.find((note) => note.id === currentNoteId) ?? null;
 
 	const updateNoteMutation = useUpdateNote();
 	const deleteNoteMutation = useDeleteNote();
 	const others = useOthers();
 	const collaborators = others.slice(0, 3);
 
+    const [title, setTitle] = useState(currentNote?.note.title ?? '');
 
 
 	const handleUpdateNoteTitle = () => {
@@ -168,6 +183,27 @@ const paginatedNotes =
 		}
 	};
 
+    useEffect(() => {
+
+           const noteId = currentNote?.id;
+						if (!noteId) return;
+
+						// Only update if the ID changed
+						if (lastLoadedId.current !== noteId) {
+							lastLoadedId.current = noteId;
+							const newTitle = currentNote.note?.title ?? '';
+
+							// OPTIMIZATION: Check if the title is actually different before setting
+							setTitle((prevTitle) => {
+								if (prevTitle !== newTitle) {
+									return newTitle;
+								}
+								return prevTitle; // Returning the same value skips the render
+							});
+						}
+        }, [ currentNote?.id]);
+
+
 	return (
 		<header className="bg-editor border-editor-border/50 flex h-16 shrink-0 items-center justify-between gap-2 border-b px-6 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 md:px-4">
 			<div className="flex items-center gap-2">
@@ -201,7 +237,7 @@ const paginatedNotes =
 			<div className="flex flex-1 items-center justify-center gap-3 px-4">
 				<Input
 					value={title}
-					onChange={() => handleUpdateNoteTitle}
+					onChange={(event) => setTitle(event.target.value)}
 					onBlur={handleUpdateNoteTitle}
 					onKeyDown={(event) => {
 						if (event.key === 'Enter') {
@@ -273,7 +309,7 @@ const paginatedNotes =
 						<TooltipContent sideOffset={6}>Delete note</TooltipContent>
 					</Tooltip>
 				</div>
-				<div className="flex divide-x divide-[#7b8efb]/60 overflow-hidden rounded-full bg-[#4f6ef9] text-white shadow-sm">
+				<div className="h-20px] flex divide-x divide-[#7b8efb]/60 overflow-hidden rounded-[10px] bg-[#4f6ef9] text-white shadow-sm">
 					<DropdownMenu>
 						<Tooltip>
 							<TooltipTrigger asChild>

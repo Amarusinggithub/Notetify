@@ -18,6 +18,8 @@ type NoteCardProp = {
 const NoteCard = ({ userNote }: NoteCardProp) => {
 	const navigate = useNavigate();
 	const selectedId = useStore((s) => s.selectedNoteId);
+    const setSelectedNoteId = useStore((s) => s.setSelectedNoteId);
+
 
 	const isActive = selectedId === userNote.id;
 	const preview = getPreview(userNote.note.content ?? '');
@@ -29,7 +31,9 @@ const NoteCard = ({ userNote }: NoteCardProp) => {
 
 	return (
 		<Card
-			onClick={() => navigate(`/notes/${userNote.id}`)}
+			onClick={() => {
+				setSelectedNoteId(userNote.id);
+				navigate(`/notes/${userNote.id}`)}}
 			className={isActive ? 'border-ring' : undefined}
 		>
 			<CardHeader className="flex flex-row items-center justify-between">
