@@ -111,7 +111,7 @@ export function EditorNotesSidebar() {
 	const rowVirtualizer = useVirtualizer({
 		count: allNotes.length,
 		getScrollElement: () => parentRef.current,
-		estimateSize: () => 200,
+		estimateSize: () => 95,
 		overscan: 5,
 	});
 
@@ -379,12 +379,13 @@ export function EditorNotesSidebar() {
 									return (
 									<div
 											key={virtualItem.key}
+											data-index={virtualItem.index}
+											ref={rowVirtualizer.measureElement}
 											style={{
 												position: 'absolute',
 												top: 0,
 												left: 0,
 												width: '100%',
-												height: `${virtualItem.size}px`,
 												transform: `translateY(${virtualItem.start}px)`,
 											}}
 										>
@@ -393,18 +394,21 @@ export function EditorNotesSidebar() {
 									);
 								})}
 							</div>
-							<div>
-								{isFetchingNextPage
-									? 'Loading more...'
-									: !hasNextPage
-										? 'Nothing more to load'
-										: ''}
-							</div>
 						</>
 					)}
 				</ScrollArea>
 			</NotesSidebarContent>
-			<NotesSidebarFooter></NotesSidebarFooter>
+			<NotesSidebarFooter>
+				{allNotes.length > 0 && (
+					<div className="text-muted-foreground w-full text-center text-xs">
+						{isFetchingNextPage
+							? 'Loading more...'
+							: !hasNextPage
+								? 'Nothing more to load'
+								: ''}
+					</div>
+				)}
+			</NotesSidebarFooter>
 		</NotesSidebar>
 	);
 }

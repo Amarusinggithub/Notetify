@@ -1,6 +1,7 @@
 import { formatDistanceToNow } from 'date-fns';
 import { Star } from 'lucide-react';
 import { useNavigate } from 'react-router';
+import { cn } from '../lib/utils';
 import { useStore } from '../stores/index.ts';
 import type { UserNote } from '../types';
 import {
@@ -36,9 +37,9 @@ const NoteCard = ({ userNote }: NoteCardProp) => {
 				setSelectedNoteId(userNote.id);
 				navigate(`/notes/${userNote.id}`);
 			}}
-			className={isActive ? 'border-ring' : undefined}
+			className={cn('gap-2 rounded-none border-x-0 border-t-0 py-3', isActive && 'border-ring')}
 		>
-			<CardHeader className="flex flex-row items-center justify-between">
+			<CardHeader className="flex flex-row items-center justify-between py-0">
 				<CardTitle className="text-base font-semibold">{title}</CardTitle>
 				{userNote.is_favorite && (
 					<Star
