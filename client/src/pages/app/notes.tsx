@@ -113,7 +113,7 @@ export default function Notes() {
 		if (!room) {
 			throw new Error('Room id is required to authorize collaboration.');
 		}
-		const response = await axiosInstance.post('/liveblocks/auth', { room });
+		const response = await axiosInstance.post('liveblocks/auth', { room });
 		return response.data;
 	}, []);
 

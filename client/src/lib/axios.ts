@@ -8,13 +8,15 @@ import { CSRF_TOKEN_COOKIE_NAME } from '../types';
 const RAW_BASE =
 	(import.meta as any).env?.VITE_BASE_URL?.toString()?.replace(/\/+$/, '') ||
 	'';
-const BASE_URL = RAW_BASE
-	? RAW_BASE.endsWith('/api')
-		? RAW_BASE
-		: `${RAW_BASE}/api`
-	: '/api';
+const BASE_URL = (
+	RAW_BASE
+		? RAW_BASE.endsWith('/api')
+			? RAW_BASE
+			: `${RAW_BASE}/api`
+		: '/api'
+).replace(/\/+$/, '') + '/';
 
-const ROOT_URL = BASE_URL.replace(/\/api$/, '');
+const ROOT_URL = BASE_URL.replace(/\/api\/$/, '');
 
 export const API_BASE_URL = BASE_URL;
 

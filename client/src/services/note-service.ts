@@ -8,10 +8,9 @@ import type {
 } from '../types';
 import type { noteQueryKeys } from '../utils/queryKeys';
 
-
 export async function fetchNotesPage({
-	pageParam = 1,
 	queryKey,
+	pageParam = 1,
 }: QueryFunctionContext<
 	ReturnType<typeof noteQueryKeys.list>,
 	number
@@ -31,14 +30,9 @@ export async function fetchNotesPage({
 		params.set('search', search);
 	}
 
-
-	if (!params.get('page')) {
-		params.set('page', '1');
-	}
-
 	try {
 		const response = await axiosInstance.get<PaginatedNotesResponse>(
-			`/notes?${params.toString()}`,
+			`notes?${params.toString()}`,
 		);
 		return response.data;
 	} catch (error) {
@@ -52,20 +46,20 @@ export async function updateNote(
 	payload: UpdateUserNotePayload,
 ): Promise<UserNote> {
 	const response = await axiosInstance.put<UserNote>(
-		`/notes/${userNoteId}`,
+		`notes/${userNoteId}`,
 		payload,
 	);
 	return response.data;
 }
 
 export async function deleteNote(userNoteId: string): Promise<void> {
-	await axiosInstance.delete(`/notes/${userNoteId}`);
+	await axiosInstance.delete(`notes/${userNoteId}`);
 }
 
 export const createNote = async (note: CreateUserNote): Promise<UserNote> => {
 	try {
 		// Map legacy CreateUserNote shape to API contract
-		const response = await axiosInstance.post('/notes/', {
+		const response = await axiosInstance.post('notes/', {
 			title: note.note_data?.title ?? '',
 			content: note.note_data?.content ?? '',
 		});

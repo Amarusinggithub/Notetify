@@ -35,7 +35,7 @@ import {
 	type InfiniteData,
 } from '@tanstack/react-query';
 import { AlertCircle, RefreshCw } from 'lucide-react';
-import { Suspense, useEffect, useRef, useState, useTransition } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { queryClient } from '../App';
 import useDebounce from '../hooks/use-debounce';
 import { fetchNotesPage } from '../services/note-service.ts';

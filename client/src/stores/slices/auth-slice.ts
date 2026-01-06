@@ -91,7 +91,7 @@ export const createAuthSlice: StateCreator<StoreState, [], [], AuthSlice> = (
 			}
 
 			await ensureCSRFToken();
-			const response = await axiosInstance.post('/auth/register/', {
+			const response = await axiosInstance.post('auth/register/', {
 				first_name: first_name.trim(),
 				last_name: last_name.trim(),
 				email: email.trim().toLowerCase(),
@@ -126,7 +126,7 @@ export const createAuthSlice: StateCreator<StoreState, [], [], AuthSlice> = (
 				return false;
 			}
 			await ensureCSRFToken();
-			const response = await axiosInstance.post('/auth/login/', {
+			const response = await axiosInstance.post('auth/login/', {
 				email: email.trim().toLowerCase(),
 				password,
 				remember,
@@ -155,7 +155,7 @@ export const createAuthSlice: StateCreator<StoreState, [], [], AuthSlice> = (
 				return false;
 			}
 			await ensureCSRFToken();
-			const response = await axiosInstance.post('/auth/confirm-password/', {
+			const response = await axiosInstance.post('auth/confirm-password/', {
 				password,
 			});
 			if (response.status >= 200 && response.status < 300) return true;
@@ -186,7 +186,7 @@ export const createAuthSlice: StateCreator<StoreState, [], [], AuthSlice> = (
 			}
 			await ensureCSRFToken();
 			const response = await axiosInstance.post(
-				'/auth/password-reset/confirm/',
+				'auth/password-reset/confirm/',
 				{ password, token },
 			);
 			return response.status >= 200 && response.status < 300;
@@ -206,7 +206,7 @@ export const createAuthSlice: StateCreator<StoreState, [], [], AuthSlice> = (
 				return null;
 			}
 			await ensureCSRFToken();
-			const response = await axiosInstance.post('/auth/password-reset/', {
+			const response = await axiosInstance.post('auth/password-reset/', {
 				email: email.trim().toLowerCase(),
 			});
 			if (response.status >= 200 && response.status < 300)
@@ -233,7 +233,7 @@ export const createAuthSlice: StateCreator<StoreState, [], [], AuthSlice> = (
 				return null;
 			}
 			await ensureCSRFToken();
-			const response = await axiosInstance.post('/auth/verify-email/', {
+			const response = await axiosInstance.post('auth/verify-email/', {
 				email: email.trim().toLowerCase(),
 			});
 			if (response.status >= 200 && response.status < 300)
@@ -267,7 +267,7 @@ export const createAuthSlice: StateCreator<StoreState, [], [], AuthSlice> = (
 			localStorage.removeItem(USERDATA_STORAGE_KEY);
 
 			try {
-				await axiosInstance.post('/auth/logout/');
+				await axiosInstance.post('auth/logout/');
 			} catch (e) {
 				// server logout may fail; local state already cleared
 			}
@@ -279,7 +279,7 @@ export const createAuthSlice: StateCreator<StoreState, [], [], AuthSlice> = (
 	async confirmAuth() {
 		try {
 			await ensureCSRFToken();
-			const response = await axiosInstance.get('/auth/me/');
+			const response = await axiosInstance.get('auth/me/');
 			if (response.status >= 200 && response.status < 300) {
 				const shared = buildShared(response.data);
 				set({ isAuthenticated: true, sharedData: shared });
