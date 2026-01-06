@@ -45,6 +45,7 @@ export const useStore = create<StoreState>()(
 						searchNotebooks: state.searchNotebooks,
 						sortNotebooksBy: state.sortNotebooksBy,
 						theme: state.theme,
+						language:state.language,
 					}),
 				},
 			),

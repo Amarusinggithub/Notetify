@@ -1,14 +1,15 @@
 import { type StateCreator } from 'zustand';
+import type { Language, Theme } from '../../types';
 import { useStore, type StoreState } from '../index';
-
-export type Theme = 'dark' | 'light' | 'system';
 
 type ThemeSliceState = {
 	theme: Theme;
+	language: Language;
 };
 
 type ThemeSliceAction = {
 	setTheme: (theme: Theme) => void;
+    setLanguage: (language: Language) => void;
 };
 
 export function applyTheme(theme: Theme) {
@@ -28,19 +29,25 @@ export type ThemeSlice = ThemeSliceState & ThemeSliceAction;
 
 export const createThemeSlice: StateCreator<StoreState, [], [], ThemeSlice> = (
 	set,
-	get,
 ) => ({
 	theme: 'system',
+	language: 'en',
 	setTheme: (t) => {
 		set({ theme: t });
 		applyTheme(t);
+	},
+    setLanguage: (l) => {
+		set({ language: l });
 	},
 });
 
 // Apply theme immediately on first import in the browser
 if (typeof globalThis.window !== 'undefined') {
-	try {
-		const t = useStore.getState().theme || 'system';
-		applyTheme(t);
-	} catch {}
+    try{const t = useStore.getState().theme || 'system';
+		applyTheme(t);}catch{
+            console.error(
+							'there was an error apply the theme ',
+						);
+        }
+
 }

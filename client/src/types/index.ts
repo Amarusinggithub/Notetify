@@ -6,7 +6,8 @@ export const USERDATA_STORAGE_KEY = 'userData';
 
 export type Role = 'OWNER' | 'EDITOR' | 'MEMBER';
 export type OAuthProvider = 'GOOGLE' | 'GITHUB' | 'FACEBOOK';
-
+export type Theme = 'dark' | 'light' | 'system';
+export type Language = 'en' | 'de'|"es"|"fr"|"ja";
 
 export type SortBy =
 	| 'updated_at'

@@ -14,7 +14,7 @@ import {
 import { Separator } from '../../components/ui/separator';
 import { Switch } from '../../components/ui/switch';
 import { useStore } from '../../stores/index';
-import { type Theme } from '../../stores/slices/theme-slice';
+import { type Theme } from '../../types';
 
 type NotificationPrefs = {
 	email: boolean;
@@ -25,7 +25,7 @@ type NotificationPrefs = {
 const STORAGE_KEY_NOTIFICATIONS = 'notification_prefs';
 
 const General = () => {
-	const { sharedData, setSharedData, theme, setTheme } = useStore();
+	const { sharedData, setSharedData, theme, setTheme, language, setLanguage} = useStore();
 	const user = sharedData?.auth.user;
 
 	// Profile State
@@ -35,10 +35,12 @@ const General = () => {
 
 	// Notification State
 	const [notifPrefs, setNotifPrefs] = useState<NotificationPrefs>(() => {
-		try {
-			const raw = localStorage.getItem(STORAGE_KEY_NOTIFICATIONS);
-			if (raw) return JSON.parse(raw);
-		} catch {}
+	try {
+		const raw = localStorage.getItem(STORAGE_KEY_NOTIFICATIONS);
+		if (raw) return JSON.parse(raw);
+	} catch {
+        console.error("there was an error adding notification preference to local storage")
+    }
 		return {
 			email: true,
 			push: false,

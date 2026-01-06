@@ -49,7 +49,7 @@ const NoteCard = ({ userNote }: NoteCardProp) => {
 				)}
 			</CardHeader>
 			<CardContent className="text-muted-foreground line-clamp-3 text-sm">
-				{content || '<h2> No Content </h2>'}
+				{content || 'No Content'}
 			</CardContent>
 			<CardFooter className="text-muted-foreground text-xs">
 				Updated {updatedLabel}
