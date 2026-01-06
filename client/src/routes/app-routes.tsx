@@ -1,6 +1,6 @@
-import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import { Player } from '@lottiefiles/react-lottie-player';
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router';
-import NotesLottie from '../assets/note.lottie';
+import NotesLottie from '../assets/Notes.json';
 import { notesLoader } from '../components/app-notes-sidebar.tsx';
 import AppLayout from '../layouts/app-layout';
 import SettingsLayout from '../layouts/settings/layout';
@@ -38,7 +38,7 @@ function AppRoutes() {
 			Component: Landing,
 			HydrateFallback: () => (
 				<div className="flex h-screen flex-col items-center justify-center gap-4">
-					<DotLottieReact
+					<Player
 						src={NotesLottie}
 						loop
 						autoplay
@@ -53,7 +53,7 @@ function AppRoutes() {
 			Component: Login,
 			HydrateFallback: () => (
 				<div className="flex h-screen flex-col items-center justify-center gap-4">
-					<DotLottieReact
+					<Player
 						src={NotesLottie}
 						loop
 						autoplay
@@ -68,7 +68,7 @@ function AppRoutes() {
 			Component: ForgotPassword,
 			HydrateFallback: () => (
 				<div className="flex h-screen flex-col items-center justify-center gap-4">
-					<DotLottieReact
+					<Player
 						src={NotesLottie}
 						loop
 						autoplay
@@ -83,7 +83,7 @@ function AppRoutes() {
 			Component: ResetPassword,
 			HydrateFallback: () => (
 				<div className="flex h-screen flex-col items-center justify-center gap-4">
-					<DotLottieReact
+					<Player
 						src={NotesLottie}
 						loop
 						autoplay
@@ -98,7 +98,7 @@ function AppRoutes() {
 			Component: VerifyEmail,
 			HydrateFallback: () => (
 				<div className="flex h-screen flex-col items-center justify-center gap-4">
-					<DotLottieReact
+					<Player
 						src={NotesLottie}
 						loop
 						autoplay
@@ -113,7 +113,7 @@ function AppRoutes() {
 			Component: TwoFactorVerification,
 			HydrateFallback: () => (
 				<div className="flex h-screen flex-col items-center justify-center gap-4">
-					<DotLottieReact
+					<Player
 						src={NotesLottie}
 						loop
 						autoplay
@@ -128,7 +128,7 @@ function AppRoutes() {
 			Component: Register,
 			HydrateFallback: () => (
 				<div className="flex h-screen flex-col items-center justify-center gap-4">
-					<DotLottieReact
+					<Player
 						src={NotesLottie}
 						loop
 						autoplay
@@ -143,7 +143,7 @@ function AppRoutes() {
 			Component: () => <Navigate to="/" replace />,
 			HydrateFallback: () => (
 				<div className="flex h-screen flex-col items-center justify-center gap-4">
-					<DotLottieReact
+					<Player
 						src={NotesLottie}
 						loop
 						autoplay
@@ -163,7 +163,7 @@ function AppRoutes() {
 			Component: AppLayout,
 			HydrateFallback: () => (
 				<div className="flex h-screen flex-col items-center justify-center gap-4">
-					<DotLottieReact
+					<Player
 						src={NotesLottie}
 						loop
 						autoplay
@@ -196,7 +196,7 @@ function AppRoutes() {
 					Component: () => <Navigate to="/settings/general" replace />,
 					HydrateFallback: () => (
 						<div className="flex h-screen flex-col items-center justify-center gap-4">
-							<DotLottieReact
+							<Player
 								src={NotesLottie}
 								loop
 								autoplay

@@ -1,5 +1,4 @@
 ﻿import { useOthers } from '@liveblocks/react/suspense';
-import { useQueryClient, type InfiniteData } from '@tanstack/react-query';
 import {
 	ArrowRightLeft,
 	ChevronDown,
