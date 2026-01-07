@@ -1,4 +1,5 @@
 import { useLiveblocksExtension } from '@liveblocks/react-tiptap';
+import { useRoom } from '@liveblocks/react/suspense';
 import { useQueryClient, type InfiniteData } from '@tanstack/react-query';
 import DragHandle from '@tiptap/extension-drag-handle-react';
 import Emoji, { gitHubEmojis } from '@tiptap/extension-emoji';
@@ -12,31 +13,31 @@ import Subscript from '@tiptap/extension-subscript';
 import Superscript from '@tiptap/extension-superscript';
 import { TableKit } from '@tiptap/extension-table';
 import TextAlign from '@tiptap/extension-text-align';
-import { TextStyle, FontSize } from '@tiptap/extension-text-style';
+import { FontSize, TextStyle } from '@tiptap/extension-text-style';
 import Youtube from '@tiptap/extension-youtube';
 import { EditorContent, Extension, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
+import { useEffect, useRef, useSyncExternalStore } from 'react';
+import { NoteEditorProvider } from '../context/editor-context.tsx';
+import { useUpdateNote } from '../hooks/use-mutate-note.tsx';
 import { cn } from '../lib/utils';
 import { useStore } from '../stores/index.ts';
 import type { PaginatedNotesResponse, UserNote } from '../types';
-import { useUpdateNote } from '../hooks/use-mutate-note.tsx';
-import { useEffect, useRef, useSyncExternalStore } from 'react';
-import { NoteEditorProvider } from '../context/editor-context.tsx';
 import EditorFooter from './editor-footer';
 import { EditorHeader, EditorHeaderSkeleton } from './editor-header';
 //import { Threads } from './editor-threads';
+import { Plugin, PluginKey } from '@tiptap/pm/state';
+import { AlertCircle, GripVertical, RefreshCw } from 'lucide-react';
+import { Skeleton } from '../components/ui/skeleton.tsx';
+import { noteQueryKeys } from '../utils/queryKeys.ts';
 import EditorToolbar from './editor-toolbar';
 import suggestion from './suggestion';
-import { noteQueryKeys } from '../utils/queryKeys.ts';
-import { GripVertical, AlertCircle, RefreshCw } from 'lucide-react';
 import { Button } from './ui/button';
-import { Plugin, PluginKey } from '@tiptap/pm/state';
-import {Skeleton} from  '../components/ui/skeleton.tsx';
-
 
 export const Editor = () => {
 	const queryClient = useQueryClient();
 	const liveblocks = useLiveblocksExtension();
+	const room = useRoom();
 	const lastLoadedId = useRef<string | null>(null);
 
 	const isMounted = useRef(false);
@@ -53,7 +54,6 @@ export const Editor = () => {
 	const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const search = useStore((s) => s.searchNotes);
 	const sortBy = useStore((s) => s.sortNotesBy);
-
 
 	// Subscribe to cache changes so the component re-renders when notes are updated
 	const paginatedNotes = useSyncExternalStore(
@@ -184,13 +184,12 @@ export const Editor = () => {
 			}),
 			Placeholder.configure({
 				showOnlyCurrent: false,
-
-				placeholder: ({ node }) => {
-					if (node.type.name === 'heading') {
+				placeholder: ({ node, pos }) => {
+					if (pos === 0 && node.type.name === 'heading') {
 						return 'What’s the title?';
 					}
 
-					return 'Write your story here:';
+					return 'Write your content here:';
 				},
 			}),
 			Image,
@@ -199,69 +198,6 @@ export const Editor = () => {
 				nested: true,
 			}),
 
-			/*Link.configure({
-				openOnClick: false,
-				autolink: true,
-				defaultProtocol: 'https',
-				protocols: ['http', 'https'],
-				isAllowedUri: (url, ctx) => {
-					try {
-						const parsedUrl = url.includes(':')
-							? new URL(url)
-							: new URL(`${ctx.defaultProtocol}://${url}`);
-
-						if (!ctx.defaultValidate(parsedUrl.href)) {
-							return false;
-						}
-
-						const disallowedProtocols = ['ftp', 'file', 'mailto'];
-						const protocol = parsedUrl.protocol.replace(':', '');
-
-						if (disallowedProtocols.includes(protocol)) {
-							return false;
-						}
-
-						const allowedProtocols = ctx.protocols.map((p) =>
-							typeof p === 'string' ? p : p.scheme,
-						);
-
-						if (!allowedProtocols.includes(protocol)) {
-							return false;
-						}
-
-						const disallowedDomains = [
-							'example-phishing.com',
-							'malicious-site.net',
-						];
-						const domain = parsedUrl.hostname;
-
-						if (disallowedDomains.includes(domain)) {
-							return false;
-						}
-
-						return true;
-					} catch {
-						return false;
-					}
-				},
-				shouldAutoLink: (url) => {
-					try {
-						const parsedUrl = url.includes(':')
-							? new URL(url)
-							: new URL(`https://${url}`);
-
-						const disallowedDomains = [
-							'example-no-autolink.com',
-							'another-no-autolink.com',
-						];
-						const domain = parsedUrl.hostname;
-
-						return !disallowedDomains.includes(domain);
-					} catch {
-						return false;
-					}
-				},
-			}),*/
 			Youtube.configure({
 				controls: false,
 				nocookie: true,
@@ -284,7 +220,7 @@ export const Editor = () => {
 		if (!editor) return;
 
 		const noteId = currentUserNote?.id;
-		editor.setEditable(Boolean(noteId));
+		editor.setEditable(Boolean(noteId && currentUserNote.is_trashed === false));
 
 		if (!noteId) {
 			editor.commands.clearContent(true);
@@ -294,10 +230,31 @@ export const Editor = () => {
 
 		if (lastLoadedId.current !== noteId) {
 			lastLoadedId.current = noteId;
-			const currentContent = currentUserNote.note?.content ?? '';
-			editor.commands.setContent(currentContent);
+
+			// Seed content from DB only if the Liveblocks room is empty
+			const initContent = async () => {
+				try {
+					const { root } = await room.getStorage();
+					// "default" is the default fragment name used by the Liveblocks Tiptap extension
+					const tiptapFragment = root.get('default');
+
+					if (!tiptapFragment || tiptapFragment.length === 0) {
+						console.info('Room is empty, seeding from DB');
+						const dbContent = currentUserNote.note?.content ?? '';
+						editor.commands.setContent(dbContent);
+					} else {
+						console.info('Room has data, letting Liveblocks sync');
+					}
+				} catch (error) {
+					console.error('Failed to check room storage:', error);
+					// Fallback: set content from DB if we can't check
+					editor.commands.setContent(currentUserNote.note?.content ?? '');
+				}
+			};
+
+			initContent();
 		}
-	}, [editor, currentUserNote?.id]);
+	}, [editor, currentUserNote?.id, room]);
 
 	if (!editor) {
 		return <EditorLoadingSkeleton />;
@@ -306,9 +263,7 @@ export const Editor = () => {
 	return (
 		<NoteEditorProvider editor={editor}>
 			<div className="bg-editor flex h-full flex-col">
-				<EditorHeader
-					currentNoteId={currentUserNote?.id}
-				/>
+				<EditorHeader currentNoteId={currentUserNote?.id} />
 				<EditorToolbar />
 				<div className="relative flex-1 overflow-auto">
 					<div
@@ -343,106 +298,105 @@ export const Editor = () => {
 	);
 };
 
-
-
-
 const TitleExtension = Extension.create({
-  name: 'title',
+	name: 'title',
 
-  addProseMirrorPlugins() {
-    return [
-      new Plugin({
-        key: new PluginKey('title'),
+	addProseMirrorPlugins() {
+		return [
+			new Plugin({
+				key: new PluginKey('title'),
 
-        filterTransaction: (transaction, state) => {
-          if (!transaction.docChanged) return true;
+				filterTransaction: (transaction, state) => {
+					if (!transaction.docChanged) return true;
 
-          const firstNodeSize = state.doc.firstChild?.nodeSize ?? 0;
+					const firstNodeSize = state.doc.firstChild?.nodeSize ?? 0;
 
-          // Check each step to see if it modifies the first node
-          for (const step of transaction.steps) {
-            const stepMap = step.getMap();
-            let touchesFirstNode = false;
+					// Check each step to see if it modifies the first node
+					for (const step of transaction.steps) {
+						const stepMap = step.getMap();
+						let touchesFirstNode = false;
 
-            // Check if step affects positions within first node
-            stepMap.forEach((oldStart, oldEnd) => {
-              if (oldStart < firstNodeSize) {
-                touchesFirstNode = true;
-              }
-            });
+						// Check if step affects positions within first node
+						stepMap.forEach((oldStart, oldEnd) => {
+							if (oldStart < firstNodeSize) {
+								touchesFirstNode = true;
+							}
+						});
 
-            // Also check step.from directly for AddMarkStep, RemoveMarkStep, etc.
-            // @ts-ignore
-            const from = step.from ?? step.pos ?? 0;
-            // @ts-ignore
-            const to = step.to ?? from;
+						// Also check step.from directly for AddMarkStep, RemoveMarkStep, etc.
+						// @ts-ignore
+						const from = step.from ?? step.pos ?? 0;
+						// @ts-ignore
+						const to = step.to ?? from;
 
-            if (from < firstNodeSize || to < firstNodeSize) {
-              touchesFirstNode = true;
-            }
+						if (from < firstNodeSize || to < firstNodeSize) {
+							touchesFirstNode = true;
+						}
 
-            if (touchesFirstNode) {
-              const newFirstNode = transaction.doc.firstChild;
+						if (touchesFirstNode) {
+							const newFirstNode = transaction.doc.firstChild;
 
-              // Block heading level changes
-              if (
-                newFirstNode &&
-                (newFirstNode.type.name !== 'heading' || newFirstNode.attrs.level !== 1)
-              ) {
-                return false;
-              }
+							// Block heading level changes
+							if (
+								newFirstNode &&
+								(newFirstNode.type.name !== 'heading' ||
+									newFirstNode.attrs.level !== 1)
+							) {
+								return false;
+							}
 
-              // Block mark additions (bold, italic, underline, fontSize, etc.)
-              // @ts-ignore - Check if this is a mark step
-              if (step.mark || step.constructor.name === 'AddMarkStep') {
-                return false;
-              }
-            }
-          }
+							// Block mark additions (bold, italic, underline, fontSize, etc.)
+							// @ts-ignore - Check if this is a mark step
+							if (step.mark || step.constructor.name === 'AddMarkStep') {
+								return false;
+							}
+						}
+					}
 
-          return true;
-        },
+					return true;
+				},
 
-        appendTransaction: (transactions, oldState, newState) => {
-          const { doc, tr } = newState;
-          const firstNode = doc.firstChild;
-          let modified = false;
+				appendTransaction: (transactions, oldState, newState) => {
+					const { doc, tr } = newState;
+					const firstNode = doc.firstChild;
+					let modified = false;
 
-          if (!firstNode) return null;
+					if (!firstNode) return null;
 
-          const firstNodeEnd = firstNode.nodeSize;
+					const firstNodeEnd = firstNode.nodeSize;
 
-          // Ensure it's h1
-          if (firstNode.type.name !== 'heading' || firstNode.attrs.level !== 1) {
-            const headingType = newState.schema.nodes.heading;
-            tr.setNodeMarkup(0, headingType, { level: 1 });
-            modified = true;
-          }
+					// Ensure it's h1
+					if (
+						firstNode.type.name !== 'heading' ||
+						firstNode.attrs.level !== 1
+					) {
+						const headingType = newState.schema.nodes.heading;
+						tr.setNodeMarkup(0, headingType, { level: 1 });
+						modified = true;
+					}
 
-          // Aggressively remove ALL marks from first node
-          if (firstNode.content.size > 0) {
-            // Position 1 is start of content inside first node, firstNodeEnd - 1 is end
-            const from = 1;
-            const to = firstNodeEnd - 1;
+					// Aggressively remove ALL marks from first node
+					if (firstNode.content.size > 0) {
+						// Position 1 is start of content inside first node, firstNodeEnd - 1 is end
+						const from = 1;
+						const to = firstNodeEnd - 1;
 
-            // Get all mark types and remove them
-            const markTypes = Object.values(newState.schema.marks);
-            markTypes.forEach((markType) => {
-              if (tr.doc.rangeHasMark(from, to, markType)) {
-                tr.removeMark(from, to, markType);
-                modified = true;
-              }
-            });
-          }
+						// Get all mark types and remove them
+						const markTypes = Object.values(newState.schema.marks);
+						markTypes.forEach((markType) => {
+							if (tr.doc.rangeHasMark(from, to, markType)) {
+								tr.removeMark(from, to, markType);
+								modified = true;
+							}
+						});
+					}
 
-          return modified ? tr : null;
-        },
-      }),
-    ];
-  },
+					return modified ? tr : null;
+				},
+			}),
+		];
+	},
 });
-
-
 
 // Loading skeleton for use in ClientSideSuspense fallback
 export const EditorLoadingSkeleton = () => {
@@ -486,7 +440,13 @@ export const EditorLoadingSkeleton = () => {
 	);
 };
 
-export function EditorError({ error, reset }: { error?: Error; reset?: () => void }) {
+export function EditorError({
+	error,
+	reset,
+}: {
+	error?: Error;
+	reset?: () => void;
+}) {
 	return (
 		<div className="bg-editor flex h-full flex-col">
 			<EditorHeaderSkeleton />
@@ -503,7 +463,8 @@ export function EditorError({ error, reset }: { error?: Error; reset?: () => voi
 					<div className="space-y-2">
 						<h3 className="text-lg font-semibold">Failed to load editor</h3>
 						<p className="text-muted-foreground max-w-sm text-sm">
-							{error?.message || 'Something went wrong while loading the editor.'}
+							{error?.message ||
+								'Something went wrong while loading the editor.'}
 						</p>
 					</div>
 					{reset && (
@@ -518,4 +479,3 @@ export function EditorError({ error, reset }: { error?: Error; reset?: () => voi
 		</div>
 	);
 }
-

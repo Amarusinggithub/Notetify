@@ -1,5 +1,5 @@
 import axiosInstance from '../lib/axios.ts';
-import { type CreateNote, type UserNotebook } from '../types/index.ts';
+import { type CreateNotebook, type UserNotebook } from '../types/index.ts';
 
 export const getNotebooks = async () => {
 	try {
@@ -12,10 +12,10 @@ export const getNotebooks = async () => {
 		console.error(e);
 	}
 };
-export const createNotebook = async (notebook: CreateNote) => {
+export const createNotebook = async (notebook: CreateNotebook) => {
 	try {
 		const response = await axiosInstance.post('notebooks/', {
-			note_data: notebook.note_data,
+			note_data: notebook.notebook_data,
 		});
 		return response.status;
 	} catch (e) {
@@ -36,7 +36,6 @@ export const updateNotebook = async (userNotebook: UserNotebook) => {
 			user: userNotebook.user,
 			is_pinned: userNotebook.is_pinned,
 			is_trashed: userNotebook.is_trashed,
-			is_favorite: userNotebook.is_favorite,
 		});
 
 		return response.status;

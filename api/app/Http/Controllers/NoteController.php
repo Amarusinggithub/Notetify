@@ -17,7 +17,6 @@ class NoteController extends Controller
      * @var array<string, string>
      */
     private array $flagColumns = [
-        'is_favorite' => 'favorite_at',
         'is_pinned' => 'pinned_at',
         'is_trashed' => 'trashed_at',
     ];
@@ -48,8 +47,7 @@ class NoteController extends Controller
         if ($request->filled('search')) {
             $search = '%' . $request->string('search')->toString() . '%';
             $query->where(function ($builder) use ($search) {
-                $builder->where('notes.title', 'like', $search)
-                    ->orWhere('notes.content', 'like', $search);
+                $builder->where('notes.content', 'like', $search);
             });
         }
 
@@ -71,7 +69,6 @@ class NoteController extends Controller
         $allowedSorts = [
             'updated_at' => 'user_note.updated_at',
             'created_at' => 'user_note.created_at',
-            'title' => 'notes.title',
         ];
         $sortColumn = $allowedSorts[$sortBy] ?? $allowedSorts['updated_at'];
         $direction = in_array($sortDir, ['asc', 'desc'], true) ? $sortDir : 'desc';
@@ -96,10 +93,8 @@ class NoteController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
             'content' => ['nullable', 'string'],
             'tags' => ['sometimes', 'array'],
-            'is_favorite' => ['sometimes', 'boolean'],
             'is_pinned' => ['sometimes', 'boolean'],
             'is_trashed' => ['sometimes', 'boolean'],
         ]);
@@ -108,7 +103,6 @@ class NoteController extends Controller
         unset($validated['tags']);
 
         $note = Note::create([
-            'title' => $validated['title'],
             'content' => $validated['content'] ?? '',
         ]);
 
@@ -134,17 +128,13 @@ class NoteController extends Controller
             ->firstOrFail();
 
         $validated = $request->validate([
-            'title' => ['sometimes', 'string', 'max:255'],
             'content' => ['sometimes', 'string', 'nullable'],
-            'is_favorite' => ['sometimes', 'boolean'],
             'is_pinned' => ['sometimes', 'boolean'],
             'is_trashed' => ['sometimes', 'boolean'],
         ]);
 
         $notePayload = [];
-        if (array_key_exists('title', $validated)) {
-            $notePayload['title'] = $validated['title'];
-        }
+
         if (array_key_exists('content', $validated)) {
             $notePayload['content'] = $validated['content'] ?? '';
         }

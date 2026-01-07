@@ -1,7 +1,4 @@
-import {
-	useMutation,
-	useQueryClient,
-} from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRevalidator } from 'react-router';
 import {
 	createNote,
@@ -15,7 +12,6 @@ import {
 	type UserNote,
 } from '../types';
 import { noteQueryKeys } from '../utils/queryKeys.ts';
-
 
 type UpdateNoteInput = {
 	id: string;
@@ -38,23 +34,19 @@ export function useCreateNote() {
 				role: 'OWNER',
 				note: {
 					id: tempId,
-					title: newNote.note_data?.title ?? 'Untitled',
 					content: newNote.note_data?.content ?? '',
 					users: newNote.note_data?.users ?? [],
 					is_shared: false,
 					created_at: now,
 					updated_at: now,
-					schedule_delete_at: undefined,
 				},
 				is_pinned: newNote.is_pinned,
 				is_trashed: newNote.is_trashed,
-				is_favorite: newNote.is_favorite,
 				tags: newNote.tags,
 				created_at: now,
 				updated_at: now,
 				shared_from: undefined,
 				shared_at: undefined,
-				removed_at: undefined,
 				archived_at: undefined,
 				trashed_at: undefined,
 				favorite_at: undefined,
@@ -65,8 +57,7 @@ export function useCreateNote() {
 				pageIndex && pageIndex > 0 ? notes : [optimistic, ...notes],
 			);
 
-
-            const store = useStore.getState();
+			const store = useStore.getState();
 			store.setSelectedNoteId(tempId);
 
 			return { previous, tempId };
@@ -76,8 +67,8 @@ export function useCreateNote() {
 				notes.map((item) => (item.id === context?.tempId ? created : item)),
 			);
 
-				const store = useStore.getState();
-				store.setSelectedNoteId(created.id);
+			const store = useStore.getState();
+			store.setSelectedNoteId(created.id);
 
 			revalidator.revalidate();
 		},
@@ -110,9 +101,7 @@ export function useUpdateNote() {
 								note: {
 									...note.note,
 									updated_at: now,
-									...(payload.title !== undefined
-										? { title: payload.title }
-										: {}),
+
 									...(payload.content !== undefined
 										? { content: payload.content ?? '' }
 										: {}),
@@ -167,8 +156,6 @@ export function useDeleteNote() {
 		},
 	});
 }
-
-
 
 /*
  Snapshot the current state of the cache so we can rollback if the mutation fails.

@@ -29,8 +29,7 @@ import {
 } from 'lucide-react';
 import { useState, useSyncExternalStore } from 'react';
 import type { BreadcrumbItem, PaginatedNotesResponse, UserNote } from 'types';
-import { useDeleteNote, useUpdateNote } from '../hooks/use-mutate-note';
-import { cn } from '../lib/utils';
+import { useDeleteNote } from '../hooks/use-mutate-note';
 import { useStore } from '../stores/index.ts';
 import { noteQueryKeys } from '../utils/queryKeys.ts';
 import { Breadcrumbs } from './breadcrumbs';
@@ -88,7 +87,6 @@ export function EditorHeader({
 		? `${globalThis.window.location.origin}/notes/${currentNoteId}`
 		: globalThis.window.location.href;
 
-	const updateNoteMutation = useUpdateNote();
 	const deleteNoteMutation = useDeleteNote();
 	const others = useOthers();
 	const collaborators = others.slice(0, 3);
@@ -108,17 +106,6 @@ export function EditorHeader({
 
 	const currentUserNote =
 		allNotes.find((n: UserNote) => n.id === currentNoteId) ?? allNotes[-1];
-
-	// Use cache value directly - mutation's onMutate handles optimistic updates
-	const isFavorite = currentUserNote?.is_favorite ?? false;
-
-	const handleFavoriteToggle = () => {
-		if (!currentUserNote) return;
-		updateNoteMutation.mutate({
-			id: currentUserNote.id,
-			payload: { is_favorite: !isFavorite },
-		});
-	};
 
 	const handleDeleteNote = () => {
 		if (!currentUserNote) return;
@@ -219,45 +206,6 @@ export function EditorHeader({
 			</div>
 
 			<div className="ml-auto flex items-center gap-3">
-				<div className="flex items-center gap-2">
-					<Tooltip>
-						<TooltipTrigger asChild>
-							<Button
-								variant="ghost"
-								size="icon"
-								disabled={!currentUserNote || updateNoteMutation.isPending}
-								onClick={handleFavoriteToggle}
-								aria-label={
-									currentUserNote?.is_favorite
-										? 'Unfavorite note'
-										: 'Favorite note'
-								}
-							>
-								<Star
-									className={cn('size-4', isFavorite ? 'text-yellow-400' : '')}
-									fill={isFavorite ? 'currentColor' : 'none'}
-								/>
-							</Button>
-						</TooltipTrigger>
-						<TooltipContent sideOffset={6}>
-							{isFavorite ? 'Remove favorite' : 'Mark as favorite'}
-						</TooltipContent>
-					</Tooltip>
-					<Tooltip>
-						<TooltipTrigger asChild>
-							<Button
-								variant="ghost"
-								size="icon"
-								disabled={!currentUserNote || deleteNoteMutation.isPending}
-								onClick={handleDeleteNote}
-								aria-label="Delete note"
-							>
-								<Trash2 />
-							</Button>
-						</TooltipTrigger>
-						<TooltipContent sideOffset={6}>Delete note</TooltipContent>
-					</Tooltip>
-				</div>
 				<div className="h-20px] flex divide-x divide-[#7b8efb]/60 overflow-hidden rounded-[10px] bg-[#4f6ef9] text-white shadow-sm">
 					<DropdownMenu>
 						<Tooltip>
@@ -498,7 +446,9 @@ export function EditorHeader({
 							<Printer className="mr-2 size-4" /> Print
 						</DropdownMenuItem>
 						<DropdownMenuItem
-							onClick={() => console.log('Move to trash')}
+							disabled={!currentUserNote || deleteNoteMutation.isPending}
+							onClick={handleDeleteNote}
+							aria-label="Delete note"
 							variant="destructive"
 						>
 							<Trash2 className="mr-2 size-4" /> Move to Trash
@@ -584,19 +534,6 @@ export function EditorHeaderSkeleton() {
 			</div>
 
 			<div className="ml-auto flex items-center gap-3">
-				<div className="flex items-center gap-2">
-					<Button
-						variant="ghost"
-						size="icon"
-						disabled
-						aria-label="Favorite note"
-					>
-						<Star className="size-4" />
-					</Button>
-					<Button variant="ghost" size="icon" disabled aria-label="Delete note">
-						<Trash2 />
-					</Button>
-				</div>
 				<div className="h-20px] flex divide-x divide-[#7b8efb]/60 overflow-hidden rounded-[10px] bg-[#4f6ef9] text-white opacity-50 shadow-sm">
 					<Button
 						size="sm"

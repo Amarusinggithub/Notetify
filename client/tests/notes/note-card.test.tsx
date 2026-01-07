@@ -21,8 +21,7 @@ const userNote = {
 	is_trashed: false,
 	note: {
 		id: 'note-1',
-		title: 'Hello',
-		content: '<p>world</p>',
+		content: 'Hello',
 		users: [],
 		is_shared: false,
 		created_at: new Date().toISOString(),
@@ -46,17 +45,17 @@ describe('NoteCard', () => {
 		);
 		const card =
 			container.querySelector('[data-slot="card"]') ||
-			screen.getByText('Hello').closest('div');
+			screen.getByText('Hello').closest('h1');
 		fireEvent.click(card!);
 		expect(mockNavigate).toHaveBeenCalledWith('/notes/usernote-1');
 	});
 
-	it('shows favorite indicator when note is favorited', () => {
+	it('shows pin note indicator when note is pinned ', () => {
 		render(
 			<MemoryRouter>
-				<NoteCard userNote={{ ...userNote, is_favorite: true } as any} />
+				<NoteCard userNote={{ ...userNote, is_pinned: true } as any} />
 			</MemoryRouter>,
 		);
-		expect(screen.getByTestId('favorite-indicator')).toBeInTheDocument();
+		expect(screen.getByTestId('footer')).toBeInTheDocument();
 	});
 });

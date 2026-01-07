@@ -21,7 +21,7 @@ class Tag extends Model
      * @var list<string>
      */
     protected $fillable = [
-        'name'
+        'name',
 
     ];
 

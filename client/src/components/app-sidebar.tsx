@@ -129,14 +129,12 @@ export function AppSidebar() {
 		if (!currentUserId) return;
 		createNoteMutation.mutate({
 			note_data: {
-				title: 'Untitled',
 				content: '',
 				users: [currentUserId],
 			},
 			tags: [],
 			is_pinned: false,
 			is_trashed: false,
-			is_favorite: false,
 		});
 	}
 

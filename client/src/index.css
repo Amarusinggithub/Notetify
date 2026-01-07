@@ -397,19 +397,9 @@
 		}
 	}
 
-	/* Link styles
-	a {
-		@apply cursor: pointer text-blue-600;
-		cursor: pointer;
-
-		&:hover {
-			@apply underline;
-		}
-	}*/
-
-	/* Placeholder (at the top) */
-	p.is-editor-empty:first-child::before {
-		color: var(--gray-4);
+	/* Placeholder */
+	.is-empty::before {
+		color: var(--muted-foreground);
 		content: attr(data-placeholder);
 		float: left;
 		height: 0;
@@ -466,14 +456,7 @@
 		}
 	}
 
-	/* Placeholder (at the top) */
-	p.is-editor-empty:first-child::before {
-		color: var(--gray-4);
-		content: attr(data-placeholder);
-		float: left;
-		height: 0;
-		pointer-events: none;
-	}
+
 	p {
 		word-break: break-all;
 	}

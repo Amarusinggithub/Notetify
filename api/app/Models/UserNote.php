@@ -16,17 +16,14 @@ class UserNote extends Model
     protected $fillable = [
         'note_id',
         'user_id',
-        'is_favorite',
         'is_pinned',
         'is_trashed',
-        'favorite_at',
         'pinned_at',
         'trashed_at',
         'order',
     ];
 
     protected $casts = [
-        'is_favorite' => 'boolean',
         'is_pinned' => 'boolean',
         'is_trashed' => 'boolean',
         'favorite_at' => 'datetime',

@@ -20,11 +20,9 @@ class Note extends Model
      * @var list<string>
      */
     protected $fillable = [
-        'title',
         'content',
-
-
     ];
+
 
 
  //note_tag

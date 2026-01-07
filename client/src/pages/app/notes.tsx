@@ -59,12 +59,10 @@ export default function Notes() {
 			createNote(
 				{
 					note_data: {
-						title: `Agenda- ${new Date().toLocaleDateString()}`,
 						content: '',
 						users: [],
 					},
 					tags: [],
-					is_favorite: false,
 					is_pinned: false,
 					is_trashed: false,
 				},

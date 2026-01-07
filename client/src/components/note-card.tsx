@@ -1,5 +1,4 @@
 import { formatDistanceToNow } from 'date-fns';
-import { Star } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { cn } from '../lib/utils';
 import { useStore } from '../stores/index.ts';
@@ -11,9 +10,7 @@ import {
 	CardHeader,
 	CardTitle,
 } from './ui/card';
-import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip.tsx';
-import { Button } from './ui/button.tsx';
-import { useUpdateNote } from '../hooks/use-mutate-note.tsx';
+
 type NoteCardProp = {
 	userNote: UserNote;
 };
@@ -32,18 +29,7 @@ const NoteCard = ({ userNote }: NoteCardProp) => {
 				addSuffix: true,
 			})
 		: 'just now';
-	const updateNoteMutation = useUpdateNote();
 
-	const isFavorite = userNote.is_favorite ?? false;
-
-	const handleFavoriteToggle = (e: React.MouseEvent) => {
-		e.stopPropagation(); // Prevent card click navigation
-		if (!userNote) return;
-		updateNoteMutation.mutate({
-			id: userNote.id,
-			payload: { is_favorite: !isFavorite },
-		});
-	};
 
 	return (
 		<Card
@@ -58,31 +44,12 @@ const NoteCard = ({ userNote }: NoteCardProp) => {
 		>
 			<CardHeader className="flex flex-row items-center justify-between py-0">
 				<CardTitle className="text-base font-semibold">{title}</CardTitle>
-				{isFavorite && (
-					<Tooltip>
-						<TooltipTrigger asChild>
-							<Button
-								variant="ghost"
-								size="icon"
-								disabled={!userNote || updateNoteMutation.isPending}
-								onClick={handleFavoriteToggle}
-								aria-label="Unfavorite note"
-							>
-								<Star
-									data-testid="favorite-indicator"
-									className="size-4 text-yellow-400"
-									fill="currentColor"
-								/>
-							</Button>
-						</TooltipTrigger>
-						<TooltipContent sideOffset={6}>Remove favorite</TooltipContent>
-					</Tooltip>
-				)}
+
 			</CardHeader>
 			<CardContent className="text-muted-foreground line-clamp-3 text-sm">
 				{content || 'No Content'}
 			</CardContent>
-			<CardFooter className="text-muted-foreground text-xs">
+			<CardFooter data-testid="footer" className="text-muted-foreground text-xs">
 				Updated {updatedLabel}
 			</CardFooter>
 		</Card>
