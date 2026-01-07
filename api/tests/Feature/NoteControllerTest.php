@@ -16,25 +16,25 @@ class NoteControllerTest extends TestCase
     public function test_user_can_fetch_notes_with_filters(): void
     {
         $user = User::factory()->create();
-        $favorite = UserNote::factory()
-            ->favorited()
+        $pinned = UserNote::factory()
+            ->state(['is_pinned' => true, 'pinned_at' => now()])
             ->for($user, 'user')
             ->create();
-        $favorite->note()->update(['title' => 'Favorite note']);
+        $pinned->note()->update(['content' => 'Pinned note']);
 
         UserNote::factory()
             ->count(2)
             ->for($user, 'user')
             ->create()
-            ->each(fn (UserNote $note) => $note->note()->update(['title' => 'Other note']));
+            ->each(fn (UserNote $note) => $note->note()->update(['content' => 'Other note']));
 
         Sanctum::actingAs($user);
 
-        $response = $this->getJson('/api/notes?search=Favorite&is_favorite=true');
+        $response = $this->getJson('/api/notes?search=Pinned&is_pinned=true');
 
         $response->assertOk()
             ->assertJsonCount(1, 'results')
-            ->assertJsonFragment(['id' => $favorite->id]);
+            ->assertJsonFragment(['id' => $pinned->id]);
     }
 
     public function test_user_can_create_note(): void
@@ -44,18 +44,16 @@ class NoteControllerTest extends TestCase
         Sanctum::actingAs($user);
 
         $payload = [
-            'title' => 'API created',
             'content' => '<p>Hello world</p>',
-            'is_favorite' => true,
+            'is_pinned' => true,
         ];
 
         $response = $this->postJson('/api/notes', $payload);
 
         $response->assertCreated()
             ->assertJsonFragment([
-                'is_favorite' => true,
+                'is_pinned' => true,
             ])
-            ->assertJsonPath('note.title', 'API created')
             ->assertJsonPath('note.content', '<p>Hello world</p>');
     }
 
@@ -65,7 +63,6 @@ class NoteControllerTest extends TestCase
         $userNote = UserNote::factory()->create([
             'user_id' => $user->id,
             'note_id' => Note::factory()->create([
-                'title' => 'Original',
                 'content' => 'Old',
             ])->id,
         ]);
@@ -73,16 +70,14 @@ class NoteControllerTest extends TestCase
         Sanctum::actingAs($user);
 
         $response = $this->putJson("/api/notes/{$userNote->id}", [
-            'title' => 'Updated title',
             'content' => 'Updated content',
-            'is_favorite' => true,
+            'is_pinned' => true,
         ]);
 
         $response->assertOk()
-            ->assertJsonPath('note.title', 'Updated title')
             ->assertJsonPath('note.content', 'Updated content')
-            ->assertJsonPath('is_favorite', true)
-            ->assertJsonStructure(['favorite_at']);
+            ->assertJsonPath('is_pinned', true)
+            ->assertJsonStructure(['pinned_at']);
     }
 
     public function test_deleting_last_link_removes_note(): void

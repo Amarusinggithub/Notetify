@@ -13,27 +13,45 @@ class UserNote extends Model
 
     protected $table = 'user_note';
 
-    protected $fillable = [
-        'note_id',
-        'user_id',
-        'is_pinned',
-        'is_trashed',
-        'pinned_at',
-        'trashed_at',
-        'order',
-    ];
+        protected $fillable = [
 
-    protected $casts = [
-        'is_pinned' => 'boolean',
-        'is_trashed' => 'boolean',
-        'favorite_at' => 'datetime',
-        'pinned_at' => 'datetime',
-        'trashed_at' => 'datetime',
-    ];
+            'note_id',
 
-    protected $with = ['note'];
+            'user_id',
 
-    public function note()
+            'is_pinned',
+
+            'is_trashed',
+
+            'pinned_at',
+
+            'trashed_at',
+
+            'order',
+
+        ];
+
+    
+
+        protected $casts = [
+
+            'is_pinned' => 'boolean',
+
+            'is_trashed' => 'boolean',
+
+            'pinned_at' => 'datetime',
+
+            'trashed_at' => 'datetime',
+
+        ];
+
+    
+
+        protected $with = ['note'];
+
+    
+
+        public function note()
     {
         return $this->belongsTo(Note::class, 'note_id');
     }
