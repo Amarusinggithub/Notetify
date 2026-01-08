@@ -1,6 +1,6 @@
 import { useLiveblocksExtension } from '@liveblocks/react-tiptap';
 import { useRoom } from '@liveblocks/react/suspense';
-import { useQueryClient, type InfiniteData } from '@tanstack/react-query';
+import {  useSuspenseInfiniteQuery } from '@tanstack/react-query';
 import DragHandle from '@tiptap/extension-drag-handle-react';
 import Emoji, { gitHubEmojis } from '@tiptap/extension-emoji';
 import FontFamily from '@tiptap/extension-font-family';
@@ -17,25 +17,28 @@ import { FontSize, TextStyle } from '@tiptap/extension-text-style';
 import Youtube from '@tiptap/extension-youtube';
 import { EditorContent, Extension, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { useEffect, useRef, useSyncExternalStore } from 'react';
+import { useEffect, useRef } from 'react';
 import { NoteEditorProvider } from '../context/editor-context.tsx';
 import { useUpdateNote } from '../hooks/use-mutate-note.tsx';
 import { cn } from '../lib/utils';
 import { useStore } from '../stores/index.ts';
-import type { PaginatedNotesResponse, UserNote } from '../types';
+import type {  UserNote } from '../types';
 import EditorFooter from './editor-footer';
 import { EditorHeader, EditorHeaderSkeleton } from './editor-header';
-//import { Threads } from './editor-threads';
+import { Threads } from './editor-threads';
 import { Plugin, PluginKey } from '@tiptap/pm/state';
 import { AlertCircle, GripVertical, RefreshCw } from 'lucide-react';
 import { Skeleton } from '../components/ui/skeleton.tsx';
-import { noteQueryKeys } from '../utils/queryKeys.ts';
 import EditorToolbar from './editor-toolbar';
 import suggestion from './suggestion';
 import { Button } from './ui/button';
+import { notesSideBarQueryOptions } from './app-notes-sidebar.tsx';
 
-export const Editor = () => {
-	const queryClient = useQueryClient();
+export const Editor = ({
+	currentNoteId = null,
+}: {
+	currentNoteId?: string | null;
+}) => {
 	const liveblocks = useLiveblocksExtension();
 	const room = useRoom();
 	const lastLoadedId = useRef<string | null>(null);
@@ -50,25 +53,18 @@ export const Editor = () => {
 	}, []);
 
 	const updateNoteMutation = useUpdateNote();
-	const selectedNoteId = useStore((s) => s.selectedNoteId);
 	const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const search = useStore((s) => s.searchNotes);
 	const sortBy = useStore((s) => s.sortNotesBy);
 
-	// Subscribe to cache changes so the component re-renders when notes are updated
-	const paginatedNotes = useSyncExternalStore(
-		(onStoreChange) => queryClient.getQueryCache().subscribe(onStoreChange),
-		() =>
-			queryClient.getQueryData<InfiniteData<PaginatedNotesResponse>>(
-				noteQueryKeys.list(search, sortBy),
-			),
-	);
+    const { data} =
+            useSuspenseInfiniteQuery(notesSideBarQueryOptions(search, sortBy));
 
-	const allNotes = paginatedNotes?.pages.flatMap((page) => page.results) ?? [];
+        const allNotes = data?.pages.flatMap((page) => page.results) ?? [];
+
 
 	const currentUserNote =
-		allNotes.find((n: UserNote) => n.id === selectedNoteId) ??
-		allNotes[allNotes.length - 1];
+		allNotes.find((n: UserNote) => n.id === currentNoteId) ?? allNotes[0];
 
 	const editor = useEditor({
 		editorProps: {
@@ -189,6 +185,10 @@ export const Editor = () => {
 						return 'What’s the title?';
 					}
 
+					if (pos === 1) {
+						return 'Write your content here:';
+					}
+
 					return 'Write your content here:';
 				},
 			}),
@@ -278,12 +278,13 @@ export const Editor = () => {
 						</DragHandle>
 						<div className="relative h-full">
 							<EditorContent
+								key={currentNoteId}
 								editor={editor}
 								className={cn(
 									'bg-editor text-editor-foreground mx-auto h-full min-h-full w-full overflow-hidden border-0 shadow-lg',
 								)}
 							/>
-							{/*currentUserNote&& <Threads />*/}
+							{currentUserNote&& <Threads />}
 						</div>{' '}
 					</div>
 					{!currentUserNote && (
@@ -311,7 +312,7 @@ const TitleExtension = Extension.create({
 
 					const firstNodeSize = state.doc.firstChild?.nodeSize ?? 0;
 
-					// Check each step to see if it modifies the first node
+					// Checks each step to see if it modifies the first node
 					for (const step of transaction.steps) {
 						const stepMap = step.getMap();
 						let touchesFirstNode = false;

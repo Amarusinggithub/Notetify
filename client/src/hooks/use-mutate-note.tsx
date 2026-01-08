@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useRevalidator } from 'react-router';
+import { useRevalidator, useNavigate } from 'react-router';
 import {
 	createNote,
 	deleteNote,
@@ -21,10 +21,15 @@ type UpdateNoteInput = {
 export function useCreateNote() {
 	const revalidator = useRevalidator();
 	const queryClient = useQueryClient();
+    const navigate = useNavigate();
 	return useMutation({
 		mutationFn: (newNote: CreateUserNote) => createNote(newNote),
 		onMutate: async (newNote) => {
-			await queryClient.cancelQueries({ queryKey: noteQueryKeys.all });
+			 try {
+					await queryClient.cancelQueries({ queryKey: noteQueryKeys.all });
+				} catch (e) {
+                    console.error("Failed to cancel queries:",e );
+				}
 			const previous = snapshotNotes(queryClient);
 			const tempId = `temp-${Date.now()}`;
 			const now = new Date().toISOString();
@@ -47,9 +52,7 @@ export function useCreateNote() {
 				updated_at: now,
 				shared_from: undefined,
 				shared_at: undefined,
-				archived_at: undefined,
 				trashed_at: undefined,
-				favorite_at: undefined,
 				pinned_at: undefined,
 			};
 
@@ -57,8 +60,8 @@ export function useCreateNote() {
 				pageIndex && pageIndex > 0 ? notes : [optimistic, ...notes],
 			);
 
-			const store = useStore.getState();
-			store.setSelectedNoteId(tempId);
+			//const store = useStore.getState();
+			//store.setSelectedNoteId(tempId);
 
 			return { previous, tempId };
 		},
@@ -69,7 +72,7 @@ export function useCreateNote() {
 
 			const store = useStore.getState();
 			store.setSelectedNoteId(created.id);
-
+            navigate(`/notes/${created.id}`);
 			revalidator.revalidate();
 		},
 		onError: (error, _input, context) => {

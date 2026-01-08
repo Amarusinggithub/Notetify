@@ -56,7 +56,7 @@ import { Skeleton } from './ui/skeleton';
 import { Switch } from './ui/switch';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
-export const notesQueryOptions = (
+export const notesSideBarQueryOptions = (
 	search: string = '',
 	sortby: SortBy = 'updated_at',
 ) => ({
@@ -73,7 +73,7 @@ export function notesLoader() {
 		InfiniteData<PaginatedNotesResponse>,
 		ReturnType<typeof noteQueryKeys.list>,
 		number
-	>(notesQueryOptions());
+	>(notesSideBarQueryOptions());
 }
 
 export function EditorNotesSidebar() {
@@ -105,7 +105,7 @@ export function EditorNotesSidebar() {
 	});
 
 	const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-		useSuspenseInfiniteQuery(notesQueryOptions(search, sortBy));
+		useSuspenseInfiniteQuery(notesSideBarQueryOptions(search, sortBy));
 
 	const allNotes = data?.pages.flatMap((page) => page.results) ?? [];
 
@@ -125,6 +125,8 @@ export function EditorNotesSidebar() {
 		if (!lastItem) {
 			return;
 		}
+
+
 
 		if (
 			lastItem.index >= allNotes.length - 1 &&

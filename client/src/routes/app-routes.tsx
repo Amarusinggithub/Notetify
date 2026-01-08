@@ -158,7 +158,7 @@ function AppRoutes() {
 	const privateRoutes = [
 		{
 			path: '/',
-			id: 'root-notes',
+			id: 'notes',
 			loader: notesLoader,
 			Component: AppLayout,
 			HydrateFallback: () => (

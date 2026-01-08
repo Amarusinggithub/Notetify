@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Http;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
-class LiveblocksAuthTest extends TestCase
+class LiveblocksControllerTest extends TestCase
 {
     use RefreshDatabase;
 

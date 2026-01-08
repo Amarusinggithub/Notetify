@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
+use App\Http\Requests\ResetPasswordRequest;
 use App\Models\User;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
@@ -34,21 +35,23 @@ class AuthController extends Controller
     }
 
     public function login(LoginRequest $request)
-{
-    $credentials = $request->only('email', 'password');
+    {
+        $credentials = $request->only('email', 'password');
 
-    $remember = $request->boolean('remember');
+        $remember = $request->boolean('remember');
 
-    if (Auth::attempt($credentials, $remember)) {
-        $request->session()->regenerate();
+        if (Auth::attempt($credentials, $remember)) {
+            if ($request->hasSession()) {
+                $request->session()->regenerate();
+            }
 
-        return response()->json(Auth::user());
+            return response()->json(Auth::user());
+        }
+
+        return response()->json([
+            'message' => 'Invalid login credentials!',
+        ], 401);
     }
-
-    return response()->json([
-        'message' => 'Invalid login credentials!',
-    ], 401);
-}
 
     public function me(Request $request)
     {
@@ -100,14 +103,13 @@ class AuthController extends Controller
         ]);
     }
 
-    public function resetPassword(Request $request)
+    public function resetPassword(ResetPasswordRequest $request)
     {
-        $request->validate([
+            $request->validate([
             'token' => 'required',
             'email' => 'required|email',
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
-
         // Reset the password
         $status = Password::reset(
             $request->only('email', 'password', 'password_confirmation', 'token'),

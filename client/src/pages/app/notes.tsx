@@ -46,7 +46,7 @@ export default function Notes() {
 			return;
 		}
 
-		const firstFromInitial = initialData?.results?.[0];
+		const firstFromInitial = initialData?.pages?.[0]?.results?.[0];
 		if (firstFromInitial) {
 			setSelected(firstFromInitial.id);
 			navigate(`/notes/${firstFromInitial.id}`, { replace: true });
@@ -54,7 +54,7 @@ export default function Notes() {
 		}
 
 		// No notes exist - create one (use ref to prevent double creation)
-		if (!isCreating && !isCreatingRef.current) {
+		if (!isCreating && !isCreatingRef.current ) {
 			isCreatingRef.current = true;
 			createNote(
 				{
@@ -117,18 +117,20 @@ export default function Notes() {
 
 	return (
 		<NotesSidebarProvider defaultOpen={true}>
-
-					<EditorNotesSidebar />
+			<EditorNotesSidebar />
 
 			<NotesSidebarInset>
 				<LiveblocksProvider
 					resolveUsers={resolveUsers}
 					authEndpoint={authEndpoint}
 				>
-					<RoomProvider id={`note-${noteId ?? selectedId ?? 'new'}`}>
-						<ErrorBoundary fallback={<EditorError/>}>
+					<RoomProvider
+						key={`note-${noteId ?? selectedId ?? 'new'}`}
+						id={`note-${noteId ?? selectedId ?? 'new'}`}
+					>
+						<ErrorBoundary fallback={<EditorError />}>
 							<ClientSideSuspense fallback={<EditorLoadingSkeleton />}>
-								<Editor />
+								<Editor currentNoteId={noteId?? selectedId} />
 							</ClientSideSuspense>
 						</ErrorBoundary>
 					</RoomProvider>
