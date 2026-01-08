@@ -26,7 +26,6 @@ import {
 	Notebook,
 	NotebookPen,
 	Paperclip,
-	Star,
 	Tag,
 	Trash2,
 	UsersRound,
@@ -60,12 +59,6 @@ const mainNavItems: NavItem[] = [
 		title: 'Home',
 		href: '/',
 		icon: Home,
-	},
-	{
-		title: 'Favorites',
-		href: '/favorites',
-		icon: Star,
-		params: 'is_favorite=true&is_trashed=false',
 	},
 	{
 		title: 'Notes',

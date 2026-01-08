@@ -5,7 +5,6 @@ import { notesLoader } from '../components/app-notes-sidebar.tsx';
 import AppLayout from '../layouts/app-layout';
 import SettingsLayout from '../layouts/settings/layout';
 import Calender from '../pages/app/calender';
-import Favorites from '../pages/app/favorites';
 import Files from '../pages/app/files';
 import Home from '../pages/app/home';
 import Notebooks from '../pages/app/notebook';
@@ -38,12 +37,7 @@ function AppRoutes() {
 			Component: Landing,
 			HydrateFallback: () => (
 				<div className="flex h-screen flex-col items-center justify-center gap-4">
-					<Player
-						src={NotesLottie}
-						loop
-						autoplay
-						className="h-60 w-60"
-					/>
+					<Player src={NotesLottie} loop autoplay className="h-60 w-60" />
 					<p className="text-muted-foreground text-lg">Loading...</p>
 				</div>
 			),
@@ -53,12 +47,7 @@ function AppRoutes() {
 			Component: Login,
 			HydrateFallback: () => (
 				<div className="flex h-screen flex-col items-center justify-center gap-4">
-					<Player
-						src={NotesLottie}
-						loop
-						autoplay
-						className="h-60 w-60"
-					/>
+					<Player src={NotesLottie} loop autoplay className="h-60 w-60" />
 					<p className="text-muted-foreground text-lg">Loading...</p>
 				</div>
 			),
@@ -68,12 +57,7 @@ function AppRoutes() {
 			Component: ForgotPassword,
 			HydrateFallback: () => (
 				<div className="flex h-screen flex-col items-center justify-center gap-4">
-					<Player
-						src={NotesLottie}
-						loop
-						autoplay
-						className="h-60 w-60"
-					/>
+					<Player src={NotesLottie} loop autoplay className="h-60 w-60" />
 					<p className="text-muted-foreground text-lg">Loading...</p>
 				</div>
 			),
@@ -83,12 +67,7 @@ function AppRoutes() {
 			Component: ResetPassword,
 			HydrateFallback: () => (
 				<div className="flex h-screen flex-col items-center justify-center gap-4">
-					<Player
-						src={NotesLottie}
-						loop
-						autoplay
-						className="h-60 w-60"
-					/>
+					<Player src={NotesLottie} loop autoplay className="h-60 w-60" />
 					<p className="text-muted-foreground text-lg">Loading...</p>
 				</div>
 			),
@@ -98,12 +77,7 @@ function AppRoutes() {
 			Component: VerifyEmail,
 			HydrateFallback: () => (
 				<div className="flex h-screen flex-col items-center justify-center gap-4">
-					<Player
-						src={NotesLottie}
-						loop
-						autoplay
-						className="h-60 w-60"
-					/>
+					<Player src={NotesLottie} loop autoplay className="h-60 w-60" />
 					<p className="text-muted-foreground text-lg">Loading...</p>
 				</div>
 			),
@@ -113,12 +87,7 @@ function AppRoutes() {
 			Component: TwoFactorVerification,
 			HydrateFallback: () => (
 				<div className="flex h-screen flex-col items-center justify-center gap-4">
-					<Player
-						src={NotesLottie}
-						loop
-						autoplay
-						className="h-60 w-60"
-					/>
+					<Player src={NotesLottie} loop autoplay className="h-60 w-60" />
 					<p className="text-muted-foreground text-lg">Loading...</p>
 				</div>
 			),
@@ -128,12 +97,7 @@ function AppRoutes() {
 			Component: Register,
 			HydrateFallback: () => (
 				<div className="flex h-screen flex-col items-center justify-center gap-4">
-					<Player
-						src={NotesLottie}
-						loop
-						autoplay
-						className="h-60 w-60"
-					/>
+					<Player src={NotesLottie} loop autoplay className="h-60 w-60" />
 					<p className="text-muted-foreground text-lg">Loading...</p>
 				</div>
 			),
@@ -143,12 +107,7 @@ function AppRoutes() {
 			Component: () => <Navigate to="/" replace />,
 			HydrateFallback: () => (
 				<div className="flex h-screen flex-col items-center justify-center gap-4">
-					<Player
-						src={NotesLottie}
-						loop
-						autoplay
-						className="h-60 w-60"
-					/>
+					<Player src={NotesLottie} loop autoplay className="h-60 w-60" />
 					<p className="text-muted-foreground text-lg">Loading...</p>
 				</div>
 			),
@@ -163,18 +122,12 @@ function AppRoutes() {
 			Component: AppLayout,
 			HydrateFallback: () => (
 				<div className="flex h-screen flex-col items-center justify-center gap-4">
-					<Player
-						src={NotesLottie}
-						loop
-						autoplay
-						className="h-60 w-60"
-					/>
+					<Player src={NotesLottie} loop autoplay className="h-60 w-60" />
 					<p className="text-muted-foreground text-lg">Loading your notes...</p>
 				</div>
 			),
 			children: [
 				{ index: true, Component: Home },
-				{ path: 'favorites', Component: Favorites },
 				{ path: 'trash', Component: Trash },
 				{ path: 'shared', Component: Shared },
 				{ path: 'files', Component: Files },
@@ -196,12 +149,7 @@ function AppRoutes() {
 					Component: () => <Navigate to="/settings/general" replace />,
 					HydrateFallback: () => (
 						<div className="flex h-screen flex-col items-center justify-center gap-4">
-							<Player
-								src={NotesLottie}
-								loop
-								autoplay
-								className="h-60 w-60"
-							/>
+							<Player src={NotesLottie} loop autoplay className="h-60 w-60" />
 							<p className="text-muted-foreground text-sm">
 								Loading Settings...
 							</p>
