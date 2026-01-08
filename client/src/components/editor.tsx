@@ -25,9 +25,9 @@ import { useStore } from '../stores/index.ts';
 import type {  UserNote } from '../types';
 import EditorFooter from './editor-footer';
 import { EditorHeader, EditorHeaderSkeleton } from './editor-header';
-import { Threads } from './editor-threads';
 import { Plugin, PluginKey } from '@tiptap/pm/state';
 import { AlertCircle, GripVertical, RefreshCw } from 'lucide-react';
+import { ScrollArea } from '../components/ui/scroll-area.tsx';
 import { Skeleton } from '../components/ui/skeleton.tsx';
 import EditorToolbar from './editor-toolbar';
 import suggestion from './suggestion';
@@ -276,16 +276,15 @@ export const Editor = ({
 						<DragHandle editor={editor}>
 							<GripVertical className="h-4 w-4" />
 						</DragHandle>
-						<div className="relative h-full">
+						<ScrollArea className="h-full">
 							<EditorContent
 								key={currentNoteId}
 								editor={editor}
 								className={cn(
-									'bg-editor text-editor-foreground mx-auto h-full min-h-full w-full overflow-hidden border-0 shadow-lg',
+									'bg-editor text-editor-foreground mx-auto  min-h-full w-full border-0 shadow-lg',
 								)}
 							/>
-							{currentUserNote&& <Threads />}
-						</div>{' '}
+						</ScrollArea>{' '}
 					</div>
 					{!currentUserNote && (
 						<div className="text-muted-foreground flex h-full items-center justify-center text-sm">

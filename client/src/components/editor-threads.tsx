@@ -14,7 +14,7 @@ export function Threads({editor}:{editor:Editor}) {
 	return (
 		<>
 			<div className="anchored-threads">
-				<AnchoredThreads editor={editor} threads={threads} />
+				{editor&&<AnchoredThreads editor={editor} threads={threads} />}
 			</div>
 			<FloatingThreads
 				editor={editor}
