@@ -16,7 +16,7 @@ import {
 	NotesSidebarInset,
 	NotesSidebarProvider,
 } from '../../components/ui/notes-sidebar';
-import { useCreateNote } from '../../hooks/use-mutate-note';
+import { useCreateNote } from '../../hooks/use-note.ts';
 import axiosInstance from '../../lib/axios';
 import { useStore } from '../../stores/index.ts';
 
@@ -123,8 +123,8 @@ export default function Notes() {
 					authEndpoint={authEndpoint}
 				>
 					<RoomProvider
-						key={`note-${ selectedId ?? 'new'}`}
-						id={`note-${ selectedId ?? 'new'}`}
+						key={`note-${selectedId ?? 'new'}`}
+						id={`note-${selectedId ?? 'new'}`}
 					>
 						<ErrorBoundary fallback={<EditorError />}>
 							<ClientSideSuspense fallback={<EditorLoadingSkeleton />}>

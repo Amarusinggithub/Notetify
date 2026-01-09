@@ -18,20 +18,19 @@ import { EditorContent, Extension, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { useEffect, useRef } from 'react';
 import { NoteEditorProvider } from '../context/editor-context.tsx';
-import { useUpdateNote } from '../hooks/use-mutate-note.tsx';
 import { cn } from '../lib/utils';
 
-import EditorFooter from './editor-footer';
-import { EditorHeader, EditorHeaderSkeleton } from './editor-header';
 import { Plugin, PluginKey } from '@tiptap/pm/state';
 import { AlertCircle, GripVertical, RefreshCw } from 'lucide-react';
 import { ScrollArea } from '../components/ui/scroll-area.tsx';
 import { Skeleton } from '../components/ui/skeleton.tsx';
+import { useFetchNote, useUpdateNote } from '../hooks/use-note.ts';
+import { useStore } from '../stores/index.ts';
+import EditorFooter from './editor-footer';
+import { EditorHeader, EditorHeaderSkeleton } from './editor-header';
 import EditorToolbar from './editor-toolbar';
 import suggestion from './suggestion';
 import { Button } from './ui/button';
-import { useFetchNote } from '../hooks/use-fetch-note.ts';
-import { useStore } from '../stores/index.ts';
 
 export const Editor = () => {
 	const liveblocks = useLiveblocksExtension();
@@ -51,8 +50,6 @@ export const Editor = () => {
 	const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
 	const { data: currentUserNote } = useFetchNote(currentNoteId!);
-
-
 
 	const editor = useEditor({
 		editorProps: {
@@ -269,7 +266,7 @@ export const Editor = () => {
 								key={currentNoteId}
 								editor={editor}
 								className={cn(
-									'bg-editor text-editor-foreground mx-auto  min-h-full w-full border-0 shadow-lg',
+									'bg-editor text-editor-foreground mx-auto min-h-full w-full border-0 shadow-lg',
 								)}
 							/>
 						</ScrollArea>{' '}

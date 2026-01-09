@@ -29,7 +29,7 @@ import {
 } from 'lucide-react';
 import { useState, useSyncExternalStore } from 'react';
 import type { BreadcrumbItem, PaginatedNotesResponse, UserNote } from 'types';
-import { useDeleteNote } from '../hooks/use-mutate-note';
+import { useDeleteNote } from '../hooks/use-note.ts';
 import { useStore } from '../stores/index.ts';
 import { noteQueryKeys } from '../utils/queryKeys.ts';
 import { Breadcrumbs } from './breadcrumbs';

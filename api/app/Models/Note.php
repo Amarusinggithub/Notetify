@@ -23,7 +23,7 @@ class Note extends Model
         'content',
     ];
 
-protected $touches = ['userNotes'];
+
 
  //note_tag
      public function tags(){

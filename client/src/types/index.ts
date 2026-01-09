@@ -20,7 +20,7 @@ export type CreateOAuthAccount = {
 	OAuthProvider: OAuthProvider;
 	access_token?: string;
 	refresh_token?: string;
-	expires_at?: Date;
+	expires_at?: string;
 };
 
 export interface OAuthAccount {
@@ -29,8 +29,8 @@ export interface OAuthAccount {
 	OAuthProvider: OAuthProvider;
 	access_token?: string;
 	refresh_token?: string;
-	expires_at?: Date;
-	created_at: Date;
+	expires_at?: string;
+	created_at: string;
 }
 
 export type CreateUser = {
@@ -67,16 +67,29 @@ export interface UserTag extends Omit<CreateUserTag, 'tag_data'> {
 	id: string;
 	tag: Tag;
 	user: string;
-	created_at: Date;
+	created_at: string;
+	is_trashed: boolean;
+	updated_at: string;
 }
 
 export interface Tag {
 	id: string;
 	name: string;
-	created_at: Date;
-	updated_at: Date;
-	schedule_delete_at?: Date;
-	removed_at?: Date;
+	created_at: string;
+	updated_at: string;
+	schedule_delete_at?: string;
+	removed_at?: string;
+}
+
+export type UpdateUserTagPayload = Partial<{
+	name: string;
+	is_trashed: boolean;
+}>;
+
+export interface PaginatedTagResponse {
+	results: UserTag[];
+	nextPage: number | null;
+	hasNextPage: boolean;
 }
 
 export interface Note {
@@ -102,7 +115,7 @@ export interface NoteTag {
 	id: string;
 	note: Note;
 	tag: Tag;
-	created_at: Date;
+	created_at: string;
 }
 
 export interface UserNote extends Omit<CreateUserNote, 'note_data'> {
@@ -134,26 +147,32 @@ export type UpdateUserNotePayload = Partial<{
 	tags: Tag[];
 }>;
 
-export type CreateNotebook = {
-	notebook_data: { name: string; users?: number[] };
-};
+
 
 export interface Notebook {
 	id: string;
 	name: string;
-	created_at: Date;
-	updated_at: Date;
+	users?: number[];
+	created_at: string;
+	updated_at: string;
+	is_shared: boolean;
 }
 
 export interface NoteBookNote {
 	id: string;
 	note: Note;
 	note_book: Notebook;
-	created_at: Date;
-	added_at: Date;
-	removed_at?: Date;
+
+	created_at: string;
+	added_at: string;
+	removed_at?: string;
 }
 
+export type CreateUserNotebook = {
+	notebook_data: { name: string; users?: number[] };
+	is_pinned: boolean;
+	is_trashed: boolean;
+};
 export interface UserNotebook {
 	id: string;
 	role: Role;
@@ -161,17 +180,26 @@ export interface UserNotebook {
 	notes?: string[];
 	notebook: Notebook;
 	is_trashed: boolean;
-	trashed_at?: Date;
-	created_at: Date;
-	updated_at: Date;
+	trashed_at?: string;
+	created_at: string;
+	updated_at: string;
 	is_pinned: boolean;
-	pinned_at?: Date;
+	pinned_at?: string;
+	shared_from?: string;
+    shared_at?: string;
+
 }
 
 export type UpdateUserNotebookPayload = Partial<{
 	name: string;
 	is_trashed: boolean;
 }>;
+
+export interface PaginatedNotebooksResponse {
+	results: UserNotebook[];
+	nextPage: number | null;
+	hasNextPage: boolean;
+}
 
 export interface BreadcrumbItem {
 	title: string;

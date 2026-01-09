@@ -37,7 +37,7 @@ import useDebounce from '../hooks/use-debounce';
 import {
 	EnsureNotes,
 	useFetchNotes,
-} from '../hooks/use-fetch-note.ts';
+} from '../hooks/use-note.ts';
 import { useStore } from '../stores/index.ts';
 
 import NoteCard from './note-card';

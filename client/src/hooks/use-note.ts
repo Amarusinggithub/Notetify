@@ -1,17 +1,75 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useRevalidator, useNavigate } from 'react-router';
+import {
+	useMutation,
+	useQueryClient,
+	useSuspenseInfiniteQuery,
+	useSuspenseQuery,
+	type InfiniteData,
+} from '@tanstack/react-query';
+import { useNavigate, useRevalidator } from 'react-router';
+import { queryClient } from '../App';
+import { fetchNote, fetchNotesPage } from '../services/note-service';
 import {
 	createNote,
 	deleteNote,
 	updateNote,
 } from '../services/note-service.ts';
 import { useStore } from '../stores/index.ts';
+import type { PaginatedNotesResponse, SortBy } from '../types';
 import {
 	type CreateUserNote,
 	type UpdateUserNotePayload,
 	type UserNote,
-} from '../types';
+} from '../types/index.ts';
 import { noteQueryKeys } from '../utils/queryKeys.ts';
+
+export const notesQueryOptions = (
+	search: string = '',
+	sortby: SortBy = 'updated_at',
+) => ({
+	queryKey: noteQueryKeys.list(search, sortby),
+	queryFn: fetchNotesPage,
+	initialPageParam: 1,
+	getNextPageParam: (lastPage: PaginatedNotesResponse) => lastPage.nextPage,
+});
+
+export const noteQueryOptions = (noteId: string) => ({
+	queryKey: noteQueryKeys.detail(noteId),
+	queryFn: fetchNote,
+});
+
+export const useFetchNote = (noteId: string) => {
+	const { data } = useSuspenseQuery(noteQueryOptions(noteId));
+	return { data };
+};
+
+export const useFetchNotes = (
+	search: string = '',
+	sortBy: SortBy = 'updated_at',
+) => {
+	const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+		useSuspenseInfiniteQuery(notesQueryOptions(search, sortBy));
+	return { data, fetchNextPage, hasNextPage, isFetchingNextPage };
+};
+
+export const prefetchNotes = (
+	search: string = '',
+	sortBy: SortBy = 'updated_at',
+) => {
+	queryClient.prefetchInfiniteQuery(notesQueryOptions(search, sortBy));
+};
+
+export const EnsureNotes = (
+	search: string = '',
+	sortBy: SortBy = 'updated_at',
+) => {
+	return queryClient.ensureInfiniteQueryData<
+		PaginatedNotesResponse,
+		Error,
+		InfiniteData<PaginatedNotesResponse>,
+		ReturnType<typeof noteQueryKeys.list>,
+		number
+	>(notesQueryOptions(search, sortBy));
+};
 
 type UpdateNoteInput = {
 	id: string;
@@ -21,15 +79,15 @@ type UpdateNoteInput = {
 export function useCreateNote() {
 	const revalidator = useRevalidator();
 	const queryClient = useQueryClient();
-    const navigate = useNavigate();
+	const navigate = useNavigate();
 	return useMutation({
 		mutationFn: (newNote: CreateUserNote) => createNote(newNote),
 		onMutate: async (newNote) => {
-			 try {
-					await queryClient.cancelQueries({ queryKey: noteQueryKeys.all });
-				} catch (e) {
-                    console.error("Failed to cancel queries:",e );
-				}
+			try {
+				await queryClient.cancelQueries({ queryKey: noteQueryKeys.all });
+			} catch (e) {
+				console.error('Failed to cancel queries:', e);
+			}
 			const previous = snapshotNotes(queryClient);
 			const tempId = `temp-${Date.now()}`;
 			const now = new Date().toISOString();
@@ -72,7 +130,7 @@ export function useCreateNote() {
 
 			const store = useStore.getState();
 			store.setSelectedNoteId(created.id);
-            navigate(`/notes/${created.id}`);
+			navigate(`/notes/${created.id}`);
 			revalidator.revalidate();
 		},
 		onError: (error, _input, context) => {

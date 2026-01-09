@@ -1,7 +1,7 @@
 import type { StoreState } from 'stores';
+import type { SortBy } from '../../types';
 import type { StateCreator } from 'zustand';
 
-type SortBy = 'updated_at' | 'created_at' | 'title';
 
 export type NotebookSliceState = {
 	selectedNotebookId: string | null;
@@ -10,9 +10,7 @@ export type NotebookSliceState = {
 };
 
 export type NotebookSliceActions = {
-	setSelectedNotebook: (id: string | null) => void;
-
-
+	setSelectedNotebookId: (id: string | null) => void;
 	setNotebookSearch: (q: string) => void;
 	setNotebookSortBy: (s: SortBy) => void;
 };
@@ -28,7 +26,7 @@ export const createNotebookSlice: StateCreator<
 	selectedNotebookId: null,
 	searchNotebooks: '',
 	sortNotebooksBy: 'updated_at',
-	setSelectedNotebook: (id: string | null) => set({ selectedNotebookId: id }),
+	setSelectedNotebookId: (id: string | null) => set({ selectedNotebookId: id }),
 
 	setNotebookSearch: (q: string) => set({ searchNotebooks: q }),
 	setNotebookSortBy: (s: SortBy) => set({ sortNotebooksBy: s }),

@@ -1,6 +1,6 @@
 import { type StateCreator } from 'zustand';
 import type { Language, Theme } from '../../types';
-import { useStore, type StoreState } from '../index';
+import type { StoreState } from '../index';
 
 type ThemeSliceState = {
 	theme: Theme;
@@ -41,12 +41,3 @@ export const createThemeSlice: StateCreator<StoreState, [], [], ThemeSlice> = (
 	},
 });
 
-// Apply theme immediately on first import in the browser
-if (typeof globalThis.window !== 'undefined') {
-	try {
-		const t = useStore.getState().theme || 'system';
-		applyTheme(t);
-	} catch {
-		console.error('there was an error apply the theme ');
-	}
-}

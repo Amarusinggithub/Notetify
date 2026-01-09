@@ -7,7 +7,7 @@ import React, {
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axiosInstance from '../lib/axios.ts';
-import { type CreateTag, type UserTag } from '../types';
+import { type CreateUserTag, type UserTag } from '../types/index.ts';
 
 interface TagContextType {
 	selectedTag: UserTag | null;
@@ -16,7 +16,7 @@ interface TagContextType {
 	setSelectedTag: React.Dispatch<React.SetStateAction<UserTag | null>>;
 	setWantToDeleteTag: React.Dispatch<React.SetStateAction<boolean>>;
 	setWantToEditTag: React.Dispatch<React.SetStateAction<boolean>>;
-	makeTag: (tag: CreateTag) => Promise<void>;
+	makeTag: (tag: CreateUserTag) => Promise<void>;
 	editTag: (tag: UserTag) => Promise<void>;
 	removeTag: (tag: UserTag) => Promise<void>;
 }
@@ -39,7 +39,7 @@ const TagProvider = ({ children }: TagProviderProps) => {
 		},
 	});
 
-	const makeTag = async (tag: CreateTag) => {
+	const makeTag = async (tag: CreateUserTag) => {
 		/*if (tagName!.trim().length > 0)
 			if (
 				data.some(
@@ -115,7 +115,7 @@ export const getTags = async () => {
 	}
 };
 
-export const createTag = async (tag: CreateTag) => {
+export const createTag = async (tag: CreateUserTag) => {
 	try {
 		const response = await axiosInstance.post('tags/', {
 			tag_data: tag.tag_data,

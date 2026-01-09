@@ -1,6 +1,6 @@
 import { Dialog, DialogContent, DialogTitle } from '@radix-ui/react-dialog';
 import React, { useEffect, useRef, useState } from 'react';
-import useMutateTag from '../hooks/use-mutate-tag';
+import useMutateTag from '../hooks/use-tag';
 import { Button } from './ui/button';
 import { DialogClose, DialogFooter, DialogHeader } from './ui/dialog';
 import { Input } from './ui/input';

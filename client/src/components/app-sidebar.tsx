@@ -30,7 +30,7 @@ import {
 	Trash2,
 	UsersRound,
 } from 'lucide-react';
-import { useCreateNote } from '../hooks/use-mutate-note';
+import { useCreateNote } from '../hooks/use-note.ts';
 import { useStore } from '../stores/index.ts';
 import { type NavItem } from '../types';
 import AppLogo from './app-logo';

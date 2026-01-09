@@ -168,6 +168,7 @@ class NoteController extends Controller
 
         $userNote->save();
         $userNote->load('note.tags');
+        $userNote->touch();
 
         return response()->json($userNote);
     }

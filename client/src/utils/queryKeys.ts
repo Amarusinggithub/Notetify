@@ -1,4 +1,4 @@
-import type { SortBy } from "../types";
+import type { SortBy } from '../types';
 
 export const noteQueryKeys = {
 	detail: (noteId: string) => [noteId],
@@ -8,42 +8,49 @@ export const noteQueryKeys = {
 };
 
 export const tagQueryKeys = {
+	detail: (tagId: string) => [tagId],
+
 	all: ['tags'] as const,
-	list: (category: string, params: string) =>
-		[...tagQueryKeys.all, category, params] as const,
+	list: (search: string, sortBy: SortBy) =>
+		[...tagQueryKeys.all, search, sortBy] as const,
 };
 
 export const notebookQueryKeys = {
+	detail: (notebookId: string) => [notebookId],
+
 	all: ['notebooks'] as const,
-	lists: () => [...notebookQueryKeys.all, 'lists'] as const,
-	list: (category: string, params: string) =>
-		[...notebookQueryKeys.lists(), category, params] as const,
+	list: (search: string, sortBy: SortBy) =>
+		[...notebookQueryKeys.all, search, sortBy] as const,
 };
 
 export const spaceQueryKeys = {
+	detail: (spaceId: string) => [spaceId],
+
 	all: ['spaces'] as const,
-	lists: () => [...spaceQueryKeys.all, 'lists'] as const,
-	list: (category: string, params: string) =>
-		[...spaceQueryKeys.lists(), category, params] as const,
+	list: (search: string, sortBy: SortBy) =>
+		[...spaceQueryKeys.all, search, sortBy] as const,
 };
 
 export const fileQueryKeys = {
+	detail: (fileId: string) => [fileId],
+
 	all: ['files'] as const,
-	lists: () => [...fileQueryKeys.all, 'lists'] as const,
-	list: (category: string, params: string) =>
-		[...fileQueryKeys.lists(), category, params] as const,
+	list: (search: string, sortBy: SortBy) =>
+		[...fileQueryKeys.all, search, sortBy] as const,
 };
 
 export const taskQueryKeys = {
+	detail: (taskId: string) => [taskId],
+
 	all: ['tasks'] as const,
-	lists: () => [...taskQueryKeys.all, 'lists'] as const,
-	list: (category: string, params: string) =>
-		[...taskQueryKeys.lists(), category, params] as const,
+	list: (search: string, sortBy: SortBy) =>
+		[...taskQueryKeys.all, search, sortBy] as const,
 };
 
-export const calendarQueryKeys = {
-	all: ['calendar'] as const,
-	lists: () => [...calendarQueryKeys.all, 'lists'] as const,
-	list: (category: string, params: string) =>
-		[...calendarQueryKeys.lists(), category, params] as const,
+export const eventQueryKeys = {
+	detail: (eventId: string) => [eventId],
+
+	all: ['events'] as const,
+	list: (search: string, sortBy: SortBy) =>
+		[...eventQueryKeys.all, search, sortBy] as const,
 };
