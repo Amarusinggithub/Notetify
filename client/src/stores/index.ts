@@ -15,8 +15,9 @@ import {
 	type ThemeSlice,
 } from './slices/theme-slice';
 import { type NotebookSlice, createNotebookSlice } from './slices/notebooks-slice';
+import { type TagSlice, createTagSlice } from './slices/tags-slice';
 
-export type StoreState = NotesSlice & AuthSlice & ThemeSlice & NotebookSlice;
+export type StoreState = NotesSlice & AuthSlice & ThemeSlice & NotebookSlice & TagSlice;
 
 export const useStore = create<StoreState>()(
 	subscribeWithSelector(
@@ -27,6 +28,7 @@ export const useStore = create<StoreState>()(
 					...createAuthSlice(...args),
 					...createThemeSlice(...args),
 					...createNotebookSlice(...args),
+					...createTagSlice(...args),
 				})),
 				{
 					name: 'notetify-store',
@@ -40,10 +42,13 @@ export const useStore = create<StoreState>()(
 					partialize: (state) => ({
 						selectedNoteId: state.selectedNoteId,
 						selectedNotebookId: state.selectedNotebookId,
+						selectedTagId: state.selectedTagId,
 						searchNotes: state.searchNotes,
 						sortNotesBy: state.sortNotesBy,
 						searchNotebooks: state.searchNotebooks,
 						sortNotebooksBy: state.sortNotebooksBy,
+						searchTags: state.searchTags,
+						sortTagsBy: state.sortTagsBy,
 						theme: state.theme,
 						language: state.language,
 						sharedData: state.sharedData,
