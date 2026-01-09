@@ -1,8 +1,7 @@
 import type { StoreState } from 'stores';
 import { type StateCreator } from 'zustand';
-import axiosInstance, { ensureCSRFToken } from '../../lib/axios';
-import type { SharedData, User } from '../../types';
-import { USERDATA_STORAGE_KEY } from '../../types';
+import * as authService from '../../services/auth-service';
+import type { SharedData } from '../../types';
 import type { FormErrors } from '../../utils/helpers';
 import { mapAxiosErrorToFieldErrors } from '../../utils/helpers';
 
@@ -43,21 +42,6 @@ export type AuthSliceActions = {
 
 export type AuthSlice = AuthSliceState & AuthSliceActions;
 
-function buildShared(apiResponse: any): SharedData {
-	const user: User = {
-		id: apiResponse.id,
-		first_name: apiResponse.first_name,
-		last_name: apiResponse.last_name,
-		email: apiResponse.email,
-		is_active: apiResponse.is_active,
-	};
-	return {
-		auth: { user },
-		name: `${user.first_name} ${user.last_name}`,
-		sidebarOpen: false,
-	} as SharedData;
-}
-
 export const createAuthSlice: StateCreator<StoreState, [], [], AuthSlice> = (
 	set,
 	get,
@@ -90,23 +74,14 @@ export const createAuthSlice: StateCreator<StoreState, [], [], AuthSlice> = (
 				return false;
 			}
 
-			await ensureCSRFToken();
-			const response = await axiosInstance.post('auth/register/', {
-				first_name: first_name.trim(),
-				last_name: last_name.trim(),
-				email: email.trim().toLowerCase(),
+			const shared = await authService.signUp({
+				first_name,
+				last_name,
+				email,
 				password,
 			});
-			if (response.status >= 200 && response.status < 300) {
-				const shared = buildShared(response.data);
-				set({ isAuthenticated: true, sharedData: shared });
-				localStorage.setItem(USERDATA_STORAGE_KEY, JSON.stringify(shared));
-				return true;
-			}
-			set({
-				errors: { general: ['Registration failed. Please try again.'] },
-			});
-			return false;
+			set({ isAuthenticated: true, sharedData: shared });
+			return true;
 		} catch (error: any) {
 			set({ errors: mapAxiosErrorToFieldErrors(error) });
 			return false;
@@ -125,20 +100,10 @@ export const createAuthSlice: StateCreator<StoreState, [], [], AuthSlice> = (
 				set({ errors: fe });
 				return false;
 			}
-			await ensureCSRFToken();
-			const response = await axiosInstance.post('auth/login/', {
-				email: email.trim().toLowerCase(),
-				password,
-				remember,
-			});
-			if (response.status >= 200 && response.status < 300) {
-				const shared = buildShared(response.data);
-				set({ isAuthenticated: true, sharedData: shared });
-				localStorage.setItem(USERDATA_STORAGE_KEY, JSON.stringify(shared));
-				return true;
-			}
-			set({ errors: { password: ['Login failed. Please try again.'] } });
-			return false;
+
+			const shared = await authService.login({ email, password, remember });
+			set({ isAuthenticated: true, sharedData: shared });
+			return true;
 		} catch (error: any) {
 			set({ errors: mapAxiosErrorToFieldErrors(error) });
 			return false;
@@ -154,13 +119,9 @@ export const createAuthSlice: StateCreator<StoreState, [], [], AuthSlice> = (
 				set({ errors: { password: ['Password is required.'] } });
 				return false;
 			}
-			await ensureCSRFToken();
-			const response = await axiosInstance.post('auth/confirm-password/', {
-				password,
-			});
-			if (response.status >= 200 && response.status < 300) return true;
-			set({ errors: { password: ['Password confirmation failed.'] } });
-			return false;
+
+			await authService.confirmPassword(password);
+			return true;
 		} catch (error: any) {
 			set({ errors: mapAxiosErrorToFieldErrors(error) });
 			return false;
@@ -184,12 +145,9 @@ export const createAuthSlice: StateCreator<StoreState, [], [], AuthSlice> = (
 				});
 				return false;
 			}
-			await ensureCSRFToken();
-			const response = await axiosInstance.post(
-				'auth/password-reset/confirm/',
-				{ password, token },
-			);
-			return response.status >= 200 && response.status < 300;
+
+			await authService.passwordReset({ token, password });
+			return true;
 		} catch (error: any) {
 			set({ errors: mapAxiosErrorToFieldErrors(error) });
 			return false;
@@ -205,18 +163,9 @@ export const createAuthSlice: StateCreator<StoreState, [], [], AuthSlice> = (
 				set({ errors: { email: ['Email is required.'] } });
 				return null;
 			}
-			await ensureCSRFToken();
-			const response = await axiosInstance.post('auth/password-reset/', {
-				email: email.trim().toLowerCase(),
-			});
-			if (response.status >= 200 && response.status < 300)
-				return response.data.token || 'success';
-			set({
-				errors: {
-					email: ['Failed to send reset email. Please try again.'],
-				},
-			});
-			return null;
+
+			const token = await authService.forgotPassword(email);
+			return token;
 		} catch (error: any) {
 			set({ errors: mapAxiosErrorToFieldErrors(error) });
 			return null;
@@ -232,18 +181,9 @@ export const createAuthSlice: StateCreator<StoreState, [], [], AuthSlice> = (
 				set({ errors: { email: ['Email is required.'] } });
 				return null;
 			}
-			await ensureCSRFToken();
-			const response = await axiosInstance.post('auth/verify-email/', {
-				email: email.trim().toLowerCase(),
-			});
-			if (response.status >= 200 && response.status < 300)
-				return response.data.token || 'success';
-			set({
-				errors: {
-					email: ['Failed to send verification email. Please try again.'],
-				},
-			});
-			return null;
+
+			const token = await authService.verifyEmail(email);
+			return token;
 		} catch (error: any) {
 			set({ errors: mapAxiosErrorToFieldErrors(error) });
 			return null;
@@ -264,10 +204,9 @@ export const createAuthSlice: StateCreator<StoreState, [], [], AuthSlice> = (
 				searchNotes: '',
 				searchNotebooks: '',
 			});
-			localStorage.removeItem(USERDATA_STORAGE_KEY);
 
 			try {
-				await axiosInstance.post('auth/logout/');
+				await authService.logout();
 			} catch (e) {
 				// server logout may fail; local state already cleared
 			}
@@ -278,15 +217,8 @@ export const createAuthSlice: StateCreator<StoreState, [], [], AuthSlice> = (
 
 	async confirmAuth() {
 		try {
-			await ensureCSRFToken();
-			const response = await axiosInstance.get('auth/me/');
-			if (response.status >= 200 && response.status < 300) {
-				const shared = buildShared(response.data);
-				set({ isAuthenticated: true, sharedData: shared });
-				localStorage.setItem(USERDATA_STORAGE_KEY, JSON.stringify(shared));
-			} else {
-				set({ isAuthenticated: false, sharedData: null });
-			}
+			const shared = await authService.getMe();
+			set({ isAuthenticated: true, sharedData: shared });
 		} catch (error: any) {
 			if (error?.response?.status === 401 || error?.response?.status === 403) {
 				set({ isAuthenticated: false, sharedData: null });

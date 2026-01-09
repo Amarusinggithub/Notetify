@@ -21,6 +21,21 @@ class NoteController extends Controller
         'is_trashed' => 'trashed_at',
     ];
 
+
+    /**
+     * Returns a single note
+     */
+
+    public function show(string $id)
+    {
+        $userNote= UserNote::with('note.tags')
+        ->where('id', $id)
+        ->where('user_id',Auth::id())
+        ->firstOrFail();
+
+        return response()->json($userNote);
+    }
+
     /**
      * Return a paginated list of the authenticated user's notes
      * in a shape compatible with the frontend InfiniteQuery.

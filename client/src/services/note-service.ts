@@ -8,6 +8,18 @@ import type {
 } from '../types';
 import type { noteQueryKeys } from '../utils/queryKeys';
 
+export async function fetchNote({
+	queryKey,
+}: QueryFunctionContext<
+	ReturnType<typeof noteQueryKeys.detail>
+>): Promise<UserNote> {
+	const [noteId] = queryKey;
+
+	const response = await axiosInstance.get<UserNote>(`notes/${noteId}`);
+
+	return response.data;
+}
+
 export async function fetchNotesPage({
 	queryKey,
 	pageParam = 1,
@@ -60,7 +72,6 @@ export const createNote = async (note: CreateUserNote): Promise<UserNote> => {
 	try {
 		// Map legacy CreateUserNote shape to API contract
 		const response = await axiosInstance.post('notes/', {
-			title: note.note_data?.title ?? '',
 			content: note.note_data?.content ?? '',
 		});
 		return response.data as UserNote;

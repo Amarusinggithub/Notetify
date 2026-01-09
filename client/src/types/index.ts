@@ -7,13 +7,14 @@ export const USERDATA_STORAGE_KEY = 'userData';
 export type Role = 'OWNER' | 'EDITOR' | 'MEMBER';
 export type OAuthProvider = 'GOOGLE' | 'GITHUB' | 'FACEBOOK';
 export type Theme = 'dark' | 'light' | 'system';
-export type Language = 'en' | 'de'|"es"|"fr"|"ja";
+export type Language = 'en' | 'de' | 'es' | 'fr' | 'ja';
 
 export type SortBy =
 	| 'updated_at'
 	| 'created_at'
 	| 'title'
-	| 'is_pinned'|'is_trashed';
+	| 'is_pinned'
+	| 'is_trashed';
 
 export type CreateOAuthAccount = {
 	OAuthProvider: OAuthProvider;
@@ -133,8 +134,6 @@ export type UpdateUserNotePayload = Partial<{
 	tags: Tag[];
 }>;
 
-
-
 export type CreateNotebook = {
 	notebook_data: { name: string; users?: number[] };
 };
@@ -145,7 +144,6 @@ export interface Notebook {
 	created_at: Date;
 	updated_at: Date;
 }
-
 
 export interface NoteBookNote {
 	id: string;
@@ -170,12 +168,10 @@ export interface UserNotebook {
 	pinned_at?: Date;
 }
 
-
 export type UpdateUserNotebookPayload = Partial<{
 	name: string;
 	is_trashed: boolean;
 }>;
-
 
 export interface BreadcrumbItem {
 	title: string;
@@ -194,4 +190,3 @@ export interface NavItem {
 	isActive?: boolean;
 	params?: string;
 }
-

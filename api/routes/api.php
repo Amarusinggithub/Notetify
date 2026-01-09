@@ -40,7 +40,7 @@ Route::prefix('auth')->group(function () {
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('liveblocks/auth', LiveblocksController::class);
-    Route::resource('notes', NoteController::class)->except(['show']);
+    Route::resource('notes', NoteController::class);
     Route::resource('notebooks', NotebookController::class)->except(['show']);
     Route::resource('tags', TagController::class)->except(['show']);
 });

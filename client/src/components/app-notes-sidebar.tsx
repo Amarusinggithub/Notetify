@@ -6,7 +6,10 @@ import {
 	Notebook,
 	Search as SearchIcon,
 	Tag as TagIcon,
+	AlertCircle,
+	RefreshCw,
 } from 'lucide-react';
+import { ErrorBoundary } from 'react-error-boundary';
 import { Button } from './ui/button';
 import {
 	DropdownMenu,
@@ -28,20 +31,15 @@ import {
 	NotesSidebarSeparator,
 } from './ui/notes-sidebar';
 import { ScrollArea } from './ui/scroll-area';
-import { ErrorBoundary } from 'react-error-boundary'
 
-import {
-	useSuspenseInfiniteQuery,
-	type InfiniteData,
-} from '@tanstack/react-query';
-import { AlertCircle, RefreshCw } from 'lucide-react';
 import { Suspense, useEffect, useRef, useState } from 'react';
-import { queryClient } from '../App';
 import useDebounce from '../hooks/use-debounce';
-import { fetchNotesPage } from '../services/note-service.ts';
+import {
+	EnsureNotes,
+	useFetchNotes,
+} from '../hooks/use-fetch-note.ts';
 import { useStore } from '../stores/index.ts';
-import { type PaginatedNotesResponse, type SortBy } from '../types';
-import { noteQueryKeys } from '../utils/queryKeys.ts';
+
 import NoteCard from './note-card';
 import { Card, CardContent, CardFooter, CardHeader } from './ui/card';
 import { Input } from './ui/input';
@@ -56,24 +54,8 @@ import { Skeleton } from './ui/skeleton';
 import { Switch } from './ui/switch';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
-export const notesSideBarQueryOptions = (
-	search: string = '',
-	sortby: SortBy = 'updated_at',
-) => ({
-	queryKey: noteQueryKeys.list(search, sortby),
-	queryFn: fetchNotesPage,
-	initialPageParam: 1,
-	getNextPageParam: (lastPage: PaginatedNotesResponse) => lastPage.nextPage,
-});
-
 export function notesLoader() {
-	return queryClient.ensureInfiniteQueryData<
-		PaginatedNotesResponse,
-		Error,
-		InfiniteData<PaginatedNotesResponse>,
-		ReturnType<typeof noteQueryKeys.list>,
-		number
-	>(notesSideBarQueryOptions());
+	return EnsureNotes();
 }
 
 export function EditorNotesSidebar() {
@@ -105,7 +87,7 @@ export function EditorNotesSidebar() {
 	});
 
 	const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-		useSuspenseInfiniteQuery(notesSideBarQueryOptions(search, sortBy));
+		useFetchNotes(search, sortBy);
 
 	const allNotes = data?.pages.flatMap((page) => page.results) ?? [];
 
@@ -125,8 +107,6 @@ export function EditorNotesSidebar() {
 		if (!lastItem) {
 			return;
 		}
-
-
 
 		if (
 			lastItem.index >= allNotes.length - 1 &&
@@ -370,44 +350,44 @@ export function EditorNotesSidebar() {
 			>
 				<Suspense fallback={<NotesSidebarSkeleton />}>
 					<NotesSidebarContent>
-				<ScrollArea ref={parentRef} className="h-full w-full">
-					{allNotes.length === 0 ? (
-						<div className="text-muted-foreground flex h-full items-center justify-center text-sm">
-							No notes yet. Create one to get started.
-						</div>
-					) : (
-						<div
-							style={{
-								height: `${rowVirtualizer.getTotalSize()}px`,
-								width: '100%',
-								position: 'relative',
-							}}
-						>
-							{virtualItems.map((virtualItem) => {
-								const note = allNotes[virtualItem.index];
-								return (
-									<div
-										key={virtualItem.key}
-										data-index={virtualItem.index}
-										ref={rowVirtualizer.measureElement}
-										style={{
-											position: 'absolute',
-											top: 0,
-											left: 0,
-											width: '100%',
-											transform: `translateY(${virtualItem.start}px)`,
-										}}
-									>
-										<NoteCard key={note.id} userNote={note} />
-									</div>
-								);
-							})}
-						</div>
-					)}
-				</ScrollArea>
-			</NotesSidebarContent>
-                </Suspense>
-                </ErrorBoundary>
+						<ScrollArea ref={parentRef} className="h-full w-full">
+							{allNotes.length === 0 ? (
+								<div className="text-muted-foreground flex h-full items-center justify-center text-sm">
+									No notes yet. Create one to get started.
+								</div>
+							) : (
+								<div
+									style={{
+										height: `${rowVirtualizer.getTotalSize()}px`,
+										width: '100%',
+										position: 'relative',
+									}}
+								>
+									{virtualItems.map((virtualItem) => {
+										const note = allNotes[virtualItem.index];
+										return (
+											<div
+												key={virtualItem.key}
+												data-index={virtualItem.index}
+												ref={rowVirtualizer.measureElement}
+												style={{
+													position: 'absolute',
+													top: 0,
+													left: 0,
+													width: '100%',
+													transform: `translateY(${virtualItem.start}px)`,
+												}}
+											>
+												<NoteCard key={note.id} userNote={note} />
+											</div>
+										);
+									})}
+								</div>
+							)}
+						</ScrollArea>
+					</NotesSidebarContent>
+				</Suspense>
+			</ErrorBoundary>
 			<NotesSidebarFooter>
 				{allNotes.length > 0 && (
 					<div className="text-muted-foreground w-full text-center text-xs">
@@ -443,26 +423,21 @@ function NoteCardSkeleton() {
 
 export function NotesSkeleton() {
 	return (
-
-
-			<NotesSidebarContent>
-				<ScrollArea className="h-full w-full">
-					<div className="flex flex-col">
-						{Array.from({ length: 6 }).map((_, i) => (
-							<NoteCardSkeleton key={i} />
-						))}
-					</div>
-				</ScrollArea>
-			</NotesSidebarContent>
-
-
+		<NotesSidebarContent>
+			<ScrollArea className="h-full w-full">
+				<div className="flex flex-col">
+					{Array.from({ length: 6 }).map((_, i) => (
+						<NoteCardSkeleton key={i} />
+					))}
+				</div>
+			</ScrollArea>
+		</NotesSidebarContent>
 	);
 }
 
-
 export function NotesSidebarSkeleton() {
 	return (
-<NotesSidebar collapsible="offcanvas" variant="inset">
+		<NotesSidebar collapsible="offcanvas" variant="inset">
 			<NotesSidebarHeader>
 				<div className="flex flex-row items-center gap-x-1">
 					<Label className="scroll-m-20 text-2xl font-semibold tracking-tight">
@@ -484,7 +459,6 @@ export function NotesSidebarSkeleton() {
 
 			<NotesSidebarFooter />
 		</NotesSidebar>
-
 	);
 }
 
@@ -532,7 +506,6 @@ export function NotesSidebarError({
 	);
 }
 
-
 export function NotesError({
 	error,
 	reset,
@@ -541,29 +514,24 @@ export function NotesError({
 	reset?: () => void;
 }) {
 	return (
-
-
-			<NotesSidebarContent>
-				<div className="flex h-full flex-col items-center justify-center gap-4 p-6 text-center">
-					<div className="bg-destructive/10 rounded-full p-3">
-						<AlertCircle className="text-destructive h-8 w-8" />
-					</div>
-					<div className="space-y-2">
-						<h3 className="text-lg font-semibold">Failed to load notes</h3>
-						<p className="text-muted-foreground text-sm">
-							{error?.message ||
-								'Something went wrong while loading your notes.'}
-						</p>
-					</div>
-					{reset && (
-						<Button variant="outline" onClick={reset} className="gap-2">
-							<RefreshCw className="h-4 w-4" />
-							Try again
-						</Button>
-					)}
+		<NotesSidebarContent>
+			<div className="flex h-full flex-col items-center justify-center gap-4 p-6 text-center">
+				<div className="bg-destructive/10 rounded-full p-3">
+					<AlertCircle className="text-destructive h-8 w-8" />
 				</div>
-			</NotesSidebarContent>
-
-
+				<div className="space-y-2">
+					<h3 className="text-lg font-semibold">Failed to load notes</h3>
+					<p className="text-muted-foreground text-sm">
+						{error?.message || 'Something went wrong while loading your notes.'}
+					</p>
+				</div>
+				{reset && (
+					<Button variant="outline" onClick={reset} className="gap-2">
+						<RefreshCw className="h-4 w-4" />
+						Try again
+					</Button>
+				)}
+			</div>
+		</NotesSidebarContent>
 	);
 }

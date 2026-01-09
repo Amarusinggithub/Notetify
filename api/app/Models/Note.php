@@ -23,7 +23,7 @@ class Note extends Model
         'content',
     ];
 
-
+protected $touches = ['userNotes'];
 
  //note_tag
      public function tags(){
@@ -60,4 +60,9 @@ class Note extends Model
             ->withPivot('order')
             ->withTimestamps();
     }
+
+    public function userNotes()
+{
+    return $this->hasMany(UserNote::class);
+}
 }

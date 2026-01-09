@@ -1,6 +1,7 @@
 import type { SortBy } from "../types";
 
 export const noteQueryKeys = {
+	detail: (noteId: string) => [noteId],
 	all: ['notes'] as const,
 	list: (search: string, sortBy: SortBy) =>
 		[...noteQueryKeys.all, search, sortBy] as const,

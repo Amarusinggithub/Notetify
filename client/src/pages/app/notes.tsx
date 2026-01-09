@@ -3,13 +3,15 @@ import {
 	LiveblocksProvider,
 	RoomProvider,
 } from '@liveblocks/react/suspense';
-import {  useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
 import { useNavigate, useParams, useRouteLoaderData } from 'react-router';
+import { EditorNotesSidebar } from '../../components/app-notes-sidebar';
 import {
-	EditorNotesSidebar,
-
-} from '../../components/app-notes-sidebar';
-import { Editor, EditorLoadingSkeleton, EditorError } from '../../components/editor';
+	Editor,
+	EditorError,
+	EditorLoadingSkeleton,
+} from '../../components/editor';
 import {
 	NotesSidebarInset,
 	NotesSidebarProvider,
@@ -17,7 +19,6 @@ import {
 import { useCreateNote } from '../../hooks/use-mutate-note';
 import axiosInstance from '../../lib/axios';
 import { useStore } from '../../stores/index.ts';
-import { ErrorBoundary } from 'react-error-boundary';
 
 export default function Notes() {
 	const { noteId } = useParams();
@@ -54,7 +55,7 @@ export default function Notes() {
 		}
 
 		// No notes exist - create one (use ref to prevent double creation)
-		if (!isCreating && !isCreatingRef.current ) {
+		if (!isCreating && !isCreatingRef.current) {
 			isCreatingRef.current = true;
 			createNote(
 				{
@@ -87,25 +88,22 @@ export default function Notes() {
 		isCreating,
 	]);
 
-	const resolveUsers = useCallback(
-		async ({ userIds }: { userIds: string[] }) => {
-			if (!currentUser) return undefined;
-			return userIds.map((id) => {
-				if (String(currentUser.id) !== id) {
-					return undefined;
-				}
-				const name = `${currentUser.first_name ?? ''} ${
-					currentUser.last_name ?? ''
-				}`.trim();
-				return {
-					name: name || currentUser.email,
-					avatar: currentUser.avatar ?? '',
-					email: currentUser.email,
-				};
-			});
-		},
-		[currentUser],
-	);
+	const resolveUsers = async ({ userIds }: { userIds: string[] }) => {
+		if (!currentUser) return undefined;
+		return userIds.map((id) => {
+			if (String(currentUser.id) !== id) {
+				return undefined;
+			}
+			const name = `${currentUser.first_name ?? ''} ${
+				currentUser.last_name ?? ''
+			}`.trim();
+			return {
+				name: name || currentUser.email,
+				avatar: currentUser.avatar ?? '',
+				email: currentUser.email,
+			};
+		});
+	};
 
 	const authEndpoint = useCallback(async (room?: string) => {
 		if (!room) {
@@ -125,12 +123,12 @@ export default function Notes() {
 					authEndpoint={authEndpoint}
 				>
 					<RoomProvider
-						key={`note-${noteId ?? selectedId ?? 'new'}`}
-						id={`note-${noteId ?? selectedId ?? 'new'}`}
+						key={`note-${ selectedId ?? 'new'}`}
+						id={`note-${ selectedId ?? 'new'}`}
 					>
 						<ErrorBoundary fallback={<EditorError />}>
 							<ClientSideSuspense fallback={<EditorLoadingSkeleton />}>
-								<Editor currentNoteId={noteId?? selectedId} />
+								<Editor />
 							</ClientSideSuspense>
 						</ErrorBoundary>
 					</RoomProvider>

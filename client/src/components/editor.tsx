@@ -1,6 +1,5 @@
 import { useLiveblocksExtension } from '@liveblocks/react-tiptap';
 import { useRoom } from '@liveblocks/react/suspense';
-import {  useSuspenseInfiniteQuery } from '@tanstack/react-query';
 import DragHandle from '@tiptap/extension-drag-handle-react';
 import Emoji, { gitHubEmojis } from '@tiptap/extension-emoji';
 import FontFamily from '@tiptap/extension-font-family';
@@ -21,8 +20,7 @@ import { useEffect, useRef } from 'react';
 import { NoteEditorProvider } from '../context/editor-context.tsx';
 import { useUpdateNote } from '../hooks/use-mutate-note.tsx';
 import { cn } from '../lib/utils';
-import { useStore } from '../stores/index.ts';
-import type {  UserNote } from '../types';
+
 import EditorFooter from './editor-footer';
 import { EditorHeader, EditorHeaderSkeleton } from './editor-header';
 import { Plugin, PluginKey } from '@tiptap/pm/state';
@@ -32,17 +30,14 @@ import { Skeleton } from '../components/ui/skeleton.tsx';
 import EditorToolbar from './editor-toolbar';
 import suggestion from './suggestion';
 import { Button } from './ui/button';
-import { notesSideBarQueryOptions } from './app-notes-sidebar.tsx';
+import { useFetchNote } from '../hooks/use-fetch-note.ts';
+import { useStore } from '../stores/index.ts';
 
-export const Editor = ({
-	currentNoteId = null,
-}: {
-	currentNoteId?: string | null;
-}) => {
+export const Editor = () => {
 	const liveblocks = useLiveblocksExtension();
 	const room = useRoom();
 	const lastLoadedId = useRef<string | null>(null);
-
+	const currentNoteId = useStore((s) => s.selectedNoteId);
 	const isMounted = useRef(false);
 
 	useEffect(() => {
@@ -54,17 +49,10 @@ export const Editor = ({
 
 	const updateNoteMutation = useUpdateNote();
 	const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-	const search = useStore((s) => s.searchNotes);
-	const sortBy = useStore((s) => s.sortNotesBy);
 
-    const { data} =
-            useSuspenseInfiniteQuery(notesSideBarQueryOptions(search, sortBy));
-
-        const allNotes = data?.pages.flatMap((page) => page.results) ?? [];
+	const { data: currentUserNote } = useFetchNote(currentNoteId!);
 
 
-	const currentUserNote =
-		allNotes.find((n: UserNote) => n.id === currentNoteId) ?? allNotes[0];
 
 	const editor = useEditor({
 		editorProps: {
