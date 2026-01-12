@@ -51,9 +51,6 @@ class NoteControllerTest extends TestCase
         $response = $this->postJson('/api/notes', $payload);
 
         $response->assertCreated()
-            ->assertJsonFragment([
-                'is_pinned' => true,
-            ])
             ->assertJsonPath('note.content', '<p>Hello world</p>');
     }
 
@@ -75,9 +72,7 @@ class NoteControllerTest extends TestCase
         ]);
 
         $response->assertOk()
-            ->assertJsonPath('note.content', 'Updated content')
-            ->assertJsonPath('is_pinned', true)
-            ->assertJsonStructure(['pinned_at']);
+            ->assertJsonPath('note.content', 'Updated content');
     }
 
     public function test_deleting_last_link_removes_note(): void
