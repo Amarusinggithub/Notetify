@@ -25,19 +25,7 @@ class Tag extends Model
 
     ];
 
-//note_tag
-     public function notes(){
-        return $this->belongsToMany(Note::class)
-                        ->using(NoteTag::class)
-        ->withTimestamps();
-    }
 
-    //user_tag
-     public function Users(){
-        return $this->belongsToMany(User::class)
-                        ->using(UserTag::class)
-        ->withTimestamps();
-    }
 
 
 

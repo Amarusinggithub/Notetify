@@ -24,19 +24,14 @@ class Notebook extends Model
     ];
 
      //user_notebook
-     public function users(){
+    public function users(){
         return $this->belongsToMany(User::class)
-                        ->using(UserNotebook::class)
-->withTimestamps();
+                    ->using(UserNotebook::class)
+                    ->withTimestamps();
     }
 
 
-     //notebook_note
-     public function notes(){
-        return $this->belongsToMany(Note::class)
-                        ->using(NotebookNote::class)
-        ->withTimestamps();
-    }
+
 
     // spaces
     public function spaces()

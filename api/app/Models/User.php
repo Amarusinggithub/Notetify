@@ -87,15 +87,7 @@ return $this->belongsToMany(Note::class)
                 ->withTimestamps();
                }
 
-    //user_tag
-       public function tags()
-    {
-return $this->belongsToMany(Tag::class)
-                ->using(UserTag::class)
-                ->withPivot('color', 'order')
-                ->withTimestamps();
-               }
-
+    
     //user_notebook
      public function notebooks(){
 return $this->belongsToMany(Notebook::class)

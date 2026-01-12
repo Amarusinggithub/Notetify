@@ -24,28 +24,13 @@ class Note extends Model
     ];
 
 
-
- //note_tag
-     public function tags(){
-        return $this->belongsToMany(Tag::class)
-                        ->using(NoteTag::class)
-        ->withTimestamps();
-    }
-
  //user_note
-     public function users(){
+    public function users(){
         return $this->belongsToMany(User::class)
-                                ->using(UserNote::class)
-->withTimestamps();
+                    ->using(UserNote::class)
+                    ->withTimestamps();
     }
 
-
-     //notebook_note
-     public function notebooks(){
-        return $this->belongsToMany(Notebook::class)
-                        ->using(NotebookNote::class)
-->withTimestamps();
-    }
 
     // tasks
     public function tasks()
@@ -62,7 +47,7 @@ class Note extends Model
     }
 
     public function userNotes()
-{
-    return $this->hasMany(UserNote::class);
-}
+    {
+        return $this->hasMany(UserNote::class);
+    }
 }
