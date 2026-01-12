@@ -2,17 +2,17 @@
 
 namespace App\Models;
 
-//use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 
-
-class User extends Authenticatable // implements MustVerifyEmail
+class User extends Authenticatable  implements MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasApiTokens, HasFactory, Notifiable, HasUuids, SoftDeletes;
@@ -27,7 +27,10 @@ class User extends Authenticatable // implements MustVerifyEmail
         'email',
         'password',
         'first_name',
-        'last_name'
+        'last_name',
+        'avatar',
+        'timezone',
+        'locale',
 
     ];
 
@@ -51,9 +54,44 @@ class User extends Authenticatable // implements MustVerifyEmail
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_active' => 'boolean',
+            'last_login_at' => 'datetime',
         ];
     }
 
+    // Scopes
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
+    public function scopeVerified($query)
+    {
+        return $query->whereNotNull('email_verified_at');
+    }
+
+    // Accessors
+    protected function name(): Attribute
+    {
+        return Attribute::make(
+            get: fn (string $value) => ucwords($value),
+            set: fn (string $value) => strtolower($value),
+        );
+    }
+
+    // Methods
+    public function recordLogin(string $ip): void
+    {
+        $this->update([
+            'last_login_at' => now(),
+            'last_login_ip' => $ip,
+        ]);
+    }
+
+    public function isVerified(): bool
+    {
+        return $this->email_verified_at !== null;
+    }
 
 
      // Rest omitted for brevity
@@ -87,7 +125,7 @@ return $this->belongsToMany(Note::class)
                 ->withTimestamps();
                }
 
-    
+
     //user_notebook
      public function notebooks(){
 return $this->belongsToMany(Notebook::class)

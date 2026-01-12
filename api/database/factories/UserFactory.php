@@ -24,12 +24,18 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'first_name' => fake()->name(),
-            'last_name' => fake()->name(),
+            'first_name' => fake()->firstName(),
+            'last_name' => fake()->lastName(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
+            'avatar' => fake()->optional()->imageUrl(200, 200, 'people'),
+            'timezone' => fake()->timezone(),
+            'locale' => fake()->randomElement(['en', 'es', 'fr', 'de', 'pt']),
+            'is_active' => true,
+            'last_login_at' => fake()->optional()->dateTimeBetween('-30 days', 'now'),
+            'last_login_ip' => fake()->optional()->ipv4(),
         ];
     }
 
@@ -40,6 +46,16 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
+        ]);
+    }
+
+    /**
+     * Indicate that the user is inactive.
+     */
+    public function inactive(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_active' => false,
         ]);
     }
 }
