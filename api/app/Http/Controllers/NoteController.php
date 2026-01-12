@@ -17,7 +17,9 @@ class NoteController extends Controller
      * @var array<string, string>
      */
     private array $flagColumns = [
-        'is_pinned' => 'pinned_at',
+        'is_pinned_to_home' => 'pinned_to_home_at',
+        'is_pinned_to_notebook' => 'pinned_to_notebook_at',
+        'is_pinned_to_space' => 'pinned_to_space_at',
         'is_trashed' => 'trashed_at',
     ];
 
@@ -28,10 +30,10 @@ class NoteController extends Controller
 
     public function show(string $id)
     {
-        $userNote= UserNote::with('note.tags')
-        ->where('id', $id)
-        ->where('user_id',Auth::id())
-        ->firstOrFail();
+        $userNote = UserNote::with(['note', 'tags'])
+            ->where('id', $id)
+            ->forUser(Auth::id())
+            ->firstOrFail();
 
         return response()->json($userNote);
     }
@@ -42,30 +44,27 @@ class NoteController extends Controller
      */
     public function index(Request $request)
     {
-        $userId = Auth::id();
-
+        // Build query using scopes - much cleaner than inline where() calls!
+        // Scopes are defined in the UserNote model (see scopeForUser, scopeWithTag, etc.)
         $query = UserNote::query()
             ->select('user_note.*')
-            ->with(['note.tags'])
-            ->where('user_note.user_id', $userId)
+            ->with(['note', 'tags'])
+            ->forUser(Auth::id())
             ->leftJoin('notes', 'notes.id', '=', 'user_note.note_id');
 
         if ($request->filled('tag')) {
-            $tagName = $request->string('tag')->toString();
-
-            // "Give me UserNotes where the related 'note' has a 'tag' with this name"
-            $query->whereHas('note.tags', function ($q) use ($tagName) {
-                $q->where('name', $tagName);
-            });
+            $query->withTag($request->string('tag')->toString());
         }
 
         if ($request->filled('search')) {
-            $search = '%' . $request->string('search')->toString() . '%';
-            $query->where(function ($builder) use ($search) {
-                $builder->where('notes.content', 'like', $search);
-            });
+            $query->search($request->string('search')->toString());
         }
 
+        if ($request->filled('notebook_id')) {
+            $query->inNotebook($request->string('notebook_id')->toString());
+        }
+
+        // Apply flag filters using the whereFlag scope
         foreach (array_keys($this->flagColumns) as $flagColumn) {
             if ($request->has($flagColumn)) {
                 $value = filter_var(
@@ -74,7 +73,7 @@ class NoteController extends Controller
                     FILTER_NULL_ON_FAILURE
                 );
                 if ($value !== null) {
-                    $query->where("user_note.{$flagColumn}", $value);
+                    $query->whereFlag($flagColumn, $value);
                 }
             }
         }
@@ -110,7 +109,11 @@ class NoteController extends Controller
         $validated = $request->validate([
             'content' => ['nullable', 'string'],
             'tags' => ['sometimes', 'array'],
-            'is_pinned' => ['sometimes', 'boolean'],
+            'notebook_id' => ['sometimes', 'nullable', 'uuid', 'exists:notebooks,id'],
+            'space_id' => ['sometimes', 'nullable', 'uuid', 'exists:spaces,id'],
+            'is_pinned_to_home' => ['sometimes', 'boolean'],
+            'is_pinned_to_notebook' => ['sometimes', 'boolean'],
+            'is_pinned_to_space' => ['sometimes', 'boolean'],
             'is_trashed' => ['sometimes', 'boolean'],
         ]);
 
@@ -121,16 +124,28 @@ class NoteController extends Controller
             'content' => $validated['content'] ?? '',
         ]);
 
-        $userNote = UserNote::create(array_merge([
+        $createData = array_merge([
             'note_id' => $note->id,
             'user_id' => Auth::id(),
-        ], $this->buildFlagPayload($validated)));
+            'notebook_id' => $validated['notebook_id'] ?? null,
+            'space_id' => $validated['space_id'] ?? null,
+        ], $this->buildFlagPayload($validated));
 
-        if (!empty($tags)) {
-            $this->syncTags($note, $tags);
+        // Handle added_at timestamps
+        if (!empty($validated['notebook_id'])) {
+            $createData['added_to_notebook_at'] = now();
+        }
+        if (!empty($validated['space_id'])) {
+            $createData['added_to_space_at'] = now();
         }
 
-            $userNote->load(['note.tags']);
+        $userNote = UserNote::create($createData);
+
+        if (!empty($tags)) {
+            $this->syncTags($userNote, $tags);
+        }
+
+        $userNote->load(['note', 'tags']);
         return response()->json($userNote, 201);
     }
 
@@ -139,12 +154,16 @@ class NoteController extends Controller
     {
         $userNote = UserNote::with('note')
             ->where('id', $id)
-            ->where('user_id', Auth::id())
+            ->forUser(Auth::id())
             ->firstOrFail();
 
         $validated = $request->validate([
             'content' => ['sometimes', 'string', 'nullable'],
-            'is_pinned' => ['sometimes', 'boolean'],
+            'notebook_id' => ['sometimes', 'nullable', 'uuid', 'exists:notebooks,id'],
+            'space_id' => ['sometimes', 'nullable', 'uuid', 'exists:spaces,id'],
+            'is_pinned_to_home' => ['sometimes', 'boolean'],
+            'is_pinned_to_notebook' => ['sometimes', 'boolean'],
+            'is_pinned_to_space' => ['sometimes', 'boolean'],
             'is_trashed' => ['sometimes', 'boolean'],
         ]);
 
@@ -162,12 +181,34 @@ class NoteController extends Controller
             $userNote->fill($flagPayload);
         }
 
+        if (array_key_exists('notebook_id', $validated)) {
+            if ($userNote->notebook_id !== $validated['notebook_id']) {
+                 $userNote->notebook_id = $validated['notebook_id'];
+                 if ($validated['notebook_id']) {
+                     $userNote->added_to_notebook_at = now();
+                 } else {
+                     $userNote->added_to_notebook_at = null;
+                 }
+            }
+        }
+
+        if (array_key_exists('space_id', $validated)) {
+             if ($userNote->space_id !== $validated['space_id']) {
+                 $userNote->space_id = $validated['space_id'];
+                 if ($validated['space_id']) {
+                     $userNote->added_to_space_at = now();
+                 } else {
+                     $userNote->added_to_space_at = null;
+                 }
+            }
+        }
+
         if (array_key_exists('tags', $validated)) {
-            $this->syncTags($userNote->note, $validated['tags']);
+            $this->syncTags($userNote, $validated['tags']);
         }
 
         $userNote->save();
-        $userNote->load('note.tags');
+        $userNote->load(['note', 'tags']);
         $userNote->touch();
 
         return response()->json($userNote);
@@ -217,10 +258,10 @@ class NoteController extends Controller
 
 
     /**
-     * Helper to find/create tags and sync them to the note.
+     * Helper to find/create tags and sync them to the user note.
      * This handles both adding new tags and removing omitted ones.
      */
-    private function syncTags(Note $note, array $tagNames): void
+    private function syncTags(UserNote $userNote, array $tagNames): void
     {
         $tagIds = [];
         foreach ($tagNames as $name) {
@@ -230,6 +271,6 @@ class NoteController extends Controller
         }
 
         // sync() removes any IDs not in $tagIds, and adds the new ones
-        $note->tags()->sync($tagIds);
+        $userNote->tags()->sync($tagIds);
     }
 }

@@ -29,7 +29,7 @@ import {
 } from 'lucide-react';
 import { useState, useSyncExternalStore } from 'react';
 import type { BreadcrumbItem, PaginatedNotesResponse, UserNote } from 'types';
-import { useDeleteNote } from '../hooks/use-note.ts';
+import { useDeleteNote, useUpdateNote } from '../hooks/use-note.ts';
 import { useStore } from '../stores/index.ts';
 import { noteQueryKeys } from '../utils/queryKeys.ts';
 import { Breadcrumbs } from './breadcrumbs';
@@ -88,6 +88,7 @@ export function EditorHeader({
 		: globalThis.window.location.href;
 
 	const deleteNoteMutation = useDeleteNote();
+	const updateNoteMutation = useUpdateNote();
 	const others = useOthers();
 	const collaborators = others.slice(0, 3);
 	const search = useStore((s) => s.searchNotes);
@@ -110,6 +111,22 @@ export function EditorHeader({
 	const handleDeleteNote = () => {
 		if (!currentUserNote) return;
 		deleteNoteMutation.mutate(currentUserNote.id);
+	};
+
+	const handlePinToHome = () => {
+		if (!currentUserNote) return;
+		updateNoteMutation.mutate({
+			id: currentUserNote.id,
+			payload: { is_pinned_to_home: !currentUserNote.is_pinned_to_home },
+		});
+	};
+
+	const handlePinToNotebook = () => {
+		if (!currentUserNote) return;
+		updateNoteMutation.mutate({
+			id: currentUserNote.id,
+			payload: { is_pinned_to_notebook: !currentUserNote.is_pinned_to_notebook },
+		});
 	};
 
 	const collaboratorsLabel = collaborators.length
@@ -402,11 +419,17 @@ export function EditorHeader({
 							<DropdownMenuItem onClick={() => console.log('Add to shortcuts')}>
 								<Star className="mr-2 size-4" /> Add to Shortcuts
 							</DropdownMenuItem>
-							<DropdownMenuItem onClick={() => console.log('Pin to notebook')}>
-								<NotebookIcon className="mr-2 size-4" /> Pin to Notebook
+							<DropdownMenuItem onClick={handlePinToNotebook}>
+								<NotebookIcon className="mr-2 size-4" />
+								{currentUserNote?.is_pinned_to_notebook
+									? 'Unpin from Notebook'
+									: 'Pin to Notebook'}
 							</DropdownMenuItem>
-							<DropdownMenuItem onClick={() => console.log('Pin to home')}>
-								<Home className="mr-2 size-4" /> Pin to Home
+							<DropdownMenuItem onClick={handlePinToHome}>
+								<Home className="mr-2 size-4" />
+								{currentUserNote?.is_pinned_to_home
+									? 'Unpin from Home'
+									: 'Pin to Home'}
 							</DropdownMenuItem>
 						</DropdownMenuGroup>
 

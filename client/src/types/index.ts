@@ -107,7 +107,12 @@ export type CreateUserNote = {
 		users: string[];
 	};
 	tags: Tag[];
-	is_pinned: boolean;
+	is_pinned?: boolean;
+	is_pinned_to_home?: boolean;
+	is_pinned_to_notebook?: boolean;
+	is_pinned_to_space?: boolean;
+	notebook_id?: string;
+	space_id?: string;
 	is_trashed: boolean;
 };
 
@@ -130,6 +135,16 @@ export interface UserNote extends Omit<CreateUserNote, 'note_data'> {
 	created_at: string;
 	updated_at: string;
 	is_pinned: boolean;
+	is_pinned_to_home: boolean;
+	pinned_to_home_at?: string;
+	is_pinned_to_notebook: boolean;
+	pinned_to_notebook_at?: string;
+	is_pinned_to_space: boolean;
+	pinned_to_space_at?: string;
+	notebook_id?: string;
+	space_id?: string;
+	added_to_notebook_at?: string;
+	added_to_space_at?: string;
 	is_trashed: boolean;
 	tags: Tag[];
 }
@@ -143,6 +158,11 @@ export interface PaginatedNotesResponse {
 export type UpdateUserNotePayload = Partial<{
 	content: string | null;
 	is_pinned: boolean;
+	is_pinned_to_home: boolean;
+	is_pinned_to_notebook: boolean;
+	is_pinned_to_space: boolean;
+	notebook_id: string | null;
+	space_id: string | null;
 	is_trashed: boolean;
 	tags: Tag[];
 }>;
