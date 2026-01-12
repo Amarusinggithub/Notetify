@@ -255,7 +255,7 @@ export const Editor = () => {
 						className={cn(
 							'h-full w-full',
 							!currentUserNote &&
-								'invisible absolute top-0 left-0 h-0 overflow-hidden',
+								'invisible absolute top-0 left-0 h-0 overflow-hidden'
 						)}
 					>
 						<DragHandle editor={editor}>
@@ -266,7 +266,7 @@ export const Editor = () => {
 								key={currentNoteId}
 								editor={editor}
 								className={cn(
-									'bg-editor text-editor-foreground mx-auto min-h-full w-full border-0 shadow-lg',
+									'bg-editor text-editor-foreground mx-auto min-h-full w-full border-0 shadow-lg'
 								)}
 							/>
 						</ScrollArea>{' '}

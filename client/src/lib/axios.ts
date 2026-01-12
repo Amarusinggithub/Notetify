@@ -8,13 +8,13 @@ import { CSRF_TOKEN_COOKIE_NAME } from '../types';
 const RAW_BASE =
 	(import.meta as any).env?.VITE_BASE_URL?.toString()?.replace(/\/+$/, '') ||
 	'';
-const BASE_URL = (
-	RAW_BASE
+const BASE_URL =
+	(RAW_BASE
 		? RAW_BASE.endsWith('/api')
 			? RAW_BASE
 			: `${RAW_BASE}/api`
 		: '/api'
-).replace(/\/+$/, '') + '/';
+	).replace(/\/+$/, '') + '/';
 
 const ROOT_URL = BASE_URL.replace(/\/api\/$/, '');
 
@@ -43,12 +43,12 @@ axiosInstance.interceptors.request.use(
 
 		return config;
 	},
-	(error) => Promise.reject(error),
+	(error) => Promise.reject(error)
 );
 
 axiosInstance.interceptors.response.use(
 	(response) => response,
-	(error) => Promise.reject(error),
+	(error) => Promise.reject(error)
 );
 
 export async function ensureCSRFToken() {

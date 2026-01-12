@@ -25,7 +25,7 @@ describe('ForgotPassword page', () => {
 		render(
 			<MemoryRouter>
 				<ForgotPassword />
-			</MemoryRouter>,
+			</MemoryRouter>
 		);
 
 		const emailInput = screen.getByLabelText(/Email address/i);
@@ -47,7 +47,7 @@ describe('ForgotPassword page', () => {
 		render(
 			<MemoryRouter>
 				<ForgotPassword />
-			</MemoryRouter>,
+			</MemoryRouter>
 		);
 
 		const emailInput = screen.getByLabelText(/Email address/i);

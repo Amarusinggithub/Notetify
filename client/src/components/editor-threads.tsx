@@ -6,15 +6,13 @@ import {
 import { useThreads } from '@liveblocks/react/suspense';
 import { Editor } from '@tiptap/react';
 
-
-export function Threads({editor}:{editor:Editor}) {
-
+export function Threads({ editor }: { editor: Editor }) {
 	const { threads } = useThreads({ query: { resolved: false } });
 
 	return (
 		<>
 			<div className="anchored-threads">
-				{editor&&<AnchoredThreads editor={editor} threads={threads} />}
+				{editor && <AnchoredThreads editor={editor} threads={threads} />}
 			</div>
 			<FloatingThreads
 				editor={editor}

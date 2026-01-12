@@ -44,7 +44,7 @@ export async function fetchNotesPage({
 
 	try {
 		const response = await axiosInstance.get<PaginatedNotesResponse>(
-			`notes?${params.toString()}`,
+			`notes?${params.toString()}`
 		);
 		return response.data;
 	} catch (error) {
@@ -55,11 +55,11 @@ export async function fetchNotesPage({
 
 export async function updateNote(
 	userNoteId: string,
-	payload: UpdateUserNotePayload,
+	payload: UpdateUserNotePayload
 ): Promise<UserNote> {
 	const response = await axiosInstance.put<UserNote>(
 		`notes/${userNoteId}`,
-		payload,
+		payload
 	);
 	return response.data;
 }

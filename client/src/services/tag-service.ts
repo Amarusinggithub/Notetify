@@ -44,7 +44,7 @@ export async function fetchTagsPage({
 
 	try {
 		const response = await axiosInstance.get<PaginatedTagResponse>(
-			`tags?${params.toString()}`,
+			`tags?${params.toString()}`
 		);
 		return response.data;
 	} catch (error) {
@@ -55,11 +55,11 @@ export async function fetchTagsPage({
 
 export async function updateTag(
 	userTagId: string,
-	payload: UpdateUserTagPayload,
+	payload: UpdateUserTagPayload
 ): Promise<UserTag> {
 	const response = await axiosInstance.put<UserTag>(
 		`tags/${userTagId}`,
-		payload,
+		payload
 	);
 	return response.data;
 }

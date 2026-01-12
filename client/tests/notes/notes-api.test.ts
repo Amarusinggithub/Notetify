@@ -21,7 +21,7 @@ describe('notes api', () => {
 			queryKey: ['notes', 'abc', 'updated_at'],
 		} as any);
 		expect((axiosInstance as any).get).toHaveBeenCalledWith(
-			'notes?page=2&sort_by=updated_at&sort_direction=desc&search=abc',
+			'notes?page=2&sort_by=updated_at&sort_direction=desc&search=abc'
 		);
 	});
 

@@ -24,7 +24,7 @@ import { noteQueryKeys } from '../utils/queryKeys.ts';
 
 export const notesQueryOptions = (
 	search: string = '',
-	sortby: SortBy = 'updated_at',
+	sortby: SortBy = 'updated_at'
 ) => ({
 	queryKey: noteQueryKeys.list(search, sortby),
 	queryFn: fetchNotesPage,
@@ -44,7 +44,7 @@ export const useFetchNote = (noteId: string) => {
 
 export const useFetchNotes = (
 	search: string = '',
-	sortBy: SortBy = 'updated_at',
+	sortBy: SortBy = 'updated_at'
 ) => {
 	const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
 		useSuspenseInfiniteQuery(notesQueryOptions(search, sortBy));
@@ -53,14 +53,14 @@ export const useFetchNotes = (
 
 export const prefetchNotes = (
 	search: string = '',
-	sortBy: SortBy = 'updated_at',
+	sortBy: SortBy = 'updated_at'
 ) => {
 	queryClient.prefetchInfiniteQuery(notesQueryOptions(search, sortBy));
 };
 
 export const EnsureNotes = (
 	search: string = '',
-	sortBy: SortBy = 'updated_at',
+	sortBy: SortBy = 'updated_at'
 ) => {
 	return queryClient.ensureInfiniteQueryData<
 		PaginatedNotesResponse,
@@ -115,7 +115,7 @@ export function useCreateNote() {
 			};
 
 			updateNotesCaches(queryClient, (notes, pageIndex) =>
-				pageIndex && pageIndex > 0 ? notes : [optimistic, ...notes],
+				pageIndex && pageIndex > 0 ? notes : [optimistic, ...notes]
 			);
 
 			//const store = useStore.getState();
@@ -125,7 +125,7 @@ export function useCreateNote() {
 		},
 		onSuccess: (created, _input, context) => {
 			updateNotesCaches(queryClient, (notes) =>
-				notes.map((item) => (item.id === context?.tempId ? created : item)),
+				notes.map((item) => (item.id === context?.tempId ? created : item))
 			);
 
 			const store = useStore.getState();
@@ -168,15 +168,15 @@ export function useUpdateNote() {
 										: {}),
 								},
 							}
-						: note,
-				),
+						: note
+				)
 			);
 
 			return { previous };
 		},
 		onSuccess: (updated: UserNote) => {
 			updateNotesCaches(queryClient, (notes) =>
-				notes.map((note) => (note.id === updated.id ? updated : note)),
+				notes.map((note) => (note.id === updated.id ? updated : note))
 			);
 
 			revalidator.revalidate();
@@ -200,7 +200,7 @@ export function useDeleteNote() {
 			await queryClient.cancelQueries({ queryKey: noteQueryKeys.all });
 			const previous = snapshotNotes(queryClient);
 			updateNotesCaches(queryClient, (notes) =>
-				notes.filter((note) => note.id !== noteId),
+				notes.filter((note) => note.id !== noteId)
 			);
 
 			return { previous };
@@ -232,7 +232,7 @@ function snapshotNotes(queryClient: ReturnType<typeof useQueryClient>) {
  */
 function restoreNotes(
 	queryClient: ReturnType<typeof useQueryClient>,
-	previous: [readonly unknown[], UserNote[] | undefined][] | undefined,
+	previous: [readonly unknown[], UserNote[] | undefined][] | undefined
 ) {
 	if (previous) {
 		previous.forEach(([queryKey, data]) => {
@@ -246,7 +246,7 @@ function restoreNotes(
  */
 function updateNotesCaches(
 	queryClient: ReturnType<typeof useQueryClient>,
-	updater: (oldNotes: UserNote[], pageIndex?: number) => UserNote[],
+	updater: (oldNotes: UserNote[], pageIndex?: number) => UserNote[]
 ) {
 	// Get all matching queries and update them individually
 	const queries = queryClient.getQueriesData<

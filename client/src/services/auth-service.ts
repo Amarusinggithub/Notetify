@@ -60,7 +60,9 @@ export async function confirmPassword(password: string): Promise<void> {
 	await axiosInstance.post('auth/confirm-password/', { password });
 }
 
-export async function passwordReset(params: PasswordResetParams): Promise<void> {
+export async function passwordReset(
+	params: PasswordResetParams
+): Promise<void> {
 	await ensureCSRFToken();
 	await axiosInstance.post('auth/password-reset/confirm/', {
 		password: params.password,

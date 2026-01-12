@@ -72,7 +72,7 @@ function NotesSidebarProvider({
 			// This sets the cookie to keep the sidebar state.
 			document.cookie = `${NOTES_SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${NOTES_SIDEBAR_COOKIE_MAX_AGE}`;
 		},
-		[setOpenProp, open],
+		[setOpenProp, open]
 	);
 
 	// Helper to toggle the sidebar.
@@ -102,7 +102,7 @@ function NotesSidebarProvider({
 			openMobile,
 			setOpenMobile,
 			toggleNotesSidebar,
-		],
+		]
 	);
 
 	return (
@@ -119,7 +119,7 @@ function NotesSidebarProvider({
 					}
 					className={cn(
 						'group/sidebar-wrapper has-data-[variant=inset]:bg-sidebar flex h-svh w-full overflow-hidden',
-						className,
+						className
 					)}
 					{...props}
 				>
@@ -150,7 +150,7 @@ function NotesSidebar({
 				data-slot="notes-sidebar"
 				className={cn(
 					'bg-sidebar text-sidebar-foreground flex h-full w-(--notes-sidebar-width) flex-col',
-					className,
+					className
 				)}
 				{...props}
 			>
@@ -177,7 +177,7 @@ function NotesSidebar({
 					'group-data-[side=right]:rotate-180',
 					variant === 'floating' || variant === 'inset'
 						? 'group-data-[collapsible=icon]:w-[calc(var(--notes-sidebar-width-icon)+(--spacing(4)))]'
-						: 'group-data-[collapsible=icon]:w-(--notes-sidebar-width-icon)',
+						: 'group-data-[collapsible=icon]:w-(--notes-sidebar-width-icon)'
 				)}
 			/>
 			<div
@@ -192,7 +192,7 @@ function NotesSidebar({
 					variant === 'floating' || variant === 'inset'
 						? 'p-2 group-data-[collapsible=icon]:w-[calc(var(--notes-sidebar-width-icon)+(--spacing(4))+2px)]'
 						: 'group-data-[collapsible=icon]:w-(--notes-sidebar-width-icon) group-data-[side=left]:border-r group-data-[side=right]:border-l',
-					className,
+					className
 				)}
 				{...props}
 			>
@@ -255,7 +255,7 @@ function NotesSidebarRail({
 				'hover:group-data-[collapsible=offcanvas]:bg-sidebar group-data-[collapsible=offcanvas]:translate-x-0 group-data-[collapsible=offcanvas]:after:left-full',
 				'[[data-side=left][data-collapsible=offcanvas]_&]:-right-2',
 				'[[data-side=right][data-collapsible=offcanvas]_&]:-left-2',
-				className,
+				className
 			)}
 			{...props}
 		/>
@@ -275,7 +275,7 @@ function NotesSidebarInset({
 				'md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow-sm',
 				// When the notes sidebar is collapsed, remove the inset gap entirely
 				'md:peer-data-[variant=inset]:peer-data-[state=collapsed]:m-0 md:peer-data-[variant=inset]:peer-data-[state=collapsed]:rounded-none md:peer-data-[variant=inset]:peer-data-[state=collapsed]:shadow-none',
-				className,
+				className
 			)}
 			{...props}
 		/>
@@ -334,7 +334,7 @@ function NotesSidebarContent({
 			data-sidebar="content"
 			className={cn(
 				'flex min-h-0 flex-1 flex-col gap-2 overflow-auto group-data-[collapsible=icon]:overflow-hidden',
-				className,
+				className
 			)}
 			{...props}
 		/>

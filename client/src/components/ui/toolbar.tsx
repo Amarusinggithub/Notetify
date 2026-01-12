@@ -1,7 +1,7 @@
 import type { Level } from '@tiptap/extension-heading';
 import { cva } from 'class-variance-authority';
 import {
-    ALargeSmall,
+	ALargeSmall,
 	AlignCenterIcon,
 	AlignJustifyIcon,
 	AlignLeftIcon,
@@ -39,7 +39,7 @@ import {
 	DialogTitle,
 } from './dialog';
 
- function ToolbarFontSizeMenuButton() {
+function ToolbarFontSizeMenuButton() {
 	const editor = useNoteEditor();
 
 	const sizes = [
@@ -48,8 +48,7 @@ import {
 		label: String(size),
 		value: `${size}px`,
 		isActive: () => editor?.isActive({ fontSize: `${size}px` }),
-		onClick: () =>
-			editor?.commands.setFontSize(`${size}px`),
+		onClick: () => editor?.commands.setFontSize(`${size}px`),
 	}));
 
 	return (
@@ -59,11 +58,10 @@ import {
 					<DropdownMenuTrigger asChild>
 						<button
 							className={cn(
-								'hover:bg-editor-accent hover:text-editor-accent-foreground flex h-7 min-w-7 shrink-0 items-center justify-center overflow-hidden rounded-sm px-1.5 text-sm transition-colors',
+								'hover:bg-editor-accent hover:text-editor-accent-foreground flex h-7 min-w-7 shrink-0 items-center justify-center overflow-hidden rounded-sm px-1.5 text-sm transition-colors'
 							)}
 						>
 							<ALargeSmall className="size-4" />
-
 						</button>
 					</DropdownMenuTrigger>
 				</TooltipTrigger>
@@ -78,7 +76,7 @@ import {
 						className={cn(
 							'hover:bg-editor-accent hover:text-editor-accent-foreground flex w-full items-center gap-x-2 rounded-sm px-2 py-1 transition-colors',
 							isActive() &&
-								'bg-editor-accent text-editor-accent-foreground font-semibold',
+								'bg-editor-accent text-editor-accent-foreground font-semibold'
 						)}
 					>
 						<span className="text-sm">{label}</span>
@@ -113,7 +111,7 @@ function ToolbarListButton() {
 					<DropdownMenuTrigger asChild>
 						<button
 							className={cn(
-								'hover:bg-editor-accent hover:text-editor-accent-foreground flex h-7 min-w-7 shrink-0 items-center justify-center overflow-hidden rounded-sm px-1.5 text-sm transition-colors',
+								'hover:bg-editor-accent hover:text-editor-accent-foreground flex h-7 min-w-7 shrink-0 items-center justify-center overflow-hidden rounded-sm px-1.5 text-sm transition-colors'
 							)}
 						>
 							<ListIcon className="size-4" />
@@ -130,7 +128,7 @@ function ToolbarListButton() {
 						onClick={onClick}
 						className={cn(
 							'hover:bg-editor-accent hover:text-editor-accent-foreground flex items-center gap-x-2 rounded-sm px-2 py-1 transition-colors',
-							isActive() && 'bg-editor-accent text-editor-accent-foreground',
+							isActive() && 'bg-editor-accent text-editor-accent-foreground'
 						)}
 					>
 						<Icon className="size-4" />
@@ -172,7 +170,7 @@ function ToolbarAlignButton() {
 			<DropdownMenuTrigger asChild>
 				<button
 					className={cn(
-						'hover:bg-editor-accent hover:text-editor-accent-foreground flex h-7 min-w-7 shrink-0 items-center justify-center overflow-hidden rounded-sm px-1.5 text-sm transition-colors',
+						'hover:bg-editor-accent hover:text-editor-accent-foreground flex h-7 min-w-7 shrink-0 items-center justify-center overflow-hidden rounded-sm px-1.5 text-sm transition-colors'
 					)}
 				>
 					<AlignLeftIcon className="size-4" />
@@ -187,7 +185,7 @@ function ToolbarAlignButton() {
 						className={cn(
 							'hover:bg-editor-accent hover:text-editor-accent-foreground flex items-center gap-x-2 rounded-sm px-2 py-1 transition-colors',
 							editor?.isActive({ textAlign: value }) &&
-								'bg-editor-accent text-editor-accent-foreground',
+								'bg-editor-accent text-editor-accent-foreground'
 						)}
 					>
 						<Icon className="size-4" />
@@ -236,7 +234,7 @@ function ToolbarImageButton() {
 				<DropdownMenuTrigger asChild>
 					<button
 						className={cn(
-							'flex h-7 min-w-7 shrink-0 items-center justify-center overflow-hidden rounded-sm px-1.5 text-sm hover:bg-neutral-200/80',
+							'flex h-7 min-w-7 shrink-0 items-center justify-center overflow-hidden rounded-sm px-1.5 text-sm hover:bg-neutral-200/80'
 						)}
 					>
 						<ImageIcon className="size-4" />
@@ -300,7 +298,7 @@ function ToolbarLinkButton() {
 					<DropdownMenuTrigger asChild>
 						<button
 							className={cn(
-								'hover:bg-editor-accent hover:text-editor-accent-foreground flex h-7 min-w-7 shrink-0 items-center justify-center overflow-hidden rounded-sm px-1.5 text-sm transition-colors',
+								'hover:bg-editor-accent hover:text-editor-accent-foreground flex h-7 min-w-7 shrink-0 items-center justify-center overflow-hidden rounded-sm px-1.5 text-sm transition-colors'
 							)}
 						>
 							<Link2Icon className="size-4" />
@@ -343,7 +341,7 @@ function ToolbarTextHighlightButton() {
 					<DropdownMenuTrigger asChild>
 						<button
 							className={cn(
-								'hover:bg-editor-accent hover:text-editor-accent-foreground flex h-7 min-w-7 shrink-0 items-center justify-center overflow-hidden rounded-sm px-1.5 text-sm transition-colors',
+								'hover:bg-editor-accent hover:text-editor-accent-foreground flex h-7 min-w-7 shrink-0 items-center justify-center overflow-hidden rounded-sm px-1.5 text-sm transition-colors'
 							)}
 						>
 							<HighlighterIcon className="size-4" />
@@ -374,7 +372,7 @@ function ToolbarTextColorButton() {
 					<DropdownMenuTrigger asChild>
 						<button
 							className={cn(
-								'hover:bg-editor-accent hover:text-editor-accent-foreground flex h-7 min-w-7 shrink-0 items-center justify-center overflow-hidden rounded-sm px-1.5 text-sm transition-colors',
+								'hover:bg-editor-accent hover:text-editor-accent-foreground flex h-7 min-w-7 shrink-0 items-center justify-center overflow-hidden rounded-sm px-1.5 text-sm transition-colors'
 							)}
 						>
 							<span className="text-xs">A</span>
@@ -411,7 +409,7 @@ const Toolbar = ({
 		<div
 			className={cn(
 				'bg-editor text-editor-foreground border-editor-border flex h-full w-full items-center border-b',
-				className,
+				className
 			)}
 			{...props}
 		>
@@ -421,13 +419,13 @@ const Toolbar = ({
 };
 
 const toolbarMenuButtonVariants = cva(
-	'peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-hidden ring-editor-ring transition-[width,height,padding] hover:bg-editor-accent hover:text-editor-accent-foreground focus-visible:ring-2 active:bg-editor-accent active:text-editor-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-data-[toolbar=menu-action]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-editor-accent data-[active=true]:font-medium data-[active=true]:text-editor-accent-foreground data-[state=open]:hover:bg-editor-accent data-[state=open]:hover:text-editor-accent-foreground group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-2! [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0',
+	'peer/menu-button ring-editor-ring hover:bg-editor-accent hover:text-editor-accent-foreground active:bg-editor-accent active:text-editor-accent-foreground data-[active=true]:bg-editor-accent data-[active=true]:text-editor-accent-foreground data-[state=open]:hover:bg-editor-accent data-[state=open]:hover:text-editor-accent-foreground flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-hidden transition-[width,height,padding] group-has-data-[toolbar=menu-action]/menu-item:pr-8 group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-2! focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:font-medium [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0',
 	{
 		variants: {
 			variant: {
 				default: 'hover:bg-editor-accent hover:text-editor-accent-foreground',
 				outline:
-					'bg-background shadow-[0_0_0_1px_hsl(var(--editor-border))] hover:bg-editor-accent hover:text-editor-accent-foreground hover:shadow-[0_0_0_1px_hsl(var(--editor-accent))]',
+					'bg-background hover:bg-editor-accent hover:text-editor-accent-foreground shadow-[0_0_0_1px_hsl(var(--editor-border))] hover:shadow-[0_0_0_1px_hsl(var(--editor-accent))]',
 			},
 			size: {
 				default: 'h-8 text-sm',
@@ -439,7 +437,7 @@ const toolbarMenuButtonVariants = cva(
 			variant: 'default',
 			size: 'default',
 		},
-	},
+	}
 );
 
 const ToolbarButton = ({
@@ -456,7 +454,7 @@ const ToolbarButton = ({
 					className={cn(
 						'hover:bg-editor-accent hover:text-editor-accent-foreground flex h-7 min-w-7 items-center justify-center rounded-sm text-sm transition-colors',
 						isActive &&
-							'bg-editor-accent text-editor-accent-foreground font-medium',
+							'bg-editor-accent text-editor-accent-foreground font-medium'
 					)}
 					aria-label={label}
 					title={label}
@@ -487,7 +485,7 @@ function ToolbarFontFamilyMenuButton() {
 					<DropdownMenuTrigger asChild>
 						<button
 							className={cn(
-								'hover:bg-editor-accent hover:text-editor-accent-foreground flex h-7 w-30 shrink-0 items-center justify-between overflow-hidden rounded-sm px-1.5 text-sm transition-colors',
+								'hover:bg-editor-accent hover:text-editor-accent-foreground flex h-7 w-30 shrink-0 items-center justify-between overflow-hidden rounded-sm px-1.5 text-sm transition-colors'
 							)}
 						>
 							<span className="truncate">
@@ -509,7 +507,7 @@ function ToolbarFontFamilyMenuButton() {
 							className={cn(
 								'hover:bg-editor-accent hover:text-editor-accent-foreground flex items-center gap-x-2 rounded-sm px-2 py-1 transition-colors',
 								editor?.getAttributes('textStyle').fontFamily === value &&
-									'bg-editor-accent text-editor-accent-foreground',
+									'bg-editor-accent text-editor-accent-foreground'
 							)}
 						>
 							<span className="text-sm">{label}</span>
@@ -549,7 +547,7 @@ function ToolbarHeadingLevelMenuButton() {
 					<DropdownMenuTrigger asChild>
 						<button
 							className={cn(
-								'hover:bg-editor-accent hover:text-editor-accent-foreground flex h-7 min-w-7 shrink-0 items-center justify-center overflow-hidden rounded-sm px-1.5 text-sm transition-colors',
+								'hover:bg-editor-accent hover:text-editor-accent-foreground flex h-7 min-w-7 shrink-0 items-center justify-center overflow-hidden rounded-sm px-1.5 text-sm transition-colors'
 							)}
 						>
 							<span className="truncate">{getCurrentHeading()}</span>
@@ -580,7 +578,7 @@ function ToolbarHeadingLevelMenuButton() {
 								'hover:bg-editor-accent hover:text-editor-accent-foreground flex items-center gap-x-2 rounded-sm px-2 py-1 transition-colors',
 								((value === 0 && !editor?.isActive('heading')) ||
 									editor?.isActive('heading', { level: value })) &&
-									'bg-editor-accent text-editor-accent-foreground',
+									'bg-editor-accent text-editor-accent-foreground'
 							)}
 						>
 							<span className="text-sm">{label}</span>

@@ -25,7 +25,7 @@ describe('Register page', () => {
 		render(
 			<MemoryRouter>
 				<Register />
-			</MemoryRouter>,
+			</MemoryRouter>
 		);
 
 		fireEvent.change(screen.getByLabelText(/First Name/i), {
@@ -51,7 +51,7 @@ describe('Register page', () => {
 			'Jane',
 			'Doe',
 			'jane.doe@example.com',
-			'password123',
+			'password123'
 		);
 	});
 
@@ -59,7 +59,7 @@ describe('Register page', () => {
 		render(
 			<MemoryRouter>
 				<Register />
-			</MemoryRouter>,
+			</MemoryRouter>
 		);
 
 		fireEvent.change(screen.getByLabelText(/First Name/i), {

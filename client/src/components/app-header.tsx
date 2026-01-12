@@ -157,7 +157,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
 											className={cn(
 												navigationMenuTriggerStyle(),
 												page.pathname === item.href && activeItemStyles,
-												'h-9 cursor-pointer px-3',
+												'h-9 cursor-pointer px-3'
 											)}
 										>
 											{item.icon && (
@@ -221,7 +221,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
 										/>
 										<AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
 											{getInitials(
-												`${auth.user.first_name} ${auth.user.last_name}`,
+												`${auth.user.first_name} ${auth.user.last_name}`
 											)}
 										</AvatarFallback>
 									</Avatar>

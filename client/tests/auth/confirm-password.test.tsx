@@ -25,7 +25,7 @@ describe('ConfirmPassword page', () => {
 		render(
 			<MemoryRouter>
 				<ConfirmPassword />
-			</MemoryRouter>,
+			</MemoryRouter>
 		);
 
 		const passwordInput = screen.getByLabelText(/^Password$/i);
@@ -47,7 +47,7 @@ describe('ConfirmPassword page', () => {
 		render(
 			<MemoryRouter>
 				<ConfirmPassword />
-			</MemoryRouter>,
+			</MemoryRouter>
 		);
 
 		const passwordInput = screen.getByLabelText(/^Password$/i);

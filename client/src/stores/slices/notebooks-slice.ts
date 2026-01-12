@@ -1,7 +1,6 @@
 import type { StoreState } from 'stores';
-import type { SortBy } from '../../types';
 import type { StateCreator } from 'zustand';
-
+import type { SortBy } from '../../types';
 
 export type NotebookSliceState = {
 	selectedNotebookId: string | null;
@@ -31,7 +30,6 @@ export const createNotebookSlice: StateCreator<
 	setNotebookSearch: (q: string) => set({ searchNotebooks: q }),
 	setNotebookSortBy: (s: SortBy) => set({ sortNotebooksBy: s }),
 });
-
 
 /*
 upsertNotebook: (

@@ -7,9 +7,11 @@ import {
 } from '@tanstack/react-query';
 import { useRevalidator } from 'react-router';
 import { queryClient } from '../App';
-import {fetchTag, fetchTagsPage,
+import {
 	createTag,
 	deleteTag,
+	fetchTag,
+	fetchTagsPage,
 	updateTag,
 } from '../services/tag-service';
 import { useStore } from '../stores/index';
@@ -23,7 +25,7 @@ import { tagQueryKeys } from '../utils/queryKeys';
 
 export const tagsQueryOptions = (
 	search: string = '',
-	sortby: SortBy = 'updated_at',
+	sortby: SortBy = 'updated_at'
 ) => ({
 	queryKey: tagQueryKeys.list(search, sortby),
 	queryFn: fetchTagsPage,
@@ -43,7 +45,7 @@ export const useFetchTag = (tagId: string) => {
 
 export const useFetchTags = (
 	search: string = '',
-	sortBy: SortBy = 'updated_at',
+	sortBy: SortBy = 'updated_at'
 ) => {
 	const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
 		useSuspenseInfiniteQuery(tagsQueryOptions(search, sortBy));
@@ -52,14 +54,14 @@ export const useFetchTags = (
 
 export const prefetchTags = (
 	search: string = '',
-	sortBy: SortBy = 'updated_at',
+	sortBy: SortBy = 'updated_at'
 ) => {
 	queryClient.prefetchInfiniteQuery(tagsQueryOptions(search, sortBy));
 };
 
 export const EnsureTags = (
 	search: string = '',
-	sortBy: SortBy = 'updated_at',
+	sortBy: SortBy = 'updated_at'
 ) => {
 	return queryClient.ensureInfiniteQueryData<
 		PaginatedTagResponse,
@@ -104,14 +106,14 @@ export function useCreateTag() {
 			};
 
 			updateTagsCaches(queryClient, (tags, pageIndex) =>
-				pageIndex && pageIndex > 0 ? tags : [optimistic, ...tags],
+				pageIndex && pageIndex > 0 ? tags : [optimistic, ...tags]
 			);
 
 			return { previous, tempId };
 		},
 		onSuccess: (created, _input, context) => {
 			updateTagsCaches(queryClient, (tags) =>
-				tags.map((item) => (item.id === context?.tempId ? created : item)),
+				tags.map((item) => (item.id === context?.tempId ? created : item))
 			);
 
 			const store = useStore.getState();
@@ -152,15 +154,15 @@ export function useUpdateTag() {
 										: {}),
 								},
 							}
-						: tag,
-				),
+						: tag
+				)
 			);
 
 			return { previous };
 		},
 		onSuccess: (updated: UserTag) => {
 			updateTagsCaches(queryClient, (tags) =>
-				tags.map((tag) => (tag.id === updated.id ? updated : tag)),
+				tags.map((tag) => (tag.id === updated.id ? updated : tag))
 			);
 
 			revalidator.revalidate();
@@ -184,7 +186,7 @@ export function useDeleteTag() {
 			await queryClient.cancelQueries({ queryKey: tagQueryKeys.all });
 			const previous = snapshotTags(queryClient);
 			updateTagsCaches(queryClient, (tags) =>
-				tags.filter((tag) => tag.id !== tagId),
+				tags.filter((tag) => tag.id !== tagId)
 			);
 
 			return { previous };
@@ -216,7 +218,7 @@ function snapshotTags(queryClient: ReturnType<typeof useQueryClient>) {
  */
 function restoreTags(
 	queryClient: ReturnType<typeof useQueryClient>,
-	previous: [readonly unknown[], UserTag[] | undefined][] | undefined,
+	previous: [readonly unknown[], UserTag[] | undefined][] | undefined
 ) {
 	if (previous) {
 		previous.forEach(([queryKey, data]) => {
@@ -230,7 +232,7 @@ function restoreTags(
  */
 function updateTagsCaches(
 	queryClient: ReturnType<typeof useQueryClient>,
-	updater: (oldTags: UserTag[], pageIndex?: number) => UserTag[],
+	updater: (oldTags: UserTag[], pageIndex?: number) => UserTag[]
 ) {
 	// Get all matching queries and update them individually
 	const queries = queryClient.getQueriesData<

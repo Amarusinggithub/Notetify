@@ -4,7 +4,7 @@ export default defineConfig({
 	e2e: {
 		setupNodeEvents(
 			on: Cypress.PluginEvents,
-			config: Cypress.PluginConfigOptions,
+			config: Cypress.PluginConfigOptions
 		) {
 			// implement node event listeners here
 		},

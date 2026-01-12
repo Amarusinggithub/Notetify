@@ -1,8 +1,6 @@
 import type { StoreState } from 'stores';
-import type { SortBy } from '../../types';
 import type { StateCreator } from 'zustand';
-
-
+import type { SortBy } from '../../types';
 
 export type NotesSliceState = {
 	selectedNoteId: string | null;
@@ -20,7 +18,7 @@ export type NotesSliceActions = {
 export type NotesSlice = NotesSliceState & NotesSliceActions;
 
 export const createNotesSlice: StateCreator<StoreState, [], [], NotesSlice> = (
-	set,
+	set
 ) => ({
 	selectedNoteId: null,
 	notes: [],

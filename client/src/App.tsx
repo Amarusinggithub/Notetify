@@ -18,7 +18,7 @@ export default function App() {
 	return (
 		<ErrorBoundary FallbackComponent={ErrorFallback}>
 			<QueryClientProvider client={queryClient}>
-					<AppRoutes />
+				<AppRoutes />
 			</QueryClientProvider>
 		</ErrorBoundary>
 	);

@@ -75,7 +75,7 @@ export default function Notes() {
 					onSettled: () => {
 						isCreatingRef.current = false;
 					},
-				},
+				}
 			);
 		}
 	}, [

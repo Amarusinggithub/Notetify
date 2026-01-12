@@ -18,7 +18,6 @@ export function NavMain({ items = [] }: NavMainProps) {
 					<SidebarMenuItem key={item.title}>
 						<SidebarMenuButton
 							asChild
-							
 							isActive={path.pathname == item.href}
 							tooltip={{ children: item.title }}
 						>

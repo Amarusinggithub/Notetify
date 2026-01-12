@@ -21,7 +21,7 @@ function renderWithRoute(path: string) {
 			<Routes>
 				<Route path="/reset-password/:token" element={<ResetPassword />} />
 			</Routes>
-		</MemoryRouter>,
+		</MemoryRouter>
 	);
 }
 

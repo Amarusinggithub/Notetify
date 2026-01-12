@@ -15,7 +15,9 @@ export async function fetchNotebook({
 >): Promise<UserNotebook> {
 	const [notebookId] = queryKey;
 
-	const response = await axiosInstance.get<UserNotebook>(`notebooks/${notebookId}`);
+	const response = await axiosInstance.get<UserNotebook>(
+		`notebooks/${notebookId}`
+	);
 
 	return response.data;
 }
@@ -44,7 +46,7 @@ export async function fetchNotebooksPage({
 
 	try {
 		const response = await axiosInstance.get<PaginatedNotebooksResponse>(
-			`notebooks?${params.toString()}`,
+			`notebooks?${params.toString()}`
 		);
 		return response.data;
 	} catch (error) {
@@ -55,11 +57,11 @@ export async function fetchNotebooksPage({
 
 export async function updateNotebook(
 	userNotebookId: string,
-	payload: UpdateUserNotebookPayload,
+	payload: UpdateUserNotebookPayload
 ): Promise<UserNotebook> {
 	const response = await axiosInstance.put<UserNotebook>(
 		`notebooks/${userNotebookId}`,
-		payload,
+		payload
 	);
 	return response.data;
 }
@@ -68,7 +70,9 @@ export async function deleteNotebook(userNotebookId: string): Promise<void> {
 	await axiosInstance.delete(`notebooks/${userNotebookId}`);
 }
 
-export const createNotebook = async (userNotebook: CreateUserNotebook): Promise<UserNotebook> => {
+export const createNotebook = async (
+	userNotebook: CreateUserNotebook
+): Promise<UserNotebook> => {
 	try {
 		// Map legacy CreateUserNote shape to API contract
 		const response = await axiosInstance.post('notebooks/', {

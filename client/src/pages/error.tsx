@@ -1,4 +1,11 @@
-import { AlertTriangle, RefreshCw, Home, Copy, Check, ChevronDown } from 'lucide-react';
+import {
+	AlertTriangle,
+	Check,
+	ChevronDown,
+	Copy,
+	Home,
+	RefreshCw,
+} from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '../components/ui/button';
 import {
@@ -51,7 +58,8 @@ function ErrorFallback({ error, resetErrorBoundary }: FallBackProps) {
 						</div>
 						<CardTitle className="text-2xl">Something went wrong</CardTitle>
 						<CardDescription className="text-base">
-							We encountered an unexpected error. Don't worry, your data is safe.
+							We encountered an unexpected error. Don't worry, your data is
+							safe.
 						</CardDescription>
 					</CardHeader>
 
@@ -73,7 +81,7 @@ function ErrorFallback({ error, resetErrorBoundary }: FallBackProps) {
 									<ChevronDown
 										className={cn(
 											'h-4 w-4 transition-transform duration-200',
-											detailsOpen && 'rotate-180',
+											detailsOpen && 'rotate-180'
 										)}
 									/>
 								</Button>

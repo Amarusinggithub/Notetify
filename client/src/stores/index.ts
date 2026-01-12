@@ -10,14 +10,21 @@ import { createAuthSlice, type AuthSlice } from './slices/auth-slice';
 import { createNotesSlice, type NotesSlice } from './slices/notes-slice';
 
 import {
+	createNotebookSlice,
+	type NotebookSlice,
+} from './slices/notebooks-slice';
+import { createTagSlice, type TagSlice } from './slices/tags-slice';
+import {
 	applyTheme,
 	createThemeSlice,
 	type ThemeSlice,
 } from './slices/theme-slice';
-import { type NotebookSlice, createNotebookSlice } from './slices/notebooks-slice';
-import { type TagSlice, createTagSlice } from './slices/tags-slice';
 
-export type StoreState = NotesSlice & AuthSlice & ThemeSlice & NotebookSlice & TagSlice;
+export type StoreState = NotesSlice &
+	AuthSlice &
+	ThemeSlice &
+	NotebookSlice &
+	TagSlice;
 
 export const useStore = create<StoreState>()(
 	subscribeWithSelector(
@@ -54,9 +61,9 @@ export const useStore = create<StoreState>()(
 						sharedData: state.sharedData,
 						isAuthenticated: state.isAuthenticated,
 					}),
-				},
+				}
 			),
-			{ name: 'NotetifyDevtools' },
-		),
-	),
+			{ name: 'NotetifyDevtools' }
+		)
+	)
 );

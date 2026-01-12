@@ -167,8 +167,6 @@ export type UpdateUserNotePayload = Partial<{
 	tags: Tag[];
 }>;
 
-
-
 export interface Notebook {
 	id: string;
 	name: string;
@@ -206,8 +204,7 @@ export interface UserNotebook {
 	is_pinned: boolean;
 	pinned_at?: string;
 	shared_from?: string;
-    shared_at?: string;
-
+	shared_at?: string;
 }
 
 export type UpdateUserNotebookPayload = Partial<{

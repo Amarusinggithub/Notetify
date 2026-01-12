@@ -1,13 +1,13 @@
 import { useVirtualizer } from '@tanstack/react-virtual';
 import {
+	AlertCircle,
 	ArrowUpDown,
 	Calendar,
 	FilterIcon,
 	Notebook,
+	RefreshCw,
 	Search as SearchIcon,
 	Tag as TagIcon,
-	AlertCircle,
-	RefreshCw,
 } from 'lucide-react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { Button } from './ui/button';
@@ -34,10 +34,7 @@ import { ScrollArea } from './ui/scroll-area';
 
 import { Suspense, useEffect, useRef, useState } from 'react';
 import useDebounce from '../hooks/use-debounce';
-import {
-	EnsureNotes,
-	useFetchNotes,
-} from '../hooks/use-note.ts';
+import { EnsureNotes, useFetchNotes } from '../hooks/use-note.ts';
 import { useStore } from '../stores/index.ts';
 
 import NoteCard from './note-card';

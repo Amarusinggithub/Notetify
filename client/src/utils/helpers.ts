@@ -5,7 +5,6 @@ export const isUserNote = (note: UserNote | CreateNote): note is UserNote => {
 	return (note as UserNote).note !== undefined;
 };
 
-
 export const colors = [
 	'#958DF1',
 	'#F98181',
@@ -59,7 +58,6 @@ export const names = [
 	'Lisa Bonet',
 ];
 
-
 export const getRandomElement = (list) =>
 	list[Math.floor(Math.random() * list.length)];
 
@@ -87,7 +85,7 @@ export function mapAxiosErrorToFieldErrors(error: any): FormErrors {
 		) {
 			return toField(
 				'general',
-				'Network error. Please check your internet connection.',
+				'Network error. Please check your internet connection.'
 			);
 		}
 		if (error?.code === 'ECONNABORTED' || error?.message?.includes('timeout')) {
@@ -122,7 +120,7 @@ export function mapAxiosErrorToFieldErrors(error: any): FormErrors {
 			// Auth-specific: surface under password to show near the form
 			return toField(
 				'password',
-				data?.message || 'Invalid credentials. Please try again.',
+				data?.message || 'Invalid credentials. Please try again.'
 			);
 		case 403:
 			return toField('general', data?.message || 'Access forbidden.');
@@ -132,7 +130,7 @@ export function mapAxiosErrorToFieldErrors(error: any): FormErrors {
 			// If backend sends a conflict without field details, attach to email by default for auth flows
 			return toField(
 				'email',
-				data?.message || 'Conflict error. This resource may already exist.',
+				data?.message || 'Conflict error. This resource may already exist.'
 			);
 		case 429:
 			return toField('general', 'Too many requests. Please try again later.');
@@ -143,14 +141,14 @@ export function mapAxiosErrorToFieldErrors(error: any): FormErrors {
 		case 504:
 			return toField(
 				'general',
-				'Service temporarily unavailable. Please try again later.',
+				'Service temporarily unavailable. Please try again later.'
 			);
 		default:
 			if (data?.message) return toField('general', data.message);
 			if (data?.detail) return toField('general', data.detail);
 			return toField(
 				'general',
-				`An error occurred (${status}). Please try again.`,
+				`An error occurred (${status}). Please try again.`
 			);
 	}
 }

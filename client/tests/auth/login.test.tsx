@@ -25,7 +25,7 @@ describe('Login page', () => {
 		render(
 			<MemoryRouter>
 				<Login />
-			</MemoryRouter>,
+			</MemoryRouter>
 		);
 
 		const emailInput = screen.getByLabelText(/Email address/i);
@@ -53,7 +53,7 @@ describe('Login page', () => {
 		render(
 			<MemoryRouter>
 				<Login />
-			</MemoryRouter>,
+			</MemoryRouter>
 		);
 
 		const emailInput = screen.getByLabelText(/Email address/i);

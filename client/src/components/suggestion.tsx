@@ -9,7 +9,7 @@ export default {
 			.filter(({ shortcodes, tags }) => {
 				return (
 					shortcodes.find((shortcode) =>
-						shortcode.startsWith(query.toLowerCase()),
+						shortcode.startsWith(query.toLowerCase())
 					) || tags.find((tag) => tag.startsWith(query.toLowerCase()))
 				);
 			})

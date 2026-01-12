@@ -17,7 +17,7 @@ export function applyTheme(theme: Theme) {
 	root.classList.remove('light', 'dark');
 	if (theme === 'system') {
 		const systemDark = globalThis.window.matchMedia(
-			'(prefers-color-scheme: dark)',
+			'(prefers-color-scheme: dark)'
 		).matches;
 		root.classList.add(systemDark ? 'dark' : 'light');
 	} else {
@@ -28,7 +28,7 @@ export function applyTheme(theme: Theme) {
 export type ThemeSlice = ThemeSliceState & ThemeSliceAction;
 
 export const createThemeSlice: StateCreator<StoreState, [], [], ThemeSlice> = (
-	set,
+	set
 ) => ({
 	theme: 'system',
 	language: 'en',
@@ -40,4 +40,3 @@ export const createThemeSlice: StateCreator<StoreState, [], [], ThemeSlice> = (
 		set({ language: l });
 	},
 });
-

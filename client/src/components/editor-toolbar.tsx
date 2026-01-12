@@ -63,7 +63,7 @@ export default function EditorToolbar() {
 					const current = editor?.view.dom.getAttribute('spellcheck');
 					editor?.view.dom.setAttribute(
 						'spellcheck',
-						current === 'false' ? 'true' : 'false',
+						current === 'false' ? 'true' : 'false'
 					);
 				},
 			},
@@ -168,5 +168,3 @@ export default function EditorToolbar() {
 		</div>
 	);
 }
-
-

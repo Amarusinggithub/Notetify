@@ -78,7 +78,7 @@ export function EditorHeader({
 	const [inviteRole, setInviteRole] = useState<'editor' | 'viewer'>('editor');
 	const inviteRoleLabel = inviteRole === 'editor' ? 'Editor' : 'Viewer';
 	const [linkAccess, setLinkAccess] = useState<'restricted' | 'anyone'>(
-		'restricted',
+		'restricted'
 	);
 	const linkAccessLabel =
 		linkAccess === 'restricted' ? 'Restricted' : 'Anyone with link';
@@ -99,8 +99,8 @@ export function EditorHeader({
 		(onStoreChange) => queryClient.getQueryCache().subscribe(onStoreChange),
 		() =>
 			queryClient.getQueryData<InfiniteData<PaginatedNotesResponse>>(
-				noteQueryKeys.list(search, sortBy),
-			),
+				noteQueryKeys.list(search, sortBy)
+			)
 	);
 
 	const allNotes = paginatedNotes?.pages.flatMap((page) => page.results) ?? [];
@@ -125,7 +125,9 @@ export function EditorHeader({
 		if (!currentUserNote) return;
 		updateNoteMutation.mutate({
 			id: currentUserNote.id,
-			payload: { is_pinned_to_notebook: !currentUserNote.is_pinned_to_notebook },
+			payload: {
+				is_pinned_to_notebook: !currentUserNote.is_pinned_to_notebook,
+			},
 		});
 	};
 

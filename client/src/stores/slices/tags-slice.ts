@@ -1,6 +1,6 @@
 import type { StoreState } from 'stores';
-import type { SortBy } from '../../types';
 import type { StateCreator } from 'zustand';
+import type { SortBy } from '../../types';
 
 export type TagSliceState = {
 	selectedTagId: string | null;
@@ -16,12 +16,9 @@ export type TagSliceActions = {
 
 export type TagSlice = TagSliceState & TagSliceActions;
 
-export const createTagSlice: StateCreator<
-	StoreState,
-	[],
-	[],
-	TagSlice
-> = (set) => ({
+export const createTagSlice: StateCreator<StoreState, [], [], TagSlice> = (
+	set
+) => ({
 	selectedTagId: null,
 	searchTags: '',
 	sortTagsBy: 'updated_at',

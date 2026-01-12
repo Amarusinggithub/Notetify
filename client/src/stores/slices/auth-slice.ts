@@ -25,13 +25,13 @@ export type AuthSliceActions = {
 		first_name: string,
 		last_name: string,
 		email: string,
-		password: string,
+		password: string
 	) => Promise<boolean>;
 	Login: (params: LoginParams) => Promise<boolean>;
 	Logout: () => Promise<void>;
 	PasswordReset: (
 		token: string | undefined,
-		password: string,
+		password: string
 	) => Promise<boolean>;
 	ForgotPassword: (email: string) => Promise<string | null>;
 	VerifyEmail: (email: string) => Promise<string | null>;
@@ -44,7 +44,7 @@ export type AuthSlice = AuthSliceState & AuthSliceActions;
 
 export const createAuthSlice: StateCreator<StoreState, [], [], AuthSlice> = (
 	set,
-	get,
+	get
 ) => ({
 	isLoading: false,
 	isAuthenticated: false,

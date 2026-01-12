@@ -21,7 +21,7 @@ describe('VerifyEmail page', () => {
 		render(
 			<MemoryRouter>
 				<VerifyEmail />
-			</MemoryRouter>,
+			</MemoryRouter>
 		);
 
 		const submitButton = screen.getByRole('button', {

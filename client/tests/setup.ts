@@ -7,7 +7,6 @@ class ResizeObserver {
 	unobserve() {}
 	disconnect() {}
 }
-// @ts-ignore
 global.ResizeObserver = ResizeObserver;
 
 // Mock js-cookie to prevent CSRF token checks from making real requests

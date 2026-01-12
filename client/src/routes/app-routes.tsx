@@ -167,7 +167,7 @@ function AppRoutes() {
 	];
 
 	const router = createBrowserRouter(
-		isAuthenticated ? privateRoutes : publicRoutes,
+		isAuthenticated ? privateRoutes : publicRoutes
 	);
 
 	return (

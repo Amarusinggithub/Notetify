@@ -50,7 +50,7 @@ const NoteCard = ({ userNote }: NoteCardProp) => {
 			onClick={handleSelectNote}
 			className={cn(
 				'gap-2 rounded-none border-x-0 border-t-0 py-3',
-				isActive && 'border-ring',
+				isActive && 'border-ring'
 			)}
 		>
 			<CardHeader className="flex flex-row items-center justify-between py-0">
