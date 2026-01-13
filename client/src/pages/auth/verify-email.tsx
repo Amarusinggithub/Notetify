@@ -10,7 +10,7 @@ export default function VerifyEmail() {
 	const { isLoading, VerifyEmail } = useStore();
 	const submit: FormEventHandler = async (e) => {
 		e.preventDefault();
-		await VerifyEmail('');
+		 await VerifyEmail('');
 	};
 
 	return (

@@ -52,11 +52,11 @@ export const useFetchTags = (
 	return { data, fetchNextPage, hasNextPage, isFetchingNextPage };
 };
 
-export const prefetchTags = (
+export const prefetchTags = async (
 	search: string = '',
 	sortBy: SortBy = 'updated_at'
 ) => {
-	queryClient.prefetchInfiniteQuery(tagsQueryOptions(search, sortBy));
+	await queryClient.prefetchInfiniteQuery(tagsQueryOptions(search, sortBy));
 };
 
 export const EnsureTags = (
@@ -111,21 +111,21 @@ export function useCreateTag() {
 
 			return { previous, tempId };
 		},
-		onSuccess: (created, _input, context) => {
+		onSuccess: async (created, _input, context) => {
 			updateTagsCaches(queryClient, (tags) =>
 				tags.map((item) => (item.id === context?.tempId ? created : item))
 			);
 
 			const store = useStore.getState();
 			store.setSelectedTagId(created.id);
-			revalidator.revalidate();
+			await revalidator.revalidate();
 		},
 		onError: (error, _input, context) => {
 			console.error('Failed to create tag:', error);
 			restoreTags(queryClient, context?.previous);
 		},
-		onSettled: () => {
-			queryClient.invalidateQueries({ queryKey: tagQueryKeys.all });
+		onSettled: async () => {
+			await queryClient.invalidateQueries({ queryKey: tagQueryKeys.all });
 		},
 	});
 }
@@ -160,19 +160,19 @@ export function useUpdateTag() {
 
 			return { previous };
 		},
-		onSuccess: (updated: UserTag) => {
+		onSuccess: async (updated: UserTag) => {
 			updateTagsCaches(queryClient, (tags) =>
 				tags.map((tag) => (tag.id === updated.id ? updated : tag))
 			);
 
-			revalidator.revalidate();
+			await revalidator.revalidate();
 		},
 		onError: (error, _input, context) => {
 			console.error('Failed to update tag:', error);
 			restoreTags(queryClient, context?.previous);
 		},
-		onSettled: () => {
-			queryClient.invalidateQueries({ queryKey: tagQueryKeys.all });
+		onSettled: async  () => {
+			await queryClient.invalidateQueries({ queryKey: tagQueryKeys.all });
 		},
 	});
 }
@@ -191,15 +191,15 @@ export function useDeleteTag() {
 
 			return { previous };
 		},
-		onSuccess: () => {
-			revalidator.revalidate();
+		onSuccess: async () => {
+			await revalidator.revalidate();
 		},
 		onError: (error, _input, context) => {
 			console.error('Failed to delete tag:', error);
 			restoreTags(queryClient, context?.previous);
 		},
-		onSettled: () => {
-			queryClient.invalidateQueries({ queryKey: tagQueryKeys.all });
+		onSettled: async  () => {
+			await queryClient.invalidateQueries({ queryKey: tagQueryKeys.all });
 		},
 	});
 }

@@ -53,11 +53,11 @@ export const useFetchNotebooks = (
 	return { data, fetchNextPage, hasNextPage, isFetchingNextPage };
 };
 
-export const prefetchNotes = (
+export const prefetchNotes = async (
 	search: string = '',
 	sortBy: SortBy = 'updated_at'
 ) => {
-	queryClient.prefetchInfiniteQuery(notebooksQueryOptions(search, sortBy));
+	await queryClient.prefetchInfiniteQuery(notebooksQueryOptions(search, sortBy));
 };
 
 export const EnsureNotes = (
@@ -121,22 +121,22 @@ export function useCreateNotebook() {
 
 			return { previous, tempId };
 		},
-		onSuccess: (created, _input, context) => {
+		onSuccess: async (created, _input, context) => {
 			updateNotebooksCaches(queryClient, (notebooks) =>
 				notebooks.map((item) => (item.id === context?.tempId ? created : item))
 			);
 
 			const store = useStore.getState();
 			store.setSelectedNotebookId(created.id);
-			navigate(`/notebooks/${created.id}`);
-			revalidator.revalidate();
+			await navigate(`/notebooks/${created.id}`);
+			await revalidator.revalidate();
 		},
 		onError: (error, _input, context) => {
 			console.error('Failed to create notebook:', error);
 			restoreNotebooks(queryClient, context?.previous);
 		},
-		onSettled: () => {
-			queryClient.invalidateQueries({ queryKey: notebookQueryKeys.all });
+		onSettled: async () => {
+			await queryClient.invalidateQueries({ queryKey: notebookQueryKeys.all });
 		},
 	});
 }
@@ -173,21 +173,21 @@ export function useUpdateNotebook() {
 
 			return { previous };
 		},
-		onSuccess: (updated: UserNotebook) => {
+		onSuccess: async (updated: UserNotebook) => {
 			updateNotebooksCaches(queryClient, (notebooks) =>
 				notebooks.map((notebook) =>
 					notebook.id === updated.id ? updated : notebook
 				)
 			);
 
-			revalidator.revalidate();
+			await revalidator.revalidate();
 		},
 		onError: (error, _input, context) => {
 			console.error('Failed to update notebook:', error);
 			restoreNotebooks(queryClient, context?.previous);
 		},
-		onSettled: () => {
-			queryClient.invalidateQueries({ queryKey: notebookQueryKeys.all });
+		onSettled: async () => {
+			await queryClient.invalidateQueries({ queryKey: notebookQueryKeys.all });
 		},
 	});
 }
@@ -206,15 +206,15 @@ export function useDeleteNotebook() {
 
 			return { previous };
 		},
-		onSuccess: () => {
-			revalidator.revalidate();
+		onSuccess: async () => {
+			await revalidator.revalidate();
 		},
 		onError: (error, _input, context) => {
 			console.error('Failed to delete notebook:', error);
 			restoreNotebooks(queryClient, context?.previous);
 		},
-		onSettled: () => {
-			queryClient.invalidateQueries({ queryKey: notebookQueryKeys.all });
+		onSettled: async () => {
+			await queryClient.invalidateQueries({ queryKey: notebookQueryKeys.all });
 		},
 	});
 }

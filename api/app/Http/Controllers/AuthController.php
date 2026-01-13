@@ -165,5 +165,9 @@ class AuthController extends Controller
             'message' => 'Verification link sent!',
         ]);
     }
+
+
+
+    
 }
 

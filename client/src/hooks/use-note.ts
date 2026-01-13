@@ -51,11 +51,11 @@ export const useFetchNotes = (
 	return { data, fetchNextPage, hasNextPage, isFetchingNextPage };
 };
 
-export const prefetchNotes = (
+export const prefetchNotes = async (
 	search: string = '',
 	sortBy: SortBy = 'updated_at'
 ) => {
-	queryClient.prefetchInfiniteQuery(notesQueryOptions(search, sortBy));
+	await queryClient.prefetchInfiniteQuery(notesQueryOptions(search, sortBy));
 };
 
 export const EnsureNotes = (
@@ -103,9 +103,14 @@ export function useCreateNote() {
 					created_at: now,
 					updated_at: now,
 				},
-				is_pinned: newNote.is_pinned,
+				is_pinned: newNote.is_pinned ?? false,
+				is_pinned_to_home: newNote.is_pinned_to_home ?? false,
+				is_pinned_to_notebook: newNote.is_pinned_to_notebook ?? false,
+				is_pinned_to_space: newNote.is_pinned_to_space ?? false,
 				is_trashed: newNote.is_trashed,
 				tags: newNote.tags,
+				notebook_id: newNote.notebook_id,
+				space_id: newNote.space_id,
 				created_at: now,
 				updated_at: now,
 				shared_from: undefined,
@@ -118,27 +123,24 @@ export function useCreateNote() {
 				pageIndex && pageIndex > 0 ? notes : [optimistic, ...notes]
 			);
 
-			//const store = useStore.getState();
-			//store.setSelectedNoteId(tempId);
-
 			return { previous, tempId };
 		},
-		onSuccess: (created, _input, context) => {
+		onSuccess: async (created, _input, context) => {
 			updateNotesCaches(queryClient, (notes) =>
 				notes.map((item) => (item.id === context?.tempId ? created : item))
 			);
 
 			const store = useStore.getState();
 			store.setSelectedNoteId(created.id);
-			navigate(`/notes/${created.id}`);
-			revalidator.revalidate();
+			await navigate(`/notes/${created.id}`);
+			await revalidator.revalidate();
 		},
 		onError: (error, _input, context) => {
 			console.error('Failed to create note:', error);
 			restoreNotes(queryClient, context?.previous);
 		},
-		onSettled: () => {
-			queryClient.invalidateQueries({ queryKey: noteQueryKeys.all });
+		onSettled: async () => {
+			await queryClient.invalidateQueries({ queryKey: noteQueryKeys.all });
 		},
 	});
 }
@@ -153,40 +155,58 @@ export function useUpdateNote() {
 			const previous = snapshotNotes(queryClient);
 			const now = new Date().toISOString();
 			updateNotesCaches(queryClient, (notes) =>
-				notes.map((note) =>
-					note.id === id
-						? {
-								...note,
-								...payload,
-								updated_at: now,
-								note: {
-									...note.note,
+				notes.map(
+					(note): UserNote =>
+						note.id === id
+							? {
+									...note,
+									...payload,
+									// this ensure required booleans are never undefined
+									is_pinned: payload.is_pinned ?? note.is_pinned,
+									is_pinned_to_home:
+										payload.is_pinned_to_home ?? note.is_pinned_to_home,
+									is_pinned_to_notebook:
+										payload.is_pinned_to_notebook ?? note.is_pinned_to_notebook,
+									is_pinned_to_space:
+										payload.is_pinned_to_space ?? note.is_pinned_to_space,
+									is_trashed: payload.is_trashed ?? note.is_trashed,
+									// Convert null to undefined for optional string fields
+									notebook_id:
+										payload.notebook_id === null
+											? undefined
+											: (payload.notebook_id ?? note.notebook_id),
+									space_id:
+										payload.space_id === null
+											? undefined
+											: (payload.space_id ?? note.space_id),
 									updated_at: now,
-
-									...(payload.content !== undefined
-										? { content: payload.content ?? '' }
-										: {}),
-								},
-							}
-						: note
+									note: {
+										...note.note,
+										updated_at: now,
+										...(payload.content !== undefined
+											? { content: payload.content ?? '' }
+											: {}),
+									},
+								}
+							: note
 				)
 			);
 
 			return { previous };
 		},
-		onSuccess: (updated: UserNote) => {
+		onSuccess: async (updated: UserNote) => {
 			updateNotesCaches(queryClient, (notes) =>
 				notes.map((note) => (note.id === updated.id ? updated : note))
 			);
 
-			revalidator.revalidate();
+			await revalidator.revalidate();
 		},
 		onError: (error, _input, context) => {
 			console.error('Failed to update note:', error);
 			restoreNotes(queryClient, context?.previous);
 		},
-		onSettled: () => {
-			queryClient.invalidateQueries({ queryKey: noteQueryKeys.all });
+		onSettled: async  () => {
+			await queryClient.invalidateQueries({ queryKey: noteQueryKeys.all });
 		},
 	});
 }
@@ -205,15 +225,15 @@ export function useDeleteNote() {
 
 			return { previous };
 		},
-		onSuccess: () => {
-			revalidator.revalidate();
+		onSuccess: async () => {
+			await revalidator.revalidate();
 		},
 		onError: (error, _input, context) => {
 			console.error('Failed to delete note:', error);
 			restoreNotes(queryClient, context?.previous);
 		},
-		onSettled: () => {
-			queryClient.invalidateQueries({ queryKey: noteQueryKeys.all });
+		onSettled: async () => {
+			await queryClient.invalidateQueries({ queryKey: noteQueryKeys.all });
 		},
 	});
 }
