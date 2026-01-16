@@ -1,5 +1,5 @@
 import { LoaderCircle } from 'lucide-react';
-import { useState } from 'react';
+import { useState, type ChangeEvent, type FormEvent } from 'react';
 import InputError from '../../components/input-error';
 import TextLink from '../../components/text-link';
 import { Button } from '../../components/ui/button.tsx';
@@ -9,26 +9,22 @@ import AuthLayout from '../../layouts/auth-layout';
 import { useStore } from '../../stores/index.ts';
 import { forgatPasswordSchema } from '../../utils/validators.ts';
 
-type ForgotPasswordProps = {
-	status?: string;
-};
-
 type ForgotPasswordForm = {
 	email: string;
 };
 
-export default function ForgotPassword({ status }: ForgotPasswordProps) {
+export default function ForgotPassword() {
 	const [form, setForm] = useState<ForgotPasswordForm>({
 		email: '',
 	});
 
 	const { isLoading, errors, setErrors, ForgotPassword } = useStore();
 
-	const change = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const change = (e: ChangeEvent<HTMLInputElement>) => {
 		setForm({ ...form, [e.target.name]: e.target.value.trim() });
 	};
 
-	const submit = async (e: React.FormEvent<HTMLFormElement>) => {
+	const submit = async (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		setErrors(null);
 
@@ -49,14 +45,13 @@ export default function ForgotPassword({ status }: ForgotPasswordProps) {
 		>
 			<h1> Forgot password</h1>
 
-			{status && (
-				<div className="mb-4 text-center text-sm font-medium text-green-600">
-					{status}
-				</div>
-			)}
-
 			<div className="space-y-6">
-				<form onSubmit={submit} noValidate>
+				<form
+					onSubmit={(e) => {
+						submit(e).catch(console.error);
+					}}
+					noValidate
+				>
 					<div className="grid gap-2">
 						<Label htmlFor="email">Email address</Label>
 						<Input

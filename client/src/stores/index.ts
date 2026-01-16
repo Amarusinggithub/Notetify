@@ -40,11 +40,11 @@ export const useStore = create<StoreState>()(
 				{
 					name: 'notetify-store',
 					storage: createJSONStorage(() => localStorage),
-					onRehydrateStorage: () => (state) => {
+					onRehydrateStorage: () => async (state) => {
 						// After rehydrate, start an auth confirmation in background
 						const t = state?.theme ?? 'system';
 						applyTheme(t);
-						state?.confirmAuth?.();
+						await state?.confirmAuth?.();
 					},
 					partialize: (state) => ({
 						selectedNoteId: state.selectedNoteId,

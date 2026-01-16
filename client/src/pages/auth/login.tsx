@@ -1,5 +1,6 @@
 import { LoaderCircle } from 'lucide-react';
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router';
 import InputError from '../../components/input-error.tsx';
 import TextLink from '../../components/text-link.tsx';
 import { Button } from '../../components/ui/button.tsx';
@@ -17,6 +18,8 @@ type LoginForm = {
 };
 
 const Login = () => {
+	const navigate = useNavigate();
+
 	const [form, setForm] = useState<LoginForm>({
 		email: '',
 		password: '',
@@ -28,7 +31,7 @@ const Login = () => {
 		setForm({ ...form, [e.target.name]: e.target.value.trim() });
 	};
 
-	const submit = async (e: React.FormEvent<HTMLFormElement>) => {
+	const submit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
 		e.preventDefault();
 		setErrors(null);
 
@@ -39,15 +42,40 @@ const Login = () => {
 			setErrors(formattedErrors);
 			return;
 		}
-		await Login(form);
+		const success = await Login(form);
+
+		if (!success) {
+			return;
+		}
+
+		// Get the current state after Login completes
+		const currentStep = useStore.getState().authenticationStep;
+
+		if (currentStep === 'two-factor') {
+			await navigate('/two-factor');
+		} else if (currentStep === 'recovery') {
+			await navigate('/recovery');
+		} else {
+			await navigate('/', {
+				replace: true,
+			});
+		}
 	};
 
+	function handleOnLinkClick() {
+		setErrors(null);
+	}
 	return (
 		<AuthLayout
 			title="Log in to your account"
 			description="Enter your email and password below to log in"
 		>
-			<form className="flex flex-col gap-6" onSubmit={submit} noValidate>
+			<form
+				className="flex flex-col gap-6"
+				onSubmit={(e) => {
+					submit(e).catch(console.error);
+				}}
+			>
 				<div className="grid gap-6">
 					{errors?.general && <InputError message={errors.general[0]} />}
 					<div className="grid gap-2">
@@ -155,8 +183,8 @@ const Login = () => {
 				</div>
 
 				<div className="text-muted-foreground text-center text-sm">
-					Don't have an account?{' '}
-					<TextLink to="/register" tabIndex={5}>
+					{"Don't have an account?"}{' '}
+					<TextLink onClick={handleOnLinkClick} to="/register" tabIndex={5}>
 						Sign up
 					</TextLink>
 				</div>

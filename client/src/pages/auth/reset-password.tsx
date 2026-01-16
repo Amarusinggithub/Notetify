@@ -1,5 +1,5 @@
 import { LoaderCircle } from 'lucide-react';
-import { type FormEventHandler, useState } from 'react';
+import { type FormEvent, useState } from 'react';
 import { useParams } from 'react-router';
 import InputError from '../../components/input-error';
 import { Button } from '../../components/ui/button.tsx';
@@ -16,6 +16,7 @@ type ResetPasswordForm = {
 
 export default function ResetPassword() {
 	const { token } = useParams();
+	const { sharedData } = useStore();
 
 	const [form, setForm] = useState<ResetPasswordForm>({
 		password: '',
@@ -24,7 +25,7 @@ export default function ResetPassword() {
 
 	const { isLoading, errors, PasswordReset, setErrors } = useStore();
 
-	const submit: FormEventHandler = async (e) => {
+	const submit = async (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		setErrors(null);
 
@@ -35,7 +36,7 @@ export default function ResetPassword() {
 			setErrors(formattedErrors);
 			return;
 		}
-		await PasswordReset(token, form.password);
+		await PasswordReset(token, form.password, sharedData!.auth.user.email);
 	};
 
 	function change(e: React.ChangeEvent<HTMLInputElement>) {
@@ -46,7 +47,11 @@ export default function ResetPassword() {
 			title="Reset password"
 			description="Please enter your new password below"
 		>
-			<form onSubmit={submit}>
+			<form
+				onSubmit={(e) => {
+					submit(e).catch(console.error);
+				}}
+			>
 				<div className="grid gap-6">
 					<div className="grid gap-2">
 						<Label htmlFor="password">Password</Label>
