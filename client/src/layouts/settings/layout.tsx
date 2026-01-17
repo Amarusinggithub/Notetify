@@ -23,7 +23,6 @@ const sidebarNavItems: NavItem[] = [
 		href: '/settings/billing',
 		icon: null,
 	},
-	
 ];
 
 export default function SettingsLayout() {

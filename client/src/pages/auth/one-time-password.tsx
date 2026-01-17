@@ -33,9 +33,6 @@ export function InputOTPForm() {
 		},
 	});
 
-
-
-
 	function onSubmit(data: z.infer<typeof InputOTPFormSchema>) {
 		toast('You submitted the following values', {
 			description: (

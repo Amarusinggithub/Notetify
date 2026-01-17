@@ -1,5 +1,10 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
+import {
+	Avatar,
+	AvatarFallback,
+	AvatarImage,
+} from '../../components/ui/avatar';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
@@ -13,10 +18,9 @@ import {
 } from '../../components/ui/select';
 import { Separator } from '../../components/ui/separator';
 import { Switch } from '../../components/ui/switch';
+import { useInitials } from '../../hooks/use-initials';
 import { useStore } from '../../stores/index';
 import { type Theme } from '../../types';
-import { useInitials } from '../../hooks/use-initials';
-import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 
 type NotificationPrefs = {
 	emailNotificationEnabled: boolean;
@@ -25,8 +29,7 @@ type NotificationPrefs = {
 };
 
 const General = () => {
-    const getInitials = useInitials();
-
+	const getInitials = useInitials();
 
 	const { sharedData, setSharedData, theme, setTheme, language, setLanguage } =
 		useStore();
@@ -39,7 +42,6 @@ const General = () => {
 
 	// Notification State
 	const [notifPrefs, setNotifPrefs] = useState<NotificationPrefs>(() => {
-
 		return {
 			emailNotificationEnabled: true,
 			pushNotificationEnabled: false,
@@ -60,11 +62,11 @@ const General = () => {
 					...user,
 					first_name: firstName.trim(),
 					last_name: lastName.trim(),
-                    avatar: user.avatar,
-                    emailNotificationEnabled: notifPrefs.emailNotificationEnabled,
-                    pushNotificationEnabled: notifPrefs.pushNotificationEnabled,
-                    marketingNotificationEnabled: notifPrefs.marketingNotificationEnabled,
-                    preferredLanguage: language,
+					avatar: user.avatar,
+					emailNotificationEnabled: notifPrefs.emailNotificationEnabled,
+					pushNotificationEnabled: notifPrefs.pushNotificationEnabled,
+					marketingNotificationEnabled: notifPrefs.marketingNotificationEnabled,
+					preferredLanguage: language,
 				},
 			},
 		};
@@ -96,7 +98,7 @@ const General = () => {
 				<Separator />
 				<form className="space-y-6" onSubmit={onSaveProfile} noValidate>
 					<div className="flex justify-start">
-						<div className="flex justify-center items-center">
+						<div className="flex items-center justify-center">
 							<Avatar className="h-8 w-8 overflow-hidden rounded-full">
 								<AvatarImage
 									src={user!.avatar}

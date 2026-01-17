@@ -14,7 +14,7 @@ type SignUpParams = {
 type PasswordResetParams = {
 	token: string;
 	password: string;
-    email: string;
+	email: string;
 };
 
 interface TwoFactorRequired {
@@ -87,14 +87,14 @@ export async function passwordReset(
 	params: PasswordResetParams
 ): Promise<number> {
 	await ensureCSRFToken();
-	const response =await axiosInstance.post('reset-password', {
+	const response = await axiosInstance.post('reset-password', {
 		token: params.token,
 		email: params.email,
 		password: params.password,
 		password_confirmation: params.password,
 	});
 
-    return response.status
+	return response.status;
 }
 
 export async function forgotPassword(email: string): Promise<void> {
@@ -120,11 +120,9 @@ export async function getTwoFactorQrCode(): Promise<string> {
 	return response.data.svg;
 }
 
-
 export async function updateProfile(params): Promise<void> {
-    await axiosInstance.put('user/profile-information', params);
+	await axiosInstance.put('user/profile-information', params);
 }
-
 
 // Resend verification email
 export async function resendVerificationEmail(): Promise<void> {
@@ -185,9 +183,12 @@ export async function disableTwoFactor(): Promise<number> {
 
 export async function confirmTwoFactor(code: string): Promise<number> {
 	await ensureCSRFToken();
-	const response =await axiosInstance.post('user/confirmed-two-factor-authentication', {
-		code,
-	});
+	const response = await axiosInstance.post(
+		'user/confirmed-two-factor-authentication',
+		{
+			code,
+		}
+	);
 
-    return response.status;
+	return response.status;
 }
