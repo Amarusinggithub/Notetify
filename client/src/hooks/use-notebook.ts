@@ -24,6 +24,12 @@ import {
 } from '../types/index.ts';
 import { notebookQueryKeys } from '../utils/queryKeys.ts';
 
+type NotebooksType =
+	| UserNotebook[]
+	| { results: UserNotebook[] }
+	| { pages: { results: UserNotebook[] }[]; pageParams: unknown[] }
+	| undefined;
+
 export const notebooksQueryOptions = (
 	search: string = '',
 	sortby: SortBy = 'updated_at'
@@ -53,14 +59,16 @@ export const useFetchNotebooks = (
 	return { data, fetchNextPage, hasNextPage, isFetchingNextPage };
 };
 
-export const prefetchNotes = async (
+export const prefetchNotebooks = async (
 	search: string = '',
 	sortBy: SortBy = 'updated_at'
 ) => {
-	await queryClient.prefetchInfiniteQuery(notebooksQueryOptions(search, sortBy));
+	await queryClient.prefetchInfiniteQuery(
+		notebooksQueryOptions(search, sortBy)
+	);
 };
 
-export const EnsureNotes = (
+export const EnsureNotebooks = (
 	search: string = '',
 	sortBy: SortBy = 'updated_at'
 ) => {
@@ -161,7 +169,6 @@ export function useUpdateNotebook() {
 								notebook: {
 									...notebook.notebook,
 									updated_at: now,
-
 									...(payload.name !== undefined
 										? { name: payload.name ?? '' }
 										: {}),
@@ -223,7 +230,7 @@ export function useDeleteNotebook() {
  Snapshot the current state of the cache so we can rollback if the mutation fails.
  */
 function snapshotNotebooks(queryClient: ReturnType<typeof useQueryClient>) {
-	return queryClient.getQueriesData<UserNotebook[]>({
+	return queryClient.getQueriesData<NotebooksType>({
 		queryKey: notebookQueryKeys.all,
 	});
 }
@@ -233,7 +240,7 @@ function snapshotNotebooks(queryClient: ReturnType<typeof useQueryClient>) {
  */
 function restoreNotebooks(
 	queryClient: ReturnType<typeof useQueryClient>,
-	previous: [readonly unknown[], UserNotebook[] | undefined][] | undefined
+	previous: [readonly unknown[], NotebooksType][] | undefined
 ) {
 	if (previous) {
 		previous.forEach(([queryKey, data]) => {
@@ -250,20 +257,14 @@ function updateNotebooksCaches(
 	updater: (oldNotes: UserNotebook[], pageIndex?: number) => UserNotebook[]
 ) {
 	// Get all matching queries and update them individually
-	const queries = queryClient.getQueriesData<
-		| UserNotebook[]
-		| { results: UserNotebook[] }
-		| { pages: { results: UserNotebook[] }[]; pageParams: unknown[] }
-	>({ queryKey: notebookQueryKeys.all });
+	const queries = queryClient.getQueriesData<NotebooksType>({
+		queryKey: notebookQueryKeys.all,
+	});
 
 	for (const [queryKey, oldData] of queries) {
 		if (!oldData) continue;
 
-		let newData:
-			| UserNotebook[]
-			| { results: UserNotebook[] }
-			| { pages: { results: UserNotebook[] }[]; pageParams: unknown[] }
-			| undefined;
+		let newData: NotebooksType;
 
 		// Handle if your API returns an Array directly
 		if (Array.isArray(oldData)) {

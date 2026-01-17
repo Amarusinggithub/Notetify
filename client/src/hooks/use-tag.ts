@@ -23,6 +23,12 @@ import {
 } from '../types/index';
 import { tagQueryKeys } from '../utils/queryKeys';
 
+type TagsType =
+	| UserTag[]
+	| { results: UserTag[] }
+	| { pages: { results: UserTag[] }[]; pageParams: unknown[] }
+	| undefined;
+
 export const tagsQueryOptions = (
 	search: string = '',
 	sortby: SortBy = 'updated_at'
@@ -171,7 +177,7 @@ export function useUpdateTag() {
 			console.error('Failed to update tag:', error);
 			restoreTags(queryClient, context?.previous);
 		},
-		onSettled: async  () => {
+		onSettled: async () => {
 			await queryClient.invalidateQueries({ queryKey: tagQueryKeys.all });
 		},
 	});
@@ -198,7 +204,7 @@ export function useDeleteTag() {
 			console.error('Failed to delete tag:', error);
 			restoreTags(queryClient, context?.previous);
 		},
-		onSettled: async  () => {
+		onSettled: async () => {
 			await queryClient.invalidateQueries({ queryKey: tagQueryKeys.all });
 		},
 	});
@@ -208,7 +214,7 @@ export function useDeleteTag() {
  Snapshot the current state of the cache so we can rollback if the mutation fails.
  */
 function snapshotTags(queryClient: ReturnType<typeof useQueryClient>) {
-	return queryClient.getQueriesData<UserTag[]>({
+	return queryClient.getQueriesData<TagsType>({
 		queryKey: tagQueryKeys.all,
 	});
 }
@@ -218,7 +224,7 @@ function snapshotTags(queryClient: ReturnType<typeof useQueryClient>) {
  */
 function restoreTags(
 	queryClient: ReturnType<typeof useQueryClient>,
-	previous: [readonly unknown[], UserTag[] | undefined][] | undefined
+	previous: [readonly unknown[], TagsType][] | undefined
 ) {
 	if (previous) {
 		previous.forEach(([queryKey, data]) => {
@@ -235,20 +241,14 @@ function updateTagsCaches(
 	updater: (oldTags: UserTag[], pageIndex?: number) => UserTag[]
 ) {
 	// Get all matching queries and update them individually
-	const queries = queryClient.getQueriesData<
-		| UserTag[]
-		| { results: UserTag[] }
-		| { pages: { results: UserTag[] }[]; pageParams: unknown[] }
-	>({ queryKey: tagQueryKeys.all });
+	const queries = queryClient.getQueriesData<TagsType>({
+		queryKey: tagQueryKeys.all,
+	});
 
 	for (const [queryKey, oldData] of queries) {
 		if (!oldData) continue;
 
-		let newData:
-			| UserTag[]
-			| { results: UserTag[] }
-			| { pages: { results: UserTag[] }[]; pageParams: unknown[] }
-			| undefined;
+		let newData: TagsType;
 
 		// Handle if your API returns an Array directly
 		if (Array.isArray(oldData)) {
