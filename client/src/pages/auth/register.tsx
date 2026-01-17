@@ -48,6 +48,10 @@ const Register = () => {
 		await SignUp(form.first_name, form.last_name, form.email, form.password);
 	}
 
+    function handleOnLinkClick (){
+        setErrors(null);
+    }
+
 	return (
 		<AuthLayout
 			title="Create an account"
@@ -55,7 +59,7 @@ const Register = () => {
 		>
 			<form
 				className="flex flex-col gap-6"
-				onSubmit={(e) => submit(e)}
+				onSubmit={(e) => {submit(e).catch(console.error)}}
 				noValidate
 			>
 				<div className="grid gap-6">
@@ -206,7 +210,7 @@ const Register = () => {
 
 				<div className="text-muted-foreground text-center text-sm">
 					Already have an account?{' '}
-					<TextLink to={'/login'} tabIndex={6}>
+					<TextLink onClick={handleOnLinkClick} to={'/login'} tabIndex={6}>
 						Log in
 					</TextLink>
 				</div>

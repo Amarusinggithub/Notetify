@@ -1,5 +1,5 @@
 import { LoaderCircle } from 'lucide-react';
-import { type FormEventHandler } from 'react';
+import { type FormEvent } from 'react';
 
 import TextLink from '../../components/text-link';
 import { Button } from '../../components/ui/button.tsx';
@@ -7,10 +7,10 @@ import AuthLayout from '../../layouts/auth-layout';
 import { useStore } from '../../stores/index.ts';
 
 export default function VerifyEmail() {
-	const { isLoading, VerifyEmail } = useStore();
-	const submit: FormEventHandler = async (e) => {
+	const { isLoading, VerifyEmail, sharedData } = useStore();
+	const submit = async (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		 await VerifyEmail('');
+		await VerifyEmail(sharedData!.auth.user.email);
 	};
 
 	return (
@@ -20,7 +20,12 @@ export default function VerifyEmail() {
 		>
 			{/* Status message handled elsewhere; removed undefined reference */}
 
-			<form onSubmit={submit} className="space-y-6 text-center">
+			<form
+				onSubmit={(e) => {
+					submit(e).catch(console.error);
+				}}
+				className="space-y-6 text-center"
+			>
 				<Button disabled={isLoading} variant="secondary">
 					{isLoading && <LoaderCircle className="h-4 w-4 animate-spin" />}
 					Resend verification email

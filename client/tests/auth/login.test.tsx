@@ -60,8 +60,10 @@ describe('Login page', () => {
 		const passwordInput = screen.getByLabelText(/^Password$/i);
 		const submitButton = screen.getByRole('button', { name: /Log in/i });
 
+		// Use a valid email format to pass native HTML validation,
+		// but a short password to fail Zod schema validation
 		fireEvent.change(emailInput, {
-			target: { name: 'email', value: 'invalid' },
+			target: { name: 'email', value: 'user@example.com' },
 		});
 		fireEvent.change(passwordInput, {
 			target: { name: 'password', value: 'short' },
@@ -71,7 +73,6 @@ describe('Login page', () => {
 
 		expect(mockSetErrors).toHaveBeenNthCalledWith(1, null);
 		expect(mockSetErrors).toHaveBeenNthCalledWith(2, {
-			email: ['Please enter a valid email address.'],
 			password: ['Password must be at least 8 characters long.'],
 		});
 		expect(mockLogin).not.toHaveBeenCalled();

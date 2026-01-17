@@ -33,6 +33,9 @@ export function InputOTPForm() {
 		},
 	});
 
+
+
+
 	function onSubmit(data: z.infer<typeof InputOTPFormSchema>) {
 		toast('You submitted the following values', {
 			description: (
@@ -45,7 +48,12 @@ export function InputOTPForm() {
 
 	return (
 		<Form {...form}>
-			<form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-6">
+			<form
+				onSubmit={(e) => {
+					form.handleSubmit(onSubmit)(e).catch(console.error);
+				}}
+				className="w-2/3 space-y-6"
+			>
 				<FormField
 					control={form.control}
 					name="pin"
@@ -65,7 +73,8 @@ export function InputOTPForm() {
 								</InputOTP>
 							</FormControl>
 							<FormDescription>
-								Please enter the one-time password sent to your phone or email.
+								Please enter the one-time password sent to your phone or email
+								or from your authenticator app.
 							</FormDescription>
 							<FormMessage />
 						</FormItem>

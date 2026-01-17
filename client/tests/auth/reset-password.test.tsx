@@ -12,6 +12,13 @@ vi.mock('../../src/stores/index.ts', () => ({
 		isLoading: false,
 		errors: null,
 		setErrors: mockSetErrors,
+		sharedData: {
+			auth: {
+				user: {
+					email: 'test@example.com',
+				},
+			},
+		},
 	}),
 }));
 
@@ -44,7 +51,11 @@ describe('ResetPassword page', () => {
 		fireEvent.click(screen.getByRole('button', { name: /Reset password/i }));
 
 		expect(mockSetErrors).toHaveBeenCalledWith(null);
-		expect(mockPasswordReset).toHaveBeenCalledWith('abc123', 'password123');
+		expect(mockPasswordReset).toHaveBeenCalledWith(
+			'abc123',
+			'password123',
+			'test@example.com'
+		);
 	});
 
 	it('prevents submission when passwords do not match', async () => {

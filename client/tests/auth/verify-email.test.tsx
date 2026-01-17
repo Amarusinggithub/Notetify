@@ -9,6 +9,13 @@ vi.mock('../../src/stores/index.ts', () => ({
 	useStore: () => ({
 		VerifyEmail: mockVerifyEmail,
 		isLoading: false,
+		sharedData: {
+			auth: {
+				user: {
+					email: 'test@example.com',
+				},
+			},
+		},
 	}),
 }));
 
@@ -29,6 +36,6 @@ describe('VerifyEmail page', () => {
 		});
 		fireEvent.click(submitButton);
 
-		expect(mockVerifyEmail).toHaveBeenCalledWith('');
+		expect(mockVerifyEmail).toHaveBeenCalledWith('test@example.com');
 	});
 });

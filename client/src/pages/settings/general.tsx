@@ -15,16 +15,19 @@ import { Separator } from '../../components/ui/separator';
 import { Switch } from '../../components/ui/switch';
 import { useStore } from '../../stores/index';
 import { type Theme } from '../../types';
+import { useInitials } from '../../hooks/use-initials';
+import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 
 type NotificationPrefs = {
-	email: boolean;
-	push: boolean;
-	marketing: boolean;
+	emailNotificationEnabled: boolean;
+	pushNotificationEnabled: boolean;
+	marketingNotificationEnabled: boolean;
 };
 
-const STORAGE_KEY_NOTIFICATIONS = 'notification_prefs';
-
 const General = () => {
+    const getInitials = useInitials();
+
+
 	const { sharedData, setSharedData, theme, setTheme, language, setLanguage } =
 		useStore();
 	const user = sharedData?.auth.user;
@@ -36,18 +39,11 @@ const General = () => {
 
 	// Notification State
 	const [notifPrefs, setNotifPrefs] = useState<NotificationPrefs>(() => {
-		try {
-			const raw = localStorage.getItem(STORAGE_KEY_NOTIFICATIONS);
-			if (raw) return JSON.parse(raw);
-		} catch {
-			console.error(
-				'there was an error adding notification preference to local storage'
-			);
-		}
+
 		return {
-			email: true,
-			push: false,
-			marketing: false,
+			emailNotificationEnabled: true,
+			pushNotificationEnabled: false,
+			marketingNotificationEnabled: false,
 		};
 	});
 
@@ -64,6 +60,11 @@ const General = () => {
 					...user,
 					first_name: firstName.trim(),
 					last_name: lastName.trim(),
+                    avatar: user.avatar,
+                    emailNotificationEnabled: notifPrefs.emailNotificationEnabled,
+                    pushNotificationEnabled: notifPrefs.pushNotificationEnabled,
+                    marketingNotificationEnabled: notifPrefs.marketingNotificationEnabled,
+                    preferredLanguage: language,
 				},
 			},
 		};
@@ -79,7 +80,6 @@ const General = () => {
 	const updateNotifPref = (key: keyof NotificationPrefs, value: boolean) => {
 		const next = { ...notifPrefs, [key]: value };
 		setNotifPrefs(next);
-		localStorage.setItem(STORAGE_KEY_NOTIFICATIONS, JSON.stringify(next));
 		toast.success('Notification preferences updated');
 	};
 
@@ -95,6 +95,19 @@ const General = () => {
 				</div>
 				<Separator />
 				<form className="space-y-6" onSubmit={onSaveProfile} noValidate>
+					<div className="flex justify-start">
+						<div className="flex justify-center items-center">
+							<Avatar className="h-8 w-8 overflow-hidden rounded-full">
+								<AvatarImage
+									src={user!.avatar}
+									alt={`${user!.first_name} ${user!.last_name}`}
+								/>
+								<AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
+									{getInitials(`${user!.first_name} ${user!.last_name}`)}
+								</AvatarFallback>
+							</Avatar>{' '}
+						</div>
+					</div>
 					<div className="grid grid-cols-2 gap-4">
 						<div className="grid gap-2">
 							<Label htmlFor="first_name">First Name</Label>
@@ -190,8 +203,10 @@ const General = () => {
 							</p>
 						</div>
 						<Switch
-							checked={notifPrefs.email}
-							onCheckedChange={(v) => updateNotifPref('email', v)}
+							checked={notifPrefs.emailNotificationEnabled}
+							onCheckedChange={(v) =>
+								updateNotifPref('emailNotificationEnabled', v)
+							}
 						/>
 					</div>
 					<div className="flex items-center justify-between rounded-lg border p-4">
@@ -202,8 +217,10 @@ const General = () => {
 							</p>
 						</div>
 						<Switch
-							checked={notifPrefs.push}
-							onCheckedChange={(v) => updateNotifPref('push', v)}
+							checked={notifPrefs.pushNotificationEnabled}
+							onCheckedChange={(v) =>
+								updateNotifPref('pushNotificationEnabled', v)
+							}
 						/>
 					</div>
 					<div className="flex items-center justify-between rounded-lg border p-4">
@@ -214,8 +231,10 @@ const General = () => {
 							</p>
 						</div>
 						<Switch
-							checked={notifPrefs.marketing}
-							onCheckedChange={(v) => updateNotifPref('marketing', v)}
+							checked={notifPrefs.marketingNotificationEnabled}
+							onCheckedChange={(v) =>
+								updateNotifPref('marketingNotificationEnabled', v)
+							}
 						/>
 					</div>
 				</div>

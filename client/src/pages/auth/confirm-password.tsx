@@ -1,6 +1,6 @@
 // Components
 import { LoaderCircle } from 'lucide-react';
-import { useState, type FormEventHandler } from 'react';
+import { useState, type FormEvent } from 'react';
 
 import InputError from '../../components/input-error';
 import { Button } from '../../components/ui/button.tsx';
@@ -18,7 +18,7 @@ export default function ConfirmPassword() {
 	});
 	const { isLoading, setErrors, errors, ConfirmPassword } = useStore();
 
-	const submit: FormEventHandler = async (e) => {
+	const submit = async (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		setErrors(null);
 
@@ -41,7 +41,11 @@ export default function ConfirmPassword() {
 			title="Confirm your password"
 			description="This is a secure area of the application. Please confirm your password before continuing."
 		>
-			<form onSubmit={submit}>
+			<form
+				onSubmit={(e) => {
+					submit(e).catch(console.error);
+				}}
+			>
 				<div className="space-y-6">
 					<div className="grid gap-2">
 						<Label htmlFor="password">Password</Label>
@@ -51,7 +55,7 @@ export default function ConfirmPassword() {
 							name="password"
 							placeholder="Password"
 							autoComplete="current-password"
-							value={form!.password}
+							value={form.password}
 							autoFocus
 							onChange={change}
 						/>

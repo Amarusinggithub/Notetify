@@ -14,8 +14,8 @@ const sidebarNavItems: NavItem[] = [
 		icon: null,
 	},
 	{
-		title: 'Account',
-		href: '/settings/account',
+		title: 'Authentication',
+		href: '/settings/authentication',
 		icon: null,
 	},
 	{
@@ -23,11 +23,7 @@ const sidebarNavItems: NavItem[] = [
 		href: '/settings/billing',
 		icon: null,
 	},
-	{
-		title: 'Authentication',
-		href: '/settings/authentication',
-		icon: null,
-	},
+	
 ];
 
 export default function SettingsLayout() {
