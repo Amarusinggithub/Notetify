@@ -26,7 +26,7 @@ class Note extends Model
 
  //user_note
     public function users(){
-        return $this->belongsToMany(User::class)
+        return $this->belongsToMany(User::class, 'user_note')
                     ->using(UserNote::class)
                     ->withTimestamps();
     }
