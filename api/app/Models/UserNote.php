@@ -13,58 +13,23 @@ class UserNote extends Model
 
     protected $table = 'user_note';
 
-        protected $fillable = [
-
-            'note_id',
-
-            'user_id',
-
-            'notebook_id',
-
-            'space_id',
-
-            'is_pinned_to_home',
-
-            'is_pinned_to_notebook',
-
-            'pinned_to_home_at',
-
-            'pinned_to_notebook_at',
-
-            'is_pinned_to_space',
-
-            'pinned_to_space_at',
-
-            'is_trashed',
-
-            'trashed_at',
-
-            'added_to_notebook_at',
-            'added_to_space_at',
-
-            'order',
-
-        ];
+    protected $fillable = [
+        'user_id',
+        'note_id',
+        'is_pinned_to_home',
+        'pinned_to_home_at',
+        'is_trashed',
+        'trashed_at',
+    ];
 
 
 
-        protected $casts = [
-            'is_pinned_to_home' => 'boolean',
-
-            'is_pinned_to_notebook' => 'boolean',
-            'is_pinned_to_space' => 'boolean',
-
-            'is_trashed' => 'boolean',
-
-            'pinned_to_home_at' => 'datetime',
-
-            'pinned_to_notebook_at' => 'datetime',
-
-            'pinned_to_space_at' => 'datetime',
-
-            'trashed_at' => 'datetime',
-
-        ];
+    protected $casts = [
+        'is_pinned_to_home' => 'boolean',
+        'is_trashed' => 'boolean',
+        'pinned_to_home_at' => 'datetime',
+        'trashed_at' => 'datetime',
+    ];
 
 
 
@@ -82,15 +47,6 @@ class UserNote extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function notebook()
-    {
-        return $this->belongsTo(Notebook::class, 'notebook_id');
-    }
-
-    public function space()
-    {
-        return $this->belongsTo(Space::class, 'space_id');
-    }
 
     public function tags()
     {
@@ -188,13 +144,4 @@ class UserNote extends Model
         return $query->where('user_note.is_trashed', false);
     }
 
-    /**
-     * Scope: Filter notes by notebook.
-     *
-     * Usage: UserNote::inNotebook($notebookId)->get();
-     */
-    public function scopeInNotebook($query, string $notebookId)
-    {
-        return $query->where('user_note.notebook_id', $notebookId);
-    }
 }

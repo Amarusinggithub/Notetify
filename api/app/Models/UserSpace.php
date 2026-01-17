@@ -7,12 +7,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class UserNotebook extends Model
+class UserSpace extends Model
 {
-    use HasFactory,SoftDeletes,HasUuids;
+    use HasFactory, SoftDeletes, HasUuids;
+
+    protected $table = 'user_space';
 
     protected $fillable = [
-        'notebook_id',
+        'space_id',
         'user_id',
         'is_trashed',
         'trashed_at',
@@ -21,17 +23,17 @@ class UserNotebook extends Model
         'is_default',
     ];
 
-    protected $cast=[
+    protected $casts = [
         'is_pinned_to_home' => 'boolean',
         'pinned_to_home_at' => 'datetime',
         'is_trashed' => 'boolean',
-        'trashed_at'=> 'datetime',
+        'trashed_at' => 'datetime',
         'is_default' => 'boolean',
     ];
 
-    public function notebook()
+    public function space()
     {
-        return $this->belongsTo(Notebook::class,'notebook_id');
+        return $this->belongsTo(Space::class, 'space_id');
     }
 
     public function user()

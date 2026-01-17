@@ -11,6 +11,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Laravel\Fortify\TwoFactorAuthenticatable;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 
 
@@ -148,6 +149,15 @@ public function sharedNotebooks()
     return $this->belongsToMany(Notebook::class, 'notebook_shares', 'shared_with_user_id', 'notebook_id')
                 ->withPivot('permission', 'expires_at', 'accepted')
                 ->withTimestamps();
+}
+
+ // tags
+    public function tags(): HasMany
+{
+    return $this->hasMany(Tag::class)
+            ->withPivot('order')
+            ->withTimestamps()
+            ->orderByPivot('order');
 }
 
     // spaces

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Space extends Model
 {
@@ -19,14 +19,12 @@ class Space extends Model
         'description',
         'icon',
         'color',
-        'is_default',
         'order',
     ];
 
     protected function casts(): array
     {
         return [
-            'is_default' => 'boolean',
             'order' => 'integer',
         ];
     }
@@ -36,11 +34,10 @@ class Space extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function notebooks(): BelongsToMany
-    {
-        return $this->belongsToMany(Notebook::class, 'space_notebook')
-            ->withPivot('order')
-            ->withTimestamps()
-            ->orderByPivot('order');
-    }
+
+    public function notebooks(): HasMany
+{
+    return $this->hasMany(Notebook::class)->orderBy('order');
+}
+
 }

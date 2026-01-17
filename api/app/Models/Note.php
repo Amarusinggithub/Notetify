@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 
 class Note extends Model
@@ -21,6 +22,15 @@ class Note extends Model
      */
     protected $fillable = [
         'content',
+        'notebook_id',
+        'is_pinned_to_notebook',
+        'pinned_to_notebook_at',
+        'order',
+    ];
+
+    protected $casts = [
+        'is_pinned_to_notebook' => 'boolean',
+        'pinned_to_notebook_at' => 'datetime',
     ];
 
 
@@ -50,4 +60,11 @@ class Note extends Model
     {
         return $this->hasMany(UserNote::class);
     }
+
+    public function notebook(): BelongsTo
+    {
+        return $this->belongsTo(Notebook::class);
+    }
+
+
 }
