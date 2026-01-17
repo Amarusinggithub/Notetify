@@ -22,6 +22,12 @@ import {
 } from '../types/index.ts';
 import { noteQueryKeys } from '../utils/queryKeys.ts';
 
+type NotesType =
+	| UserNote[]
+	| { results: UserNote[] }
+	| { pages: { results: UserNote[] }[]; pageParams: unknown[] }
+	| undefined;
+
 export const notesQueryOptions = (
 	search: string = '',
 	sortby: SortBy = 'updated_at'
@@ -205,7 +211,7 @@ export function useUpdateNote() {
 			console.error('Failed to update note:', error);
 			restoreNotes(queryClient, context?.previous);
 		},
-		onSettled: async  () => {
+		onSettled: async () => {
 			await queryClient.invalidateQueries({ queryKey: noteQueryKeys.all });
 		},
 	});
@@ -242,7 +248,7 @@ export function useDeleteNote() {
  Snapshot the current state of the cache so we can rollback if the mutation fails.
  */
 function snapshotNotes(queryClient: ReturnType<typeof useQueryClient>) {
-	return queryClient.getQueriesData<UserNote[]>({
+	return queryClient.getQueriesData<NotesType>({
 		queryKey: noteQueryKeys.all,
 	});
 }
@@ -252,7 +258,7 @@ function snapshotNotes(queryClient: ReturnType<typeof useQueryClient>) {
  */
 function restoreNotes(
 	queryClient: ReturnType<typeof useQueryClient>,
-	previous: [readonly unknown[], UserNote[] | undefined][] | undefined
+	previous: [readonly unknown[], NotesType][] | undefined
 ) {
 	if (previous) {
 		previous.forEach(([queryKey, data]) => {
@@ -269,20 +275,14 @@ function updateNotesCaches(
 	updater: (oldNotes: UserNote[], pageIndex?: number) => UserNote[]
 ) {
 	// Get all matching queries and update them individually
-	const queries = queryClient.getQueriesData<
-		| UserNote[]
-		| { results: UserNote[] }
-		| { pages: { results: UserNote[] }[]; pageParams: unknown[] }
-	>({ queryKey: noteQueryKeys.all });
+	const queries = queryClient.getQueriesData<NotesType>({
+		queryKey: noteQueryKeys.all,
+	});
 
 	for (const [queryKey, oldData] of queries) {
 		if (!oldData) continue;
 
-		let newData:
-			| UserNote[]
-			| { results: UserNote[] }
-			| { pages: { results: UserNote[] }[]; pageParams: unknown[] }
-			| undefined;
+		let newData: NotesType;
 
 		// Handle if your API returns an Array directly
 		if (Array.isArray(oldData)) {

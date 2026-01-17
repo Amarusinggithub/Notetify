@@ -71,7 +71,7 @@ export const createAuthSlice: StateCreator<StoreState, [], [], AuthSlice> = (
 	clearErrors: () => set({ errors: null }),
 	setSharedData: (s) => set({ sharedData: s }),
 
-async getTwoFactorQrCode() {
+	async getTwoFactorQrCode() {
 		set({ isLoading: true, errors: null });
 		try {
 			const svg = await authService.getTwoFactorQrCode();
@@ -113,7 +113,7 @@ async getTwoFactorQrCode() {
 	async confirmTwoFactor(code) {
 		set({ isLoading: true, errors: null });
 		try {
-			const statuCode=await authService.confirmTwoFactor(code);
+			const statuCode = await authService.confirmTwoFactor(code);
 		} catch (error: any) {
 			set({ errors: mapAxiosErrorToFieldErrors(error) });
 		} finally {
@@ -147,7 +147,11 @@ async getTwoFactorQrCode() {
 		set({ isLoading: true, errors: null });
 		try {
 			const shared = await authService.submitRecoveryCode(recoveryCode);
-			set({ isAuthenticated: true, sharedData: shared, authenticationStep: 'credentials' });
+			set({
+				isAuthenticated: true,
+				sharedData: shared,
+				authenticationStep: 'credentials',
+			});
 			return shared;
 		} catch (error: any) {
 			set({ errors: mapAxiosErrorToFieldErrors(error) });
@@ -161,7 +165,11 @@ async getTwoFactorQrCode() {
 		set({ isLoading: true, errors: null });
 		try {
 			const shared = await authService.submitTwoFactorCode(code);
-			set({ isAuthenticated: true, sharedData: shared, authenticationStep: 'credentials' });
+			set({
+				isAuthenticated: true,
+				sharedData: shared,
+				authenticationStep: 'credentials',
+			});
 			return shared;
 		} catch (error: any) {
 			set({ errors: mapAxiosErrorToFieldErrors(error) });
@@ -229,7 +237,6 @@ async getTwoFactorQrCode() {
 			const shared = await authService.login({ email, password, remember });
 			if ('requiresTwoFactor' in shared) {
 				set({ authenticationStep: 'two-factor' });
-                
 			} else if ('requiresRecovery' in shared) {
 				set({ authenticationStep: 'recovery' });
 			} else {
@@ -278,7 +285,11 @@ async getTwoFactorQrCode() {
 				return false;
 			}
 
-			const statusCode=await authService.passwordReset({ token, password, email });
+			const statusCode = await authService.passwordReset({
+				token,
+				password,
+				email,
+			});
 			return true;
 		} catch (error: any) {
 			set({ errors: mapAxiosErrorToFieldErrors(error) });

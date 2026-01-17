@@ -21,9 +21,8 @@ import ResetPassword from '../pages/auth/reset-password';
 import { TwoFactorVerification } from '../pages/auth/two-factor-verification';
 import VerifyEmail from '../pages/auth/verify-email';
 import Landing from '../pages/landing';
-import Account from '../pages/settings/account';
 import Authentication from '../pages/settings/authentication';
-import Billing from '../pages/settings/billing';
+import Billing from '../pages/settings/billing.tsx';
 import General from '../pages/settings/general';
 import { useStore } from '../stores/index.ts';
 
@@ -157,7 +156,6 @@ function AppRoutes() {
 					),
 				},
 				{ path: 'general', Component: General },
-				{ path: 'account', Component: Account },
 				{ path: 'authentication', Component: Authentication },
 				{ path: 'billing', Component: Billing },
 			],

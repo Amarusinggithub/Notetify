@@ -20,6 +20,12 @@ export function NavUser() {
 	const { state } = useSidebar();
 	const isMobile = useIsMobile();
 
+	const user = sharedData?.auth?.user;
+
+	if (!user) {
+		return null;
+	}
+
 	return (
 		<SidebarMenu>
 			<SidebarMenuItem>
@@ -29,7 +35,7 @@ export function NavUser() {
 							size="lg"
 							className="group text-sidebar-accent-foreground data-[state=open]:bg-sidebar-accent"
 						>
-							<UserInfo showEmail={true} user={sharedData!.auth.user} />
+							<UserInfo showEmail={true} user={user} />
 							<ChevronsUpDown className="ml-auto size-4" />
 						</SidebarMenuButton>
 					</DropdownMenuTrigger>
@@ -40,7 +46,7 @@ export function NavUser() {
 							isMobile ? 'bottom' : state === 'collapsed' ? 'left' : 'bottom'
 						}
 					>
-						<UserMenuContent user={sharedData!.auth.user} />
+						<UserMenuContent user={user} />
 					</DropdownMenuContent>
 				</DropdownMenu>
 			</SidebarMenuItem>
