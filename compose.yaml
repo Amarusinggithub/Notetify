@@ -120,6 +120,34 @@ services:
     env_file:
       - .env.development
 
+
+
+  mailpit:
+    networks:
+      - notetify-net
+    image: 'axllent/mailpit:latest'
+    container_name: mailpit
+    restart: always
+    hostname: localhost
+    volumes:
+      - ./data:/data
+    ports:
+        - '${FORWARD_MAILPIT_PORT:-1025}:1025'
+        - '${FORWARD_MAILPIT_DASHBOARD_PORT:-8025}:8025'
+    expose:
+      - 8025
+      - 1025
+    depends_on:
+      api:
+        condition: service_healthy
+    environment:
+      MP_MAX_MESSAGES: 5000
+      MP_DATA_FILE: /data/mailpit.db
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+    env_file:
+      - .env.development
+
 networks:
   notetify-net:
     driver: bridge

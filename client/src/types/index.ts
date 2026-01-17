@@ -45,6 +45,9 @@ export interface User extends Omit<CreateUser, 'password'> {
 	remember?: boolean;
 	avatar?: string;
 	is_active: boolean;
+	emailNotificationEnabled?: boolean;
+	pushNotificationEnabled?: boolean;
+	marketingNotificationEnabled?: boolean;
 }
 export interface SharedData {
 	name: string;
