@@ -112,7 +112,9 @@ function AppRoutes() {
 				{
 					index: true,
 					Component: () => <Navigate to="/settings/general" replace />,
-					HydrateFallback: () => <LoadingSpinner message="Loading Settings..." />,
+					HydrateFallback: () => (
+						<LoadingSpinner message="Loading Settings..." />
+					),
 				},
 				{ path: 'general', Component: General },
 				{ path: 'authentication', Component: Authentication },

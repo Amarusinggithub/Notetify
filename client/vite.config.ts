@@ -26,16 +26,12 @@ export default defineConfig({
 		rollupOptions: {
 			output: {
 				manualChunks: {
-					tiptap: ['@tiptap/react', '@tiptap/starter-kit', '@tiptap/core'],
+					tiptap: ['@tiptap/react', '@tiptap/starter-kit'],
 					liveblocks: ['@liveblocks/react', '@liveblocks/client'],
-					radix: [
-						'@radix-ui/react-dialog',
-						'@radix-ui/react-dropdown-menu' ,
-					],
+					radix: ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu'],
 					katex: ['katex'],
 				},
 			},
 		},
 	},
 });
-

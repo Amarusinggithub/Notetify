@@ -1,6 +1,6 @@
+import { useLiveblocksExtension } from '@liveblocks/react-tiptap';
 import '@liveblocks/react-tiptap/styles.css';
 import '@liveblocks/react-ui/styles.css';
-import { useLiveblocksExtension } from '@liveblocks/react-tiptap';
 import { useRoom } from '@liveblocks/react/suspense';
 import DragHandle from '@tiptap/extension-drag-handle-react';
 import Emoji, { gitHubEmojis } from '@tiptap/extension-emoji';

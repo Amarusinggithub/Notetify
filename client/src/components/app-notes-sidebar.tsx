@@ -347,7 +347,10 @@ export function EditorNotesSidebar() {
 			>
 				<Suspense fallback={<NotesSidebarSkeleton />}>
 					<NotesSidebarContent>
-						<ScrollArea ref={parentRef} className="h-full w-full *:data-[slot=scroll-area-viewport]:overscroll-contain">
+						<ScrollArea
+							ref={parentRef}
+							className="h-full w-full *:data-[slot=scroll-area-viewport]:overscroll-contain"
+						>
 							{allNotes.length === 0 ? (
 								<div className="text-muted-foreground flex h-full items-center justify-center text-sm">
 									No notes yet. Create one to get started.

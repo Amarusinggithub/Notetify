@@ -1,11 +1,9 @@
 import 'axios';
 import type { LucideIcon } from 'lucide-react';
 
-
 // Constants
 export const CSRF_TOKEN_COOKIE_NAME = 'XSRF-TOKEN';
 export const USERDATA_STORAGE_KEY = 'userData';
-
 
 // Common Types
 export type Role = 'OWNER' | 'EDITOR' | 'MEMBER';
@@ -19,7 +17,6 @@ export type SortBy =
 	| 'title'
 	| 'is_pinned'
 	| 'is_trashed';
-
 
 // Auth & User Types
 export type CreateOAuthAccount = {
@@ -66,7 +63,6 @@ export interface SharedData {
 export interface Auth {
 	user: User;
 }
-
 
 // Tag Types
 export interface Tag {
@@ -155,7 +151,6 @@ export interface PaginatedSpacesResponse {
 	hasNextPage: boolean;
 }
 
-
 // Notebook Types
 export interface Notebook {
 	id: string;
@@ -203,7 +198,6 @@ export interface PaginatedNotebooksResponse {
 	nextPage: number | null;
 	hasNextPage: boolean;
 }
-
 
 // Note Types
 export interface Note {
@@ -271,7 +265,6 @@ export interface PaginatedNotesResponse {
 	hasNextPage: boolean;
 }
 
-
 // Share Types
 export interface SpaceShare {
 	id: string;
@@ -311,7 +304,6 @@ export interface NoteShare {
 	created_at: string;
 	updated_at: string;
 }
-
 
 // Task Types
 
@@ -363,7 +355,6 @@ export interface PaginatedTasksResponse {
 	nextPage: number | null;
 	hasNextPage: boolean;
 }
-
 
 // Event Types
 export type EventRepeat = 'none' | 'daily' | 'weekly' | 'monthly' | 'yearly';

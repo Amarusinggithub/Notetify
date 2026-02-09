@@ -13,9 +13,15 @@ import {
 type NavMainProps = { items: NavItem[] };
 
 const prefetchMap: Record<string, () => void> = {
-	'/notes': ()  =>{ prefetchNotes();},
-	'/notebooks': () => {prefetchNotebooks();},
-	'/tags': () => {prefetchTags();},
+	'/notes': () => {
+		prefetchNotes();
+	},
+	'/notebooks': () => {
+		prefetchNotebooks();
+	},
+	'/tags': () => {
+		prefetchTags();
+	},
 };
 export function NavMain({ items = [] }: NavMainProps) {
 	const path = useLocation();

@@ -41,7 +41,6 @@ export const notesQueryOptions = (
 export const noteQueryOptions = (noteId: string) => ({
 	queryKey: noteQueryKeys.detail(noteId),
 	queryFn: fetchNote,
-    
 });
 
 export const useFetchNote = (noteId: string) => {

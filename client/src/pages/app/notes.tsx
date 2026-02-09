@@ -3,11 +3,11 @@ import {
 	LiveblocksProvider,
 	RoomProvider,
 } from '@liveblocks/react/suspense';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useRef } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useNavigate, useParams, useRouteLoaderData } from 'react-router';
 import { EditorNotesSidebar } from '../../components/app-notes-sidebar';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
 	Editor,
 	EditorContentPreview,
@@ -85,7 +85,7 @@ export default function Notes() {
 					is_trashed: false,
 				},
 				{
-					onSuccess:  (created)  => {
+					onSuccess: (created) => {
 						setSelected(created.id);
 						navigate(`/notes/${created.id}`, { replace: true });
 					},
