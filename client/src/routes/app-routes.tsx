@@ -1,30 +1,41 @@
-import { Player } from '@lottiefiles/react-lottie-player';
+import { lazy } from 'react';
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router';
-import NotesLottie from '../assets/Notes.json';
 import { notesLoader } from '../components/app-notes-sidebar.tsx';
 import AppLayout from '../layouts/app-layout';
 import SettingsLayout from '../layouts/settings/layout';
-import Calender from '../pages/app/calender';
-import Files from '../pages/app/files';
 import Home from '../pages/app/home';
-import Notebooks from '../pages/app/notebook';
-import Notes from '../pages/app/notes';
-import Shared from '../pages/app/shared-with-me';
-import Spaces from '../pages/app/spaces';
-import Tags from '../pages/app/tags';
-import Tasks from '../pages/app/tasks';
-import Trash from '../pages/app/trash';
-import ForgotPassword from '../pages/auth/forgot-password';
-import Login from '../pages/auth/login';
-import Register from '../pages/auth/register';
-import ResetPassword from '../pages/auth/reset-password';
-import { TwoFactorVerification } from '../pages/auth/two-factor-verification';
-import VerifyEmail from '../pages/auth/verify-email';
 import Landing from '../pages/landing';
-import Authentication from '../pages/settings/authentication';
-import Billing from '../pages/settings/billing.tsx';
-import General from '../pages/settings/general';
 import { useStore } from '../stores/index.ts';
+
+function LoadingSpinner({ message = 'Loading...' }: { message?: string }) {
+	return (
+		<div className="flex h-screen flex-col items-center justify-center gap-4">
+			<div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-200 border-t-green-500" />
+			<p className="text-muted-foreground text-lg">{message}</p>
+		</div>
+	);
+}
+
+const Notes = lazy(() => import('../pages/app/notes'));
+const Notebooks = lazy(() => import('../pages/app/notebook'));
+const Files = lazy(() => import('../pages/app/files'));
+const Calender = lazy(() => import('../pages/app/calender'));
+const Tasks = lazy(() => import('../pages/app/tasks'));
+const Shared = lazy(() => import('../pages/app/shared'));
+const Tags = lazy(() => import('../pages/app/tags'));
+const Spaces = lazy(() => import('../pages/app/spaces'));
+const Trash = lazy(() => import('../pages/app/trash'));
+const Billing = lazy(() => import('../pages/settings/billing'));
+const General = lazy(() => import('../pages/settings/general'));
+const Authentication = lazy(() => import('../pages/settings/authentication'));
+const ForgotPassword = lazy(() => import('../pages/auth/forgot-password'));
+const ResetPassword = lazy(() => import('../pages/auth/reset-password'));
+const VerifyEmail = lazy(() => import('../pages/auth/verify-email'));
+const TwoFactorVerification = lazy(
+	() => import('../pages/auth/two-factor-verification')
+);
+const Register = lazy(() => import('../pages/auth/register'));
+const Login = lazy(() => import('../pages/auth/login'));
 
 function AppRoutes() {
 	const { isAuthenticated, checkingAuth } = useStore();
@@ -34,82 +45,42 @@ function AppRoutes() {
 		{
 			index: true,
 			Component: Landing,
-			HydrateFallback: () => (
-				<div className="flex h-screen flex-col items-center justify-center gap-4">
-					<Player src={NotesLottie} loop autoplay className="h-60 w-60" />
-					<p className="text-muted-foreground text-lg">Loading...</p>
-				</div>
-			),
+			HydrateFallback: LoadingSpinner,
 		},
 		{
 			path: 'login',
 			Component: Login,
-			HydrateFallback: () => (
-				<div className="flex h-screen flex-col items-center justify-center gap-4">
-					<Player src={NotesLottie} loop autoplay className="h-60 w-60" />
-					<p className="text-muted-foreground text-lg">Loading...</p>
-				</div>
-			),
+			HydrateFallback: LoadingSpinner,
 		},
 		{
 			path: 'forgot-password',
 			Component: ForgotPassword,
-			HydrateFallback: () => (
-				<div className="flex h-screen flex-col items-center justify-center gap-4">
-					<Player src={NotesLottie} loop autoplay className="h-60 w-60" />
-					<p className="text-muted-foreground text-lg">Loading...</p>
-				</div>
-			),
+			HydrateFallback: LoadingSpinner,
 		},
 		{
 			path: 'reset-password/:token',
 			Component: ResetPassword,
-			HydrateFallback: () => (
-				<div className="flex h-screen flex-col items-center justify-center gap-4">
-					<Player src={NotesLottie} loop autoplay className="h-60 w-60" />
-					<p className="text-muted-foreground text-lg">Loading...</p>
-				</div>
-			),
+			HydrateFallback: LoadingSpinner,
 		},
 		{
 			path: 'verify-email',
 			Component: VerifyEmail,
-			HydrateFallback: () => (
-				<div className="flex h-screen flex-col items-center justify-center gap-4">
-					<Player src={NotesLottie} loop autoplay className="h-60 w-60" />
-					<p className="text-muted-foreground text-lg">Loading...</p>
-				</div>
-			),
+			HydrateFallback: LoadingSpinner,
 		},
 		{
 			path: 'Two-factor-verification',
 			Component: TwoFactorVerification,
-			HydrateFallback: () => (
-				<div className="flex h-screen flex-col items-center justify-center gap-4">
-					<Player src={NotesLottie} loop autoplay className="h-60 w-60" />
-					<p className="text-muted-foreground text-lg">Loading...</p>
-				</div>
-			),
+			HydrateFallback: LoadingSpinner,
 		},
 		{
 			path: 'register',
 			Component: Register,
-			HydrateFallback: () => (
-				<div className="flex h-screen flex-col items-center justify-center gap-4">
-					<Player src={NotesLottie} loop autoplay className="h-60 w-60" />
-					<p className="text-muted-foreground text-lg">Loading...</p>
-				</div>
-			),
+			HydrateFallback: LoadingSpinner,
 		},
 		{
 			path: '*',
 			Component: () => <Navigate to="/" replace />,
-			HydrateFallback: () => (
-				<div className="flex h-screen flex-col items-center justify-center gap-4">
-					<Player src={NotesLottie} loop autoplay className="h-60 w-60" />
-					<p className="text-muted-foreground text-lg">Loading...</p>
-				</div>
-			),
+			HydrateFallback: LoadingSpinner,
 		},
 	];
 
@@ -119,12 +90,7 @@ function AppRoutes() {
 			id: 'notes',
 			loader: notesLoader,
 			Component: AppLayout,
-			HydrateFallback: () => (
-				<div className="flex h-screen flex-col items-center justify-center gap-4">
-					<Player src={NotesLottie} loop autoplay className="h-60 w-60" />
-					<p className="text-muted-foreground text-lg">Loading your notes...</p>
-				</div>
-			),
+			HydrateFallback: () => <LoadingSpinner message="Loading your notes..." />,
 			children: [
 				{ index: true, Component: Home },
 				{ path: 'trash', Component: Trash },
@@ -146,14 +112,7 @@ function AppRoutes() {
 				{
 					index: true,
 					Component: () => <Navigate to="/settings/general" replace />,
-					HydrateFallback: () => (
-						<div className="flex h-screen flex-col items-center justify-center gap-4">
-							<Player src={NotesLottie} loop autoplay className="h-60 w-60" />
-							<p className="text-muted-foreground text-sm">
-								Loading Settings...
-							</p>
-						</div>
-					),
+					HydrateFallback: () => <LoadingSpinner message="Loading Settings..." />,
 				},
 				{ path: 'general', Component: General },
 				{ path: 'authentication', Component: Authentication },

@@ -120,13 +120,12 @@ export function AppSidebar() {
 
 	function handleCreateNote() {
 		if (!currentUserId) return;
+
 		createNoteMutation.mutate({
 			note_data: {
 				content: '',
-				users: [currentUserId],
 			},
 			tags: [],
-			is_pinned: false,
 			is_trashed: false,
 		});
 	}
@@ -171,6 +170,7 @@ export function AppSidebar() {
 							<Button
 								size="lg"
 								onClick={handleCreateNote}
+								disabled={createNoteMutation.isPending}
 								className="h-10 w-40 bg-[#00a82d] px-3 text-white hover:bg-[#009325]"
 							>
 								<NotebookPen className="size-4" />
@@ -217,6 +217,7 @@ export function AppSidebar() {
 								size="lg"
 								variant="outline"
 								onClick={handleCreateNote}
+								disabled={createNoteMutation.isPending}
 								className="h-10 w-26 border-[#c9bff5] px-4 hover:bg-[#f5f1ff]"
 							>
 								<CheckCircle2 className="size-4 text-[#6d4df0]" />
@@ -227,6 +228,7 @@ export function AppSidebar() {
 								size="lg"
 								variant="outline"
 								onClick={handleCreateNote}
+								disabled={createNoteMutation.isPending}
 								className="h-10 w-26 border-[#ffd8bf] px-4 hover:bg-[#fff4ee]"
 							>
 								<CalendarPlus className="size-4 text-[#f0642d]" />

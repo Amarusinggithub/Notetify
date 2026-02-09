@@ -172,7 +172,7 @@ function NotesSidebar({
 			<div
 				data-slot="notes-sidebar-gap"
 				className={cn(
-					'relative w-(--notes-sidebar-width) bg-transparent transition-[width] duration-200 ease-linear',
+					'relative w-(--notes-sidebar-width) bg-transparent transition-[width] duration-300 ease-in-out',
 					'group-data-[collapsible=offcanvas]:w-0',
 					'group-data-[side=right]:rotate-180',
 					variant === 'floating' || variant === 'inset'
@@ -183,7 +183,7 @@ function NotesSidebar({
 			<div
 				data-slot="notes-sidebar-container"
 				className={cn(
-					'relative z-10 hidden h-svh w-(--notes-sidebar-width) transition-[left,right,width] duration-200 ease-linear md:flex',
+					'relative z-10 hidden h-svh w-(--notes-sidebar-width) transition-[left,right,width] duration-300 ease-in-out md:flex',
 					side === 'left'
 						? 'left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--notes-sidebar-width)*-1)]'
 						: 'right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--notes-sidebar-width)*-1)]',
@@ -249,7 +249,7 @@ function NotesSidebarRail({
 			onClick={toggleSidebar}
 			title="Toggle Sidebar"
 			className={cn(
-				'hover:after:bg-sidebar-border absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-linear group-data-[side=left]:-right-4 group-data-[side=right]:left-0 after:absolute after:inset-y-0 after:left-1/2 after:w-0.5 sm:flex',
+				'hover:after:bg-sidebar-border absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-in-out group-data-[side=left]:-right-4 group-data-[side=right]:left-0 after:absolute after:inset-y-0 after:left-1/2 after:w-0.5 sm:flex',
 				'in-data-[side=left]:cursor-w-resize in-data-[side=right]:cursor-e-resize',
 				'[[data-side=left][data-state=collapsed]_&]:cursor-e-resize [[data-side=right][data-state=collapsed]_&]:cursor-w-resize',
 				'hover:group-data-[collapsible=offcanvas]:bg-sidebar group-data-[collapsible=offcanvas]:translate-x-0 group-data-[collapsible=offcanvas]:after:left-full',
@@ -270,7 +270,7 @@ function NotesSidebarInset({
 		<main
 			data-slot="notes-sidebar-inset"
 			className={cn(
-				'bg-background relative flex w-full flex-1 flex-col',
+				'bg-background relative flex w-full flex-1 flex-col transition-[margin,border-radius,box-shadow] duration-300 ease-in-out',
 				// Inset styling when notes list is open
 				'md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow-sm',
 				// When the notes sidebar is collapsed, remove the inset gap entirely

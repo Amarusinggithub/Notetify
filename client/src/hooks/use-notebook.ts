@@ -5,7 +5,7 @@ import {
 	useSuspenseQuery,
 	type InfiniteData,
 } from '@tanstack/react-query';
-import { queryClient } from 'App.tsx';
+import { queryClient } from '../App';
 import { useNavigate, useRevalidator } from 'react-router';
 import {
 	createNotebook,
@@ -109,7 +109,9 @@ export function useCreateNotebook() {
 				notebook: {
 					id: tempId,
 					name: newNotebook.notebook_data?.name ?? '',
-					users: newNotebook.notebook_data?.users ?? [],
+					is_pinned_to_space: false,
+					order: 0,
+					users: [],
 					is_shared: false,
 					created_at: now,
 					updated_at: now,
@@ -118,9 +120,6 @@ export function useCreateNotebook() {
 				is_trashed: newNotebook.is_trashed,
 				created_at: now,
 				updated_at: now,
-				shared_from: undefined,
-				shared_at: undefined,
-				trashed_at: undefined,
 			};
 
 			updateNotebooksCaches(queryClient, (notebooks, pageIndex) =>

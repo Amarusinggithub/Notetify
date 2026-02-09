@@ -1,6 +1,8 @@
 import { Link, useLocation } from 'react-router';
+import { prefetchNotes } from '../hooks/use-note';
+import { prefetchNotebooks } from '../hooks/use-notebook';
+import { prefetchTags } from '../hooks/use-tag';
 import { type NavItem } from '../types';
-
 import {
 	SidebarGroup,
 	SidebarMenu,
@@ -9,6 +11,12 @@ import {
 } from './ui/sidebar';
 
 type NavMainProps = { items: NavItem[] };
+
+const prefetchMap: Record<string, () => void> = {
+	'/notes': ()  =>{ prefetchNotes();},
+	'/notebooks': () => {prefetchNotebooks();},
+	'/tags': () => {prefetchTags();},
+};
 export function NavMain({ items = [] }: NavMainProps) {
 	const path = useLocation();
 	return (
@@ -21,7 +29,10 @@ export function NavMain({ items = [] }: NavMainProps) {
 							isActive={path.pathname == item.href}
 							tooltip={{ children: item.title }}
 						>
-							<Link to={item.href}>
+							<Link
+								to={item.href}
+								onMouseEnter={() => prefetchMap[item.href]?.()}
+							>
 								{item.icon && <item.icon />}
 								<span>{item.title}</span>
 							</Link>

@@ -41,6 +41,7 @@ export const notesQueryOptions = (
 export const noteQueryOptions = (noteId: string) => ({
 	queryKey: noteQueryKeys.detail(noteId),
 	queryFn: fetchNote,
+    
 });
 
 export const useFetchNote = (noteId: string) => {
@@ -100,29 +101,22 @@ export function useCreateNote() {
 			const optimistic: UserNote = {
 				id: tempId,
 				user: 'me',
-				role: 'OWNER',
 				note: {
 					id: tempId,
 					content: newNote.note_data?.content ?? '',
-					users: newNote.note_data?.users ?? [],
+					notebook_id: newNote.note_data?.notebook_id,
+					is_pinned_to_notebook: false,
+					order: 0,
+					users: [],
 					is_shared: false,
 					created_at: now,
 					updated_at: now,
 				},
-				is_pinned: newNote.is_pinned ?? false,
 				is_pinned_to_home: newNote.is_pinned_to_home ?? false,
-				is_pinned_to_notebook: newNote.is_pinned_to_notebook ?? false,
-				is_pinned_to_space: newNote.is_pinned_to_space ?? false,
 				is_trashed: newNote.is_trashed,
 				tags: newNote.tags,
-				notebook_id: newNote.notebook_id,
-				space_id: newNote.space_id,
 				created_at: now,
 				updated_at: now,
-				shared_from: undefined,
-				shared_at: undefined,
-				trashed_at: undefined,
-				pinned_at: undefined,
 			};
 
 			updateNotesCaches(queryClient, (notes, pageIndex) =>
@@ -166,25 +160,10 @@ export function useUpdateNote() {
 						note.id === id
 							? {
 									...note,
-									...payload,
-									// this ensure required booleans are never undefined
-									is_pinned: payload.is_pinned ?? note.is_pinned,
 									is_pinned_to_home:
 										payload.is_pinned_to_home ?? note.is_pinned_to_home,
-									is_pinned_to_notebook:
-										payload.is_pinned_to_notebook ?? note.is_pinned_to_notebook,
-									is_pinned_to_space:
-										payload.is_pinned_to_space ?? note.is_pinned_to_space,
 									is_trashed: payload.is_trashed ?? note.is_trashed,
-									// Convert null to undefined for optional string fields
-									notebook_id:
-										payload.notebook_id === null
-											? undefined
-											: (payload.notebook_id ?? note.notebook_id),
-									space_id:
-										payload.space_id === null
-											? undefined
-											: (payload.space_id ?? note.space_id),
+									tags: payload.tags ?? note.tags,
 									updated_at: now,
 									note: {
 										...note.note,

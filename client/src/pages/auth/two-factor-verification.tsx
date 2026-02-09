@@ -26,7 +26,7 @@ const InputOTPFormSchema = z.object({
 	}),
 });
 
-export function TwoFactorVerification() {
+export default function TwoFactorVerification() {
 	const form = useForm<z.infer<typeof InputOTPFormSchema>>({
 		resolver: zodResolver(InputOTPFormSchema),
 		defaultValues: {

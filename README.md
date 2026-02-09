@@ -123,7 +123,7 @@ Frontend runs at: **[http://localhost:5173](http://localhost:5173)**
 A preview of the Notetify UI in action (add screenshot here).
 
 ### Landing page View
-![landing page](./screenshots/notetify_ui.png)
+![landing page](./docs/screenshots/notetify_ui.png)
 
 ---
 

@@ -16,8 +16,8 @@ import {
 	UploadIcon,
 	type LucideIcon,
 } from 'lucide-react';
-import React, { useState } from 'react';
-import { CompactPicker, type ColorResult } from 'react-color';
+import React, { lazy, useState } from 'react';
+import { type ColorResult } from 'react-color';
 import { useNoteEditor } from '../../context/editor-context.tsx';
 import { cn } from '../../lib/utils';
 import { Button } from './button';
@@ -38,6 +38,10 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from './dialog';
+
+const CompactPicker = lazy(() =>
+	import('react-color').then((m) => ({ default: m.CompactPicker }))
+);
 
 function ToolbarFontSizeMenuButton() {
 	const editor = useNoteEditor();

@@ -1,5 +1,3 @@
-import '@liveblocks/react-tiptap/styles.css';
-import '@liveblocks/react-ui/styles.css';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ErrorBoundary } from 'react-error-boundary';
 import './App.css';
