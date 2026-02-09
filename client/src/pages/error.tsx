@@ -7,6 +7,8 @@ import {
 	RefreshCw,
 } from 'lucide-react';
 import { useState } from 'react';
+// 1. Import the official type from the library
+import { FallbackProps } from 'react-error-boundary';
 import { Button } from '../components/ui/button';
 import {
 	Card,
@@ -23,16 +25,15 @@ import {
 } from '../components/ui/collapsible';
 import { cn } from '../lib/utils';
 
-type FallBackProps = {
-	error: Error;
-	resetErrorBoundary: () => void;
-};
 
-function ErrorFallback({ error, resetErrorBoundary }: FallBackProps) {
+function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
 	const [copied, setCopied] = useState(false);
 	const [detailsOpen, setDetailsOpen] = useState(false);
 
-	const errorDetails = `Error: ${error.message}\n\nStack Trace:\n${error.stack ?? 'No stack trace available'}`;
+	// Safely extract error info
+	const errorMessage = error?.message || 'An unknown error occurred';
+	const errorStack = error?.stack ?? 'No stack trace available';
+	const errorDetails = `Error: ${errorMessage}\n\nStack Trace:\n${errorStack}`;
 
 	const handleCopy = async () => {
 		try {
@@ -40,11 +41,14 @@ function ErrorFallback({ error, resetErrorBoundary }: FallBackProps) {
 			setCopied(true);
 			setTimeout(() => setCopied(false), 2000);
 		} catch {
-			// Clipboard API not available
+			// Clipboard API not available/blocked
 		}
 	};
 
 	const handleGoHome = () => {
+		// Reset the boundary state before navigating to ensure
+		// the error doesn't persist if the home page re-renders
+		resetErrorBoundary();
 		window.location.href = '/';
 	};
 
@@ -66,7 +70,7 @@ function ErrorFallback({ error, resetErrorBoundary }: FallBackProps) {
 					<CardContent className="space-y-4">
 						<div className="bg-destructive/5 border-destructive/20 rounded-lg border p-4">
 							<p className="text-destructive text-sm font-medium">
-								{error.message || 'An unknown error occurred'}
+								{errorMessage}
 							</p>
 						</div>
 
@@ -101,7 +105,7 @@ function ErrorFallback({ error, resetErrorBoundary }: FallBackProps) {
 										)}
 									</Button>
 									<pre className="text-muted-foreground max-h-48 overflow-auto pr-8 font-mono text-xs">
-										{error.stack ?? 'No stack trace available'}
+										{errorStack}
 									</pre>
 								</div>
 							</CollapsibleContent>
