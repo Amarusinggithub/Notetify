@@ -171,14 +171,11 @@ export const Editor = () => {
 				suggestion,
 			}),
 			Placeholder.configure({
-				showOnlyCurrent: false,
+				showOnlyCurrent: true,
+				includeChildren: true,
 				placeholder: ({ node, pos }) => {
 					if (pos === 0 && node.type.name === 'heading') {
-						return 'What’s the title?';
-					}
-
-					if (pos === 1) {
-						return 'Write your content here:';
+						return "What's the title?";
 					}
 
 					return 'Write your content here:';
