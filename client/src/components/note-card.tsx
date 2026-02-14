@@ -1,5 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { formatDistanceToNow } from 'date-fns';
+import { useRef } from 'react';
 import { useNavigate } from 'react-router';
 import { noteQueryOptions } from '../hooks/use-note.ts';
 import { cn } from '../lib/utils';
@@ -22,6 +23,7 @@ const NoteCard = ({ userNote }: NoteCardProp) => {
 	const navigate = useNavigate();
 	const selectedId = useStore((s) => s.selectedNoteId);
 	const setSelectedNoteId = useStore((s) => s.setSelectedNoteId);
+	const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
 	const isActive = selectedId === userNote.id;
 	const title = getTitleFromHtml(userNote.note.content);
@@ -33,11 +35,21 @@ const NoteCard = ({ userNote }: NoteCardProp) => {
 			})
 		: 'just now';
 
-	const prefetch = () => {
-		queryClient.prefetchQuery(noteQueryOptions(userNote?.id));
+	const startPrefetch = () => {
+		hoverTimer.current = setTimeout(() => {
+			queryClient.prefetchQuery(noteQueryOptions(userNote?.id));
+		}, 200);
+	};
+
+	const cancelPrefetch = () => {
+		if (hoverTimer.current) {
+			clearTimeout(hoverTimer.current);
+			hoverTimer.current = null;
+		}
 	};
 
 	const handleSelectNote = async () => {
+		cancelPrefetch();
 		await queryClient.ensureQueryData(noteQueryOptions(userNote.id));
 		setSelectedNoteId(userNote.id);
 		navigate(`/notes/${userNote.id}`);
@@ -45,8 +57,10 @@ const NoteCard = ({ userNote }: NoteCardProp) => {
 
 	return (
 		<Card
-			onMouseEnter={prefetch}
-			onFocus={prefetch}
+			onMouseEnter={startPrefetch}
+			onMouseLeave={cancelPrefetch}
+			onFocus={startPrefetch}
+			onBlur={cancelPrefetch}
 			onClick={handleSelectNote}
 			className={cn(
 				'gap-2 rounded-none border-x-0 border-t-0 py-3',

@@ -1,56 +1,55 @@
 import type { SortBy } from '../types';
 
 export const noteQueryKeys = {
-	detail: (noteId: string) => [noteId],
 	all: ['notes'] as const,
+	detail: (noteId: string) => [...noteQueryKeys.all, 'detail', noteId] as const,
 	list: (search: string, sortBy: SortBy) =>
-		[...noteQueryKeys.all, search, sortBy] as const,
+		[...noteQueryKeys.all, 'list', search, sortBy] as const,
 };
 
 export const tagQueryKeys = {
-	detail: (tagId: string) => [tagId],
-
 	all: ['tags'] as const,
+	detail: (tagId: string) => [...tagQueryKeys.all, 'detail', tagId] as const,
 	list: (search: string, sortBy: SortBy) =>
-		[...tagQueryKeys.all, search, sortBy] as const,
+		[...tagQueryKeys.all, 'list', search, sortBy] as const,
 };
 
 export const notebookQueryKeys = {
-	detail: (notebookId: string) => [notebookId],
-
 	all: ['notebooks'] as const,
+	detail: (notebookId: string) =>
+		[...notebookQueryKeys.all, 'detail', notebookId] as const,
 	list: (search: string, sortBy: SortBy) =>
-		[...notebookQueryKeys.all, search, sortBy] as const,
+		[...notebookQueryKeys.all, 'list', search, sortBy] as const,
 };
 
 export const spaceQueryKeys = {
-	detail: (spaceId: string) => [spaceId],
-
 	all: ['spaces'] as const,
+	detail: (spaceId: string) =>
+		[...spaceQueryKeys.all, 'detail', spaceId] as const,
 	list: (search: string, sortBy: SortBy) =>
-		[...spaceQueryKeys.all, search, sortBy] as const,
+		[...spaceQueryKeys.all, 'list', search, sortBy] as const,
 };
 
 export const fileQueryKeys = {
-	detail: (fileId: string) => [fileId],
-
 	all: ['files'] as const,
+	detail: (fileId: string) =>
+		[...fileQueryKeys.all, 'detail', fileId] as const,
 	list: (search: string, sortBy: SortBy) =>
-		[...fileQueryKeys.all, search, sortBy] as const,
+		[...fileQueryKeys.all, 'list', search, sortBy] as const,
 };
 
 export const taskQueryKeys = {
-	detail: (taskId: string) => [taskId],
-
 	all: ['tasks'] as const,
+	detail: (taskId: string) =>
+		[...taskQueryKeys.all, 'detail', taskId] as const,
 	list: (search: string, sortBy: SortBy) =>
-		[...taskQueryKeys.all, search, sortBy] as const,
+		[...taskQueryKeys.all, 'list', search, sortBy] as const,
 };
 
 export const eventQueryKeys = {
-	detail: (eventId: string) => [eventId],
-
 	all: ['events'] as const,
+	detail: (eventId: string) =>
+		[...eventQueryKeys.all, 'detail', eventId] as const,
 	list: (search: string, sortBy: SortBy) =>
-		[...eventQueryKeys.all, search, sortBy] as const,
+		[...eventQueryKeys.all, 'list', search, sortBy] as const,
 };

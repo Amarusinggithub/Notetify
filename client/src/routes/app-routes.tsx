@@ -3,8 +3,6 @@ import { createBrowserRouter, Navigate, RouterProvider } from 'react-router';
 import { notesLoader } from '../components/app-notes-sidebar.tsx';
 import AppLayout from '../layouts/app-layout';
 import SettingsLayout from '../layouts/settings/layout';
-import Home from '../pages/app/home';
-import Landing from '../pages/landing';
 import { useStore } from '../stores/index.ts';
 
 function LoadingSpinner({ message = 'Loading...' }: { message?: string }) {
@@ -36,10 +34,14 @@ const TwoFactorVerification = lazy(
 );
 const Register = lazy(() => import('../pages/auth/register'));
 const Login = lazy(() => import('../pages/auth/login'));
+const Home = lazy(() => import('../pages/app/home'));
+const Landing = lazy(() => import('../pages/landing'));
 
 function AppRoutes() {
-	const { isAuthenticated, checkingAuth } = useStore();
-	if (checkingAuth) return null;
+	const checkingAuth = useStore((state) => state.checkingAuth);
+    const  isAuthenticated = useStore((state)=> state.isAuthenticated);
+
+	if (checkingAuth) return <LoadingSpinner message="Checking session..." />;
 
 	const publicRoutes = [
 		{
@@ -88,9 +90,8 @@ function AppRoutes() {
 		{
 			path: '/',
 			id: 'notes',
-			loader: notesLoader,
 			Component: AppLayout,
-			HydrateFallback: () => <LoadingSpinner message="Loading your notes..." />,
+			HydrateFallback: () => <LoadingSpinner message="Loading ..." />,
 			children: [
 				{ index: true, Component: Home },
 				{ path: 'trash', Component: Trash },
@@ -100,8 +101,8 @@ function AppRoutes() {
 				{ path: 'tags', Component: Tags },
 				{ path: 'notebooks', Component: Notebooks },
 				{ path: 'spaces', Component: Spaces },
-				{ path: 'notes', Component: Notes },
-				{ path: 'notes/:noteId', Component: Notes },
+				{ path: 'notes', Component: Notes, loader: notesLoader },
+				{ path: 'notes/:noteId', Component: Notes, loader: notesLoader },
 				{ path: 'tasks', Component: Tasks },
 			],
 		},

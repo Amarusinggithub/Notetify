@@ -1,6 +1,7 @@
 import { useLiveblocksExtension } from '@liveblocks/react-tiptap';
 import '@liveblocks/react-tiptap/styles.css';
 import '@liveblocks/react-ui/styles.css';
+import '@liveblocks/react-ui/styles/dark/media-query.css';
 import { useRoom } from '@liveblocks/react/suspense';
 import DragHandle from '@tiptap/extension-drag-handle-react';
 import Emoji, { gitHubEmojis } from '@tiptap/extension-emoji';
@@ -79,6 +80,7 @@ export const Editor = () => {
 		onUpdate: ({ editor: currentEditor }) => {
 			// Debounced auto-save
 			if (currentUserNote) {
+                if(currentUserNote.note.content!= currentEditor.getHTML()){
 				//Clear the previous timer if it exists
 				if (saveTimeoutRef.current) {
 					clearTimeout(saveTimeoutRef.current);
@@ -92,9 +94,9 @@ export const Editor = () => {
 						id: currentUserNote.id,
 						payload: { content: html },
 					});
-				}, 1000);
+				}, 2000);
 			}
-		},
+		}},
 
 		extensions: [
 			liveblocks,

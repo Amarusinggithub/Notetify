@@ -13,7 +13,7 @@ export async function fetchTag({
 }: QueryFunctionContext<
 	ReturnType<typeof tagQueryKeys.detail>
 >): Promise<UserTag> {
-	const [tagId] = queryKey;
+	const [,, tagId] = queryKey;
 
 	const response = await axiosInstance.get<UserTag>(`tags/${tagId}`);
 
@@ -27,7 +27,7 @@ export async function fetchTagsPage({
 	ReturnType<typeof tagQueryKeys.list>,
 	number
 >): Promise<PaginatedTagResponse> {
-	const [_key, search, sortBy] = queryKey;
+	const [,, search, sortBy] = queryKey;
 	const params = new URLSearchParams({
 		page: String(pageParam),
 		sort_by: sortBy,
@@ -42,15 +42,10 @@ export async function fetchTagsPage({
 		params.set('search', search);
 	}
 
-	try {
-		const response = await axiosInstance.get<PaginatedTagResponse>(
-			`tags?${params.toString()}`
-		);
-		return response.data;
-	} catch (error) {
-		console.error('Failed to fetch tags:', error);
-		return { results: [], nextPage: null, hasNextPage: false };
-	}
+	const response = await axiosInstance.get<PaginatedTagResponse>(
+		`tags?${params.toString()}`
+	);
+	return response.data;
 }
 
 export async function updateTag(

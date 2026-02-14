@@ -1,5 +1,4 @@
 ﻿import { useOthers } from '@liveblocks/react/suspense';
-import { useQueryClient, type InfiniteData } from '@tanstack/react-query';
 import {
 	ArrowRightLeft,
 	ChevronDown,
@@ -27,11 +26,10 @@ import {
 	Tag,
 	Trash2,
 } from 'lucide-react';
-import { useState, useSyncExternalStore } from 'react';
-import type { BreadcrumbItem, PaginatedNotesResponse, UserNote } from 'types';
-import { useDeleteNote, useUpdateNote } from '../hooks/use-note.ts';
+import { useState } from 'react';
+import type { BreadcrumbItem } from 'types';
+import { useDeleteNote, useFetchNote, useUpdateNote } from '../hooks/use-note.ts';
 import { useStore } from '../stores/index.ts';
-import { noteQueryKeys } from '../utils/queryKeys.ts';
 import { Breadcrumbs } from './breadcrumbs';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Badge } from './ui/badge';
@@ -72,7 +70,6 @@ export function EditorHeader({
 		setOpen: setNotesOpen,
 		setOpenMobile: setNotesOpenMobile,
 	} = useNotesSidebar();
-	const queryClient = useQueryClient();
 
 	const currentUser = useStore((s) => s.sharedData?.auth.user);
 	const [inviteRole, setInviteRole] = useState<'editor' | 'viewer'>('editor');
@@ -91,22 +88,9 @@ export function EditorHeader({
 	const updateNoteMutation = useUpdateNote();
 	const others = useOthers();
 	const collaborators = others.slice(0, 3);
-	const search = useStore((s) => s.searchNotes);
-	const sortBy = useStore((s) => s.sortNotesBy);
 
-	// Subscribe to cache changes so the component re-renders when notes are updated
-	const paginatedNotes = useSyncExternalStore(
-		(onStoreChange) => queryClient.getQueryCache().subscribe(onStoreChange),
-		() =>
-			queryClient.getQueryData<InfiniteData<PaginatedNotesResponse>>(
-				noteQueryKeys.list(search, sortBy)
-			)
-	);
 
-	const allNotes = paginatedNotes?.pages.flatMap((page) => page.results) ?? [];
-
-	const currentUserNote =
-		allNotes.find((n: UserNote) => n.id === currentNoteId) ?? allNotes[-1];
+	const { data: currentUserNote } = useFetchNote(currentNoteId!);
 
 	const handleDeleteNote = () => {
 		if (!currentUserNote) return;
@@ -126,7 +110,7 @@ export function EditorHeader({
 		updateNoteMutation.mutate({
 			id: currentUserNote.id,
 			payload: {
-				is_pinned_to_notebook: !currentUserNote.is_pinned_to_notebook,
+				is_pinned_to_home: !currentUserNote.is_pinned_to_home,
 			},
 		});
 	};
@@ -172,7 +156,7 @@ export function EditorHeader({
 	};
 
 	return (
-		<header className="bg-editor border-editor-border/50 flex h-16 shrink-0 items-center justify-between gap-2 border-b px-6 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 md:px-4">
+		<header className="bg-editor border-editor-border/50 flex h-16 shrink-0 items-center justify-between gap-2 border-b px-6 transition-[width,height] duration-300 ease-in-out group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 md:px-4">
 			<div className="flex items-center gap-2">
 				<Tooltip>
 					<TooltipTrigger asChild>
@@ -423,7 +407,7 @@ export function EditorHeader({
 							</DropdownMenuItem>
 							<DropdownMenuItem onClick={handlePinToNotebook}>
 								<NotebookIcon className="mr-2 size-4" />
-								{currentUserNote?.is_pinned_to_notebook
+								{currentUserNote?.is_pinned_to_home
 									? 'Unpin from Notebook'
 									: 'Pin to Notebook'}
 							</DropdownMenuItem>
@@ -517,7 +501,7 @@ export function EditorHeaderSkeleton() {
 	};
 
 	return (
-		<header className="bg-editor border-editor-border/50 flex h-16 shrink-0 items-center justify-between gap-2 border-b px-6 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 md:px-4">
+		<header className="bg-editor border-editor-border/50 flex h-16 shrink-0 items-center justify-between gap-2 border-b px-6 transition-[width,height] duration-300 ease-in-out group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 md:px-4">
 			<div className="flex items-center gap-2">
 				<Tooltip>
 					<TooltipTrigger asChild>

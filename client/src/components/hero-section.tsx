@@ -3,6 +3,7 @@ import dark from '../assets/dark.png';
 import light from '../assets/light.png';
 import { AnimatedGroup } from '../components/ui/animated-group';
 import { TextEffect } from '../components/ui/text-effect';
+import { useStore } from '../stores/index.ts';
 import { Button } from './ui/button';
 
 const transitionVariants = {
@@ -21,6 +22,12 @@ const transitionVariants = {
 };
 
 export default function HeroSection() {
+	const theme = useStore((s) => s.theme);
+	const isDark =
+		theme === 'dark' ||
+		(theme === 'system' &&
+			window.matchMedia('(prefers-color-scheme: dark)').matches);
+
 	return (
 		<section>
 			<div aria-hidden className="absolute inset-0 isolate hidden lg:block">
@@ -99,18 +106,13 @@ export default function HeroSection() {
 						/>
 						<div className="ring-background bg-background relative mx-auto max-w-5xl overflow-hidden rounded-2xl border p-4 shadow-lg ring-1 inset-shadow-2xs shadow-zinc-950/15 dark:inset-shadow-white/20">
 							<img
-								className="bg-background relative hidden aspect-15/8 rounded-2xl dark:block"
-								src={dark}
+								src={isDark ? dark : light}
+								className={`bg-background relative aspect-15/8 rounded-2xl ${isDark ? '' : 'border-border/25 z-2 border'}`}
 								alt="app screen"
 								width="2700"
 								height="1440"
-							/>
-							<img
-								src={light}
-								className="border-border/25 relative z-2 aspect-15/8 rounded-2xl border dark:hidden"
-								alt="app screen"
-								width="2700"
-								height="1440"
+								fetchPriority="high"
+								loading="eager"
 							/>
 						</div>
 					</div>

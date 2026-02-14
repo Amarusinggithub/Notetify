@@ -72,7 +72,7 @@ interface AppHeaderProps {
 }
 
 export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
-	const { sharedData } = useStore();
+	const sharedData = useStore((state) => state.sharedData);
 	const { auth } = sharedData!;
 	const page = useLocation();
 	const getInitials = useInitials();
@@ -192,7 +192,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
 													href={item.href}
 													target="_blank"
 													rel="noopener noreferrer"
-													className="group text-accent-foreground ring-offset-background hover:bg-accent hover:text-accent-foreground focus-visible:ring-ring ml-1 inline-flex h-9 w-9 items-center justify-center rounded-md bg-transparent p-0 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
+													className="group text-accent-foreground ring-offset-background hover:bg-accent hover:text-accent-foreground focus-visible:ring-ring ml-1 inline-flex h-9 w-9 items-center justify-center rounded-md bg-transparent p-0 text-sm font-medium transition-colors duration-200 ease-out focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
 												>
 													<span className="sr-only">{item.title}</span>
 													{item.icon && (

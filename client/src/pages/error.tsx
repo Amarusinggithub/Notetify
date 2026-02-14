@@ -7,8 +7,7 @@ import {
 	RefreshCw,
 } from 'lucide-react';
 import { useState } from 'react';
-// 1. Import the official type from the library
-import { FallbackProps } from 'react-error-boundary';
+import type { FallbackProps } from 'react-error-boundary';
 import { Button } from '../components/ui/button';
 import {
 	Card,
@@ -31,8 +30,8 @@ function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
 	const [detailsOpen, setDetailsOpen] = useState(false);
 
 	// Safely extract error info
-	const errorMessage = error?.message || 'An unknown error occurred';
-	const errorStack = error?.stack ?? 'No stack trace available';
+	const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+	const errorStack = error instanceof Error ? error.stack ?? 'No stack trace available' : 'No stack trace available';
 	const errorDetails = `Error: ${errorMessage}\n\nStack Trace:\n${errorStack}`;
 
 	const handleCopy = async () => {
@@ -84,7 +83,7 @@ function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
 									<span>Technical details</span>
 									<ChevronDown
 										className={cn(
-											'h-4 w-4 transition-transform duration-200',
+											'h-4 w-4 transition-transform duration-300 ease-in-out',
 											detailsOpen && 'rotate-180'
 										)}
 									/>

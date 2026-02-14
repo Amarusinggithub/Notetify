@@ -13,7 +13,7 @@ export async function fetchNote({
 }: QueryFunctionContext<
 	ReturnType<typeof noteQueryKeys.detail>
 >): Promise<UserNote> {
-	const [noteId] = queryKey;
+	const [,, noteId] = queryKey;
 
 	const response = await axiosInstance.get<UserNote>(`notes/${noteId}`);
 
@@ -27,7 +27,7 @@ export async function fetchNotesPage({
 	ReturnType<typeof noteQueryKeys.list>,
 	number
 >): Promise<PaginatedNotesResponse> {
-	const [_key, search, sortBy] = queryKey;
+	const [,, search, sortBy] = queryKey;
 	const params = new URLSearchParams({
 		page: String(pageParam),
 		sort_by: sortBy,
@@ -42,15 +42,10 @@ export async function fetchNotesPage({
 		params.set('search', search);
 	}
 
-	try {
-		const response = await axiosInstance.get<PaginatedNotesResponse>(
-			`notes?${params.toString()}`
-		);
-		return response.data;
-	} catch (error) {
-		console.error('Failed to fetch notes:', error);
-		return { results: [], nextPage: null, hasNextPage: false };
-	}
+	const response = await axiosInstance.get<PaginatedNotesResponse>(
+		`notes?${params.toString()}`
+	);
+	return response.data;
 }
 
 export async function updateNote(
@@ -75,15 +70,8 @@ export const createNote = async (note: CreateUserNote): Promise<UserNote> => {
 			is_trashed: note.is_trashed,
 		};
 
-		if (note.notebook_id) payload.notebook_id = note.notebook_id;
-		if (note.space_id) payload.space_id = note.space_id;
 		if (note.is_pinned_to_home !== undefined)
 			payload.is_pinned_to_home = note.is_pinned_to_home;
-		if (note.is_pinned_to_notebook !== undefined)
-			payload.is_pinned_to_notebook = note.is_pinned_to_notebook;
-		if (note.is_pinned_to_space !== undefined)
-			payload.is_pinned_to_space = note.is_pinned_to_space;
-
 		if (note.tags && note.tags.length > 0) {
 			payload.tags = note.tags.map((t) => t.name);
 		}

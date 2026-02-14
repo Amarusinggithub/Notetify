@@ -13,7 +13,7 @@ export async function fetchNotebook({
 }: QueryFunctionContext<
 	ReturnType<typeof notebookQueryKeys.detail>
 >): Promise<UserNotebook> {
-	const [notebookId] = queryKey;
+	const [,, notebookId] = queryKey;
 
 	const response = await axiosInstance.get<UserNotebook>(
 		`notebooks/${notebookId}`
@@ -29,7 +29,7 @@ export async function fetchNotebooksPage({
 	ReturnType<typeof notebookQueryKeys.list>,
 	number
 >): Promise<PaginatedNotebooksResponse> {
-	const [_key, search, sortBy] = queryKey;
+	const [,, search, sortBy] = queryKey;
 	const params = new URLSearchParams({
 		page: String(pageParam),
 		sort_by: sortBy,
@@ -44,15 +44,10 @@ export async function fetchNotebooksPage({
 		params.set('search', search);
 	}
 
-	try {
-		const response = await axiosInstance.get<PaginatedNotebooksResponse>(
-			`notebooks?${params.toString()}`
-		);
-		return response.data;
-	} catch (error) {
-		console.error('Failed to fetch notebooks:', error);
-		return { results: [], nextPage: null, hasNextPage: false };
-	}
+	const response = await axiosInstance.get<PaginatedNotebooksResponse>(
+		`notebooks?${params.toString()}`
+	);
+	return response.data;
 }
 
 export async function updateNotebook(
