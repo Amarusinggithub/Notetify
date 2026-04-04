@@ -25,11 +25,11 @@ export default defineConfig({
 	build: {
 		rollupOptions: {
 			output: {
-				manualChunks: {
-					tiptap: ['@tiptap/react', '@tiptap/starter-kit'],
-					liveblocks: ['@liveblocks/react', '@liveblocks/client'],
-					radix: ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu'],
-					katex: ['katex'],
+				manualChunks: (id) => {
+					if (id.includes('@tiptap/')) return 'tiptap';
+					if (id.includes('@liveblocks/')) return 'liveblocks';
+					if (id.includes('@radix-ui/')) return 'radix';
+					if (id.includes('katex')) return 'katex';
 				},
 			},
 		},
