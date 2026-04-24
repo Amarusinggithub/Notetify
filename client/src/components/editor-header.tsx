@@ -1,34 +1,30 @@
-﻿import { useOthers } from '@liveblocks/react/suspense';
 import {
 	ArrowRightLeft,
-	ChevronDown,
 	Copy,
 	CopyPlus,
-	Eye,
 	FilePlus2,
-	Globe2,
 	History,
 	Home,
 	Info,
 	Link2,
 	ListTree,
-	Lock,
 	Maximize2,
 	Minimize2,
 	MoreHorizontal,
 	Notebook as NotebookIcon,
-	PenLine,
 	Printer,
 	Search,
-	Send,
 	Share2,
 	Star,
 	Tag,
 	Trash2,
 } from 'lucide-react';
-import { useState } from 'react';
 import type { BreadcrumbItem } from 'types';
-import { useDeleteNote, useFetchNote, useUpdateNote } from '../hooks/use-note.ts';
+import {
+	useDeleteNote,
+	useFetchNote,
+	useUpdateNote,
+} from '../hooks/use-note.ts';
 import { useStore } from '../stores/index.ts';
 import { Breadcrumbs } from './breadcrumbs';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
@@ -45,7 +41,6 @@ import {
 	DropdownMenuSubTrigger,
 	DropdownMenuTrigger,
 } from './ui/dropdown-menu';
-import { Input } from './ui/input';
 import { NotesSidebarTrigger, useNotesSidebar } from './ui/notes-sidebar';
 import { Separator } from './ui/separator';
 import { useSidebar } from './ui/sidebar';
@@ -72,25 +67,17 @@ export function EditorHeader({
 	} = useNotesSidebar();
 
 	const currentUser = useStore((s) => s.sharedData?.auth.user);
-	const [inviteRole, setInviteRole] = useState<'editor' | 'viewer'>('editor');
-	const inviteRoleLabel = inviteRole === 'editor' ? 'Editor' : 'Viewer';
-	const [linkAccess, setLinkAccess] = useState<'restricted' | 'anyone'>(
-		'restricted'
-	);
-	const linkAccessLabel =
-		linkAccess === 'restricted' ? 'Restricted' : 'Anyone with link';
-
 	const noteUrl = currentNoteId
 		? `${globalThis.window.location.origin}/notes/${currentNoteId}`
 		: globalThis.window.location.href;
 
 	const deleteNoteMutation = useDeleteNote();
 	const updateNoteMutation = useUpdateNote();
-	const others = useOthers();
-	const collaborators = others.slice(0, 3);
-
-
 	const { data: currentUserNote } = useFetchNote(currentNoteId!);
+	const ownerLabel = currentUser
+		? `${currentUser.first_name ?? ''} ${currentUser.last_name ?? ''}`.trim() ||
+			currentUser.email
+		: 'You';
 
 	const handleDeleteNote = () => {
 		if (!currentUserNote) return;
@@ -114,10 +101,6 @@ export function EditorHeader({
 			},
 		});
 	};
-
-	const collaboratorsLabel = collaborators.length
-		? `${collaborators.length} collaborator${collaborators.length > 1 ? 's' : ''}`
-		: 'Only you here';
 
 	const handleFullscreenToggle = () => {
 		const anyOpen = appOpen || appOpenMobile || notesOpen || notesOpenMobile;
@@ -191,19 +174,14 @@ export function EditorHeader({
 
 			<div className="flex flex-1 items-center justify-center gap-3 px-4">
 				<div className="flex items-center gap-2">
-					{collaborators.map((other) => (
-						<Avatar
-							key={other.connectionId}
-							className="border-border size-8 border"
-						>
-							<AvatarImage src={other.info?.avatar} alt={other.info?.name} />
-							<AvatarFallback>
-								{other.info?.name?.charAt(0) ?? '?'}
-							</AvatarFallback>
-						</Avatar>
-					))}
+					<Avatar className="border-border size-8 border">
+						<AvatarImage src={currentUser?.avatar ?? ''} alt={ownerLabel} />
+						<AvatarFallback>
+							{ownerLabel.charAt(0).toUpperCase()}
+						</AvatarFallback>
+					</Avatar>
 					<Badge variant="secondary" className="rounded-full px-3 py-1 text-xs">
-						{collaboratorsLabel}
+						Workspace note
 					</Badge>
 				</div>
 			</div>
@@ -232,99 +210,47 @@ export function EditorHeader({
 							className="w-90 border-none bg-transparent p-0 shadow-none"
 						>
 							<div className="border-border rounded-2xl border bg-white p-4 shadow-xl">
-								<Input
-									placeholder="Add name or email"
-									className="h-11 w-full rounded-xl"
-								/>
-								<div className="mt-3 flex flex-wrap items-center gap-2">
-									<DropdownMenu>
-										<DropdownMenuTrigger asChild>
-											<Button
-												variant="outline"
-												size="sm"
-												className="h-10 min-w-40 justify-between rounded-lg px-3 text-sm font-medium"
-											>
-												<span>{inviteRoleLabel}</span>
-												<ChevronDown className="size-4" />
-											</Button>
-										</DropdownMenuTrigger>
-										<DropdownMenuContent align="start" className="w-48">
-											<DropdownMenuItem onClick={() => setInviteRole('editor')}>
-												<PenLine className="mr-2 size-4" /> Editor
-											</DropdownMenuItem>
-											<DropdownMenuItem onClick={() => setInviteRole('viewer')}>
-												<Eye className="mr-2 size-4" /> Viewer
-											</DropdownMenuItem>
-										</DropdownMenuContent>
-									</DropdownMenu>
+								<div className="space-y-1">
+									<h3 className="text-foreground text-sm font-semibold">
+										Share note
+									</h3>
+									<p className="text-muted-foreground text-sm">
+										Copy the note link or use your device share sheet.
+									</p>
+								</div>
+
+								<div className="border-border mt-4 flex items-center gap-3 rounded-lg border px-3 py-2">
+									<Avatar className="size-9 overflow-hidden rounded-full">
+										<AvatarImage
+											alt="Current user"
+											src={currentUser?.avatar ?? ''}
+										/>
+										<AvatarFallback className="rounded-full bg-[#ecebff] text-[#4f6ef9]">
+											{ownerLabel.charAt(0).toUpperCase()}
+										</AvatarFallback>
+									</Avatar>
+									<div className="flex-1">
+										<div className="text-foreground text-sm font-medium">
+											{ownerLabel}
+										</div>
+										<div className="text-muted-foreground text-xs">
+											{currentUser?.email ?? 'Signed in user'}
+										</div>
+									</div>
+									<span className="text-muted-foreground text-xs font-medium">
+										Owner
+									</span>
+								</div>
+
+								<div className="mt-4 flex flex-wrap items-center gap-3">
 									<Button
 										size="sm"
+										onClick={handleShare}
 										className="h-10 rounded-lg bg-[#4f6ef9] px-4 text-white hover:bg-[#3f58d4]"
 									>
-										<Send className="mr-1 size-4" />
-										<span>Send invite</span>
+										<Share2 className="mr-1 size-4" />
+										<span>Share</span>
 									</Button>
-								</div>
-
-								<div className="mt-4 space-y-3">
-									<div className="text-foreground flex items-center justify-between text-sm font-medium">
-										<span>People with access</span>
-										<span className="text-muted-foreground text-xs">1</span>
-									</div>
-									<div className="border-border flex items-center gap-3 rounded-lg border px-3 py-2">
-										<Avatar className="size-9 overflow-hidden rounded-full">
-											<AvatarImage
-												alt="Current user"
-												src={currentUser?.avatar ?? ''}
-											/>
-											<AvatarFallback className="rounded-full bg-[#ecebff] text-[#4f6ef9]">
-												{(
-													currentUser?.first_name?.[0] ??
-													currentUser?.email?.[0] ??
-													'Y'
-												).toUpperCase()}
-											</AvatarFallback>
-										</Avatar>
-										<div className="flex-1">
-											<div className="text-foreground text-sm font-medium">
-												{currentUser
-													? `${currentUser.first_name ?? ''} ${currentUser.last_name ?? ''}`.trim() ||
-														currentUser.email
-													: 'You'}
-											</div>
-											<div className="text-muted-foreground text-xs">
-												{currentUser?.email ?? 'you@example.com'}
-											</div>
-										</div>
-										<span className="text-muted-foreground text-xs font-medium">
-											Owner
-										</span>
-									</div>
-								</div>
-
-								<div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-									<DropdownMenu>
-										<DropdownMenuTrigger asChild>
-											<Button
-												variant="outline"
-												size="sm"
-												className="h-10 min-w-40 justify-between rounded-lg px-3 text-sm font-medium"
-											>
-												<span>{linkAccessLabel}</span>
-												<ChevronDown className="size-4" />
-											</Button>
-										</DropdownMenuTrigger>
-										<DropdownMenuContent align="start" className="w-56">
-											<DropdownMenuItem
-												onClick={() => setLinkAccess('restricted')}
-											>
-												<Lock className="mr-2 size-4" /> Restricted
-											</DropdownMenuItem>
-											<DropdownMenuItem onClick={() => setLinkAccess('anyone')}>
-												<Globe2 className="mr-2 size-4" /> Anyone with link
-											</DropdownMenuItem>
-										</DropdownMenuContent>
-									</DropdownMenu>
 									<Button
 										variant="outline"
 										size="sm"
@@ -385,7 +311,7 @@ export function EditorHeader({
 							<DropdownMenuItem onClick={() => console.log('Move note')}>
 								<ArrowRightLeft className="mr-2 size-4" /> Move
 							</DropdownMenuItem>
-							<DropdownMenuItem onClick={() => console.log('Copy note toï¿½')}>
+							<DropdownMenuItem onClick={() => console.log('Copy note to')}>
 								<CopyPlus className="mr-2 size-4" /> Copy to
 							</DropdownMenuItem>
 							<DropdownMenuItem onClick={() => console.log('Duplicate note')}>
@@ -469,7 +395,7 @@ export function EditorHeader({
 	);
 }
 
-// Loading version of header that doesn't use Liveblocks hooks
+// Loading version of the header shown before note data is ready
 export function EditorHeaderSkeleton() {
 	const {
 		open: appOpen,

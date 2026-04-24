@@ -1,8 +1,3 @@
-import { useLiveblocksExtension } from '@liveblocks/react-tiptap';
-import '@liveblocks/react-tiptap/styles.css';
-import '@liveblocks/react-ui/styles.css';
-import '@liveblocks/react-ui/styles/dark/media-query.css';
-import { useRoom } from '@liveblocks/react/suspense';
 import DragHandle from '@tiptap/extension-drag-handle-react';
 import Emoji, { gitHubEmojis } from '@tiptap/extension-emoji';
 import FontFamily from '@tiptap/extension-font-family';
@@ -17,17 +12,16 @@ import { TableKit } from '@tiptap/extension-table';
 import TextAlign from '@tiptap/extension-text-align';
 import { FontSize, TextStyle } from '@tiptap/extension-text-style';
 import Youtube from '@tiptap/extension-youtube';
+import { Plugin, PluginKey } from '@tiptap/pm/state';
 import { EditorContent, Extension, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { useEffect, useRef } from 'react';
-import { NoteEditorProvider } from '../context/editor-context.tsx';
-import { cn } from '../lib/utils';
-
-import { Plugin, PluginKey } from '@tiptap/pm/state';
 import { AlertCircle, GripVertical, RefreshCw } from 'lucide-react';
+import { useEffect, useRef } from 'react';
 import { ScrollArea } from '../components/ui/scroll-area.tsx';
 import { Skeleton } from '../components/ui/skeleton.tsx';
+import { NoteEditorProvider } from '../context/editor-context.tsx';
 import { useFetchNote, useUpdateNote } from '../hooks/use-note.ts';
+import { cn } from '../lib/utils';
 import { useStore } from '../stores/index.ts';
 import EditorFooter from './editor-footer';
 import { EditorHeader, EditorHeaderSkeleton } from './editor-header';
@@ -36,8 +30,6 @@ import suggestion from './suggestion';
 import { Button } from './ui/button';
 
 export const Editor = () => {
-	const liveblocks = useLiveblocksExtension();
-	const room = useRoom();
 	const lastLoadedId = useRef<string | null>(null);
 	const currentNoteId = useStore((s) => s.selectedNoteId);
 	const isMounted = useRef(false);
@@ -80,26 +72,26 @@ export const Editor = () => {
 		onUpdate: ({ editor: currentEditor }) => {
 			// Debounced auto-save
 			if (currentUserNote) {
-                if(currentUserNote.note.content!= currentEditor.getHTML()){
-				//Clear the previous timer if it exists
-				if (saveTimeoutRef.current) {
-					clearTimeout(saveTimeoutRef.current);
+				if (currentUserNote.note.content != currentEditor.getHTML()) {
+					//Clear the previous timer if it exists
+					if (saveTimeoutRef.current) {
+						clearTimeout(saveTimeoutRef.current);
+					}
+
+					//Set the new timer
+					saveTimeoutRef.current = setTimeout(() => {
+						const html = currentEditor.getHTML();
+
+						updateNoteMutation.mutate({
+							id: currentUserNote.id,
+							payload: { content: html },
+						});
+					}, 2000);
 				}
-
-				//Set the new timer
-				saveTimeoutRef.current = setTimeout(() => {
-					const html = currentEditor.getHTML();
-
-					updateNoteMutation.mutate({
-						id: currentUserNote.id,
-						payload: { content: html },
-					});
-				}, 2000);
 			}
-		}},
+		},
 
 		extensions: [
-			liveblocks,
 			StarterKit.configure({
 				undoRedo: false,
 				heading: {
@@ -222,30 +214,14 @@ export const Editor = () => {
 		if (lastLoadedId.current !== noteId) {
 			lastLoadedId.current = noteId;
 
-			// Seed content from DB only if the Liveblocks room is empty
 			const initContent = async () => {
-				try {
-					const { root } = await room.getStorage();
-					// "default" is the default fragment name used by the Liveblocks Tiptap extension
-					const tiptapFragment = root.get('default');
-
-					if (!tiptapFragment || tiptapFragment.length === 0) {
-						console.info('Room is empty, seeding from DB');
-						const dbContent = currentUserNote.note?.content ?? '';
-						editor.commands.setContent(dbContent);
-					} else {
-						console.info('Room has data, letting Liveblocks sync');
-					}
-				} catch (error) {
-					console.error('Failed to check room storage:', error);
-					// Fallback: set content from DB if we can't check
-					editor.commands.setContent(currentUserNote.note?.content ?? '');
-				}
+				const dbContent = currentUserNote.note?.content ?? '';
+				editor.commands.setContent(dbContent);
 			};
 
 			initContent();
 		}
-	}, [editor, currentUserNote?.id, room]);
+	}, [editor, currentUserNote?.id]);
 
 	if (!editor) {
 		return <EditorLoadingSkeleton />;
@@ -389,7 +365,7 @@ const TitleExtension = Extension.create({
 	},
 });
 
-// Read-only content preview shown while Liveblocks connects in the background
+// Read-only content preview shown while note data is loading
 export const EditorContentPreview = ({ content }: { content: string }) => {
 	return (
 		<div className="bg-editor flex h-full flex-col">
@@ -418,7 +394,7 @@ export const EditorContentPreview = ({ content }: { content: string }) => {
 	);
 };
 
-// Loading skeleton for use in ClientSideSuspense fallback
+// Loading skeleton for suspense fallback
 export const EditorLoadingSkeleton = () => {
 	return (
 		<div className="bg-editor flex h-full flex-col">

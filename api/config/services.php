@@ -53,9 +53,4 @@ return [
         'redirect' => env('FACEBOOK_REDIRECT_URI'),
     ],
 
-    'liveblocks' => [
-        'secret' => env('LIVEBLOCKS_SECRET_KEY'),
-        'base_uri' => env('LIVEBLOCKS_BASE_URI', 'https://api.liveblocks.io'),
-    ],
-
 ];
