@@ -27,7 +27,6 @@ export default defineConfig({
 			output: {
 				manualChunks: (id) => {
 					if (id.includes('@tiptap/')) return 'tiptap';
-					if (id.includes('@liveblocks/')) return 'liveblocks';
 					if (id.includes('@radix-ui/')) return 'radix';
 					if (id.includes('katex')) return 'katex';
 				},

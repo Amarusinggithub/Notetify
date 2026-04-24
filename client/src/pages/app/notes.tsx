@@ -1,10 +1,5 @@
-import {
-	ClientSideSuspense,
-	LiveblocksProvider,
-	RoomProvider,
-} from '@liveblocks/react/suspense';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useCallback, useEffect, useRef } from 'react';
+import { Suspense, useEffect, useRef } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useNavigate, useParams, useRouteLoaderData } from 'react-router';
 import { EditorNotesSidebar } from '../../components/app-notes-sidebar';
@@ -19,7 +14,6 @@ import {
 	NotesSidebarProvider,
 } from '../../components/ui/notes-sidebar';
 import { noteQueryOptions, useCreateNote } from '../../hooks/use-note.ts';
-import axiosInstance from '../../lib/axios';
 import { useStore } from '../../stores/index.ts';
 import { noteQueryKeys } from '../../utils/queryKeys.ts';
 
@@ -31,7 +25,6 @@ export default function Notes() {
 	const selectedId = useStore((s) => s.selectedNoteId);
 	const setSelected = useStore((s) => s.setSelectedNoteId);
 	const { mutate: createNote, isPending: isCreating } = useCreateNote();
-	const currentUser = useStore((s) => s.sharedData?.auth.user);
 	const isCreatingRef = useRef(false);
 
 	// Cache-prime individual note from the route loader's list data
@@ -42,7 +35,7 @@ export default function Notes() {
 		}
 	}, [initialData, queryClient]);
 
-	// Fetch note data in parallel with Liveblocks auth for the preview
+	// Fetch note data in parallel so the suspense fallback can render a preview
 	const { data: previewNote } = useQuery({
 		...noteQueryOptions(selectedId!),
 		enabled: !!selectedId,
@@ -105,61 +98,26 @@ export default function Notes() {
 		isCreating,
 	]);
 
-	const resolveUsers = async ({ userIds }: { userIds: string[] }) => {
-		if (!currentUser) return undefined;
-		return userIds.map((id) => {
-			if (String(currentUser.id) !== id) {
-				return undefined;
-			}
-			const name = `${currentUser.first_name ?? ''} ${
-				currentUser.last_name ?? ''
-			}`.trim();
-			return {
-				name: name || currentUser.email,
-				avatar: currentUser.avatar ?? '',
-				email: currentUser.email,
-			};
-		});
-	};
-
-	const authEndpoint = useCallback(async (room?: string) => {
-		if (!room) {
-			throw new Error('Room id is required to authorize collaboration.');
-		}
-		const response = await axiosInstance.post('liveblocks/auth', { room });
-		return response.data;
-	}, []);
-
 	return (
 		<NotesSidebarProvider defaultOpen={true}>
 			<EditorNotesSidebar />
 
 			<NotesSidebarInset>
-				<LiveblocksProvider
-					resolveUsers={resolveUsers}
-					authEndpoint={authEndpoint}
-				>
-					<RoomProvider
-						key={`note-${selectedId ?? 'new'}`}
-						id={`note-${selectedId ?? 'new'}`}
+				<ErrorBoundary fallback={<EditorError />}>
+					<Suspense
+						fallback={
+							previewNote ? (
+								<EditorContentPreview
+									content={previewNote.note?.content ?? ''}
+								/>
+							) : (
+								<EditorLoadingSkeleton />
+							)
+						}
 					>
-						<ErrorBoundary fallback={<EditorError />}>
-							<ClientSideSuspense
-								fallback={
-									previewNote ? (
-										<EditorContentPreview
-											content={previewNote.note?.content ?? ''}
-										/>
-									) : (
-										<EditorLoadingSkeleton />
-									)
-								}
-							>
-								<Editor />
-							</ClientSideSuspense>
-						</ErrorBoundary>
-					</RoomProvider>
-				</LiveblocksProvider>
+						<Editor />
+					</Suspense>
+				</ErrorBoundary>
 			</NotesSidebarInset>
 		</NotesSidebarProvider>
 	);

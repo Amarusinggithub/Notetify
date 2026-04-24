@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\LiveblocksController;
 use App\Http\Controllers\NoteController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\NotebookController;
@@ -41,7 +40,6 @@ Route::prefix('auth')->group(function () {
 });
 
 Route::middleware(['auth:sanctum'])->group(function () {
-    Route::post('liveblocks/auth', LiveblocksController::class);
     Route::resource('notes', NoteController::class);
     Route::resource('notebooks', NotebookController::class)->except(['show']);
     Route::resource('tags', TagController::class)->except(['show']);
