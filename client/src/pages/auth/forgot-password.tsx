@@ -1,5 +1,5 @@
 import { LoaderCircle } from 'lucide-react';
-import { useState, type ChangeEvent, type FormEvent } from 'react';
+import { useState, type ChangeEvent } from 'react';
 import InputError from '@/components/shared/input-error';
 import TextLink from '@/components/shared/text-link';
 import { Button } from '@/components/ui/button.tsx';
@@ -24,7 +24,7 @@ export default function ForgotPassword() {
 		setForm({ ...form, [e.target.name]: e.target.value.trim() });
 	};
 
-	const submit = async (e: FormEvent<HTMLFormElement>) => {
+	const submit = async (e: React.SubmitEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		setErrors(null);
 

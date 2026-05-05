@@ -1,6 +1,6 @@
 // Components
 import { LoaderCircle } from 'lucide-react';
-import { useState, type FormEvent } from 'react';
+import { useState } from 'react';
 
 import InputError from '@/components/shared/input-error';
 import { Button } from '@/components/ui/button.tsx';
@@ -18,7 +18,7 @@ export default function ConfirmPassword() {
 	});
 	const { isLoading, setErrors, errors, ConfirmPassword } = useStore();
 
-	const submit = async (e: FormEvent<HTMLFormElement>) => {
+	const submit = async (e: React.SubmitEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		setErrors(null);
 

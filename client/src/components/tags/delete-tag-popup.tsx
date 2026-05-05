@@ -1,5 +1,5 @@
 import { LightbulbIcon } from 'lucide-react';
-import useMutateTag from '@/hooks/use-tag';
+import {useMutateTag} from '@/hooks/use-tag';
 import { Button } from '@/components/ui/button';
 import {
 	Dialog,

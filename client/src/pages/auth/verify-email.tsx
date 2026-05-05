@@ -1,5 +1,4 @@
 import { LoaderCircle } from 'lucide-react';
-import { type FormEvent } from 'react';
 
 import TextLink from '@/components/shared/text-link';
 import { Button } from '@/components/ui/button.tsx';
@@ -8,7 +7,7 @@ import { useStore } from '@/stores/index.ts';
 
 export default function VerifyEmail() {
 	const { isLoading, VerifyEmail, sharedData } = useStore();
-	const submit = async (e: FormEvent<HTMLFormElement>) => {
+	const submit = async (e: React.SubmitEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		await VerifyEmail(sharedData!.auth.user.email);
 	};

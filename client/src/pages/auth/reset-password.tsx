@@ -1,5 +1,5 @@
 import { LoaderCircle } from 'lucide-react';
-import { type FormEvent, useState } from 'react';
+import {  useState } from 'react';
 import { useParams } from 'react-router';
 import InputError from '@/components/shared/input-error';
 import { Button } from '@/components/ui/button.tsx';
@@ -25,7 +25,7 @@ export default function ResetPassword() {
 
 	const { isLoading, errors, PasswordReset, setErrors } = useStore();
 
-	const submit = async (e: FormEvent<HTMLFormElement>) => {
+	const submit = async (e: React.SubmitEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		setErrors(null);
 
