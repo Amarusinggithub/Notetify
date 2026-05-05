@@ -51,8 +51,8 @@ const NoteCard = ({ userNote }: NoteCardProp) => {
 	const handleSelectNote = async () => {
 		cancelPrefetch();
 		await queryClient.ensureQueryData(noteQueryOptions(userNote.id));
+		await navigate(`/notes/${userNote.id}`);
 		setSelectedNoteId(userNote.id);
-		navigate(`/notes/${userNote.id}`);
 	};
 
 	return (

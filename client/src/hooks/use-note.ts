@@ -129,9 +129,9 @@ export function useCreateNote() {
 				notes.map((item) => (item.id === context?.tempId ? created : item))
 			);
 
-			const store = useStore.getState();
-			store.setSelectedNoteId(created.id);
+			queryClient.setQueryData(noteQueryKeys.detail(created.id), created);
 			await navigate(`/notes/${created.id}`);
+			useStore.getState().setSelectedNoteId(created.id);
 			await revalidator.revalidate();
 		},
 		onError: (error, _input, context) => {
@@ -153,32 +153,41 @@ export function useUpdateNote() {
 			await queryClient.cancelQueries({ queryKey: noteQueryKeys.all });
 			const previous = snapshotNotes(queryClient);
 			const now = new Date().toISOString();
+
+			const optimisticUpdater = (note: UserNote): UserNote => ({
+				...note,
+				is_pinned_to_home:
+					payload.is_pinned_to_home ?? note.is_pinned_to_home,
+				is_trashed: payload.is_trashed ?? note.is_trashed,
+				tags: payload.tags ?? note.tags,
+				updated_at: now,
+				note: {
+					...note.note,
+					updated_at: now,
+					...(payload.content !== undefined
+						? { content: payload.content ?? '' }
+						: {}),
+				},
+			});
+
 			updateNotesCaches(queryClient, (notes) =>
-				notes.map(
-					(note): UserNote =>
-						note.id === id
-							? {
-									...note,
-									is_pinned_to_home:
-										payload.is_pinned_to_home ?? note.is_pinned_to_home,
-									is_trashed: payload.is_trashed ?? note.is_trashed,
-									tags: payload.tags ?? note.tags,
-									updated_at: now,
-									note: {
-										...note.note,
-										updated_at: now,
-										...(payload.content !== undefined
-											? { content: payload.content ?? '' }
-											: {}),
-									},
-								}
-							: note
-				)
+				notes.map((note) => (note.id === id ? optimisticUpdater(note) : note))
 			);
+
+			const prevDetail = queryClient.getQueryData<UserNote>(
+				noteQueryKeys.detail(id)
+			);
+			if (prevDetail) {
+				queryClient.setQueryData(
+					noteQueryKeys.detail(id),
+					optimisticUpdater(prevDetail)
+				);
+			}
 
 			return { previous };
 		},
 		onSuccess: async (updated: UserNote) => {
+			queryClient.setQueryData(noteQueryKeys.detail(updated.id), updated);
 			updateNotesCaches(queryClient, (notes) =>
 				notes.map((note) => (note.id === updated.id ? updated : note))
 			);

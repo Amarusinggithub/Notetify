@@ -2,22 +2,24 @@ import { Menu, X } from 'lucide-react';
 import { useScroll } from 'motion/react';
 import React from 'react';
 import { Link } from 'react-router';
-import { cn } from '../lib/utils';
-import AppLogo from './app-logo';
-import { ModeToggle } from './mode-toggle';
-import { Button } from './ui/button';
+import { cn } from '../../lib/utils';
+import AppLogo from '../app-logo';
+import { ModeToggle } from '../mode-toggle';
+import { Button } from '../ui/button';
 
-const menuItems = [
-	{ name: 'Features', href: '#features' },
-	{ name: 'About', href: '#about' },
-	{ name: 'Pricing', href: '#pricing' },
-	{ name: 'Contact', href: '#contact' },
+const links = [
+	{ label: 'Features', links: '#features', id:'features' },
+	{ label: 'How It Works', links: '#how-it-works', id: 'how-it-works' },
+	{ label: 'About Us', links: '#about', id: 'about' },
+	{ label: 'Pricing', links: '#pricing', id: 'pricing' },
+	{ label: 'Contact', links: '#contact', id: 'contact' },
 ];
 export const HeroHeader = () => {
 	const [menuState, setMenuState] = React.useState(false);
 	const [scrolled, setScrolled] = React.useState(false);
-	const scrollToSection = (href: string) => {
-		const element = document.querySelector(href);
+
+	const scrollToSection = (id: string) => {
+		const element = document.getElementById(id);
 		if (element) {
 			element.scrollIntoView({ behavior: 'smooth' });
 			setMenuState(false); // Close mobile menu after click
@@ -64,13 +66,14 @@ export const HeroHeader = () => {
 
 							<div className="hidden lg:block">
 								<ul className="flex gap-8 text-sm">
-									{menuItems.map((item, index) => (
+									{links.map((item, index) => (
 										<li key={index}>
 											<Link
-												to={item.href}
+												onClick={() => scrollToSection(item.id)}
+												to={item.links}
 												className="text-muted-foreground hover:text-accent-foreground block transition-colors duration-200 ease-out"
 											>
-												<span>{item.name}</span>
+												<span>{item.label}</span>
 											</Link>
 										</li>
 									))}
@@ -81,13 +84,14 @@ export const HeroHeader = () => {
 						<div className="bg-background mb-6 hidden w-full flex-wrap items-center justify-end space-y-8 rounded-3xl border p-6 shadow-2xl shadow-zinc-300/20 in-data-[state=active]:block md:flex-nowrap lg:m-0 lg:flex lg:w-fit lg:gap-6 lg:space-y-0 lg:border-transparent lg:bg-transparent lg:p-0 lg:shadow-none lg:in-data-[state=active]:flex dark:shadow-none dark:lg:bg-transparent">
 							<div className="lg:hidden">
 								<ul className="space-y-6 text-base">
-									{menuItems.map((item, index) => (
+									{links.map((item, index) => (
 										<li key={index}>
 											<Link
-												to={item.href}
+												onClick={() => scrollToSection(item.id)}
+												to={item.links}
 												className="text-muted-foreground hover:text-accent-foreground block transition-colors duration-200 ease-out"
 											>
-												<span>{item.name}</span>
+												<span>{item.label}</span>
 											</Link>
 										</li>
 									))}

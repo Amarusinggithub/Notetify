@@ -1,5 +1,5 @@
 import { Link } from 'react-router';
-import AppLogo from './app-logo';
+import AppLogo from '../app-logo';
 
 const links = [
 	{
@@ -24,9 +24,9 @@ const links = [
 	},
 ];
 
-export default function FooterSection() {
+export default function Footer() {
 	return (
-		<footer className="py-16 md:py-32">
+		<footer className="py-16 md:py-32" id='about'>
 			<div className="mx-auto max-w-5xl px-6">
 				<Link to="/" aria-label="go home" className="mx-auto block size-fit">
 					<AppLogo />

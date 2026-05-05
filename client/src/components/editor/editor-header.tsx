@@ -24,12 +24,12 @@ import {
 	useDeleteNote,
 	useFetchNote,
 	useUpdateNote,
-} from '../hooks/use-note.ts';
-import { useStore } from '../stores/index.ts';
-import { Breadcrumbs } from './breadcrumbs';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { Badge } from './ui/badge';
-import { Button } from './ui/button';
+} from '../../hooks/use-note.ts';
+import { useStore } from '../../stores/index.ts';
+import { Breadcrumbs } from '../breadcrumbs';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -40,11 +40,11 @@ import {
 	DropdownMenuSubContent,
 	DropdownMenuSubTrigger,
 	DropdownMenuTrigger,
-} from './ui/dropdown-menu';
-import { NotesSidebarTrigger, useNotesSidebar } from './ui/notes-sidebar';
-import { Separator } from './ui/separator';
-import { useSidebar } from './ui/sidebar';
-import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
+} from '../ui/dropdown-menu';
+import { NotesSidebarTrigger, useNotesSidebar } from '../ui/notes-sidebar';
+import { Separator } from '../ui/separator';
+import { useSidebar } from '../ui/sidebar';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 
 export function EditorHeader({
 	breadcrumbs = [],

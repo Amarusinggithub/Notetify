@@ -17,22 +17,23 @@ import { EditorContent, Extension, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { AlertCircle, GripVertical, RefreshCw } from 'lucide-react';
 import { useEffect, useRef } from 'react';
-import { ScrollArea } from '../components/ui/scroll-area.tsx';
-import { Skeleton } from '../components/ui/skeleton.tsx';
-import { NoteEditorProvider } from '../context/editor-context.tsx';
-import { useFetchNote, useUpdateNote } from '../hooks/use-note.ts';
-import { cn } from '../lib/utils';
-import { useStore } from '../stores/index.ts';
+import { NoteEditorProvider } from '../../context/editor-context.tsx';
+import { useFetchNote, useUpdateNote } from '../../hooks/use-note.ts';
+import { cn } from '../../lib/utils.ts';
+import { useStore } from '../../stores/index.ts';
+import { EditorHeader, EditorHeaderSkeleton } from './editor-header.tsx';
+import EditorToolbar from './editor-toolbar.tsx';
+import suggestion from '../suggestion.tsx';
+import { Button } from '../ui/button.tsx';
+import { ScrollArea } from '../ui/scroll-area.tsx';
+import { Skeleton } from '../ui/skeleton.tsx';
 import EditorFooter from './editor-footer';
-import { EditorHeader, EditorHeaderSkeleton } from './editor-header';
-import EditorToolbar from './editor-toolbar';
-import suggestion from './suggestion';
-import { Button } from './ui/button';
 
 export const Editor = () => {
 	const lastLoadedId = useRef<string | null>(null);
 	const currentNoteId = useStore((s) => s.selectedNoteId);
 	const isMounted = useRef(false);
+	const isLoadingContent = useRef(false);
 
 	useEffect(() => {
 		isMounted.current = true;
@@ -70,20 +71,25 @@ export const Editor = () => {
 			isMounted.current = false;
 		},
 		onUpdate: ({ editor: currentEditor }) => {
+			// Skip saves triggered by programmatic content loads (note switching)
+			if (isLoadingContent.current) return;
 			// Debounced auto-save
 			if (currentUserNote) {
-				if (currentUserNote.note.content != currentEditor.getHTML()) {
+				const html = currentEditor.getHTML();
+
+				if (currentUserNote.note.content != html) {
 					//Clear the previous timer if it exists
 					if (saveTimeoutRef.current) {
 						clearTimeout(saveTimeoutRef.current);
 					}
 
+					const noteId = currentUserNote.id;
+
 					//Set the new timer
 					saveTimeoutRef.current = setTimeout(() => {
-						const html = currentEditor.getHTML();
-
+						saveTimeoutRef.current = null;
 						updateNoteMutation.mutate({
-							id: currentUserNote.id,
+							id: noteId,
 							payload: { content: html },
 						});
 					}, 2000);
@@ -200,6 +206,14 @@ export const Editor = () => {
 	});
 
 	useEffect(() => {
+		return () => {
+			if (!saveTimeoutRef.current) return;
+
+			clearTimeout(saveTimeoutRef.current);
+			saveTimeoutRef.current = null;
+		};
+	}, [currentUserNote?.id]);
+	useEffect(() => {
 		if (!editor) return;
 
 		const noteId = currentUserNote?.id;
@@ -213,13 +227,10 @@ export const Editor = () => {
 
 		if (lastLoadedId.current !== noteId) {
 			lastLoadedId.current = noteId;
-
-			const initContent = async () => {
-				const dbContent = currentUserNote.note?.content ?? '';
-				editor.commands.setContent(dbContent);
-			};
-
-			initContent();
+			const dbContent = currentUserNote.note?.content ?? '';
+			isLoadingContent.current = true;
+			editor.commands.setContent(dbContent);
+			isLoadingContent.current = false;
 		}
 	}, [editor, currentUserNote?.id]);
 

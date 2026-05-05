@@ -10,9 +10,8 @@
     /* Bundler mode */
     "moduleResolution": "bundler",
     "rootDir": "./" /* Specify the root folder within your source files. */,
-    "baseUrl": "./src" /* Specify the base directory to resolve non-relative module names. */,
     "paths": {
-      "@/*": ["./src/*"]
+    "@/*": ["./src/*"]
     },
     "outDir": "./dist" /* Specify an output folder for all emitted files. */,
 
@@ -36,6 +35,7 @@
     "cypress.config.ts",
     "cypress/**/*.ts",
     "cypress",
-    "src/vite-env.d.ts"
-  ]
+    "src/vite-env.d.ts",    "**/*.ts",
+    "**/*.tsx",
+  ],  "exclude": ["node_modules"]
 }

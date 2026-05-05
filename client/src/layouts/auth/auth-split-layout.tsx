@@ -1,6 +1,6 @@
 import { type PropsWithChildren } from 'react';
 import { Link } from 'react-router';
-import useAuth from 'stores/slices/auth-slice';
+import {useStore} from '../../stores/index';
 import AppLogoIcon from '../../components/app-logo-icon';
 
 interface AuthLayoutProps {
@@ -13,9 +13,9 @@ export default function AuthSplitLayout({
 	title,
 	description,
 }: PropsWithChildren<AuthLayoutProps>) {
-	const { sharedData } = useAuth();
+const sharedData = useStore((s) => s.sharedData);
 
-	const { name, quote } = sharedData;
+	const name = sharedData?.name;
 	return (
 		<div className="relative grid h-dvh flex-col items-center justify-center px-8 sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0">
 			<div className="bg-muted relative hidden h-full flex-col p-10 text-white lg:flex dark:border-r">
@@ -27,19 +27,10 @@ export default function AuthSplitLayout({
 					<AppLogoIcon className="mr-2 size-8 fill-current text-white" />
 					{name}
 				</Link>
-				{quote && (
-					<div className="relative z-20 mt-auto">
-						<blockquote className="space-y-2">
-							<p className="text-lg">&ldquo;{quote.message}&rdquo;</p>
-							<footer className="text-sm text-neutral-300">
-								{quote.author}
-							</footer>
-						</blockquote>
-					</div>
-				)}
+
 			</div>
 			<div className="w-full lg:p-8">
-				<div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
+				<div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-87.5">
 					<Link
 						to={'/home'}
 						className="relative z-20 flex items-center justify-center lg:hidden"

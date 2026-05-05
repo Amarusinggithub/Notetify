@@ -8,7 +8,7 @@ import {
 	EditorContentPreview,
 	EditorError,
 	EditorLoadingSkeleton,
-} from '../../components/editor';
+} from '../../components/editor/editor.tsx';
 import {
 	NotesSidebarInset,
 	NotesSidebarProvider,
@@ -78,10 +78,6 @@ export default function Notes() {
 					is_trashed: false,
 				},
 				{
-					onSuccess: (created) => {
-						setSelected(created.id);
-						navigate(`/notes/${created.id}`, { replace: true });
-					},
 					onSettled: () => {
 						isCreatingRef.current = false;
 					},

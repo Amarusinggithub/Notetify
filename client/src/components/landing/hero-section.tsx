@@ -1,10 +1,10 @@
 import { Link } from 'react-router';
-import dark from '../assets/dark.png';
-import light from '../assets/light.png';
-import { AnimatedGroup } from '../components/ui/animated-group';
-import { TextEffect } from '../components/ui/text-effect';
-import { useStore } from '../stores/index.ts';
-import { Button } from './ui/button';
+import dark from '../../assets/dark.png';
+import light from '../../assets/light.png';
+import { AnimatedGroup } from '../../components/ui/animated-group';
+import { TextEffect } from '../../components/ui/text-effect';
+import { useStore } from '../../stores/index.ts';
+import { Button } from '../ui/button';
 
 const transitionVariants = {
 	item: {

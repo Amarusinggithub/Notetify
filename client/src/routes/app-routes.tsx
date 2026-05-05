@@ -1,18 +1,17 @@
 import { lazy } from 'react';
-import { createBrowserRouter, Navigate, RouterProvider } from 'react-router';
+import {
+	createBrowserRouter,
+	Navigate,
+	RouterProvider,
+	type RouteObject,
+} from 'react-router';
 import { notesLoader } from '../components/app-notes-sidebar.tsx';
 import AppLayout from '../layouts/app-layout';
 import SettingsLayout from '../layouts/settings/layout';
 import { useStore } from '../stores/index.ts';
-
-function LoadingSpinner({ message = 'Loading...' }: { message?: string }) {
-	return (
-		<div className="flex h-screen flex-col items-center justify-center gap-4">
-			<div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-200 border-t-green-500" />
-			<p className="text-muted-foreground text-lg">{message}</p>
-		</div>
-	);
-}
+import LandingLayout from '@/layouts/lannding/layout.tsx';
+import LoadingPage from '@/pages/loading.tsx';
+import NotFound from '@/pages/not-found.tsx';
 
 const Notes = lazy(() => import('../pages/app/notes'));
 const Notebooks = lazy(() => import('../pages/app/notebook'));
@@ -39,59 +38,61 @@ const Landing = lazy(() => import('../pages/landing'));
 
 function AppRoutes() {
 	const checkingAuth = useStore((state) => state.checkingAuth);
-    const  isAuthenticated = useStore((state)=> state.isAuthenticated);
+	const isAuthenticated = useStore((state) => state.isAuthenticated);
 
-	if (checkingAuth) return <LoadingSpinner message="Checking session..." />;
+	if (checkingAuth) return <LoadingPage message="Checking session..." />;
 
-	const publicRoutes = [
+	const publicRoutes: RouteObject[] = [
 		{
-			index: true,
-			Component: Landing,
-			HydrateFallback: LoadingSpinner,
+			Component: LandingLayout,
+			HydrateFallback: LoadingPage,
+			children: [
+				{ index: true, Component: Landing },
+			],
 		},
 		{
 			path: 'login',
 			Component: Login,
-			HydrateFallback: LoadingSpinner,
+			HydrateFallback: LoadingPage,
 		},
 		{
 			path: 'forgot-password',
 			Component: ForgotPassword,
-			HydrateFallback: LoadingSpinner,
+			HydrateFallback: LoadingPage,
 		},
 		{
 			path: 'reset-password/:token',
 			Component: ResetPassword,
-			HydrateFallback: LoadingSpinner,
+			HydrateFallback: LoadingPage,
 		},
 		{
 			path: 'verify-email',
 			Component: VerifyEmail,
-			HydrateFallback: LoadingSpinner,
+			HydrateFallback: LoadingPage,
 		},
 		{
 			path: 'Two-factor-verification',
 			Component: TwoFactorVerification,
-			HydrateFallback: LoadingSpinner,
+			HydrateFallback: LoadingPage,
 		},
 		{
 			path: 'register',
 			Component: Register,
-			HydrateFallback: LoadingSpinner,
+			HydrateFallback: LoadingPage,
 		},
 		{
 			path: '*',
-			Component: () => <Navigate to="/" replace />,
-			HydrateFallback: LoadingSpinner,
+			Component: NotFound,
+			HydrateFallback: LoadingPage,
 		},
 	];
 
-	const privateRoutes = [
+	const privateRoutes: RouteObject[] = [
 		{
 			path: '/',
 			id: 'notes',
 			Component: AppLayout,
-			HydrateFallback: () => <LoadingSpinner message="Loading ..." />,
+			HydrateFallback: () => <LoadingPage message="Loading ..." />,
 			children: [
 				{ index: true, Component: Home },
 				{ path: 'trash', Component: Trash },
@@ -104,6 +105,7 @@ function AppRoutes() {
 				{ path: 'notes', Component: Notes, loader: notesLoader },
 				{ path: 'notes/:noteId', Component: Notes, loader: notesLoader },
 				{ path: 'tasks', Component: Tasks },
+				{ path: '*', Component: NotFound },
 			],
 		},
 		{
@@ -113,17 +115,16 @@ function AppRoutes() {
 				{
 					index: true,
 					Component: () => <Navigate to="/settings/general" replace />,
-					HydrateFallback: () => (
-						<LoadingSpinner message="Loading Settings..." />
-					),
+					HydrateFallback: () => <LoadingPage message="Loading Settings..." />,
 				},
 				{ path: 'general', Component: General },
 				{ path: 'authentication', Component: Authentication },
 				{ path: 'billing', Component: Billing },
+				{ path: '*', Component: NotFound },
 			],
 		},
 
-		{ path: '*', Component: () => <Navigate to="/" replace /> },
+		{ path: '*', Component: NotFound },
 	];
 
 	const router = createBrowserRouter(

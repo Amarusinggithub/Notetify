@@ -1,17 +1,13 @@
-import CallToAction from '../components/call-to-action';
-import Features from '../components/feature';
-import FooterSection from '../components/footer';
-import { HeroHeader } from '../components/hero-header';
-import HeroSection from '../components/hero-section';
+import CallToAction from '../components/landing/call-to-action';
+import Features from '../components/landing/feature';
+import HeroSection from '../components/landing/hero-section';
 
 export default function Landing() {
 	return (
-		<main>
-			<HeroHeader />
+		<>
 			<HeroSection />
 			<Features />
 			<CallToAction />
-			<FooterSection />
-		</main>
+		</>
 	);
 }
