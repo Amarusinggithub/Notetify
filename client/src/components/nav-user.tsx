@@ -1,19 +1,19 @@
 import { ChevronsUpDown } from 'lucide-react';
-import { useIsMobile } from '../hooks/use-mobile';
-import { useStore } from '../stores/index.ts';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { useStore } from '@/stores/index.ts';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuTrigger,
-} from './ui/dropdown-menu';
+} from '@/components/ui/dropdown-menu';
 import {
 	SidebarMenu,
 	SidebarMenuButton,
 	SidebarMenuItem,
 	useSidebar,
-} from './ui/sidebar';
-import { UserInfo } from './user-info';
-import { UserMenuContent } from './user-menu-content';
+} from '@/components/ui/sidebar';
+import { UserInfo } from '@/components/user-info';
+import { UserMenuContent } from '@/components/user-menu-content';
 
 export function NavUser() {
 	const  sharedData  = useStore((state) => state.sharedData);

@@ -1,12 +1,12 @@
 import type { QueryFunctionContext } from '@tanstack/react-query';
-import axiosInstance from '../lib/axios';
+import axiosInstance from '@/lib/axios';
 import type {
 	CreateUserNotebook,
 	PaginatedNotebooksResponse,
 	UpdateUserNotebookPayload,
 	UserNotebook,
-} from '../types';
-import type { notebookQueryKeys } from '../utils/queryKeys';
+} from '@/types';
+import type { notebookQueryKeys } from '@/utils/queryKeys';
 
 export async function fetchNotebook({
 	queryKey,

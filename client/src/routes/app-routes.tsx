@@ -5,36 +5,36 @@ import {
 	RouterProvider,
 	type RouteObject,
 } from 'react-router';
-import { notesLoader } from '../components/app-notes-sidebar.tsx';
-import AppLayout from '../layouts/app-layout';
-import SettingsLayout from '../layouts/settings/layout';
-import { useStore } from '../stores/index.ts';
-import LandingLayout from '@/layouts/lannding/layout.tsx';
-import LoadingPage from '@/pages/loading.tsx';
-import NotFound from '@/pages/not-found.tsx';
+import { notesLoader } from '@/components/app-notes-sidebar';
+import AppLayout from '@/layouts/app-layout';
+import SettingsLayout from '@/layouts/settings/layout';
+import LandingLayout from '@/layouts/landing/layout';
+import LoadingPage from '@/pages/loading';
+import { useStore } from '@/stores/index';
 
-const Notes = lazy(() => import('../pages/app/notes'));
-const Notebooks = lazy(() => import('../pages/app/notebook'));
-const Files = lazy(() => import('../pages/app/files'));
-const Calender = lazy(() => import('../pages/app/calender'));
-const Tasks = lazy(() => import('../pages/app/tasks'));
-const Shared = lazy(() => import('../pages/app/shared'));
-const Tags = lazy(() => import('../pages/app/tags'));
-const Spaces = lazy(() => import('../pages/app/spaces'));
-const Trash = lazy(() => import('../pages/app/trash'));
-const Billing = lazy(() => import('../pages/settings/billing'));
-const General = lazy(() => import('../pages/settings/general'));
-const Authentication = lazy(() => import('../pages/settings/authentication'));
-const ForgotPassword = lazy(() => import('../pages/auth/forgot-password'));
-const ResetPassword = lazy(() => import('../pages/auth/reset-password'));
-const VerifyEmail = lazy(() => import('../pages/auth/verify-email'));
+const NotFound = lazy(() => import('@/pages/not-found'));
+const Notes = lazy(() => import('@/pages/app/notes'));
+const Notebooks = lazy(() => import('@/pages/app/notebook'));
+const Files = lazy(() => import('@/pages/app/files'));
+const Calender = lazy(() => import('@/pages/app/calender'));
+const Tasks = lazy(() => import('@/pages/app/tasks'));
+const Shared = lazy(() => import('@/pages/app/shared'));
+const Tags = lazy(() => import('@/pages/app/tags'));
+const Spaces = lazy(() => import('@/pages/app/spaces'));
+const Trash = lazy(() => import('@/pages/app/trash'));
+const Billing = lazy(() => import('@/pages/settings/billing'));
+const General = lazy(() => import('@/pages/settings/general'));
+const Authentication = lazy(() => import('@/pages/settings/authentication'));
+const ForgotPassword = lazy(() => import('@/pages/auth/forgot-password'));
+const ResetPassword = lazy(() => import('@/pages/auth/reset-password'));
+const VerifyEmail = lazy(() => import('@/pages/auth/verify-email'));
 const TwoFactorVerification = lazy(
-	() => import('../pages/auth/two-factor-verification')
+	() => import('@/pages/auth/two-factor-verification')
 );
-const Register = lazy(() => import('../pages/auth/register'));
-const Login = lazy(() => import('../pages/auth/login'));
-const Home = lazy(() => import('../pages/app/home'));
-const Landing = lazy(() => import('../pages/landing'));
+const Register = lazy(() => import('@/pages/auth/register'));
+const Login = lazy(() => import('@/pages/auth/login'));
+const Home = lazy(() => import('@/pages/app/home'));
+const Landing = lazy(() => import('@/pages/landing'));
 
 function AppRoutes() {
 	const checkingAuth = useStore((state) => state.checkingAuth);

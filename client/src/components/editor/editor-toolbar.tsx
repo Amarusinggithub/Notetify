@@ -11,7 +11,7 @@ import {
 	UnderlineIcon,
 	UndoIcon,
 } from 'lucide-react';
-import { useNoteEditor } from '../../context/editor-context.tsx';
+import { useNoteEditor } from '@/context/editor-context.tsx';
 import {
 	Toolbar,
 	ToolbarButton,
@@ -23,7 +23,7 @@ import {
 	ToolbarSeparator,
 	ToolbarTextColorButton,
 	ToolbarTextHighlightButton,
-} from '../ui/toolbar';
+} from '@/components/ui/toolbar';
 
 export default function EditorToolbar() {
 	const editor = useNoteEditor();

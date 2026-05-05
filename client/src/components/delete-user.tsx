@@ -1,7 +1,7 @@
-import HeadingSmall from './heading-small';
-import { useDeleteUser } from './hooks/use-delete-user';
-import InputError from './input-error';
-import { Button } from './ui/button';
+import HeadingSmall from '@/components/heading-small';
+import { useDeleteUser } from '@/components/hooks/use-delete-user';
+import InputError from '@/components/input-error';
+import { Button } from '@/components/ui/button';
 import {
 	Dialog,
 	DialogClose,
@@ -10,9 +10,9 @@ import {
 	DialogFooter,
 	DialogTitle,
 	DialogTrigger,
-} from './ui/dialog';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 export default function DeleteUser() {
 	const {

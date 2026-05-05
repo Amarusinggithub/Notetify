@@ -18,18 +18,18 @@ import {
 } from 'lucide-react';
 import React, { lazy, useState } from 'react';
 import type { ColorResult } from 'react-color';
-import { useNoteEditor } from '../../context/editor-context.tsx';
-import { cn } from '../../lib/utils';
-import { Button } from './button';
+import { useNoteEditor } from '@/context/editor-context.tsx';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuTrigger,
-} from './dropdown-menu';
-import { Input } from './input';
-import { Separator } from './separator';
-import { Tooltip, TooltipContent, TooltipTrigger } from './tooltip';
+} from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
+import { Separator } from '@/components/ui/separator';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 import {
 	Dialog,
@@ -37,7 +37,7 @@ import {
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
-} from './dialog';
+} from '@/components/ui/dialog';
 
 const CompactPicker = lazy(() =>
 	import('react-color').then((m) => ({ default: m.CompactPicker }))

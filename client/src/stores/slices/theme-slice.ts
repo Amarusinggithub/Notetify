@@ -1,6 +1,6 @@
 import { type StateCreator } from 'zustand';
-import type { Language, Theme } from '../../types';
-import type { StoreState } from '../index';
+import type { Language, Theme } from '@/types';
+import type { StoreState } from '@/stores/index';
 
 type ThemeSliceState = {
 	theme: Theme;

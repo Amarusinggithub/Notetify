@@ -8,9 +8,9 @@ import {
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Link } from 'react-router';
-import AppLogoIcon from '../components/app-logo-icon';
-import { Button } from '../components/ui/button';
-import { useStore } from '../stores/index.ts';
+import AppLogoIcon from '@/components/app-logo-icon';
+import { Button } from '@/components/ui/button';
+import { useStore } from '@/stores/index.ts';
 
 type QuickLink = {
 	description: string;

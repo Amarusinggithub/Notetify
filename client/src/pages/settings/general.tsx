@@ -4,23 +4,23 @@ import {
 	Avatar,
 	AvatarFallback,
 	AvatarImage,
-} from '../../components/ui/avatar';
-import { Button } from '../../components/ui/button';
-import { Input } from '../../components/ui/input';
-import { Label } from '../../components/ui/label';
-import { RadioGroup, RadioGroupItem } from '../../components/ui/radio-group';
+} from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import {
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-} from '../../components/ui/select';
-import { Separator } from '../../components/ui/separator';
-import { Switch } from '../../components/ui/switch';
-import { useInitials } from '../../hooks/use-initials';
-import { useStore } from '../../stores/index';
-import { type Theme } from '../../types';
+} from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
+import { Switch } from '@/components/ui/switch';
+import { useInitials } from '@/hooks/use-initials';
+import { useStore } from '@/stores/index';
+import { type Theme } from '@/types';
 
 type NotificationPrefs = {
 	emailNotificationEnabled: boolean;

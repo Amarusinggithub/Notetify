@@ -6,23 +6,23 @@ import {
 	type InfiniteData,
 } from '@tanstack/react-query';
 import { useNavigate, useRevalidator } from 'react-router';
-import { queryClient } from '../App';
+import { queryClient } from '@/App';
 import {
 	createNotebook,
 	deleteNotebook,
 	fetchNotebook,
 	fetchNotebooksPage,
 	updateNotebook,
-} from '../services/notebook-service.ts';
-import { useStore } from '../stores/index.ts';
+} from '@/services/notebook-service.ts';
+import { useStore } from '@/stores/index.ts';
 import {
 	type CreateUserNotebook,
 	type PaginatedNotebooksResponse,
 	type SortBy,
 	type UpdateUserNotebookPayload,
 	type UserNotebook,
-} from '../types/index.ts';
-import { notebookQueryKeys } from '../utils/queryKeys.ts';
+} from '@/types/index.ts';
+import { notebookQueryKeys } from '@/utils/queryKeys.ts';
 
 type NotebooksType =
 	| UserNotebook[]

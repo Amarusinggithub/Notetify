@@ -1,6 +1,6 @@
-import { useInitials } from '../hooks/use-initials';
-import { type User } from '../types';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { useInitials } from '@/hooks/use-initials';
+import { type User } from '@/types';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 type UserInfoProps = { user: User; showEmail?: boolean };
 

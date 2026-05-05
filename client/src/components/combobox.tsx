@@ -1,8 +1,8 @@
 import { CheckIcon, ChevronsUpDownIcon } from 'lucide-react';
 import * as React from 'react';
 
-import { cn } from '../lib/utils';
-import { Button } from './ui/button';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 import {
 	Command,
 	CommandEmpty,
@@ -10,8 +10,8 @@ import {
 	CommandInput,
 	CommandItem,
 	CommandList,
-} from './ui/command';
-import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
+} from '@/components/ui/command';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 const frameworks = [
 	{

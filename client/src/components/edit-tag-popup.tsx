@@ -1,9 +1,9 @@
 import { Dialog, DialogContent, DialogTitle } from '@radix-ui/react-dialog';
 import React, { useEffect, useRef, useState } from 'react';
-import useMutateTag from '../hooks/use-tag';
-import { Button } from './ui/button';
-import { DialogClose, DialogFooter, DialogHeader } from './ui/dialog';
-import { Input } from './ui/input';
+import useMutateTag from '@/hooks/use-tag';
+import { Button } from '@/components/ui/button';
+import { DialogClose, DialogFooter, DialogHeader } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 
 const EditTagPopup = () => {
 	const [TagName, setTagName] = useState('');

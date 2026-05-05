@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
-import { Button } from '../../components/ui/button';
+import { Button } from '@/components/ui/button';
 import {
 	Form,
 	FormControl,
@@ -12,13 +12,13 @@ import {
 	FormItem,
 	FormLabel,
 	FormMessage,
-} from '../../components/ui/form';
+} from '@/components/ui/form';
 import {
 	InputOTP,
 	InputOTPGroup,
 	InputOTPSlot,
-} from '../../components/ui/input-otp';
-import AuthLayout from '../../layouts/auth-layout';
+} from '@/components/ui/input-otp';
+import AuthLayout from '@/layouts/auth-layout';
 
 const InputOTPFormSchema = z.object({
 	pin: z.string().min(6, {

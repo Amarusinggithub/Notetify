@@ -2,11 +2,11 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import * as React from 'react';
 
 import { useTransition } from 'react';
-import { useIsMobile } from '../../hooks/use-mobile';
-import { cn } from '../../lib/utils';
-import { Button } from './button';
-import { Separator } from './separator';
-import { TooltipProvider } from './tooltip';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { TooltipProvider } from '@/components/ui/tooltip';
 const NOTES_SIDEBAR_COOKIE_NAME = 'sidebar_state';
 const NOTES_SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 const NOTES_SIDEBAR_WIDTH = '20rem';

@@ -6,22 +6,22 @@ import {
 	type InfiniteData,
 } from '@tanstack/react-query';
 import { useRevalidator } from 'react-router';
-import { queryClient } from '../App';
+import { queryClient } from '@/App';
 import {
 	createTag,
 	deleteTag,
 	fetchTag,
 	fetchTagsPage,
 	updateTag,
-} from '../services/tag-service';
-import { useStore } from '../stores/index';
-import type { PaginatedTagResponse, SortBy } from '../types';
+} from '@/services/tag-service';
+import { useStore } from '@/stores/index';
+import type { PaginatedTagResponse, SortBy } from '@/types';
 import {
 	type CreateUserTag,
 	type UpdateUserTagPayload,
 	type UserTag,
-} from '../types/index';
-import { tagQueryKeys } from '../utils/queryKeys';
+} from '@/types/index';
+import { tagQueryKeys } from '@/utils/queryKeys';
 
 type TagsType =
 	| UserTag[]

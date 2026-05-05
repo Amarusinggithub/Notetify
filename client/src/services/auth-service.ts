@@ -1,6 +1,6 @@
 import axios from 'axios';
-import axiosInstance, { ensureCSRFToken } from '../lib/axios';
-import type { SharedData, User } from '../types';
+import axiosInstance, { ensureCSRFToken } from '@/lib/axios';
+import type { SharedData, User } from '@/types';
 
 type LoginParams = { email: string; password: string; remember?: boolean };
 

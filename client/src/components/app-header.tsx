@@ -1,42 +1,42 @@
 import { BookOpen, Folder, Home, Menu, Search } from 'lucide-react';
 import { Link, useLocation } from 'react-router';
-import { useInitials } from '../hooks/use-initials';
-import { type BreadcrumbItem, type NavItem } from '../types';
+import { useInitials } from '@/hooks/use-initials';
+import { type BreadcrumbItem, type NavItem } from '@/types';
 
-import { cn } from '../lib/utils';
-import AppLogo from './app-logo';
-import AppLogoIcon from './app-logo-icon';
-import { Breadcrumbs } from './breadcrumbs';
-import { Icon } from './icon';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { Button } from './ui/button';
+import { cn } from '@/lib/utils';
+import AppLogo from '@/components/app-logo';
+import AppLogoIcon from '@/components/app-logo-icon';
+import { Breadcrumbs } from '@/components/breadcrumbs';
+import { Icon } from '@/components/icon';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuTrigger,
-} from './ui/dropdown-menu';
+} from '@/components/ui/dropdown-menu';
 
-import { useStore } from '../stores/index.ts';
+import { useStore } from '@/stores/index.ts';
 import {
 	NavigationMenu,
 	NavigationMenuItem,
 	NavigationMenuList,
 	navigationMenuTriggerStyle,
-} from './ui/navigation-menu';
+} from '@/components/ui/navigation-menu';
 import {
 	Sheet,
 	SheetContent,
 	SheetHeader,
 	SheetTitle,
 	SheetTrigger,
-} from './ui/sheet';
+} from '@/components/ui/sheet';
 import {
 	Tooltip,
 	TooltipContent,
 	TooltipProvider,
 	TooltipTrigger,
-} from './ui/tooltip';
-import { UserMenuContent } from './user-menu-content';
+} from '@/components/ui/tooltip';
+import { UserMenuContent } from '@/components/user-menu-content';
 
 const mainNavItems: NavItem[] = [
 	{

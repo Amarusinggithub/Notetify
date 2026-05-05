@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import type { FallbackProps } from 'react-error-boundary';
-import { Button } from '../components/ui/button';
+import { Button } from '@/components/ui/button';
 import {
 	Card,
 	CardContent,
@@ -16,13 +16,13 @@ import {
 	CardFooter,
 	CardHeader,
 	CardTitle,
-} from '../components/ui/card';
+} from '@/components/ui/card';
 import {
 	Collapsible,
 	CollapsibleContent,
 	CollapsibleTrigger,
-} from '../components/ui/collapsible';
-import { cn } from '../lib/utils';
+} from '@/components/ui/collapsible';
+import { cn } from '@/lib/utils';
 
 
 function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {

@@ -1,13 +1,13 @@
 import { LoaderCircle } from 'lucide-react';
 import { type FormEvent, useState } from 'react';
 import { useParams } from 'react-router';
-import InputError from '../../components/input-error';
-import { Button } from '../../components/ui/button.tsx';
-import { Input } from '../../components/ui/input';
-import { Label } from '../../components/ui/label';
-import AuthLayout from '../../layouts/auth-layout';
-import { useStore } from '../../stores/index.ts';
-import { resetPasswordSchema } from '../../utils/validators.ts';
+import InputError from '@/components/input-error';
+import { Button } from '@/components/ui/button.tsx';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import AuthLayout from '@/layouts/auth-layout';
+import { useStore } from '@/stores/index.ts';
+import { resetPasswordSchema } from '@/utils/validators.ts';
 
 type ResetPasswordForm = {
 	password: string;

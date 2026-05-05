@@ -6,10 +6,10 @@ import {
 	BreadcrumbList,
 	BreadcrumbPage,
 	BreadcrumbSeparator,
-} from './ui/breadcrumb';
+} from '@/components/ui/breadcrumb';
 
 import { Fragment } from 'react';
-import { type BreadcrumbItem as BreadcrumbItemType } from '../types';
+import { type BreadcrumbItem as BreadcrumbItemType } from '@/types';
 
 export function Breadcrumbs({
 	breadcrumbs,

@@ -1,6 +1,6 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import { CSRF_TOKEN_COOKIE_NAME } from '../types';
+import { CSRF_TOKEN_COOKIE_NAME } from '@/types';
 
 // Normalize base URL to ensure it targets the Laravel API prefix.
 // If VITE_BASE_URL is "http://localhost:8000", we append "/api".

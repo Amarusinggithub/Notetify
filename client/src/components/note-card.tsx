@@ -2,17 +2,17 @@ import { useQueryClient } from '@tanstack/react-query';
 import { formatDistanceToNow } from 'date-fns';
 import { useRef } from 'react';
 import { useNavigate } from 'react-router';
-import { noteQueryOptions } from '../hooks/use-note.ts';
-import { cn } from '../lib/utils';
-import { useStore } from '../stores/index.ts';
-import type { UserNote } from '../types';
+import { noteQueryOptions } from '@/hooks/use-note.ts';
+import { cn } from '@/lib/utils';
+import { useStore } from '@/stores/index.ts';
+import type { UserNote } from '@/types';
 import {
 	Card,
 	CardContent,
 	CardFooter,
 	CardHeader,
 	CardTitle,
-} from './ui/card';
+} from '@/components/ui/card';
 
 type NoteCardProp = {
 	userNote: UserNote;

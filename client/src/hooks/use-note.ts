@@ -6,21 +6,21 @@ import {
 	type InfiniteData,
 } from '@tanstack/react-query';
 import { useNavigate, useRevalidator } from 'react-router';
-import { queryClient } from '../App';
-import { fetchNote, fetchNotesPage } from '../services/note-service';
+import { queryClient } from '@/App';
+import { fetchNote, fetchNotesPage } from '@/services/note-service';
 import {
 	createNote,
 	deleteNote,
 	updateNote,
-} from '../services/note-service.ts';
-import { useStore } from '../stores/index.ts';
-import type { PaginatedNotesResponse, SortBy } from '../types';
+} from '@/services/note-service.ts';
+import { useStore } from '@/stores/index.ts';
+import type { PaginatedNotesResponse, SortBy } from '@/types';
 import {
 	type CreateUserNote,
 	type UpdateUserNotePayload,
 	type UserNote,
-} from '../types/index.ts';
-import { noteQueryKeys } from '../utils/queryKeys.ts';
+} from '@/types/index.ts';
+import { noteQueryKeys } from '@/utils/queryKeys.ts';
 
 type NotesType =
 	| UserNote[]

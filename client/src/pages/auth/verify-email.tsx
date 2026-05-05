@@ -1,10 +1,10 @@
 import { LoaderCircle } from 'lucide-react';
 import { type FormEvent } from 'react';
 
-import TextLink from '../../components/text-link';
-import { Button } from '../../components/ui/button.tsx';
-import AuthLayout from '../../layouts/auth-layout';
-import { useStore } from '../../stores/index.ts';
+import TextLink from '@/components/text-link';
+import { Button } from '@/components/ui/button.tsx';
+import AuthLayout from '@/layouts/auth-layout';
+import { useStore } from '@/stores/index.ts';
 
 export default function VerifyEmail() {
 	const { isLoading, VerifyEmail, sharedData } = useStore();

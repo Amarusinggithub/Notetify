@@ -1,13 +1,13 @@
 import { type ComponentPropsWithoutRef } from 'react';
-import { type NavItem } from '../types';
-import { Icon } from './icon';
+import { type NavItem } from '@/types';
+import { Icon } from '@/components/icon';
 import {
 	SidebarGroup,
 	SidebarGroupContent,
 	SidebarMenu,
 	SidebarMenuButton,
 	SidebarMenuItem,
-} from './ui/sidebar';
+} from '@/components/ui/sidebar';
 
 export function NavFooter({
 	items,

@@ -1,9 +1,9 @@
 import type { StoreState } from 'stores';
 import { type StateCreator } from 'zustand';
-import * as authService from '../../services/auth-service';
-import type { SharedData } from '../../types';
-import type { FormErrors } from '../../utils/helpers';
-import { mapAxiosErrorToFieldErrors } from '../../utils/helpers';
+import * as authService from '@/services/auth-service';
+import type { SharedData } from '@/types';
+import type { FormErrors } from '@/utils/helpers';
+import { mapAxiosErrorToFieldErrors } from '@/utils/helpers';
 
 type LoginParams = { email: string; password: string; remember?: boolean };
 type AuthenticationStepType = 'credentials' | 'two-factor' | 'recovery';

@@ -2,20 +2,20 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Suspense, useEffect, useRef } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useNavigate, useParams, useRouteLoaderData } from 'react-router';
-import { EditorNotesSidebar } from '../../components/app-notes-sidebar';
+import { EditorNotesSidebar } from '@/components/app-notes-sidebar';
 import {
 	Editor,
 	EditorContentPreview,
 	EditorError,
 	EditorLoadingSkeleton,
-} from '../../components/editor/editor.tsx';
+} from '@/components/editor/editor.tsx';
 import {
 	NotesSidebarInset,
 	NotesSidebarProvider,
-} from '../../components/ui/notes-sidebar';
-import { noteQueryOptions, useCreateNote } from '../../hooks/use-note.ts';
-import { useStore } from '../../stores/index.ts';
-import { noteQueryKeys } from '../../utils/queryKeys.ts';
+} from '@/components/ui/notes-sidebar';
+import { noteQueryOptions, useCreateNote } from '@/hooks/use-note.ts';
+import { useStore } from '@/stores/index.ts';
+import { noteQueryKeys } from '@/utils/queryKeys.ts';
 
 export default function Notes() {
 	const { noteId } = useParams();

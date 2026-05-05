@@ -8,9 +8,9 @@ import {
 	Settings,
 	Sparkles,
 } from 'lucide-react';
-import { useMobileNavigation } from '../hooks/use-mobile-navigation';
-import { useStore } from '../stores/index.ts';
-import { type User } from '../types';
+import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
+import { useStore } from '@/stores/index.ts';
+import { type User } from '@/types';
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -22,15 +22,15 @@ import {
 	AlertDialogPortal,
 	AlertDialogTitle,
 	AlertDialogTrigger,
-} from './ui/alert-dialog';
-import { Button } from './ui/button';
+} from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
 import {
 	DropdownMenuGroup,
 	DropdownMenuItem,
 	DropdownMenuLabel,
 	DropdownMenuSeparator,
-} from './ui/dropdown-menu';
-import { UserInfo } from './user-info';
+} from '@/components/ui/dropdown-menu';
+import { UserInfo } from '@/components/user-info';
 
 interface UserMenuContentProps {
 	user: User;

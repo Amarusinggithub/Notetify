@@ -8,7 +8,7 @@ import {
 	SidebarMenuButton,
 	SidebarMenuItem,
 	SidebarSeparator,
-} from './ui/sidebar';
+} from '@/components/ui/sidebar';
 
 import { ScrollArea } from '@radix-ui/react-scroll-area';
 import {
@@ -30,29 +30,29 @@ import {
 	Trash2,
 	UsersRound,
 } from 'lucide-react';
-import { useCreateNote } from '../hooks/use-note.ts';
-import { useStore } from '../stores/index.ts';
-import { type NavItem } from '../types';
-import AppLogo from './app-logo';
-import { NavMain } from './nav-main';
-import { NavUser } from './nav-user';
-import { SearchInput } from './search-input';
-import { Button } from './ui/button';
+import { useCreateNote } from '@/hooks/use-note.ts';
+import { useStore } from '@/stores/index.ts';
+import { type NavItem } from '@/types';
+import AppLogo from '@/components/app-logo';
+import { NavMain } from '@/components/nav-main';
+import { NavUser } from '@/components/nav-user';
+import { SearchInput } from '@/components/search-input';
+import { Button } from '@/components/ui/button';
 import {
 	Dialog,
 	DialogContent,
 	DialogOverlay,
 	DialogPortal,
 	DialogTrigger,
-} from './ui/dialog';
+} from '@/components/ui/dialog';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuGroup,
 	DropdownMenuItem,
 	DropdownMenuTrigger,
-} from './ui/dropdown-menu';
-import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
+} from '@/components/ui/dropdown-menu';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 const mainNavItems: NavItem[] = [
 	{

@@ -1,6 +1,6 @@
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
-import '../styles/note-card-skeleton.css';
+import '@/styles/note-card-skeleton.css';
 
 type CardSkeleton = {
 	cards: number;

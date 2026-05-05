@@ -2,10 +2,10 @@ import { Menu, X } from 'lucide-react';
 import { useScroll } from 'motion/react';
 import React from 'react';
 import { Link } from 'react-router';
-import { cn } from '../../lib/utils';
-import AppLogo from '../app-logo';
-import { ModeToggle } from '../mode-toggle';
-import { Button } from '../ui/button';
+import { cn } from '@/lib/utils';
+import AppLogo from '@/components/app-logo';
+import { ModeToggle } from '@/components/mode-toggle';
+import { Button } from '@/components/ui/button';
 
 const links = [
 	{ label: 'Features', links: '#features', id:'features' },

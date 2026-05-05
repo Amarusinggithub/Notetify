@@ -1,6 +1,6 @@
 import type { StoreState } from 'stores';
 import type { StateCreator } from 'zustand';
-import type { SortBy } from '../../types';
+import type { SortBy } from '@/types';
 
 export type NotesSliceState = {
 	selectedNoteId: string | null;

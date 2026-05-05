@@ -17,17 +17,17 @@ import { EditorContent, Extension, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { AlertCircle, GripVertical, RefreshCw } from 'lucide-react';
 import { useEffect, useRef } from 'react';
-import { NoteEditorProvider } from '../../context/editor-context.tsx';
-import { useFetchNote, useUpdateNote } from '../../hooks/use-note.ts';
-import { cn } from '../../lib/utils.ts';
-import { useStore } from '../../stores/index.ts';
-import { EditorHeader, EditorHeaderSkeleton } from './editor-header.tsx';
-import EditorToolbar from './editor-toolbar.tsx';
-import suggestion from '../suggestion.tsx';
-import { Button } from '../ui/button.tsx';
-import { ScrollArea } from '../ui/scroll-area.tsx';
-import { Skeleton } from '../ui/skeleton.tsx';
-import EditorFooter from './editor-footer';
+import { NoteEditorProvider } from '@/context/editor-context.tsx';
+import { useFetchNote, useUpdateNote } from '@/hooks/use-note.ts';
+import { cn } from '@/lib/utils.ts';
+import { useStore } from '@/stores/index.ts';
+import { EditorHeader, EditorHeaderSkeleton } from '@/components/editor/editor-header.tsx';
+import EditorToolbar from '@/components/editor/editor-toolbar.tsx';
+import suggestion from '@/components/suggestion.tsx';
+import { Button } from '@/components/ui/button.tsx';
+import { ScrollArea } from '@/components/ui/scroll-area.tsx';
+import { Skeleton } from '@/components/ui/skeleton.tsx';
+import EditorFooter from '@/components/editor/editor-footer';
 
 export const Editor = () => {
 	const lastLoadedId = useRef<string | null>(null);

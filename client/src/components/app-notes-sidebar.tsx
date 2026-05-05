@@ -10,7 +10,7 @@ import {
 	Tag as TagIcon,
 } from 'lucide-react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { Button } from './ui/button';
+import { Button } from '@/components/ui/button';
 import {
 	DropdownMenu,
 	DropdownMenuCheckboxItem,
@@ -21,35 +21,35 @@ import {
 	DropdownMenuRadioItem,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
-} from './ui/dropdown-menu';
-import { Label } from './ui/label';
+} from '@/components/ui/dropdown-menu';
+import { Label } from '@/components/ui/label';
 import {
 	NotesSidebar,
 	NotesSidebarContent,
 	NotesSidebarFooter,
 	NotesSidebarHeader,
 	NotesSidebarSeparator,
-} from './ui/notes-sidebar';
-import { ScrollArea } from './ui/scroll-area';
+} from '@/components/ui/notes-sidebar';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 import { Suspense, useEffect, useRef, useState } from 'react';
-import useDebounce from '../hooks/use-debounce';
-import { EnsureNotes, useFetchNotes } from '../hooks/use-note.ts';
-import { useStore } from '../stores/index.ts';
+import useDebounce from '@/hooks/use-debounce';
+import { EnsureNotes, useFetchNotes } from '@/hooks/use-note.ts';
+import { useStore } from '@/stores/index.ts';
 
-import NoteCard from './note-card';
-import { Card, CardContent, CardFooter, CardHeader } from './ui/card';
-import { Input } from './ui/input';
+import NoteCard from '@/components/note-card';
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import {
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-} from './ui/select';
-import { Skeleton } from './ui/skeleton';
-import { Switch } from './ui/switch';
-import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
+} from '@/components/ui/select';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Switch } from '@/components/ui/switch';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 export function notesLoader() {
 	return EnsureNotes();

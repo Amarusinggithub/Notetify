@@ -1,6 +1,6 @@
 import { LightbulbIcon } from 'lucide-react';
-import useMutateTag from '../hooks/use-tag';
-import { Button } from './ui/button';
+import useMutateTag from '@/hooks/use-tag';
+import { Button } from '@/components/ui/button';
 import {
 	Dialog,
 	DialogClose,
@@ -9,7 +9,7 @@ import {
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
-} from './ui/dialog';
+} from '@/components/ui/dialog';
 
 const DeleteTagPopup = () => {
 	const { removeTag, selectedTag, setWantToDeleteTag } = useMutateTag();

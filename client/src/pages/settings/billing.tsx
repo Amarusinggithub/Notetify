@@ -1,12 +1,12 @@
-import { Button } from '../../components/ui/button';
+import { Button } from '@/components/ui/button';
 import {
 	Card,
 	CardContent,
 	CardFooter,
 	CardHeader,
 	CardTitle,
-} from '../../components/ui/card';
-import { Label } from '../../components/ui/label';
+} from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
 
 export default function Billing() {
 	return (

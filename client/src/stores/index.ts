@@ -6,19 +6,19 @@ import {
 	subscribeWithSelector,
 } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import { createAuthSlice, type AuthSlice } from './slices/auth-slice';
-import { createNotesSlice, type NotesSlice } from './slices/notes-slice';
+import { createAuthSlice, type AuthSlice } from '@/stores/slices/auth-slice';
+import { createNotesSlice, type NotesSlice } from '@/stores/slices/notes-slice';
 
 import {
 	createNotebookSlice,
 	type NotebookSlice,
-} from './slices/notebooks-slice';
-import { createTagSlice, type TagSlice } from './slices/tags-slice';
+} from '@/stores/slices/notebooks-slice';
+import { createTagSlice, type TagSlice } from '@/stores/slices/tags-slice';
 import {
 	applyTheme,
 	createThemeSlice,
 	type ThemeSlice,
-} from './slices/theme-slice';
+} from '@/stores/slices/theme-slice';
 
 export type StoreState = NotesSlice &
 	AuthSlice &

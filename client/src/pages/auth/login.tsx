@@ -1,15 +1,15 @@
 import { LoaderCircle } from 'lucide-react';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
-import InputError from '../../components/input-error.tsx';
-import TextLink from '../../components/text-link.tsx';
-import { Button } from '../../components/ui/button.tsx';
-import { Checkbox } from '../../components/ui/checkbox.tsx';
-import { Input } from '../../components/ui/input.tsx';
-import { Label } from '../../components/ui/label.tsx';
-import AuthLayout from '../../layouts/auth-layout.tsx';
-import { useStore } from '../../stores/index.ts';
-import { loginSchema } from '../../utils/validators.ts';
+import InputError from '@/components/input-error.tsx';
+import TextLink from '@/components/text-link.tsx';
+import { Button } from '@/components/ui/button.tsx';
+import { Checkbox } from '@/components/ui/checkbox.tsx';
+import { Input } from '@/components/ui/input.tsx';
+import { Label } from '@/components/ui/label.tsx';
+import AuthLayout from '@/layouts/auth-layout.tsx';
+import { useStore } from '@/stores/index.ts';
+import { loginSchema } from '@/utils/validators.ts';
 
 type LoginForm = {
 	email: string;

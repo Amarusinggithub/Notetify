@@ -1,14 +1,14 @@
 import { Link, useLocation } from 'react-router';
-import { prefetchNotes } from '../hooks/use-note';
-import { prefetchNotebooks } from '../hooks/use-notebook';
-import { prefetchTags } from '../hooks/use-tag';
-import { type NavItem } from '../types';
+import { prefetchNotes } from '@/hooks/use-note';
+import { prefetchNotebooks } from '@/hooks/use-notebook';
+import { prefetchTags } from '@/hooks/use-tag';
+import { type NavItem } from '@/types';
 import {
 	SidebarGroup,
 	SidebarMenu,
 	SidebarMenuButton,
 	SidebarMenuItem,
-} from './ui/sidebar';
+} from '@/components/ui/sidebar';
 
 type NavMainProps = { items: NavItem[] };
 
