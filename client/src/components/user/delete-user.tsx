@@ -1,6 +1,6 @@
-import HeadingSmall from '@/components/heading-small';
+import HeadingSmall from '@/components/shared/heading-small';
 import { useDeleteUser } from '@/components/hooks/use-delete-user';
-import InputError from '@/components/input-error';
+import InputError from '@/components/shared/input-error';
 import { Button } from '@/components/ui/button';
 import {
 	Dialog,

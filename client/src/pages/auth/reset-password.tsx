@@ -1,7 +1,7 @@
 import { LoaderCircle } from 'lucide-react';
 import { type FormEvent, useState } from 'react';
 import { useParams } from 'react-router';
-import InputError from '@/components/input-error';
+import InputError from '@/components/shared/input-error';
 import { Button } from '@/components/ui/button.tsx';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';

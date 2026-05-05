@@ -23,7 +23,7 @@ import { cn } from '@/lib/utils.ts';
 import { useStore } from '@/stores/index.ts';
 import { EditorHeader, EditorHeaderSkeleton } from '@/components/editor/editor-header.tsx';
 import EditorToolbar from '@/components/editor/editor-toolbar.tsx';
-import suggestion from '@/components/suggestion.tsx';
+import suggestion from '@/components/shared/suggestion.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { ScrollArea } from '@/components/ui/scroll-area.tsx';
 import { Skeleton } from '@/components/ui/skeleton.tsx';

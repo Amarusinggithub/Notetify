@@ -3,8 +3,8 @@ import { useScroll } from 'motion/react';
 import React from 'react';
 import { Link } from 'react-router';
 import { cn } from '@/lib/utils';
-import AppLogo from '@/components/app-logo';
-import { ModeToggle } from '@/components/mode-toggle';
+import AppLogo from '@/components/app/app-logo';
+import { ModeToggle } from '@/components/shared/mode-toggle';
 import { Button } from '@/components/ui/button';
 
 const links = [

@@ -33,10 +33,10 @@ import {
 import { useCreateNote } from '@/hooks/use-note.ts';
 import { useStore } from '@/stores/index.ts';
 import { type NavItem } from '@/types';
-import AppLogo from '@/components/app-logo';
-import { NavMain } from '@/components/nav-main';
-import { NavUser } from '@/components/nav-user';
-import { SearchInput } from '@/components/search-input';
+import AppLogo from '@/components/app/app-logo';
+import { NavMain } from '@/components/navigation/nav-main';
+import { NavUser } from '@/components/navigation/nav-user';
+import { SearchInput } from '@/components/search/search-input';
 import { Button } from '@/components/ui/button';
 import {
 	Dialog,

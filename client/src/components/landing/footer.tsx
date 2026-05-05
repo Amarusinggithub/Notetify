@@ -1,5 +1,5 @@
 import { Link } from 'react-router';
-import AppLogo from '@/components/app-logo';
+import AppLogo from '@/components/app/app-logo';
 
 const links = [
 	{

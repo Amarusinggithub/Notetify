@@ -1,6 +1,6 @@
 import { type ComponentPropsWithoutRef } from 'react';
 import { type NavItem } from '@/types';
-import { Icon } from '@/components/icon';
+import { Icon } from '@/components/shared/icon';
 import {
 	SidebarGroup,
 	SidebarGroupContent,

@@ -30,7 +30,7 @@ import {
 	DropdownMenuLabel,
 	DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
-import { UserInfo } from '@/components/user-info';
+import { UserInfo } from '@/components/user/user-info';
 
 interface UserMenuContentProps {
 	user: User;

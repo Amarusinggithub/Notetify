@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Link } from 'react-router';
-import AppLogoIcon from '@/components/app-logo-icon';
+import AppLogoIcon from '@/components/app/app-logo-icon';
 import { Button } from '@/components/ui/button';
 import { useStore } from '@/stores/index.ts';
 

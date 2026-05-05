@@ -4,10 +4,10 @@ import { useInitials } from '@/hooks/use-initials';
 import { type BreadcrumbItem, type NavItem } from '@/types';
 
 import { cn } from '@/lib/utils';
-import AppLogo from '@/components/app-logo';
-import AppLogoIcon from '@/components/app-logo-icon';
-import { Breadcrumbs } from '@/components/breadcrumbs';
-import { Icon } from '@/components/icon';
+import AppLogo from '@/components/app/app-logo';
+import AppLogoIcon from '@/components/app/app-logo-icon';
+import { Breadcrumbs } from '@/components/navigation/breadcrumbs';
+import { Icon } from '@/components/shared/icon';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -36,7 +36,7 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { UserMenuContent } from '@/components/user-menu-content';
+import { UserMenuContent } from '@/components/user/user-menu-content';
 
 const mainNavItems: NavItem[] = [
 	{

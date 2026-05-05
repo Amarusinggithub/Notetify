@@ -1,6 +1,6 @@
 import { type PropsWithChildren } from 'react';
 import { Link } from 'react-router';
-import AppLogoIcon from '@/components/app-logo-icon';
+import AppLogoIcon from '@/components/app/app-logo-icon';
 import {
 	Card,
 	CardContent,

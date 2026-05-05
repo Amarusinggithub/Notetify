@@ -26,7 +26,7 @@ import {
 	useUpdateNote,
 } from '@/hooks/use-note.ts';
 import { useStore } from '@/stores/index.ts';
-import { Breadcrumbs } from '@/components/breadcrumbs';
+import { Breadcrumbs } from '@/components/navigation/breadcrumbs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';

@@ -1,7 +1,7 @@
 import { LoaderCircle } from 'lucide-react';
 import { type FormEvent } from 'react';
 
-import TextLink from '@/components/text-link';
+import TextLink from '@/components/shared/text-link';
 import { Button } from '@/components/ui/button.tsx';
 import AuthLayout from '@/layouts/auth-layout';
 import { useStore } from '@/stores/index.ts';

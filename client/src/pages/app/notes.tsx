@@ -2,7 +2,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Suspense, useEffect, useRef } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useNavigate, useParams, useRouteLoaderData } from 'react-router';
-import { EditorNotesSidebar } from '@/components/app-notes-sidebar';
+import { EditorNotesSidebar } from '@/components/app/app-notes-sidebar';
 import {
 	Editor,
 	EditorContentPreview,

@@ -1,5 +1,5 @@
 import { type BreadcrumbItem as BreadcrumbItemType } from '@/types';
-import { Breadcrumbs } from '@/components/breadcrumbs';
+import { Breadcrumbs } from '@/components/navigation/breadcrumbs';
 
 export function AppSidebarHeader({
 	breadcrumbs = [],

@@ -12,8 +12,8 @@ import {
 	SidebarMenuItem,
 	useSidebar,
 } from '@/components/ui/sidebar';
-import { UserInfo } from '@/components/user-info';
-import { UserMenuContent } from '@/components/user-menu-content';
+import { UserInfo } from '@/components/user/user-info';
+import { UserMenuContent } from '@/components/user/user-menu-content';
 
 export function NavUser() {
 	const  sharedData  = useStore((state) => state.sharedData);

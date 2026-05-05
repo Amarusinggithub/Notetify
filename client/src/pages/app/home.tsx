@@ -1,6 +1,6 @@
 //import { type BreadcrumbItem } from '@/types';
 
-import { AppSidebarHeader } from '@/components/app-sidebar-header';
+import { AppSidebarHeader } from '@/components/app/app-sidebar-header';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import type { BreadcrumbItem } from '@/types';
 

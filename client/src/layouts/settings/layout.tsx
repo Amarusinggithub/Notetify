@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation } from 'react-router';
-import Heading from '@/components/heading';
+import Heading from '@/components/shared/heading';
 import { Button } from '@/components/ui/button.tsx';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils.ts';

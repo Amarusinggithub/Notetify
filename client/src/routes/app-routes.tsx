@@ -5,7 +5,7 @@ import {
 	RouterProvider,
 	type RouteObject,
 } from 'react-router';
-import { notesLoader } from '@/components/app-notes-sidebar';
+import { notesLoader } from '@/components/app/app-notes-sidebar';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import LandingLayout from '@/layouts/landing/layout';
