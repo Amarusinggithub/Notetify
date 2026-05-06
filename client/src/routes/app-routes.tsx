@@ -74,6 +74,7 @@ function AppRoutes() {
 			path: 'Two-factor-verification',
 			Component: TwoFactorVerification,
 			HydrateFallback: LoadingPage,
+
 		},
 		{
 			path: 'register',
@@ -92,7 +93,7 @@ function AppRoutes() {
 			path: '/',
 			id: 'notes',
 			Component: AppLayout,
-			HydrateFallback: () => <LoadingPage message="Loading ..." />,
+			HydrateFallback: () => <LoadingPage message="Loading Your Workspace..." />,
 			children: [
 				{ index: true, Component: Home },
 				{ path: 'trash', Component: Trash },

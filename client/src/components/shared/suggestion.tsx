@@ -1,7 +1,7 @@
 import { computePosition } from '@floating-ui/dom';
 import { ReactRenderer } from '@tiptap/react';
 
-import { EmojiList } from '@/components/shared/emoji-list.jsx';
+import { EmojiList } from '@/components/shared/emoji-list';
 
 export default {
 	items: ({ editor, query }) => {

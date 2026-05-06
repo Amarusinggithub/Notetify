@@ -1,4 +1,3 @@
-import DragHandle from '@tiptap/extension-drag-handle-react';
 import Emoji, { gitHubEmojis } from '@tiptap/extension-emoji';
 import FontFamily from '@tiptap/extension-font-family';
 import Highlight from '@tiptap/extension-highlight';
@@ -15,19 +14,18 @@ import Youtube from '@tiptap/extension-youtube';
 import { Plugin, PluginKey } from '@tiptap/pm/state';
 import { EditorContent, Extension, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { AlertCircle, GripVertical, RefreshCw } from 'lucide-react';
+import { GripVertical } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { NoteEditorProvider } from '@/context/editor-context.tsx';
 import { useFetchNote, useUpdateNote } from '@/hooks/use-note.ts';
 import { cn } from '@/lib/utils.ts';
 import { useStore } from '@/stores/index.ts';
-import { EditorHeader, EditorHeaderSkeleton } from '@/components/editor/editor-header.tsx';
+import { EditorHeader } from '@/components/editor/editor-header.tsx';
 import EditorToolbar from '@/components/editor/editor-toolbar.tsx';
 import suggestion from '@/components/shared/suggestion.tsx';
-import { Button } from '@/components/ui/button.tsx';
 import { ScrollArea } from '@/components/ui/scroll-area.tsx';
-import { Skeleton } from '@/components/ui/skeleton.tsx';
 import EditorFooter from '@/components/editor/editor-footer';
+import { EditorLoadingSkeleton } from './editor-loading-skeleton';
 
 export const Editor = () => {
 	const lastLoadedId = useRef<string | null>(null);
@@ -251,9 +249,7 @@ export const Editor = () => {
 								'invisible absolute top-0 left-0 h-0 overflow-hidden'
 						)}
 					>
-						<DragHandle editor={editor}>
-							<GripVertical className="h-4 w-4" />
-						</DragHandle>
+
 						<ScrollArea className="h-full">
 							<EditorContent
 								key={currentNoteId}
@@ -376,113 +372,3 @@ const TitleExtension = Extension.create({
 	},
 });
 
-// Read-only content preview shown while note data is loading
-export const EditorContentPreview = ({ content }: { content: string }) => {
-	return (
-		<div className="bg-editor flex h-full flex-col">
-			<EditorHeaderSkeleton />
-			{/* Toolbar skeleton */}
-			<div className="border-editor-border bg-editor flex items-center gap-2 border-b px-4 py-2">
-				<Skeleton className="h-8 w-8" />
-				<Skeleton className="h-8 w-8" />
-				<Skeleton className="h-8 w-8" />
-				<div className="bg-editor-border mx-2 h-6 w-px" />
-				<Skeleton className="h-8 w-8" />
-				<Skeleton className="h-8 w-8" />
-				<Skeleton className="h-8 w-8" />
-				<div className="bg-editor-border mx-2 h-6 w-px" />
-				<Skeleton className="h-8 w-20" />
-			</div>
-			{/* Actual note content rendered as read-only HTML */}
-			<div className="relative flex-1 overflow-auto">
-				<div
-					className="tiptap ProseMirror bg-editor text-editor-foreground mx-auto min-h-full w-full border-0 pt-10 pr-14 pb-10 pl-14 shadow-lg"
-					dangerouslySetInnerHTML={{ __html: content }}
-				/>
-			</div>
-			<EditorFooter />
-		</div>
-	);
-};
-
-// Loading skeleton for suspense fallback
-export const EditorLoadingSkeleton = () => {
-	return (
-		<div className="bg-editor flex h-full flex-col">
-			<EditorHeaderSkeleton />
-			{/* Toolbar skeleton */}
-			<div className="border-editor-border bg-editor flex items-center gap-2 border-b px-4 py-2">
-				<Skeleton className="h-8 w-8" />
-				<Skeleton className="h-8 w-8" />
-				<Skeleton className="h-8 w-8" />
-				<div className="bg-editor-border mx-2 h-6 w-px" />
-				<Skeleton className="h-8 w-8" />
-				<Skeleton className="h-8 w-8" />
-				<Skeleton className="h-8 w-8" />
-				<div className="bg-editor-border mx-2 h-6 w-px" />
-				<Skeleton className="h-8 w-20" />
-			</div>
-			{/* Editor content skeleton */}
-			<div className="relative flex-1 overflow-auto">
-				<div className="bg-editor text-editor-foreground mx-auto h-full min-h-full w-full border-0 px-14 pt-10 pb-10 shadow-lg">
-					{/* Title skeleton */}
-					<Skeleton className="mb-6 h-10 w-3/5" />
-					{/* Paragraph skeletons */}
-					<div className="space-y-3">
-						<Skeleton className="h-5 w-full" />
-						<Skeleton className="h-5 w-[95%]" />
-						<Skeleton className="h-5 w-[88%]" />
-						<Skeleton className="h-5 w-[92%]" />
-						<div className="h-4" />
-						<Skeleton className="h-5 w-full" />
-						<Skeleton className="h-5 w-[78%]" />
-						<Skeleton className="h-5 w-[85%]" />
-						<div className="h-4" />
-						<Skeleton className="h-5 w-[70%]" />
-					</div>
-				</div>
-			</div>
-			<EditorFooter />
-		</div>
-	);
-};
-
-export function EditorError({
-	error,
-	reset,
-}: {
-	error?: Error;
-	reset?: () => void;
-}) {
-	return (
-		<div className="bg-editor flex h-full flex-col">
-			<EditorHeaderSkeleton />
-			<div className="border-editor-border bg-editor flex items-center gap-2 border-b px-4 py-2">
-				<Skeleton className="h-8 w-8" />
-				<Skeleton className="h-8 w-8" />
-				<Skeleton className="h-8 w-8" />
-			</div>
-			<div className="flex flex-1 items-center justify-center">
-				<div className="flex flex-col items-center gap-4 p-6 text-center">
-					<div className="bg-destructive/10 rounded-full p-3">
-						<AlertCircle className="text-destructive h-8 w-8" />
-					</div>
-					<div className="space-y-2">
-						<h3 className="text-lg font-semibold">Failed to load editor</h3>
-						<p className="text-muted-foreground max-w-sm text-sm">
-							{error?.message ||
-								'Something went wrong while loading the editor.'}
-						</p>
-					</div>
-					{reset && (
-						<Button variant="outline" onClick={reset} className="gap-2">
-							<RefreshCw className="h-4 w-4" />
-							Try again
-						</Button>
-					)}
-				</div>
-			</div>
-			<EditorFooter />
-		</div>
-	);
-}

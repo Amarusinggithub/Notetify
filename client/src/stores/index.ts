@@ -7,13 +7,13 @@ import {
 } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { createAuthSlice, type AuthSlice } from '@/stores/slices/auth-slice';
-import { createNotesSlice, type NotesSlice } from '@/stores/slices/notes-slice';
+import { createNotesSlice, type NotesSlice } from '@/stores/slices/note-slice';
 
 import {
 	createNotebookSlice,
 	type NotebookSlice,
-} from '@/stores/slices/notebooks-slice';
-import { createTagSlice, type TagSlice } from '@/stores/slices/tags-slice';
+} from '@/stores/slices/notebook-slice';
+import { createTagSlice, type TagSlice } from '@/stores/slices/tag-slice';
 import {
 	applyTheme,
 	createThemeSlice,

@@ -1,14 +1,7 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Suspense, useEffect, useRef } from 'react';
-import { ErrorBoundary } from 'react-error-boundary';
-import { useNavigate, useParams, useRouteLoaderData } from 'react-router';
 import { EditorNotesSidebar } from '@/components/app/app-notes-sidebar';
-import {
-	Editor,
-	EditorContentPreview,
-	EditorError,
-	EditorLoadingSkeleton,
-} from '@/components/editor/editor.tsx';
+import { EditorError } from '@/components/editor/editor-error.tsx';
+import { EditorLoadingSkeleton } from '@/components/editor/editor-loading-skeleton.tsx';
+import { EditorContentPreview } from '@/components/editor/editor-preview.tsx';
 import {
 	NotesSidebarInset,
 	NotesSidebarProvider,
@@ -16,6 +9,13 @@ import {
 import { noteQueryOptions, useCreateNote } from '@/hooks/use-note.ts';
 import { useStore } from '@/stores/index.ts';
 import { noteQueryKeys } from '@/utils/queryKeys.ts';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { lazy, Suspense, useEffect, useRef } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
+import { useNavigate, useParams, useRouteLoaderData } from 'react-router';
+const Editor = lazy(() =>
+	import('@/components/editor/editor.tsx').then((m) => ({ default: m.Editor }))
+);
 
 export default function Notes() {
 	const { noteId } = useParams();

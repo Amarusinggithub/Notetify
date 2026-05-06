@@ -4,7 +4,6 @@ import type { SortBy } from '@/types';
 
 export type NotesSliceState = {
 	selectedNoteId: string | null;
-
 	searchNotes: string;
 	sortNotesBy: SortBy;
 };
@@ -21,7 +20,6 @@ export const createNotesSlice: StateCreator<StoreState, [], [], NotesSlice> = (
 	set
 ) => ({
 	selectedNoteId: null,
-	notes: [],
 	searchNotes: '',
 	sortNotesBy: 'updated_at',
 	setSelectedNoteId: (id: string | null) => set({ selectedNoteId: id }),

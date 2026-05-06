@@ -493,16 +493,18 @@ html {
 	scroll-behavior: smooth;
 }
 
-/* Lock page scrolling and hide outer scrollbar */
 html,
-body,
-#root {
-	height: 100%;
-	overflow:hidden ;
+body {
+	min-height: 100%;
 }
-/* Cross-browser scrollbar hide for the page
-html { scrollbar-width: none; -ms-overflow-style: none; }
-html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; }*/
+
+body {
+	overflow-x: hidden;
+}
+
+#root {
+	min-height: 100vh;
+}
 
 /* For mobile */
 .floating-threads {
