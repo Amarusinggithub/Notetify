@@ -3,7 +3,6 @@ import type { LucideIcon } from 'lucide-react';
 
 // Constants
 export const CSRF_TOKEN_COOKIE_NAME = 'XSRF-TOKEN';
-export const USERDATA_STORAGE_KEY = 'userData';
 
 // Common Types
 export type Role = 'OWNER' | 'EDITOR' | 'MEMBER';

@@ -36,7 +36,7 @@ const NoteCard = memo(({ userNote }: NoteCardProp) => {
 	const startPrefetch = () => {
 		hoverTimer.current = setTimeout(() => {
 			queryClient.prefetchQuery(noteQueryOptions(userNote?.id));
-		}, 200);
+		}, 150);
 	};
 
 	const cancelPrefetch = () => {

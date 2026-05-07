@@ -1,4 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { ErrorBoundary } from 'react-error-boundary';
 import './App.css';
 import ErrorFallback from '@/pages/error.tsx';
@@ -20,6 +21,7 @@ export default function App() {
 			<Suspense fallback={<LoadingPage />}>
 				<QueryClientProvider client={queryClient}>
 					<AppRoutes />
+					<ReactQueryDevtools initialIsOpen={false} />
 				</QueryClientProvider>
 			</Suspense>
 		</ErrorBoundary>

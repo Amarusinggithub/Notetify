@@ -338,7 +338,8 @@ export const createAuthSlice: StateCreator<StoreState, [], [], AuthSlice> = (
 	async Logout() {
 		set({ isLoading: true, errors: null });
 		try {
-			// Reset auth state and persisted values to defaults
+			await authService.logout();
+		} finally {
 			set({
 				isAuthenticated: false,
 				sharedData: null,
@@ -346,11 +347,8 @@ export const createAuthSlice: StateCreator<StoreState, [], [], AuthSlice> = (
 				selectedNotebookId: null,
 				searchNotes: '',
 				searchNotebooks: '',
+				isLoading: false,
 			});
-
-			await authService.logout();
-		} finally {
-			set({ isLoading: false });
 			window.location.href = '/';
 		}
 	},

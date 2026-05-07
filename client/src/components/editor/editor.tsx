@@ -22,7 +22,7 @@ import { useStore } from '@/stores/index.ts';
 import { EditorHeader } from '@/components/editor/editor-header.tsx';
 import EditorToolbar from '@/components/editor/editor-toolbar.tsx';
 import suggestion from '@/components/shared/suggestion.tsx';
-import { ScrollArea } from '@/components/ui/scroll-area.tsx';
+
 import EditorFooter from '@/components/editor/editor-footer';
 import { EditorLoadingSkeleton } from './editor-loading-skeleton';
 
@@ -278,7 +278,7 @@ export const Editor = () => {
 			<div className="bg-editor flex h-full flex-col">
 				<EditorHeader currentNoteId={currentUserNote?.id} />
 				<EditorToolbar />
-				<div className="relative flex-1 overflow-auto">
+				<div className="relative flex-1 overflow-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border hover:scrollbar-thumb-muted-foreground/40">
 					<div
 						className={cn(
 							'h-full w-full',
@@ -287,14 +287,12 @@ export const Editor = () => {
 						)}
 					>
 
-						<ScrollArea className="h-full">
 							<EditorContent
 								editor={editor}
 								className={cn(
 									'bg-editor text-editor-foreground mx-auto min-h-full w-full border-0 shadow-lg'
 								)}
 							/>
-						</ScrollArea>{' '}
 					</div>
 					{!currentUserNote && (
 						<div className="text-muted-foreground flex h-full items-center justify-center text-sm">
