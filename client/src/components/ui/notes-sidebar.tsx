@@ -1,7 +1,6 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import * as React from 'react';
 
-import { useTransition } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -50,26 +49,18 @@ function NotesSidebarProvider({
 }) {
 	const isMobile = useIsMobile();
 	const [openMobile, setOpenMobile] = React.useState(false);
-	const [isPending, startTransition] = useTransition();
 
-	// This is the internal state of the sidebar.
-	// We use openProp and setOpenProp for control from outside the component.
 	const [_open, _setOpen] = React.useState(defaultOpen);
 	const open = openProp ?? _open;
 	const setOpen = React.useCallback(
 		(value: boolean | ((value: boolean) => boolean)) => {
 			const openState = typeof value === 'function' ? value(open) : value;
 			if (setOpenProp) {
-				startTransition(() => {
-					setOpenProp(openState);
-				});
+				setOpenProp(openState);
 			} else {
-				startTransition(() => {
-					_setOpen(openState);
-				});
+				_setOpen(openState);
 			}
 
-			// This sets the cookie to keep the sidebar state.
 			document.cookie = `${NOTES_SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${NOTES_SIDEBAR_COOKIE_MAX_AGE}`;
 		},
 		[setOpenProp, open]
@@ -161,7 +152,7 @@ function NotesSidebar({
 
 	return (
 		<div
-			className="group peer text-sidebar-foreground hidden md:block"
+			className="group peer text-sidebar-foreground relative hidden overflow-hidden md:block"
 			data-state={state}
 			data-collapsible={state === 'collapsed' ? collapsible : ''}
 			data-variant={variant}
@@ -183,12 +174,10 @@ function NotesSidebar({
 			<div
 				data-slot="notes-sidebar-container"
 				className={cn(
-					'relative z-10 hidden h-full w-(--notes-sidebar-width) transition-[left,right,width] duration-300 ease-in-out md:flex',
+					'absolute inset-y-0 z-10 hidden h-full w-(--notes-sidebar-width) transition-transform duration-300 ease-in-out md:flex',
 					side === 'left'
-						? 'left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--notes-sidebar-width)*-1)]'
-						: 'right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--notes-sidebar-width)*-1)]',
-					'group-data-[collapsible=offcanvas]:w-0',
-					// Adjust the padding for floating and inset variants.
+						? 'left-0 group-data-[collapsible=offcanvas]:-translate-x-full'
+						: 'right-0 group-data-[collapsible=offcanvas]:translate-x-full',
 					variant === 'floating' || variant === 'inset'
 						? 'p-2 group-data-[collapsible=icon]:w-[calc(var(--notes-sidebar-width-icon)+(--spacing(4))+2px)]'
 						: 'group-data-[collapsible=icon]:w-(--notes-sidebar-width-icon) group-data-[side=left]:border-r group-data-[side=right]:border-l',

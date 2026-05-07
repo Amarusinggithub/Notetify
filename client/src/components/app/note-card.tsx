@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { formatDistanceToNow } from 'date-fns';
-import { useRef } from 'react';
+import { memo, useRef } from 'react';
 import { useNavigate } from 'react-router';
 import { noteQueryOptions } from '@/hooks/use-note.ts';
 import { cn } from '@/lib/utils';
@@ -18,16 +18,14 @@ type NoteCardProp = {
 	userNote: UserNote;
 };
 
-const NoteCard = ({ userNote }: NoteCardProp) => {
+const NoteCard = memo(({ userNote }: NoteCardProp) => {
 	const queryClient = useQueryClient();
 	const navigate = useNavigate();
-	const selectedId = useStore((s) => s.selectedNoteId);
+	const isActive = useStore((s) => s.selectedNoteId === userNote.id);
 	const setSelectedNoteId = useStore((s) => s.setSelectedNoteId);
 	const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-	const isActive = selectedId === userNote.id;
 	const title = getTitleFromHtml(userNote.note.content);
-
 	const content = getContentPreview(userNote.note.content);
 	const updatedLabel = userNote.updated_at
 		? formatDistanceToNow(new Date(userNote.updated_at), {
@@ -64,7 +62,7 @@ const NoteCard = ({ userNote }: NoteCardProp) => {
 			onClick={handleSelectNote}
 			className={cn(
 				'gap-2 rounded-none border-x-0 border-t-0 py-3',
-				isActive && 'border-ring'
+				isActive && 'bg-accent'
 			)}
 		>
 			<CardHeader className="flex flex-row items-center justify-between py-0">
@@ -81,7 +79,7 @@ const NoteCard = ({ userNote }: NoteCardProp) => {
 			</CardFooter>
 		</Card>
 	);
-};
+}, (prev, next) => prev.userNote.id === next.userNote.id && prev.userNote.updated_at === next.userNote.updated_at);
 
 function getContentPreview(html: string, maxLength = 119): string {
 	const preview = html

@@ -55,34 +55,23 @@ export function notesLoader() {
 	return EnsureNotes();
 }
 
-export function EditorNotesSidebar() {
-	const search = useStore((s) => s.searchNotes);
-	const sortBy = useStore((s) => s.sortNotesBy);
-	const setSortBy = useStore((s) => s.setSortBy);
-	const setSearch = useStore((s) => s.setSearch);
-	const [searchInput, setSearchInput] = useState(search);
-	const debouncedSearch = useDebounce(searchInput, 300);
+function NotesCount({ search, sortBy }: { search: string; sortBy: string }) {
+	const { data } = useFetchNotes(search, sortBy);
+	const count = data?.pages.reduce((sum, page) => sum + page.results.length, 0) ?? 0;
+	return (
+		<h3 className="muted-foreground scroll-m-20 text-xl font-semibold tracking-tight">
+			{count}
+		</h3>
+	);
+}
 
-	useEffect(() => {
-		if (debouncedSearch !== undefined) {
-			setSearch(debouncedSearch);
-		}
-	}, [debouncedSearch, setSearch]);
-
-	useEffect(() => {
-		setSearchInput(search);
-	}, [search]);
-
-	// Local-only filter UI state (not yet applied to API)
-	const [filters, setFilters] = useState({
-		tags: '',
-		notebook: '',
-		created: '',
-		updated: '',
-		showShared: false,
-		showSpaces: false,
-	});
-
+function VirtualNotesList({
+	search,
+	sortBy,
+}: {
+	search: string;
+	sortBy: string;
+}) {
 	const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
 		useFetchNotes(search, sortBy);
 
@@ -101,9 +90,7 @@ export function EditorNotesSidebar() {
 
 	useEffect(() => {
 		const lastItem = virtualItems[virtualItems.length - 1];
-		if (!lastItem) {
-			return;
-		}
+		if (!lastItem) return;
 
 		if (
 			lastItem.index >= allNotes.length - 1 &&
@@ -119,6 +106,91 @@ export function EditorNotesSidebar() {
 		isFetchingNextPage,
 		virtualItems,
 	]);
+
+	return (
+		<>
+			<NotesSidebarContent>
+				<div
+					ref={parentRef}
+					className="h-full w-full overflow-y-auto overscroll-contain scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border hover:scrollbar-thumb-muted-foreground/40"
+				>
+					{allNotes.length === 0 ? (
+						<div className="text-muted-foreground flex h-full items-center justify-center text-sm">
+							No notes yet. Create one to get started.
+						</div>
+					) : (
+						<div
+							style={{
+								height: rowVirtualizer.getTotalSize(),
+								width: '100%',
+								position: 'relative',
+							}}
+						>
+							{virtualItems.map((virtualItem) => {
+								const note = allNotes[virtualItem.index];
+								return (
+									<div
+										key={virtualItem.key}
+										data-index={virtualItem.index}
+										ref={rowVirtualizer.measureElement}
+										style={{
+											position: 'absolute',
+											top: 0,
+											left: 0,
+											width: '100%',
+											transform: `translateY(${virtualItem.start}px)`,
+										}}
+									>
+										<NoteCard key={note.id} userNote={note} />
+									</div>
+								);
+							})}
+						</div>
+					)}
+				</div>
+			</NotesSidebarContent>
+			<NotesSidebarFooter>
+				{allNotes.length > 0 && (
+					<div className="text-muted-foreground w-full text-center text-xs">
+						{isFetchingNextPage
+							? 'Loading more...'
+							: !hasNextPage
+								? 'Nothing more to load'
+								: ''}
+					</div>
+				)}
+			</NotesSidebarFooter>
+		</>
+	);
+}
+
+export function EditorNotesSidebar() {
+	const search = useStore((s) => s.searchNotes);
+	const sortBy = useStore((s) => s.sortNotesBy);
+	const setSortBy = useStore((s) => s.setSortBy);
+	const setSearch = useStore((s) => s.setSearch);
+	const [searchInput, setSearchInput] = useState(search);
+	const debouncedSearch = useDebounce(searchInput, 300);
+
+	useEffect(() => {
+		if (debouncedSearch !== undefined) {
+			setSearch(debouncedSearch);
+		}
+	}, [debouncedSearch, setSearch]);
+
+	useEffect(() => {
+		setSearchInput(search);
+	}, [search]);
+
+	const [filters, setFilters] = useState({
+		tags: '',
+		notebook: '',
+		created: '',
+		updated: '',
+		showShared: false,
+		showSpaces: false,
+	});
+
 	return (
 		<NotesSidebar collapsible="offcanvas" variant="sidebar">
 			<NotesSidebarHeader>
@@ -126,9 +198,7 @@ export function EditorNotesSidebar() {
 					<Label className="scroll-m-20 text-2xl font-semibold tracking-tight">
 						Notes
 					</Label>
-					<h3 className="muted-foreground scroll-m-20 text-xl font-semibold tracking-tight">
-						{allNotes.length}
-					</h3>
+					<NotesCount search={search} sortBy={sortBy} />
 				</div>
 
 				<div className="flex flex-1 items-center justify-end gap-2">
@@ -346,60 +416,9 @@ export function EditorNotesSidebar() {
 				)}
 			>
 				<Suspense fallback={<NotesSidebarSkeleton />}>
-					<NotesSidebarContent>
-						<ScrollArea
-							ref={parentRef}
-							className="h-full w-full *:data-[slot=scroll-area-viewport]:overscroll-contain"
-						>
-							{allNotes.length === 0 ? (
-								<div className="text-muted-foreground flex h-full items-center justify-center text-sm">
-									No notes yet. Create one to get started.
-								</div>
-							) : (
-								<div
-									style={{
-										height: `${rowVirtualizer.getTotalSize()}px`,
-										width: '100%',
-										position: 'relative',
-										willChange: 'transform',
-									}}
-								>
-									{virtualItems.map((virtualItem) => {
-										const note = allNotes[virtualItem.index];
-										return (
-											<div
-												key={virtualItem.key}
-												data-index={virtualItem.index}
-												ref={rowVirtualizer.measureElement}
-												style={{
-													position: 'absolute',
-													top: 0,
-													left: 0,
-													width: '100%',
-													transform: `translateY(${virtualItem.start}px)`,
-												}}
-											>
-												<NoteCard key={note.id} userNote={note} />
-											</div>
-										);
-									})}
-								</div>
-							)}
-						</ScrollArea>
-					</NotesSidebarContent>
+					<VirtualNotesList search={search} sortBy={sortBy} />
 				</Suspense>
 			</ErrorBoundary>
-			<NotesSidebarFooter>
-				{allNotes.length > 0 && (
-					<div className="text-muted-foreground w-full text-center text-xs">
-						{isFetchingNextPage
-							? 'Loading more...'
-							: !hasNextPage
-								? 'Nothing more to load'
-								: ''}
-					</div>
-				)}
-			</NotesSidebarFooter>
 		</NotesSidebar>
 	);
 }

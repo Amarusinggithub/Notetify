@@ -1,7 +1,6 @@
 import { EditorNotesSidebar } from '@/components/app/app-notes-sidebar';
 import { EditorError } from '@/components/editor/editor-error.tsx';
 import { EditorLoadingSkeleton } from '@/components/editor/editor-loading-skeleton.tsx';
-import { EditorContentPreview } from '@/components/editor/editor-preview.tsx';
 import {
 	NotesSidebarInset,
 	NotesSidebarProvider,
@@ -9,7 +8,7 @@ import {
 import { noteQueryOptions, useCreateNote } from '@/hooks/use-note.ts';
 import { useStore } from '@/stores/index.ts';
 import { noteQueryKeys } from '@/utils/queryKeys.ts';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { lazy, Suspense, useEffect, useRef } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useNavigate, useParams, useRouteLoaderData } from 'react-router';
@@ -35,11 +34,7 @@ export default function Notes() {
 		}
 	}, [initialData, queryClient]);
 
-	// Fetch note data in parallel so the suspense fallback can render a preview
-	const { data: previewNote } = useQuery({
-		...noteQueryOptions(selectedId!),
-		enabled: !!selectedId,
-	});
+
 
 	useEffect(() => {
 		const routeNoteId = noteId ?? null;
@@ -100,17 +95,7 @@ export default function Notes() {
 
 			<NotesSidebarInset>
 				<ErrorBoundary fallback={<EditorError />}>
-					<Suspense
-						fallback={
-							previewNote ? (
-								<EditorContentPreview
-									content={previewNote.note?.content ?? ''}
-								/>
-							) : (
-								<EditorLoadingSkeleton />
-							)
-						}
-					>
+					<Suspense fallback={<EditorLoadingSkeleton />}>
 						<Editor />
 					</Suspense>
 				</ErrorBoundary>

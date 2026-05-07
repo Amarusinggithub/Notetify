@@ -3,7 +3,6 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { Maximize2 } from 'lucide-react';
 import * as React from 'react';
 
-import { useTransition } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -67,26 +66,18 @@ function SidebarProvider({
 }) {
 	const isMobile = useIsMobile();
 	const [openMobile, setOpenMobile] = React.useState(false);
-	const [isPending, startTransition] = useTransition();
 
-	// This is the internal state of the sidebar.
-	// We use openProp and setOpenProp for control from outside the component.
 	const [_open, _setOpen] = React.useState(defaultOpen);
 	const open = openProp ?? _open;
 	const setOpen = React.useCallback(
 		(value: boolean | ((value: boolean) => boolean)) => {
 			const openState = typeof value === 'function' ? value(open) : value;
 			if (setOpenProp) {
-				startTransition(() => {
-					setOpenProp(openState);
-				});
+				setOpenProp(openState);
 			} else {
-				startTransition(() => {
-					_setOpen(openState);
-				});
+				_setOpen(openState);
 			}
 
-			// This sets the cookie to keep the sidebar state.
 			document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
 		},
 		[setOpenProp, open]
@@ -382,7 +373,7 @@ function SidebarContent({ className, ...props }: React.ComponentProps<'div'>) {
 			data-slot="sidebar-content"
 			data-sidebar="content"
 			className={cn(
-				'flex min-h-0 flex-1 flex-col gap-2 overflow-auto group-data-[collapsible=icon]:overflow-hidden',
+				'flex min-h-0 flex-1 flex-col gap-2 overflow-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-sidebar-border hover:scrollbar-thumb-muted-foreground/40 group-data-[collapsible=icon]:overflow-hidden',
 				className
 			)}
 			{...props}
