@@ -7,6 +7,7 @@ use App\Models\Tag;
 use App\Models\UserNote;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class NoteController extends Controller
@@ -30,10 +31,15 @@ class NoteController extends Controller
 
     public function show(string $id)
     {
-        $userNote = UserNote::with(['note', 'tags'])
-            ->where('id', $id)
-            ->forUser(Auth::id())
-            ->firstOrFail();
+        $userId = Auth::id();
+        $cacheKey = "user:{$userId}:note:{$id}";
+
+        $userNote = Cache::remember($cacheKey, 300, function () use ($id, $userId) {
+            return UserNote::with(['note', 'tags'])
+                ->where('id', $id)
+                ->forUser($userId)
+                ->firstOrFail();
+        });
 
         return response()->json($userNote);
     }
@@ -44,63 +50,67 @@ class NoteController extends Controller
      */
     public function index(Request $request)
     {
-        // Build query using scopes - much cleaner than inline where() calls!
-        // Scopes are defined in the UserNote model (see scopeForUser, scopeWithTag, etc.)
-        $query = UserNote::query()
-            ->select('user_note.*')
-            ->with(['note', 'tags'])
-            ->forUser(Auth::id())
-            ->leftJoin('notes', 'notes.id', '=', 'user_note.note_id');
+        $userId = Auth::id();
+        $cacheKey = "user:{$userId}:notes:" . md5($request->getQueryString() ?? '');
 
-        if ($request->filled('tag')) {
-            $query->withTag($request->string('tag')->toString());
-        }
+        $data = Cache::remember($cacheKey, 60, function () use ($request, $userId) {
+            $query = UserNote::query()
+                ->select('user_note.*')
+                ->with(['note', 'tags'])
+                ->forUser($userId)
+                ->leftJoin('notes', 'notes.id', '=', 'user_note.note_id');
 
-        if ($request->filled('search')) {
-            $query->search($request->string('search')->toString());
-        }
+            if ($request->filled('tag')) {
+                $query->withTag($request->string('tag')->toString());
+            }
 
-        if ($request->filled('notebook_id')) {
-            $query->inNotebook($request->string('notebook_id')->toString());
-        }
+            if ($request->filled('search')) {
+                $query->search($request->string('search')->toString());
+            }
 
-        // Apply flag filters using the whereFlag scope
-        foreach (array_keys($this->flagColumns) as $flagColumn) {
-            if ($request->has($flagColumn)) {
-                $value = filter_var(
-                    $request->query($flagColumn),
-                    FILTER_VALIDATE_BOOLEAN,
-                    FILTER_NULL_ON_FAILURE
-                );
-                if ($value !== null) {
-                    $query->whereFlag($flagColumn, $value);
+            if ($request->filled('notebook_id')) {
+                $query->inNotebook($request->string('notebook_id')->toString());
+            }
+
+            foreach (array_keys($this->flagColumns) as $flagColumn) {
+                if ($request->has($flagColumn)) {
+                    $value = filter_var(
+                        $request->query($flagColumn),
+                        FILTER_VALIDATE_BOOLEAN,
+                        FILTER_NULL_ON_FAILURE
+                    );
+                    if ($value !== null) {
+                        $query->whereFlag($flagColumn, $value);
+                    }
                 }
             }
-        }
 
-        $sortBy = $request->string('sort_by')->toString();
-        $sortDir = strtolower($request->string('sort_direction')->toString() ?: 'desc');
-        $allowedSorts = [
-            'updated_at' => 'user_note.updated_at',
-            'created_at' => 'user_note.created_at',
-        ];
-        $sortColumn = $allowedSorts[$sortBy] ?? $allowedSorts['updated_at'];
-        $direction = in_array($sortDir, ['asc', 'desc'], true) ? $sortDir : 'desc';
-        $query->orderBy($sortColumn, $direction);
+            $sortBy = $request->string('sort_by')->toString();
+            $sortDir = strtolower($request->string('sort_direction')->toString() ?: 'desc');
+            $allowedSorts = [
+                'updated_at' => 'user_note.updated_at',
+                'created_at' => 'user_note.created_at',
+            ];
+            $sortColumn = $allowedSorts[$sortBy] ?? $allowedSorts['updated_at'];
+            $direction = in_array($sortDir, ['asc', 'desc'], true) ? $sortDir : 'desc';
+            $query->orderBy($sortColumn, $direction);
 
-        $perPage = (int) ($request->integer('per_page') ?: 20);
-        $perPage = max(1, min($perPage, 50));
-        $page = (int) ($request->integer('page') ?: 1);
+            $perPage = (int) ($request->integer('per_page') ?: 20);
+            $perPage = max(1, min($perPage, 50));
+            $page = (int) ($request->integer('page') ?: 1);
 
-        $paginator = $query->paginate($perPage, ['user_note.*'], 'page', $page);
+            $paginator = $query->paginate($perPage, ['user_note.*'], 'page', $page);
 
-        return response()->json([
-            'results' => $paginator->getCollection()->values(),
-            'nextPage' => $paginator->currentPage() < $paginator->lastPage()
-                ? $paginator->currentPage() + 1
-                : null,
-            'hasNextPage' => $paginator->hasMorePages(),
-        ]);
+            return [
+                'results' => $paginator->getCollection()->values(),
+                'nextPage' => $paginator->currentPage() < $paginator->lastPage()
+                    ? $paginator->currentPage() + 1
+                    : null,
+                'hasNextPage' => $paginator->hasMorePages(),
+            ];
+        });
+
+        return response()->json($data);
     }
 
     /** Create a new note and attach to current user */
@@ -146,6 +156,7 @@ class NoteController extends Controller
         }
 
         $userNote->load(['note', 'tags']);
+        $this->clearUserNotesCache(Auth::id());
         return response()->json($userNote, 201);
     }
 
@@ -211,6 +222,10 @@ class NoteController extends Controller
         $userNote->load(['note', 'tags']);
         $userNote->touch();
 
+        $userId = Auth::id();
+        Cache::forget("user:{$userId}:note:{$id}");
+        $this->clearUserNotesCache($userId);
+
         return response()->json($userNote);
     }
 
@@ -232,6 +247,9 @@ class NoteController extends Controller
                 $note->delete();
             }
         });
+
+        $this->clearUserNotesCache(Auth::id());
+        Cache::forget("user:" . Auth::id() . ":note:{$id}");
 
         return response()->json(['status' => 'deleted']);
     }
@@ -261,6 +279,16 @@ class NoteController extends Controller
      * Helper to find/create tags and sync them to the user note.
      * This handles both adding new tags and removing omitted ones.
      */
+    private function clearUserNotesCache(string $userId): void
+    {
+        $prefix = config('cache.prefix') . ':';
+        $pattern = "{$prefix}user:{$userId}:notes:*";
+
+        foreach (Cache::getRedis()->keys($pattern) as $key) {
+            Cache::getRedis()->del(str_replace($prefix, '', $key));
+        }
+    }
+
     private function syncTags(UserNote $userNote, array $tagNames): void
     {
         $tagIds = [];
