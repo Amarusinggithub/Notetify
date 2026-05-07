@@ -104,7 +104,6 @@ export const Editor = () => {
 
 		extensions: [
 			StarterKit.configure({
-				undoRedo: false,
 				heading: {
 					levels: [1, 2, 3, 4, 5],
 				},

@@ -6,11 +6,15 @@ import ErrorFallback from '@/pages/error.tsx';
 import AppRoutes from '@/routes/app-routes.tsx';
 import { Suspense } from 'react';
 import LoadingPage from './pages/loading';
+import { toast } from 'sonner';
 
 export const queryClient = new QueryClient({
 	defaultOptions: {
 		queries: {
 			staleTime: 1000 * 60 * 5, // Data is considered "fresh" for 5 minutes
+		},
+		mutations: {
+			onError: (error) => toast.error(error.message),
 		},
 	},
 });

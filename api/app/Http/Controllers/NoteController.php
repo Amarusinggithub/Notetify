@@ -51,66 +51,61 @@ class NoteController extends Controller
     public function index(Request $request)
     {
         $userId = Auth::id();
-        $cacheKey = "user:{$userId}:notes:" . md5($request->getQueryString() ?? '');
 
-        $data = Cache::remember($cacheKey, 60, function () use ($request, $userId) {
-            $query = UserNote::query()
-                ->select('user_note.*')
-                ->with(['note', 'tags'])
-                ->forUser($userId)
-                ->leftJoin('notes', 'notes.id', '=', 'user_note.note_id');
+        $query = UserNote::query()
+            ->select('user_note.*')
+            ->with(['note', 'tags'])
+            ->forUser($userId)
+            ->leftJoin('notes', 'notes.id', '=', 'user_note.note_id');
 
-            if ($request->filled('tag')) {
-                $query->withTag($request->string('tag')->toString());
-            }
+        if ($request->filled('tag')) {
+            $query->withTag($request->string('tag')->toString());
+        }
 
-            if ($request->filled('search')) {
-                $query->search($request->string('search')->toString());
-            }
+        if ($request->filled('search')) {
+            $query->search($request->string('search')->toString());
+        }
 
-            if ($request->filled('notebook_id')) {
-                $query->inNotebook($request->string('notebook_id')->toString());
-            }
+        if ($request->filled('notebook_id')) {
+            $query->inNotebook($request->string('notebook_id')->toString());
+        }
 
-            foreach (array_keys($this->flagColumns) as $flagColumn) {
-                if ($request->has($flagColumn)) {
-                    $value = filter_var(
-                        $request->query($flagColumn),
-                        FILTER_VALIDATE_BOOLEAN,
-                        FILTER_NULL_ON_FAILURE
-                    );
-                    if ($value !== null) {
-                        $query->whereFlag($flagColumn, $value);
-                    }
+        foreach (array_keys($this->flagColumns) as $flagColumn) {
+            if ($request->has($flagColumn)) {
+                $value = filter_var(
+                    $request->query($flagColumn),
+                    FILTER_VALIDATE_BOOLEAN,
+                    FILTER_NULL_ON_FAILURE
+                );
+                if ($value !== null) {
+                    $query->whereFlag($flagColumn, $value);
                 }
             }
+        }
 
-            $sortBy = $request->string('sort_by')->toString();
-            $sortDir = strtolower($request->string('sort_direction')->toString() ?: 'desc');
-            $allowedSorts = [
-                'updated_at' => 'user_note.updated_at',
-                'created_at' => 'user_note.created_at',
-            ];
-            $sortColumn = $allowedSorts[$sortBy] ?? $allowedSorts['updated_at'];
-            $direction = in_array($sortDir, ['asc', 'desc'], true) ? $sortDir : 'desc';
-            $query->orderBy($sortColumn, $direction);
+        $sortBy = $request->string('sort_by')->toString();
+        $sortDir = strtolower($request->string('sort_direction')->toString() ?: 'desc');
+        $allowedSorts = [
+            'updated_at' => 'user_note.updated_at',
+            'created_at' => 'user_note.created_at',
+        ];
+        $sortColumn = $allowedSorts[$sortBy] ?? $allowedSorts['updated_at'];
+        $direction = in_array($sortDir, ['asc', 'desc'], true) ? $sortDir : 'desc';
+        $query->orderBy($sortColumn, $direction);
 
-            $perPage = (int) ($request->integer('per_page') ?: 20);
-            $perPage = max(1, min($perPage, 50));
-            $page = (int) ($request->integer('page') ?: 1);
+        $perPage = (int) ($request->integer('per_page') ?: 20);
+        $perPage = max(1, min($perPage, 50));
+        $page = (int) ($request->integer('page') ?: 1);
 
-            $paginator = $query->paginate($perPage, ['user_note.*'], 'page', $page);
+        $paginator = $query->paginate($perPage, ['user_note.*'], 'page', $page);
 
-            return [
-                'results' => $paginator->getCollection()->values(),
-                'nextPage' => $paginator->currentPage() < $paginator->lastPage()
-                    ? $paginator->currentPage() + 1
-                    : null,
-                'hasNextPage' => $paginator->hasMorePages(),
-            ];
-        });
-
-        return response()->json($data);
+        return response()->json([
+            'results' => $paginator->getCollection()->values(),
+            'nextPage' => $paginator->currentPage() < $paginator->lastPage()
+                ? $paginator->currentPage() + 1
+                : null,
+            'hasNextPage' => $paginator->hasMorePages(),
+        ]);
     }
 
     /** Create a new note and attach to current user */
@@ -156,7 +151,6 @@ class NoteController extends Controller
         }
 
         $userNote->load(['note', 'tags']);
-        $this->clearUserNotesCache(Auth::id());
         return response()->json($userNote, 201);
     }
 
@@ -222,9 +216,7 @@ class NoteController extends Controller
         $userNote->load(['note', 'tags']);
         $userNote->touch();
 
-        $userId = Auth::id();
-        Cache::forget("user:{$userId}:note:{$id}");
-        $this->clearUserNotesCache($userId);
+        Cache::forget("user:" . Auth::id() . ":note:{$id}");
 
         return response()->json($userNote);
     }
@@ -248,7 +240,6 @@ class NoteController extends Controller
             }
         });
 
-        $this->clearUserNotesCache(Auth::id());
         Cache::forget("user:" . Auth::id() . ":note:{$id}");
 
         return response()->json(['status' => 'deleted']);
@@ -274,20 +265,6 @@ class NoteController extends Controller
         return $payload;
     }
 
-
-    /**
-     * Helper to find/create tags and sync them to the user note.
-     * This handles both adding new tags and removing omitted ones.
-     */
-    private function clearUserNotesCache(string $userId): void
-    {
-        $prefix = config('cache.prefix') . ':';
-        $pattern = "{$prefix}user:{$userId}:notes:*";
-
-        foreach (Cache::getRedis()->keys($pattern) as $key) {
-            Cache::getRedis()->del(str_replace($prefix, '', $key));
-        }
-    }
 
     private function syncTags(UserNote $userNote, array $tagNames): void
     {

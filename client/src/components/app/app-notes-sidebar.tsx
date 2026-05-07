@@ -50,14 +50,15 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { Switch } from '@/components/ui/switch';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import type { SortBy } from '@/types';
 
 export function notesLoader() {
 	return EnsureNotes();
 }
 
-function NotesCount({ search, sortBy }: { search: string; sortBy: string }) {
+function NotesCount({ search, sortBy }: { search: string; sortBy: SortBy| undefined }) {
 	const { data } = useFetchNotes(search, sortBy);
-	const count = data?.pages.reduce((sum, page) => sum + page.results.length, 0) ?? 0;
+	const count = data?.length ?? 0;
 	return (
 		<h3 className="muted-foreground scroll-m-20 text-xl font-semibold tracking-tight">
 			{count}
@@ -70,12 +71,10 @@ function VirtualNotesList({
 	sortBy,
 }: {
 	search: string;
-	sortBy: string;
+	sortBy : SortBy| undefined;
 }) {
-	const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+	const { data: allNotes, fetchNextPage, hasNextPage, isFetchingNextPage } =
 		useFetchNotes(search, sortBy);
-
-	const allNotes = data?.pages.flatMap((page) => page.results) ?? [];
 
 	const parentRef = useRef<HTMLDivElement>(null);
 
@@ -84,6 +83,7 @@ function VirtualNotesList({
 		getScrollElement: () => parentRef.current,
 		estimateSize: () => 95,
 		overscan: 10,
+
 	});
 
 	const virtualItems = rowVirtualizer.getVirtualItems();
@@ -412,7 +412,10 @@ export function EditorNotesSidebar() {
 			</NotesSidebarHeader>
 			<ErrorBoundary
 				fallbackRender={({ error, resetErrorBoundary }) => (
-					<NotesError error={error} reset={resetErrorBoundary} />
+					<NotesError
+						error={error instanceof Error ? error : new Error(String(error))}
+						reset={resetErrorBoundary}
+					/>
 				)}
 			>
 				<Suspense fallback={<NotesSidebarSkeleton />}>
