@@ -76,7 +76,6 @@ The repo root contains three deployable services and three Compose stacks. Each 
 
 - @docs/ARCHITECTURE.md — data model and sharing system
 - @docs/COLLABORATION.md — real-time collab (Yjs / Hocuspocus / SSE); **mandatory** before any change to the editor or note body
-- @docs/CHANGE.md — Linux/Postgres operational notes
 - @docs/TOLEARN.md — `UserNote` modelling background
 - @README.Docker.md — Docker stacks (dev/test/prod) and ops commands
 - @README.md — high-level project overview
