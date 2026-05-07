@@ -261,8 +261,11 @@ function Sidebar({
 function SidebarTrigger({
 	className,
 	onClick,
+	icon: Icon = Maximize2,
 	...props
-}: React.ComponentProps<typeof Button>) {
+}: React.ComponentProps<typeof Button> & {
+	icon?: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+}) {
 	const { toggleSidebar } = useSidebar();
 
 	return (
@@ -278,8 +281,7 @@ function SidebarTrigger({
 			}}
 			{...props}
 		>
-			{/*<PanelLeftIcon />*/}
-			<Maximize2 />
+			<Icon />
 			<span className="sr-only">Toggle Sidebar</span>
 		</Button>
 	);

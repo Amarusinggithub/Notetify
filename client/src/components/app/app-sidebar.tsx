@@ -140,12 +140,12 @@ export function AppSidebar() {
 		input.click();
 	}
 	return (
-		<Sidebar collapsible="offcanvas" variant="inset">
+		<Sidebar collapsible="offcanvas" variant="sidebar">
 			<SidebarHeader>
 				<SidebarMenu>
 					<SidebarMenuItem>
 						<SidebarMenuButton size="lg" asChild>
-							<Link to={'/home'}>
+							<Link to={'/'}>
 								<AppLogo />
 							</Link>
 						</SidebarMenuButton>

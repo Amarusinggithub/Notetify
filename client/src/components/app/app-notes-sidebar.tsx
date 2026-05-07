@@ -120,7 +120,7 @@ export function EditorNotesSidebar() {
 		virtualItems,
 	]);
 	return (
-		<NotesSidebar collapsible="offcanvas" variant="inset">
+		<NotesSidebar collapsible="offcanvas" variant="sidebar">
 			<NotesSidebarHeader>
 				<div className="flex flex-row items-center gap-x-1">
 					<Label className="scroll-m-20 text-2xl font-semibold tracking-tight">

@@ -2,7 +2,7 @@
 
 Notetify is a sleek and modern full-stack document editing note-taking application inspired by Google Docs and Evernote, designed to help you easily organize your thoughts, tasks, and plans.
 
-It supports tagging,  pinning, and favoriting notes, along with powerful real-time collaboration features that allow users to share and work together on documents simultaneously. Users are also able to upload different medias and reference and preview them within there notes.
+It supports tagging, pinning, and favoriting notes, along with powerful real-time collaboration features that allow users to share and work together on documents simultaneously. Users are also able to upload different medias and reference and preview them within there notes.
 
 Built with a React frontend and a Laravel backend.
 
@@ -10,13 +10,13 @@ Built with a React frontend and a Laravel backend.
 
 ## Features
 
-* Create and manage notes with ease
-* Pin important notes for quick access
-* Use custom tags to categorize notes
-* delete notes when no longer needed
-* Modern UI with dark theme for comfort
-* Real-time collaboration: Share notes and notebooks and collaborate in real-time
-* Upload files ,documents and other medias and reference and preview them in your notes
+- Create and manage notes with ease
+- Pin important notes for quick access
+- Use custom tags to categorize notes
+- delete notes when no longer needed
+- Modern UI with dark theme for comfort
+- Real-time collaboration: Share notes and notebooks and collaborate in real-time
+- Upload files ,documents and other medias and reference and preview them in your notes
 
 ---
 
@@ -37,11 +37,11 @@ Notetify/
 
 Make sure you have the following installed:
 
-* [Node.js (v18+)](https://nodejs.org/) & npm
-* [PHP (8.1+)](https://www.php.net/downloads.php)
-* [Composer (PHP package manager)](https://getcomposer.org/)
-* A local database server (MySQL or PostgreSQL)
-* (Optional) [Docker & Docker Compose](https://docs.docker.com/)
+- [Node.js (v18+)](https://nodejs.org/) & npm
+- [PHP (8.1+)](https://www.php.net/downloads.php)
+- [Composer (PHP package manager)](https://getcomposer.org/)
+- A local database server (MySQL or PostgreSQL)
+- (Optional) [Docker & Docker Compose](https://docs.docker.com/)
 
 ---
 
@@ -123,14 +123,15 @@ Frontend runs at: **[http://localhost:5173](http://localhost:5173)**
 A preview of the Notetify UI in action (add screenshot here).
 
 ### Landing page View
+
 ![landing page](./docs/screenshots/notetify_ui.png)
 
 ---
 
 ## Environment Variables
 
-* Copy `.env.example` → `.env` in both **backend** and **frontend** directories.
-* Update database connection details in `backend/.env`.
+- Copy `.env.example` → `.env` in both **backend** and **frontend** directories.
+- Update database connection details in `backend/.env`.
 
 ---
 
@@ -150,8 +151,6 @@ docker ps
 
 ![container id](./screenshots/redis_container_id.png)
 
-
-
 Access Redis container:
 
 ```bash
@@ -159,7 +158,6 @@ docker exec -it <yourRedisContainerId> sh
 ```
 
 ![container id](./screenshots/enter_redis_container_terminal.png)
-
 
 ---
 
@@ -182,4 +180,3 @@ For production:
 ```bash
 docker-compose -f docker-compose.prod.yaml up --build
 ```
-
