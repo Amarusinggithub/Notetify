@@ -172,18 +172,16 @@ export function EditorHeader({
 				<Breadcrumbs breadcrumbs={breadcrumbs} />
 			</div>
 
-			<div className="flex flex-1 items-center justify-center gap-3 px-4">
-				<div className="flex items-center gap-2">
-					<Avatar className="border-border size-8 border">
-						<AvatarImage src={currentUser?.avatar ?? ''} alt={ownerLabel} />
-						<AvatarFallback>
-							{ownerLabel.charAt(0).toUpperCase()}
-						</AvatarFallback>
-					</Avatar>
-					<Badge variant="secondary" className="rounded-full px-3 py-1 text-xs">
-						Workspace note
-					</Badge>
-				</div>
+			<div className="flex items-center gap-2">
+				<Avatar className="border-border size-8 border">
+					<AvatarImage src={currentUser?.avatar ?? ''} alt={ownerLabel} />
+					<AvatarFallback>
+						{ownerLabel.charAt(0).toUpperCase()}
+					</AvatarFallback>
+				</Avatar>
+				<Badge variant="secondary" className="rounded-full px-3 py-1 text-xs">
+					Workspace note
+				</Badge>
 			</div>
 
 			<div className="ml-auto flex items-center gap-3">
@@ -209,7 +207,7 @@ export function EditorHeader({
 							sideOffset={8}
 							className="w-90 border-none bg-transparent p-0 shadow-none"
 						>
-							<div className="border-border rounded-2xl border bg-white p-4 shadow-xl">
+							<div className="bg-popover text-popover-foreground border-border rounded-2xl border p-4 shadow-xl">
 								<div className="space-y-1">
 									<h3 className="text-foreground text-sm font-semibold">
 										Share note
@@ -255,7 +253,7 @@ export function EditorHeader({
 										variant="outline"
 										size="sm"
 										onClick={handleCopyLink}
-										className="h-10 rounded-lg px-4 text-sm font-medium text-[#4f6ef9] hover:bg-[#eef2ff]"
+										className="h-10 rounded-lg px-4 text-sm font-medium text-[#4f6ef9] hover:bg-[#eef2ff] dark:text-[#8b9cf7] dark:hover:bg-[#4f6ef9]/10"
 									>
 										<Link2 className="mr-2 size-4" /> Copy link
 									</Button>

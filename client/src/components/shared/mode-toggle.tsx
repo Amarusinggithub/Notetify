@@ -1,4 +1,4 @@
-import { Moon, Sun } from 'lucide-react';
+import { Monitor, Moon, Sun } from 'lucide-react';
 
 import { useStore } from '@/stores/index.ts';
 import { Button } from '@/components/ui/button';
@@ -23,13 +23,13 @@ export function ModeToggle() {
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="end">
 				<DropdownMenuItem onClick={() => setTheme('light')}>
-					Light
+					<Sun className="mr-2 size-4" /> Light
 				</DropdownMenuItem>
 				<DropdownMenuItem onClick={() => setTheme('dark')}>
-					Dark
+					<Moon className="mr-2 size-4" /> Dark
 				</DropdownMenuItem>
 				<DropdownMenuItem onClick={() => setTheme('system')}>
-					System
+					<Monitor className="mr-2 size-4" /> System
 				</DropdownMenuItem>
 			</DropdownMenuContent>
 		</DropdownMenu>

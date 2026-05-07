@@ -12,10 +12,12 @@ export default function AppSidebarLayout({
 			<AppSidebar />
 			<AppContent
 				variant="sidebar"
-				className="min-h-0 overflow-x-hidden overflow-y-hidden"
+				className="min-h-0 overflow-hidden"
 			>
 				<AppSidebarHeader />
-				{children}
+				<div className="flex-1 overflow-y-auto">
+					{children}
+				</div>
 			</AppContent>
 		</AppShell>
 	);
