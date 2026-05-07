@@ -14,7 +14,6 @@ import Youtube from '@tiptap/extension-youtube';
 import { Plugin, PluginKey } from '@tiptap/pm/state';
 import { EditorContent, Extension, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { GripVertical } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { NoteEditorProvider } from '@/context/editor-context.tsx';
 import { useFetchNote, useUpdateNote } from '@/hooks/use-note.ts';
@@ -30,8 +29,10 @@ import { EditorLoadingSkeleton } from './editor-loading-skeleton';
 export const Editor = () => {
 	const lastLoadedId = useRef<string | null>(null);
 	const currentNoteId = useStore((s) => s.selectedNoteId);
+	const prevNoteIdRef = useRef<string | null>(currentNoteId);
 	const isMounted = useRef(false);
 	const isLoadingContent = useRef(false);
+	const EMPTY_NOTE = '<h1></h1>';
 
 	useEffect(() => {
 		isMounted.current = true;
@@ -49,6 +50,7 @@ export const Editor = () => {
 	const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
 	const { data: currentUserNote } = useFetchNote(currentNoteId!);
+	const currentUserNoteRef = useRef<typeof currentUserNote>(null);
 
 	const editor = useEditor({
 		editorProps: {
@@ -68,31 +70,36 @@ export const Editor = () => {
 		onDestroy: () => {
 			isMounted.current = false;
 		},
+		// Debounced auto-save: fires on every editor content change (typing, formatting, etc.)
 		onUpdate: ({ editor: currentEditor }) => {
-			// Skip saves triggered by programmatic content loads (note switching)
+			// Skip saves triggered by programmatic content loading (note switch)
 			if (isLoadingContent.current) return;
-			// Debounced auto-save
-			if (currentUserNote) {
-				const html = currentEditor.getHTML();
 
-				if (currentUserNote.note.content != html) {
-					//Clear the previous timer if it exists
-					if (saveTimeoutRef.current) {
-						clearTimeout(saveTimeoutRef.current);
-					}
+			// Skip if ref is null (note is mid-transition between old and new)
+			const note = currentUserNoteRef.current;
+			if (!note) return;
 
-					const noteId = currentUserNote.id;
+			// Skip if content hasn't actually changed from what's in the database
+			const html = currentEditor.getHTML();
+			if (note.note.content === html) return;
 
-					//Set the new timer
-					saveTimeoutRef.current = setTimeout(() => {
-						saveTimeoutRef.current = null;
-						updateNoteMutation.mutate({
-							id: noteId,
-							payload: { content: html },
-						});
-					}, 2000);
-				}
+			// Cancel any previously queued save to restart the debounce timer
+			if (saveTimeoutRef.current) {
+				clearTimeout(saveTimeoutRef.current);
 			}
+
+			const noteId = note.id;
+
+			// Save after 500ms of inactivity
+			saveTimeoutRef.current = setTimeout(() => {
+				saveTimeoutRef.current = null;
+				// Re-verify we're still on the same note before saving
+				if (currentUserNoteRef.current?.id !== noteId) return;
+				updateNoteMutation.mutate({
+					id: noteId,
+					payload: { content: html },
+				});
+			}, 500);
 		},
 
 		extensions: [
@@ -203,33 +210,63 @@ export const Editor = () => {
 		],
 	});
 
+	// Immediate cleanup when the selected note changes in the store.
+	// Runs BEFORE the content-loading effect so the editor is in a clean
+	// state and no stale saves can leak to the wrong note.
 	useEffect(() => {
-		return () => {
-			if (!saveTimeoutRef.current) return;
+		if (prevNoteIdRef.current !== currentNoteId) {
+			// Cancel any pending debounced save from the old note
+			if (saveTimeoutRef.current) {
+				clearTimeout(saveTimeoutRef.current);
+				saveTimeoutRef.current = null;
+			}
+			prevNoteIdRef.current = currentNoteId;
 
-			clearTimeout(saveTimeoutRef.current);
-			saveTimeoutRef.current = null;
-		};
-	}, [currentUserNote?.id]);
+			// Null the ref so onUpdate is blocked during the transition
+			currentUserNoteRef.current = null;
+
+			// Clear the editor immediately (uses <h1> to satisfy TitleExtension filter)
+			if (editor) {
+				isLoadingContent.current = true;
+				editor.commands.setContent(EMPTY_NOTE);
+				isLoadingContent.current = false;
+				lastLoadedId.current = null;
+			}
+		}
+	}, [currentNoteId, editor]);
+
+	// Loads the note's content into the editor once the query data is available.
+	// Also keeps editability and the note ref in sync.
 	useEffect(() => {
 		if (!editor) return;
 
 		const noteId = currentUserNote?.id;
+
+		// Disable editing when no note is selected or note is trashed
 		editor.setEditable(Boolean(noteId && currentUserNote.is_trashed === false));
 
+		// No note selected — reset everything
 		if (!noteId) {
-			editor.commands.clearContent(true);
+			currentUserNoteRef.current = null;
+			isLoadingContent.current = true;
+			editor.commands.setContent(EMPTY_NOTE);
+			isLoadingContent.current = false;
 			lastLoadedId.current = null;
 			return;
 		}
 
+		// Load content only once per note (skip if already loaded)
 		if (lastLoadedId.current !== noteId) {
 			lastLoadedId.current = noteId;
-			const dbContent = currentUserNote.note?.content ?? '';
+			const dbContent = currentUserNote.note?.content || EMPTY_NOTE;
 			isLoadingContent.current = true;
 			editor.commands.setContent(dbContent);
 			isLoadingContent.current = false;
 		}
+
+		// Only set the ref AFTER content is loaded so onUpdate always
+		// sees the correct note data matching the editor content
+		currentUserNoteRef.current = currentUserNote;
 	}, [editor, currentUserNote?.id]);
 
 	if (!editor) {
@@ -252,7 +289,6 @@ export const Editor = () => {
 
 						<ScrollArea className="h-full">
 							<EditorContent
-								key={currentNoteId}
 								editor={editor}
 								className={cn(
 									'bg-editor text-editor-foreground mx-auto min-h-full w-full border-0 shadow-lg'
