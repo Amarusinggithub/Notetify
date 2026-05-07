@@ -1,137 +1,425 @@
+# =============================================================================
+# Notetify — production stack (AWS deployment)
+# -----------------------------------------------------------------------------
+# Designed for a single-host EC2 deployment with Docker Compose. Bring up via:
+#
+#   docker compose -f docker-compose.prod.yaml --env-file .env.production up -d
+#
+# Architectural notes for AWS:
+#   - For a real production load, migrate db -> RDS Postgres and
+#     redis -> ElastiCache. Update .env.production hosts accordingly and
+#     remove the corresponding services here. Keep this file as the
+#     application tier (api/horizon/pulse/collab/client/rustfs).
+#   - Mail in prod uses Amazon SES (Laravel's `ses` driver). MAIL_* vars in
+#     .env.production must be set; no Mailpit container in prod.
+#   - Logs default to json-file with rotation. To ship to CloudWatch, install
+#     the CloudWatch agent on the EC2 host or switch the logging driver here
+#     to `awslogs` and supply awslogs-group / awslogs-region env vars.
+#   - All internal services use `expose:` (not `ports:`) so only the client
+#     reverse proxy (80/443) is reachable from the public internet. Lock down
+#     the security group accordingly.
+# =============================================================================
+
+# Shared logging defaults — JSON file with rotation, suitable for CloudWatch
+# agent ingestion. Switch driver to `awslogs` if running on ECS or if you'd
+# rather have Docker stream directly.
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+    tag: "{{.Name}}"
+
 services:
-  db_prod:
-    networks:
-      - notetify-net-prod
+
+  # ---------------------------------------------------------------------------
+  # db — Postgres 17
+  # Primary datastore. For real production replace with Amazon RDS and remove
+  # this service. RDS gives you automated backups, multi-AZ failover, and
+  # point-in-time recovery — none of which a single container provides.
+  # Internal only (no published port).
+  # ---------------------------------------------------------------------------
+  db:
     image: postgres:17-alpine
-    container_name: notetify-db-prod
+    container_name: notetify-db
+    networks:
+      - notetify-net
+    restart: always
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "postgres"]
+      test: ["CMD", "pg_isready", "-U", "postgres", "-d", "notetify"]
       interval: 10s
-      timeout: 10s
+      timeout: 5s
       retries: 10
-      start_period: 10s
-    restart: unless-stopped
+      start_period: 15s
     user: postgres
-    secrets:
-      - db-password
     volumes:
-      - db-data-prod:/var/lib/postgresql/data
+      - db-data:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=notetify
-      - POSTGRES_PASSWORD_FILE=/run/secrets/db-password
+      - POSTGRES_USER=${DB_USERNAME:-postgres}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:?DB_PASSWORD must be set in .env.production}
     expose:
       - 5432
     env_file:
       - .env.production
+    logging: *default-logging
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2g
+        reservations:
+          cpus: "0.5"
+          memory: 512m
 
-  redis_prod:
-    networks:
-      - notetify-net-prod
+  # ---------------------------------------------------------------------------
+  # redis — Redis 8
+  # Cache + sessions + queue + Pulse ingest + Hocuspocus pub/sub. For real
+  # production replace with Amazon ElastiCache. Keep AOF persistence on so a
+  # restart doesn't drop in-flight queue jobs.
+  # Internal only.
+  # ---------------------------------------------------------------------------
+  redis:
     image: redis:8.0.1-alpine
-    container_name: notetify-redis-prod
+    container_name: notetify-redis
+    networks:
+      - notetify-net
+    restart: always
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "allkeys-lru"]
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
       timeout: 5s
       retries: 10
       start_period: 5s
-    restart: unless-stopped
-    depends_on:
-      db_prod:
-        condition: service_healthy
     volumes:
-      - redis-data-prod:/data
+      - redis-data:/data
     expose:
       - 6379
     env_file:
       - .env.production
+    logging: *default-logging
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1g
+        reservations:
+          cpus: "0.1"
+          memory: 128m
 
-  api_prod:
+  # ---------------------------------------------------------------------------
+  # rustfs — S3-compatible object storage
+  # Holds note attachments. EBS-backed volume on the host. If you'd rather
+  # use AWS S3 directly, swap Laravel's filesystem disk to `s3`, fill in
+  # AWS_* env vars, and delete this service.
+  # Internal only — Laravel reaches it on http://rustfs:9000.
+  # ---------------------------------------------------------------------------
+  rustfs:
+    image: rustfs/rustfs:latest
+    container_name: notetify-rustfs
     networks:
-      - notetify-net-prod
+      - notetify-net
+    restart: always
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9000/minio/health/live"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+    environment:
+      RUSTFS_ROOT_USER: ${RUSTFS_KEY:?RUSTFS_KEY must be set in .env.production}
+      RUSTFS_ROOT_PASSWORD: ${RUSTFS_SECRET:?RUSTFS_SECRET must be set in .env.production}
+      RUSTFS_VOLUMES: /data
+    volumes:
+      - rustfs-data:/data
+    expose:
+      - 9000
+    logging: *default-logging
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2g
+        reservations:
+          cpus: "0.25"
+          memory: 256m
+
+  # ---------------------------------------------------------------------------
+  # api — Laravel HTTP API (PHP-FPM + nginx)
+  # Serves /api/*. Internal only — fronted by client's nginx which
+  # terminates TLS and proxies /api to this container.
+  # ---------------------------------------------------------------------------
+  api:
     build:
       context: ./api
-      dockerfile: Dockerfile
+      dockerfile: docker/Dockerfile
       target: production
-    container_name: notetify-api-prod
-    restart: unless-stopped
+    container_name: notetify-api
+    networks:
+      - notetify-net
+    restart: always
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80/api/health"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
-    expose:
-      - 80
     depends_on:
-      db_prod:
+      db:
         condition: service_healthy
-      redis_prod:
+      redis:
         condition: service_healthy
-    secrets:
-      - db-password
+      rustfs:
+        condition: service_started
     env_file:
       - .env.production
     environment:
-      - DB_HOST=db_prod
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - DB_HOST=db
       - DB_PORT=5432
       - DB_DATABASE=notetify
       - DB_USERNAME=postgres
-      - REDIS_HOST=redis_prod
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - RUSTFS_ENDPOINT=http://rustfs:9000
+      - FILESYSTEM_DISK=rustfs
+    volumes:
+      - api-storage:/app/storage
+    expose:
+      - 80
+    logging: *default-logging
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 1g
+        reservations:
+          cpus: "0.5"
+          memory: 512m
+
+  # ---------------------------------------------------------------------------
+  # horizon — queue worker supervisor
+  # Runs `php artisan horizon`. Processes mail (SES), reindex jobs, etc.
+  # Reuses api image; same code, different command. Dashboard at
+  # /horizon (served by api) — gate it via Horizon::auth() for prod.
+  # ---------------------------------------------------------------------------
+  horizon:
+    build:
+      context: ./api
+      dockerfile: docker/Dockerfile
+      target: production
+    container_name: notetify-horizon
+    networks:
+      - notetify-net
+    restart: always
+    command: ["php", "artisan", "horizon"]
+    healthcheck:
+      test: ["CMD-SHELL", "php artisan horizon:status | grep -q running"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    depends_on:
+      api:
+        condition: service_healthy
+    env_file:
+      - .env.production
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_DATABASE=notetify
+      - DB_USERNAME=postgres
+      - REDIS_HOST=redis
       - REDIS_PORT=6379
     volumes:
-      - api-storage-prod:/app/storage
+      - api-storage:/app/storage
+    logging: *default-logging
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 768m
+        reservations:
+          cpus: "0.25"
+          memory: 256m
 
-  client_prod:
+  # ---------------------------------------------------------------------------
+  # pulse — Pulse aggregator
+  # Runs `php artisan pulse:work`. Aggregates Redis-buffered metrics into
+  # Postgres for the /pulse dashboard.
+  # ---------------------------------------------------------------------------
+  pulse:
+    build:
+      context: ./api
+      dockerfile: docker/Dockerfile
+      target: production
+    container_name: notetify-pulse
     networks:
-      - notetify-net-prod
+      - notetify-net
+    restart: always
+    command: ["php", "artisan", "pulse:work"]
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -f 'pulse:work' > /dev/null"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    depends_on:
+      api:
+        condition: service_healthy
+    env_file:
+      - .env.production
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_DATABASE=notetify
+      - DB_USERNAME=postgres
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    logging: *default-logging
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 384m
+        reservations:
+          cpus: "0.05"
+          memory: 64m
+
+  # ---------------------------------------------------------------------------
+  # collab — Hocuspocus (Yjs CRDT WebSocket server)
+  # Real-time collaborative editing. Receives WS connections at /collab
+  # (proxied by client's nginx with Upgrade headers). Persists via
+  # webhook back to api. Multi-instance fanout via Redis.
+  # See docs/COLLABORATION.md for the full architecture.
+  # ---------------------------------------------------------------------------
+  collab:
+    build:
+      context: ./collab
+      dockerfile: docker/Dockerfile
+      target: production
+    container_name: notetify-collab
+    networks:
+      - notetify-net
+    restart: always
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:1234/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    depends_on:
+      redis:
+        condition: service_healthy
+      api:
+        condition: service_healthy
+    env_file:
+      - .env.production
+    environment:
+      - PORT=1234
+      - LARAVEL_URL=http://api:80
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - NODE_ENV=production
+    expose:
+      - 1234
+    logging: *default-logging
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 768m
+        reservations:
+          cpus: "0.1"
+          memory: 128m
+
+  # ---------------------------------------------------------------------------
+  # client — nginx + static React build (public-facing)
+  # The only container with published ports. Terminates TLS via Let's Encrypt
+  # certs (mounted from ./certbot/conf), serves the SPA, and reverse-proxies:
+  #   /api    -> api:80
+  #   /collab -> collab:1234  (with Upgrade/Connection for WebSocket)
+  # Make sure client/nginx/*.conf includes both proxy blocks.
+  # ---------------------------------------------------------------------------
+  client:
     build:
       context: ./client
-      dockerfile: Dockerfile
+      dockerfile: docker/Dockerfile
       target: production
       args:
-        # Use localhost for local testing, change to domain for production
         - VITE_BASE_URL=${CLIENT_BASE_URL:-https://localhost/api/}
         - VITE_WS_ORIGIN=${CLIENT_WS_ORIGIN:-wss://localhost}
         - VITE_APP_NAME=Notetify
         - VITE_CLIENT_URL=${CLIENT_URL:-https://localhost/}
-    container_name: notetify-client-prod
-    restart: unless-stopped
+    container_name: notetify-client
+    networks:
+      - notetify-net
+    restart: always
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
     ports:
       - "80:80"
       - "443:443"
     depends_on:
-      api_prod:
+      api:
+        condition: service_healthy
+      collab:
         condition: service_healthy
     env_file:
       - .env.production
     environment:
-      # Set DOMAIN=localhost for local testing
       - DOMAIN=${DOMAIN:-localhost}
     volumes:
       - ./certbot/conf:/etc/nginx/certs:ro
       - ./certbot/www:/var/www/certbot:ro
+    logging: *default-logging
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 256m
+        reservations:
+          cpus: "0.1"
+          memory: 64m
 
-  # Optional: Only needed for real production with auto-renewal
+  # ---------------------------------------------------------------------------
+  # certbot — Let's Encrypt cert renewal
+  # Runs continuously, attempting renewal every 12h. Activate with the
+  # `production` profile so it doesn't start in local prod-test runs.
+  # ---------------------------------------------------------------------------
   certbot:
     image: certbot/certbot
     container_name: certbot
     profiles:
       - production
+    restart: always
     volumes:
       - ./certbot/conf:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    logging: *default-logging
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 128m
 
 networks:
-  notetify-net-prod:
+  notetify-net:
     driver: bridge
 
 volumes:
-  db-data-prod:
-  redis-data-prod:
-  api-storage-prod:
-
-secrets:
-  db-password:
-    file: db/password.txt
+  db-data:
+  redis-data:
+  rustfs-data:
+  api-storage:

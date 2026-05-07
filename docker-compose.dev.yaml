@@ -1,63 +1,223 @@
+# =============================================================================
+# Notetify — development stack
+# -----------------------------------------------------------------------------
+# Brings up the full local environment: Postgres, Redis, the Laravel API,
+# the React client, the Hocuspocus collab hand-off (run separately), plus
+# dev-only observability and storage tooling (Mailpit, Seq, RustFS, Horizon,
+# Pulse).
+#
+# Bring up:   docker compose -f docker-compose.dev.yaml up --build
+# Tear down:  docker compose -f docker-compose.dev.yaml down
+#
+# All resource limits are conservative dev defaults — bump them if a service
+# starts OOM-killing on your machine. They're applied via `deploy.resources`
+# which Docker Compose v2 honours even outside of swarm.
+# =============================================================================
+
 services:
-  db_dev:
+
+  # ---------------------------------------------------------------------------
+  # db — Postgres 17
+  # Primary datastore. Holds users, notes (incl. content JSONB + ydoc_state
+  # BYTEA), tags, sessions. Source of truth for everything except live CRDT
+  # state in Hocuspocus memory.
+  # Reachable on host: localhost:5432
+  # ---------------------------------------------------------------------------
+  db:
     image: postgres:17-alpine
-    container_name: notetify-db-dev
+    container_name: notetify-db
     networks:
-      - notetify-net-dev
+      - notetify-net
+    restart: unless-stopped
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "postgres"]
+      test: ["CMD", "pg_isready", "-U", "postgres", "-d",  '${POSTGRES_USER:-app}' ]
       interval: 10s
-      timeout: 10s
+      timeout: 5s
       retries: 10
       start_period: 10s
-    restart: unless-stopped
     user: postgres
-    secrets:
-      - db-password
     volumes:
-      - db-data-dev:/var/lib/postgresql/data
+      - db-data:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=notetify
-      - POSTGRES_PASSWORD_FILE=/run/secrets/db-password
+      - POSTGRES_USER=${DB_USERNAME:-postgres}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-postgres}
     expose:
       - 5432
     ports:
       - "5432:5432"
     env_file:
       - .env.development
+    deploy:
+      resources:
+        limits:
+          cpus: "1.5"
+          memory: 1g
+        reservations:
+          cpus: "0.25"
+          memory: 256m
 
-  redis_dev:
+  # ---------------------------------------------------------------------------
+  # redis — Redis 8
+  # Multi-purpose: Laravel cache + sessions + queue (Horizon) + Pulse ingest +
+  # Hocuspocus pub/sub for SSE invalidation.
+  # Reachable on host: localhost:6379
+  # ---------------------------------------------------------------------------
+  redis:
     image: redis:8.0.1-alpine
-    container_name: notetify-redis-cache-dev
+    container_name: notetify-redis-cache
     networks:
-      - notetify-net-dev
+      - notetify-net
+    restart: unless-stopped
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
       timeout: 5s
       retries: 10
       start_period: 5s
-    restart: unless-stopped
-    depends_on:
-      db_dev:
-        condition: service_healthy
     volumes:
-      - redis-data-dev:/data
+      - redis-data:/data
     expose:
       - 6379
     ports:
       - "6379:6379"
     env_file:
       - .env.development
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512m
+        reservations:
+          cpus: "0.1"
+          memory: 64m
 
-  api_dev:
+  # ---------------------------------------------------------------------------
+  # mailpit — SMTP catcher + web UI
+  # Catches every outgoing email from Laravel in dev (verification, password
+  # reset, etc.) so nothing actually leaves the machine.
+  # Web UI:   http://localhost:8025
+  # SMTP in:  mailpit:1025 (used by api MAIL_HOST)
+  # ---------------------------------------------------------------------------
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: notetify-mailpit
+    networks:
+      - notetify-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8025/livez"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    environment:
+      MP_MAX_MESSAGES: 5000
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+    ports:
+      - "1025:1025"   # SMTP
+      - "8025:8025"   # Web UI
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 128m
+        reservations:
+          cpus: "0.05"
+          memory: 32m
+
+  # ---------------------------------------------------------------------------
+  # seq — structured log store + search UI
+  # Optional. Receives JSON logs from Laravel (configure via Monolog channel
+  # pointing at http://seq:5341/api/events/raw). Use for searching across
+  # api, horizon, pulse logs from one UI.
+  # Web UI:   http://localhost:5341
+  # Ingest:   http://seq:5341  (from inside the network)
+  # ---------------------------------------------------------------------------
+  seq:
+    image: datalust/seq:latest
+    container_name: notetify-seq
+    networks:
+      - notetify-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    environment:
+      ACCEPT_EULA: "Y"
+    volumes:
+      - seq-data:/data
+    ports:
+      - "5341:80"     # Web UI + ingest
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512m
+        reservations:
+          cpus: "0.05"
+          memory: 64m
+
+  # ---------------------------------------------------------------------------
+  # rustfs — S3-compatible object storage
+  # Holds note attachments (images, files dropped into the editor). Laravel's
+  # `rustfs` filesystem disk points here. Note bodies stay in Postgres; only
+  # binary attachments live here.
+  # S3 API:   http://rustfs:9000  (used by api RUSTFS_ENDPOINT)
+  # Console:  http://localhost:9001   (login: rustfs / rustfs-secret)
+  # ---------------------------------------------------------------------------
+  rustfs:
+    image: rustfs/rustfs:latest
+    container_name: notetify-rustfs
+    networks:
+      - notetify-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9000/minio/health/live"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    environment:
+      RUSTFS_ROOT_USER: rustfs
+      RUSTFS_ROOT_PASSWORD: rustfs-secret
+      RUSTFS_VOLUMES: /data
+    volumes:
+      - rustfs-data:/data
+    ports:
+      - "9000:9000"   # S3 API
+      - "9001:9001"   # Console UI
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512m
+        reservations:
+          cpus: "0.1"
+          memory: 64m
+
+  # ---------------------------------------------------------------------------
+  # api — Laravel HTTP API (PHP-FPM + nginx in one image)
+  # Serves /api/*. Owns auth (Sanctum), notes/notebooks/tags CRUD, the collab
+  # JWT issuer, and the Hocuspocus persistence webhooks. Uses Postgres,
+  # Redis, RustFS, and Mailpit.
+  # API:        http://localhost:8000
+  # Telescope:  http://localhost:8000/telescope
+  # Horizon:    http://localhost:8000/horizon
+  # Pulse:      http://localhost:8000/pulse
+  # ---------------------------------------------------------------------------
+  api:
     build:
       context: ./api
-      dockerfile: Dockerfile
+      dockerfile: docker/Dockerfile
       target: development
-    container_name: notetify-api-dev
+    container_name: notetify-api
     networks:
-      - notetify-net-dev
+      - notetify-net
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80/api/health"]
@@ -66,50 +226,181 @@ services:
       retries: 3
       start_period: 40s
     depends_on:
-      db_dev:
+      db:
         condition: service_healthy
-      redis_dev:
+      redis:
         condition: service_healthy
-    secrets:
-      - db-password
+      mailpit:
+        condition: service_started
+      rustfs:
+        condition: service_started
     volumes:
       - ./api:/app
-      - api_vendor_dev:/app/vendor
-      - api_storage_dev:/app/storage
+      - api_vendor:/app/vendor
+      - api_storage:/app/storage
     ports:
       - "8000:80"
     environment:
-      - DB_HOST=db_dev
+      - DB_HOST=db
       - DB_PORT=5432
       - DB_DATABASE=notetify
       - DB_USERNAME=postgres
-      - REDIS_HOST=redis_dev
+      - REDIS_HOST=redis
       - REDIS_PORT=6379
       - APP_ENV=local
       - APP_DEBUG=true
+      - MAIL_MAILER=smtp
+      - MAIL_HOST=mailpit
+      - MAIL_PORT=1025
+      - MAIL_USERNAME=null
+      - MAIL_PASSWORD=null
+      - MAIL_ENCRYPTION=null
+      - RUSTFS_ENDPOINT=http://rustfs:9000
+      - RUSTFS_KEY=rustfs
+      - RUSTFS_SECRET=rustfs-secret
+      - RUSTFS_BUCKET=notetify
+      - RUSTFS_REGION=us-east-1
+      - RUSTFS_USE_PATH_STYLE_ENDPOINT=true
+      - FILESYSTEM_DISK=rustfs
     env_file:
       - .env.development
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 1g
+        reservations:
+          cpus: "0.25"
+          memory: 256m
 
-  client_dev:
+  # ---------------------------------------------------------------------------
+  # horizon — queue worker + dashboard supervisor
+  # Reuses the api image; runs `php artisan horizon` instead of the web
+  # server. Processes mail jobs, search reindex jobs, etc. Dashboard is
+  # served by api at /horizon.
+  # ---------------------------------------------------------------------------
+  horizon:
+    build:
+      context: ./api
+      dockerfile: docker/Dockerfile
+      target: development
+    container_name: notetify-horizon
+    networks:
+      - notetify-net
+    restart: unless-stopped
+    command: ["php", "artisan", "horizon"]
+    healthcheck:
+      test: ["CMD-SHELL", "php artisan horizon:status | grep -q running"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    depends_on:
+      api:
+        condition: service_healthy
+    volumes:
+      - ./api:/app
+      - api_vendor:/app/vendor
+      - api_storage:/app/storage
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_DATABASE=notetify
+      - DB_USERNAME=postgres
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - APP_ENV=local
+    env_file:
+      - .env.development
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512m
+        reservations:
+          cpus: "0.1"
+          memory: 128m
+
+  # ---------------------------------------------------------------------------
+  # pulse — Pulse aggregator
+  # Reuses the api image; runs `php artisan pulse:work` to ingest the
+  # sampled metrics Pulse buffers in Redis and write aggregates to Postgres.
+  # Dashboard is served by api at /pulse.
+  # ---------------------------------------------------------------------------
+  pulse:
+    build:
+      context: ./api
+      dockerfile: docker/Dockerfile
+      target: development
+    container_name: notetify-pulse
+    networks:
+      - notetify-net
+    restart: unless-stopped
+    command: ["php", "artisan", "pulse:work"]
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -f 'pulse:work' > /dev/null"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    depends_on:
+      api:
+        condition: service_healthy
+    volumes:
+      - ./api:/app
+      - api_vendor:/app/vendor
+      - api_storage:/app/storage
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_DATABASE=notetify
+      - DB_USERNAME=postgres
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - APP_ENV=local
+    env_file:
+      - .env.development
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256m
+        reservations:
+          cpus: "0.05"
+          memory: 64m
+
+  # ---------------------------------------------------------------------------
+  # client — Vite dev server (React + Tiptap)
+  # The user-facing SPA. Talks to api over HTTP and (later) to the
+  # Hocuspocus service over WS for collaborative editing.
+  # App: http://localhost:3000
+  # ---------------------------------------------------------------------------
+  client:
     build:
       context: ./client
-      dockerfile: Dockerfile
+      dockerfile: docker/Dockerfile
       target: development
       args:
         - VITE_BASE_URL=http://localhost:8000/api/
         - VITE_WS_ORIGIN=ws://localhost:8000
         - VITE_APP_NAME=Notetify
         - VITE_CLIENT_URL=http://localhost:3000/
-    container_name: notetify-client-dev
+    container_name: notetify-client
     networks:
-      - notetify-net-dev
+      - notetify-net
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
     depends_on:
-      api_dev:
+      api:
         condition: service_healthy
     volumes:
       - ./client:/usr/src/app
-      - node_modules_client_dev:/usr/src/app/node_modules
+      - node_modules_client:/usr/src/app/node_modules
     ports:
       - "3000:3000"
     environment:
@@ -121,18 +412,24 @@ services:
       - .env.development
     stdin_open: true
     tty: true
+    deploy:
+      resources:
+        limits:
+          cpus: "1.5"
+          memory: 1g
+        reservations:
+          cpus: "0.25"
+          memory: 256m
 
 networks:
-  notetify-net-dev:
+  notetify-net:
     driver: bridge
 
 volumes:
-  redis-data-dev:
-  db-data-dev:
-  node_modules_client_dev:
-  api_vendor_dev:
-  api_storage_dev:
-
-secrets:
-  db-password:
-    file: db/password.txt
+  redis-data:
+  db-data:
+  node_modules_client:
+  api_vendor:
+  api_storage:
+  rustfs-data:
+  seq-data:

@@ -5,14 +5,14 @@ echo "Starting Notetify API (Development)"
 
 # Wait for database
 echo "Waiting for database..."
-until nc -z db_dev 5432; do
+until nc -z db 5432; do
     sleep 1
 done
 echo "Database is ready!"
 
 # Wait for Redis
 echo "Waiting for Redis..."
-until nc -z redis_dev 6379; do
+until nc -z redis 6379; do
     sleep 1
 done
 echo "Redis is ready!"

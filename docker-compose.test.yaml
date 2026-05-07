@@ -1,164 +1,246 @@
-services:
-  db:
-    networks:
-      - notetify-net
-    image: postgres:17-alpine
-    container_name: notetify-db
-    healthcheck:
-      test: ["CMD", "pg_isready", "-U", "postgres"]
-      interval: 10s
-      timeout: 10s
-      retries: 10
-      start_period: 10s
-    restart: always
-    user: postgres
-    secrets:
-      - db-password
-    volumes:
-      - db-data:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_DB=notetify
-      - POSTGRES_PASSWORD_FILE=/run/secrets/db-password
-    expose:
-      - 5432
-    ports:
-      - "5432:5432"
-    env_file:
-      - .env.development
+# =============================================================================
+# Notetify — test stack
+# -----------------------------------------------------------------------------
+# Ephemeral environment for running PHPUnit/Pest and Cypress against a clean
+# Postgres + Redis. Designed to be brought up, run a test suite, and torn
+# down. Data lives in tmpfs (RAM) — every `up` starts from a blank schema.
+#
+# Bring up:           docker compose -p notetify-test -f docker-compose.test.yaml up -d --build
+# Run backend tests:  docker compose -p notetify-test -f docker-compose.test.yaml run --rm test
+# Run e2e tests:      docker compose -p notetify-test -f docker-compose.test.yaml --profile e2e up
+# Tear down:          docker compose -p notetify-test -f docker-compose.test.yaml down -v
+#
+# Notes:
+#   - Always pass `-p notetify-test` so this stack doesn't collide with dev's
+#     containers, networks, or volumes when both are running.
+#   - Ports are offset by +1 (5433/6380/8001/3001) for the same reason.
+#   - No Mailpit — Laravel uses MAIL_MAILER=array in tests (mails are
+#     captured in memory and asserted via Mail::fake() / assertSent()).
+#   - No Horizon, Pulse, RustFS, Seq — none are needed for unit/feature
+#     tests. Add them only if a specific test exercises them.
+# =============================================================================
 
-  redis:
+services:
+
+  # ---------------------------------------------------------------------------
+  # db — Postgres 17 (tmpfs)
+  # Throwaway test database. Data is in RAM via tmpfs so each `up` is clean
+  # and migrations run fast. Database name: notetify_test.
+  # ---------------------------------------------------------------------------
+  db:
+    image: postgres:17-alpine
+    container_name: notetify-db-test
     networks:
       - notetify-net
+    restart: "no"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres", "-d", "notetify_test"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    user: postgres
+    tmpfs:
+      - /var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=notetify_test
+      - POSTGRES_USER=${DB_USERNAME:-postgres}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-postgres}
+    ports:
+      - "5433:5432"
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512m
+
+  # ---------------------------------------------------------------------------
+  # redis — Redis 8 (no persistence)
+  # Cache + session backend for tests. Persistence disabled, runs on a
+  # separate logical DB (15) to keep test state isolated.
+  # ---------------------------------------------------------------------------
+  redis:
     image: redis:8.0.1-alpine
-    container_name: notetify-redis-cache
+    container_name: notetify-redis-test
+    networks:
+      - notetify-net
+    restart: "no"
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
-      timeout: 5s
-      retries: 10
-      start_period: 5s
-    restart: always
-    depends_on:
-      db:
-        condition: service_healthy
-    volumes:
-      - redis-data:/data
-    expose:
-      - 6379
+      timeout: 3s
+      retries: 5
+      start_period: 3s
     ports:
-      - "6379:6379"
-    env_file:
-      - .env.development
+      - "6380:6379"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 128m
 
+  # ---------------------------------------------------------------------------
+  # api — Laravel API booted in testing mode
+  # Same image as dev. APP_ENV=testing flips Laravel into the test config:
+  # MAIL_MAILER=array, CACHE_STORE=array, etc. Used both as the target for
+  # feature tests run inside the container and as the backend for Cypress.
+  # ---------------------------------------------------------------------------
   api:
-    networks:
-      - notetify-net
     build:
       context: ./api
-      dockerfile: Dockerfile
+      dockerfile: docker/Dockerfile
       target: development
-    container_name: notetify-api
-    restart: always
+    container_name: notetify-api-test
+    networks:
+      - notetify-net
+    restart: "no"
     healthcheck:
-      test: ["CMD", "php", "artisan", "health:check"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     ports:
-      - "8000:80"
+      - "8001:80"
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_healthy
-    secrets:
-      - db-password
-    env_file:
-      - .env.development
     environment:
+      - APP_ENV=testing
+      - APP_DEBUG=true
       - DB_HOST=db
       - DB_PORT=5432
-      - DB_DATABASE=notetify
-      - DB_USERNAME=postgres
+      - DB_DATABASE=notetify_test
+      - DB_USERNAME=${DB_USERNAME:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-postgres}
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - REDIS_DB=15
+      - CACHE_STORE=array
+      - SESSION_DRIVER=array
+      - QUEUE_CONNECTION=sync
+      - MAIL_MAILER=array
+      - FILESYSTEM_DISK=local
+      - TELESCOPE_ENABLED=false
+      - PULSE_ENABLED=false
     volumes:
       - ./api:/app
       - api_vendor:/app/vendor
-      - api_storage:/app/storage
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 1g
 
-  client:
+  # ---------------------------------------------------------------------------
+  # test — one-shot PHPUnit/Pest runner
+  # Runs `php artisan test` once and exits. Use:
+  #   docker compose -p notetify-test -f docker-compose.test.yaml run --rm test
+  # Reuses the api image. Does NOT start automatically with `up` — must be
+  # invoked via `run`. Inherits env from api so DB/redis/queue match.
+  # ---------------------------------------------------------------------------
+  test:
+    build:
+      context: ./api
+      dockerfile: docker/Dockerfile
+      target: development
+    container_name: notetify-test-runner
     networks:
       - notetify-net
+    profiles:
+      - tools
+    command: ["php", "artisan", "test", "--parallel"]
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      - APP_ENV=testing
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_DATABASE=notetify_test
+      - DB_USERNAME=${DB_USERNAME:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-postgres}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=15
+      - CACHE_STORE=array
+      - SESSION_DRIVER=array
+      - QUEUE_CONNECTION=sync
+      - MAIL_MAILER=array
+      - FILESYSTEM_DISK=local
+    volumes:
+      - ./api:/app
+      - api_vendor:/app/vendor
+
+  # ---------------------------------------------------------------------------
+  # client — Vite SPA (e2e profile only)
+  # Only started for end-to-end tests. Backend-only test runs skip this to
+  # save resources. Activate with `--profile e2e`.
+  # ---------------------------------------------------------------------------
+  client:
     build:
       context: ./client
-      dockerfile: Dockerfile
+      dockerfile: docker/Dockerfile
       target: development
       args:
-        - VITE_BASE_URL=http://localhost:8000/api/
-        - VITE_WS_ORIGIN=ws://localhost:8000
+        - VITE_BASE_URL=http://localhost:8001/api/
+        - VITE_WS_ORIGIN=ws://localhost:8001
         - VITE_APP_NAME=Notetify
-        - VITE_CLIENT_URL=http://localhost:3000/
-    container_name: notetify-client
-    restart: always
+        - VITE_CLIENT_URL=http://localhost:3001/
+    container_name: notetify-client-test
+    networks:
+      - notetify-net
+    profiles:
+      - e2e
+    restart: "no"
     ports:
-      - "3000:3000"
+      - "3001:3000"
     depends_on:
       api:
         condition: service_healthy
     volumes:
       - ./client:/usr/src/app
       - node_modules_client:/usr/src/app/node_modules
-    stdin_open: true
-    tty: true
     environment:
-      - VITE_BASE_URL=http://localhost:8000/api/
-      - VITE_WS_ORIGIN=ws://localhost:8000
+      - VITE_BASE_URL=http://localhost:8001/api/
+      - VITE_WS_ORIGIN=ws://localhost:8001
       - VITE_APP_NAME=Notetify
-      - VITE_CLIENT_URL=http://localhost:3000/
-    env_file:
-      - .env.development
+      - VITE_CLIENT_URL=http://localhost:3001/
 
-
-
-  mailpit:
+  # ---------------------------------------------------------------------------
+  # cypress — headless e2e runner (e2e profile only)
+  # Runs the Cypress suite against the test client. Exits when the suite
+  # finishes. Activate with `--profile e2e`.
+  # ---------------------------------------------------------------------------
+  cypress:
+    image: cypress/included:13.13.0
+    container_name: notetify-cypress
     networks:
       - notetify-net
-    image: 'axllent/mailpit:latest'
-    container_name: mailpit
-    restart: always
-    hostname: localhost
-    volumes:
-      - ./data:/data
-    ports:
-        - '${FORWARD_MAILPIT_PORT:-1025}:1025'
-        - '${FORWARD_MAILPIT_DASHBOARD_PORT:-8025}:8025'
-    expose:
-      - 8025
-      - 1025
+    profiles:
+      - e2e
     depends_on:
+      client:
+        condition: service_started
       api:
         condition: service_healthy
+    working_dir: /e2e
     environment:
-      MP_MAX_MESSAGES: 5000
-      MP_DATA_FILE: /data/mailpit.db
-      MP_SMTP_AUTH_ACCEPT_ANY: 1
-      MP_SMTP_AUTH_ALLOW_INSECURE: 1
-    env_file:
-      - .env.development
+      - CYPRESS_baseUrl=http://client:3000
+    volumes:
+      - ./client:/e2e
 
 networks:
   notetify-net:
     driver: bridge
 
+# Note: vendor volume is the only persistent piece — caches composer install
+# between runs so `up` is fast. Everything else is tmpfs or unmounted.
 volumes:
-  redis-data:
-  db-data:
-  node_modules_client:
   api_vendor:
-  api_storage:
-
-secrets:
-  db-password:
-    file: db/password.txt
+  node_modules_client:

@@ -3,6 +3,13 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "cypress",
+      "esbuild",
+      "@tailwindcss/oxide"
+    ]
+  },
   "scripts": {
     "cy:open": "cypress open",
     "dev": "vite",
@@ -16,6 +23,7 @@
     "preview": " vite preview --host 0.0.0.0 --port 3000 "
   },
   "dependencies": {
+    "@base-ui/react": "^1.4.1",
     "@floating-ui/dom": "^1.7.6",
     "@hocuspocus/provider": "^4.0.0",
     "@hookform/resolvers": "^5.2.2",
