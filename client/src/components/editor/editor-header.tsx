@@ -46,13 +46,7 @@ import { Separator } from '@/components/ui/separator';
 import { useSidebar } from '@/components/ui/sidebar';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
-export function EditorHeader({
-	breadcrumbs = [],
-	currentNoteId = null,
-}: {
-	breadcrumbs?: BreadcrumbItem[];
-	currentNoteId?: string | null;
-}) {
+function FullscreenToggle() {
 	const {
 		open: appOpen,
 		openMobile: appOpenMobile,
@@ -66,6 +60,47 @@ export function EditorHeader({
 		setOpenMobile: setNotesOpenMobile,
 	} = useNotesSidebar();
 
+	const anyOpen = appOpen || appOpenMobile || notesOpen || notesOpenMobile;
+
+	const handleFullscreenToggle = () => {
+		if (anyOpen) {
+			setAppOpen(false);
+			setAppOpenMobile(false);
+			setNotesOpen(false);
+			setNotesOpenMobile(false);
+		} else {
+			setAppOpen(true);
+			setAppOpenMobile(true);
+			setNotesOpen(true);
+			setNotesOpenMobile(true);
+		}
+	};
+
+	return (
+		<Tooltip>
+			<TooltipTrigger asChild>
+				<Button
+					variant="ghost"
+					size="icon"
+					className="-ml-1 size-7"
+					onClick={handleFullscreenToggle}
+					aria-label="Toggle fullscreen (hide sidebars)"
+				>
+					{anyOpen ? <Maximize2 /> : <Minimize2 />}
+				</Button>
+			</TooltipTrigger>
+			<TooltipContent sideOffset={6}>Fullscreen</TooltipContent>
+		</Tooltip>
+	);
+}
+
+export function EditorHeader({
+	breadcrumbs = [],
+	currentNoteId = null,
+}: {
+	breadcrumbs?: BreadcrumbItem[];
+	currentNoteId?: string | null;
+}) {
 	const currentUser = useStore((s) => s.sharedData?.auth.user);
 	const noteUrl = currentNoteId
 		? `${globalThis.window.location.origin}/notes/${currentNoteId}`
@@ -102,22 +137,6 @@ export function EditorHeader({
 		});
 	};
 
-	const handleFullscreenToggle = () => {
-		const anyOpen = appOpen || appOpenMobile || notesOpen || notesOpenMobile;
-
-		if (anyOpen) {
-			setAppOpen(false);
-			setAppOpenMobile(false);
-			setNotesOpen(false);
-			setNotesOpenMobile(false);
-		} else {
-			setAppOpen(true);
-			setAppOpenMobile(true);
-			setNotesOpen(true);
-			setNotesOpenMobile(true);
-		}
-	};
-
 	const handleCopyLink = async () => {
 		try {
 			await navigator.clipboard.writeText(noteUrl);
@@ -148,24 +167,7 @@ export function EditorHeader({
 					<TooltipContent sideOffset={6}>Toggle Notes</TooltipContent>
 				</Tooltip>
 
-				<Tooltip>
-					<TooltipTrigger asChild>
-						<Button
-							variant="ghost"
-							size="icon"
-							className="-ml-1 size-7"
-							onClick={handleFullscreenToggle}
-							aria-label="Toggle fullscreen (hide sidebars)"
-						>
-							{appOpen || appOpenMobile || notesOpen || notesOpenMobile ? (
-								<Maximize2 />
-							) : (
-								<Minimize2 />
-							)}
-						</Button>
-					</TooltipTrigger>
-					<TooltipContent sideOffset={6}>Fullscreen</TooltipContent>
-				</Tooltip>
+				<FullscreenToggle />
 
 				<Separator orientation="vertical" />
 
@@ -393,37 +395,7 @@ export function EditorHeader({
 	);
 }
 
-// Loading version of the header shown before note data is ready
 export function EditorHeaderSkeleton() {
-	const {
-		open: appOpen,
-		openMobile: appOpenMobile,
-		setOpen: setAppOpen,
-		setOpenMobile: setAppOpenMobile,
-	} = useSidebar();
-	const {
-		open: notesOpen,
-		openMobile: notesOpenMobile,
-		setOpen: setNotesOpen,
-		setOpenMobile: setNotesOpenMobile,
-	} = useNotesSidebar();
-
-	const handleFullscreenToggle = () => {
-		const anyOpen = appOpen || appOpenMobile || notesOpen || notesOpenMobile;
-
-		if (anyOpen) {
-			setAppOpen(false);
-			setAppOpenMobile(false);
-			setNotesOpen(false);
-			setNotesOpenMobile(false);
-		} else {
-			setAppOpen(true);
-			setAppOpenMobile(true);
-			setNotesOpen(true);
-			setNotesOpenMobile(true);
-		}
-	};
-
 	return (
 		<header className="bg-editor border-editor-border/50 flex h-16 shrink-0 items-center justify-between gap-2 border-b px-6 transition-[width,height] duration-300 ease-in-out group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 md:px-4">
 			<div className="flex items-center gap-2">
@@ -434,24 +406,7 @@ export function EditorHeaderSkeleton() {
 					<TooltipContent sideOffset={6}>Toggle Notes</TooltipContent>
 				</Tooltip>
 
-				<Tooltip>
-					<TooltipTrigger asChild>
-						<Button
-							variant="ghost"
-							size="icon"
-							className="-ml-1 size-7"
-							onClick={handleFullscreenToggle}
-							aria-label="Toggle fullscreen (hide sidebars)"
-						>
-							{appOpen || appOpenMobile || notesOpen || notesOpenMobile ? (
-								<Maximize2 />
-							) : (
-								<Minimize2 />
-							)}
-						</Button>
-					</TooltipTrigger>
-					<TooltipContent sideOffset={6}>Fullscreen</TooltipContent>
-				</Tooltip>
+				<FullscreenToggle />
 
 				<Separator orientation="vertical" />
 
