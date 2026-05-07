@@ -60,10 +60,7 @@ export const Editor = () => {
 					'focus:outline-none print:border-0 bg-editor text-editor-foreground border border-editor-border flex-col min-h-[1054px] w-full pt-10 pr-14 pb-10 pl-14 cursor-text',
 			},
 		},
-		enableContentCheck: true,
-		onContentError: ({ disableCollaboration }) => {
-			disableCollaboration();
-		},
+		enableContentCheck: false,
 		onCreate: () => {
 			isMounted.current = true;
 		},
@@ -259,7 +256,7 @@ export const Editor = () => {
 			lastLoadedId.current = noteId;
 			const dbContent = currentUserNote.note?.content || EMPTY_NOTE;
 			isLoadingContent.current = true;
-			editor.commands.setContent(dbContent);
+			editor.commands.setContent(dbContent, false, { errorOnInvalidContent: false });
 			isLoadingContent.current = false;
 		}
 

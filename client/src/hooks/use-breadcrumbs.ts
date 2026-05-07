@@ -11,7 +11,7 @@ const routeLabels: Record<string, string> = {
 	notebooks: 'Notebook',
 	shared: 'Shared with me',
 	spaces: 'Spaces',
-	trash: 'Trash',
+	trash: 'Trash'
 };
 
 export default function useBreadcrumbs(): BreadcrumbItemType[] {

@@ -1,6 +1,6 @@
 import { AlertCircle, RefreshCw } from "lucide-react";
-import type { Button } from "../ui/button";
-import type { Skeleton } from "../ui/skeleton";
+import { Button } from "../ui/button";
+import { Skeleton } from "../ui/skeleton";
 import EditorFooter from "./editor-footer";
 import { EditorHeaderSkeleton } from "./editor-header";
 
