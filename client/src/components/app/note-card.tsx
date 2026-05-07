@@ -18,68 +18,73 @@ type NoteCardProp = {
 	userNote: UserNote;
 };
 
-const NoteCard = memo(({ userNote }: NoteCardProp) => {
-	const queryClient = useQueryClient();
-	const navigate = useNavigate();
-	const isActive = useStore((s) => s.selectedNoteId === userNote.id);
-	const setSelectedNoteId = useStore((s) => s.setSelectedNoteId);
-	const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+const NoteCard = memo(
+	({ userNote }: NoteCardProp) => {
+		const queryClient = useQueryClient();
+		const navigate = useNavigate();
+		const isActive = useStore((s) => s.selectedNoteId === userNote.id);
+		const setSelectedNoteId = useStore((s) => s.setSelectedNoteId);
+		const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-	const title = getTitleFromHtml(userNote.note.content);
-	const content = getContentPreview(userNote.note.content);
-	const updatedLabel = userNote.updated_at
-		? formatDistanceToNow(new Date(userNote.updated_at), {
-				addSuffix: true,
-			})
-		: 'just now';
+		const title = getTitleFromHtml(userNote.note.content);
+		const content = getContentPreview(userNote.note.content);
+		const updatedLabel = userNote.updated_at
+			? formatDistanceToNow(new Date(userNote.updated_at), {
+					addSuffix: true,
+				})
+			: 'just now';
 
-	const startPrefetch = () => {
-		hoverTimer.current = setTimeout(() => {
-			queryClient.prefetchQuery(noteQueryOptions(userNote?.id));
-		}, 150);
-	};
+		const startPrefetch = () => {
+			hoverTimer.current = setTimeout(() => {
+				queryClient.prefetchQuery(noteQueryOptions(userNote?.id));
+			}, 150);
+		};
 
-	const cancelPrefetch = () => {
-		if (hoverTimer.current) {
-			clearTimeout(hoverTimer.current);
-			hoverTimer.current = null;
-		}
-	};
+		const cancelPrefetch = () => {
+			if (hoverTimer.current) {
+				clearTimeout(hoverTimer.current);
+				hoverTimer.current = null;
+			}
+		};
 
-	const handleSelectNote = async () => {
-		cancelPrefetch();
-		await queryClient.ensureQueryData(noteQueryOptions(userNote.id));
-		await navigate(`/notes/${userNote.id}`);
-		setSelectedNoteId(userNote.id);
-	};
+		const handleSelectNote = async () => {
+			cancelPrefetch();
+			await queryClient.ensureQueryData(noteQueryOptions(userNote.id));
+			await navigate(`/notes/${userNote.id}`);
+			setSelectedNoteId(userNote.id);
+		};
 
-	return (
-		<Card
-			onMouseEnter={startPrefetch}
-			onMouseLeave={cancelPrefetch}
-			onFocus={startPrefetch}
-			onBlur={cancelPrefetch}
-			onClick={handleSelectNote}
-			className={cn(
-				'gap-2 rounded-none border-x-0 border-t-0 py-3',
-				isActive && 'bg-accent'
-			)}
-		>
-			<CardHeader className="flex flex-row items-center justify-between py-0">
-				<CardTitle className="text-base font-semibold">{title}</CardTitle>
-			</CardHeader>
-			<CardContent className="text-muted-foreground line-clamp-3 text-sm">
-				{content || 'No Content'}
-			</CardContent>
-			<CardFooter
-				data-testid="footer"
-				className="text-muted-foreground text-xs"
+		return (
+			<Card
+				onMouseEnter={startPrefetch}
+				onMouseLeave={cancelPrefetch}
+				onFocus={startPrefetch}
+				onBlur={cancelPrefetch}
+				onClick={handleSelectNote}
+				className={cn(
+					'gap-2 rounded-none border-x-0 border-t-0 py-3',
+					isActive && 'bg-accent'
+				)}
 			>
-				Updated {updatedLabel}
-			</CardFooter>
-		</Card>
-	);
-}, (prev, next) => prev.userNote.id === next.userNote.id && prev.userNote.updated_at === next.userNote.updated_at);
+				<CardHeader className="flex flex-row items-center justify-between py-0">
+					<CardTitle className="text-base font-semibold">{title}</CardTitle>
+				</CardHeader>
+				<CardContent className="text-muted-foreground line-clamp-3 text-sm">
+					{content || 'No Content'}
+				</CardContent>
+				<CardFooter
+					data-testid="footer"
+					className="text-muted-foreground text-xs"
+				>
+					Updated {updatedLabel}
+				</CardFooter>
+			</Card>
+		);
+	},
+	(prev, next) =>
+		prev.userNote.id === next.userNote.id &&
+		prev.userNote.updated_at === next.userNote.updated_at
+);
 
 function getContentPreview(html: string, maxLength = 119): string {
 	const preview = html

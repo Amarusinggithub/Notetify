@@ -1,8 +1,8 @@
-import { AlertCircle, RefreshCw } from "lucide-react";
-import { Button } from "../ui/button";
-import { Skeleton } from "../ui/skeleton";
-import EditorFooter from "./editor-footer";
-import { EditorHeaderSkeleton } from "./editor-header";
+import { AlertCircle, RefreshCw } from 'lucide-react';
+import { Button } from '../ui/button';
+import { Skeleton } from '../ui/skeleton';
+import EditorFooter from './editor-footer';
+import { EditorHeaderSkeleton } from './editor-header';
 
 export function EditorError({
 	error,

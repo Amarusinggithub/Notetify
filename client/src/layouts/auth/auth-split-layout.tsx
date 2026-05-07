@@ -1,6 +1,6 @@
 import { type PropsWithChildren } from 'react';
 import { Link } from 'react-router';
-import {useStore} from '@/stores/index';
+import { useStore } from '@/stores/index';
 import AppLogoIcon from '@/components/app/app-logo-icon';
 
 interface AuthLayoutProps {
@@ -13,7 +13,7 @@ export default function AuthSplitLayout({
 	title,
 	description,
 }: PropsWithChildren<AuthLayoutProps>) {
-const sharedData = useStore((s) => s.sharedData);
+	const sharedData = useStore((s) => s.sharedData);
 
 	const name = sharedData?.name;
 	return (
@@ -27,7 +27,6 @@ const sharedData = useStore((s) => s.sharedData);
 					<AppLogoIcon className="mr-2 size-8 fill-current text-white" />
 					{name}
 				</Link>
-
 			</div>
 			<div className="w-full lg:p-8">
 				<div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-87.5">

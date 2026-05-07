@@ -16,7 +16,7 @@ import { UserInfo } from '@/components/user/user-info';
 import { UserMenuContent } from '@/components/user/user-menu-content';
 
 export function NavUser() {
-	const  sharedData  = useStore((state) => state.sharedData);
+	const sharedData = useStore((state) => state.sharedData);
 	const { state } = useSidebar();
 	const isMobile = useIsMobile();
 

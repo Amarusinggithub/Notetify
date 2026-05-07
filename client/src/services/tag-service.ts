@@ -13,7 +13,7 @@ export async function fetchTag({
 }: QueryFunctionContext<
 	ReturnType<typeof tagQueryKeys.detail>
 >): Promise<UserTag> {
-	const [,, tagId] = queryKey;
+	const [, , tagId] = queryKey;
 
 	const response = await axiosInstance.get<UserTag>(`tags/${tagId}`);
 
@@ -27,7 +27,7 @@ export async function fetchTagsPage({
 	ReturnType<typeof tagQueryKeys.list>,
 	number
 >): Promise<PaginatedTagResponse> {
-	const [,, search, sortBy] = queryKey;
+	const [, , search, sortBy] = queryKey;
 	const params = new URLSearchParams({
 		page: String(pageParam),
 		sort_by: sortBy,

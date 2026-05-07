@@ -114,8 +114,7 @@ function PricingCard({ tier }: { tier: PricingTier }) {
 				variant={tier.highlighted ? 'default' : 'outline'}
 				className={cn(
 					'w-full',
-					tier.highlighted &&
-						'bg-[#e5a00d] text-black hover:bg-[#d4940c]'
+					tier.highlighted && 'bg-[#e5a00d] text-black hover:bg-[#d4940c]'
 				)}
 			>
 				<Link to="/register">{tier.cta}</Link>

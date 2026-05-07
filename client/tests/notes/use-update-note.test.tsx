@@ -98,7 +98,9 @@ describe('useUpdateNote', () => {
 		});
 
 		await waitFor(() => {
-			const cached = queryClient.getQueryData<any>(noteQueryKeys.detail(noteId));
+			const cached = queryClient.getQueryData<any>(
+				noteQueryKeys.detail(noteId)
+			);
 			expect(cached.note.content).toBe(nextContent);
 		});
 

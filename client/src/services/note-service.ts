@@ -13,7 +13,7 @@ export async function fetchNote({
 }: QueryFunctionContext<
 	ReturnType<typeof noteQueryKeys.detail>
 >): Promise<UserNote> {
-	const [,, noteId] = queryKey;
+	const [, , noteId] = queryKey;
 
 	const response = await axiosInstance.get<UserNote>(`notes/${noteId}`);
 
@@ -27,7 +27,7 @@ export async function fetchNotesPage({
 	ReturnType<typeof noteQueryKeys.list>,
 	number
 >): Promise<PaginatedNotesResponse> {
-	const [,, search, sortBy] = queryKey;
+	const [, , search, sortBy] = queryKey;
 	const params = new URLSearchParams({
 		page: String(pageParam),
 		sort_by: sortBy,

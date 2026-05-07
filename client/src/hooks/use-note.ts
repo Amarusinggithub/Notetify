@@ -8,11 +8,7 @@ import {
 import { useNavigate, useRevalidator } from 'react-router';
 import { queryClient } from '@/App';
 import { fetchNote, fetchNotesPage } from '@/services/note-service';
-import {
-	createNote,
-	deleteNote,
-	updateNote,
-} from '@/services/note-service.ts';
+import { createNote, deleteNote, updateNote } from '@/services/note-service.ts';
 import { useStore } from '@/stores/index.ts';
 import type { PaginatedNotesResponse, SortBy } from '@/types';
 import {
@@ -35,7 +31,7 @@ export const notesQueryOptions = (
 	queryKey: noteQueryKeys.list(search, sortby),
 	queryFn: fetchNotesPage,
 	initialPageParam: 1,
-    maxPages: 5,
+	maxPages: 5,
 	getNextPageParam: (lastPage: PaginatedNotesResponse) => lastPage.nextPage,
 });
 
@@ -179,8 +175,7 @@ export function useUpdateNote() {
 
 			const optimisticUpdater = (note: UserNote): UserNote => ({
 				...note,
-				is_pinned_to_home:
-					payload.is_pinned_to_home ?? note.is_pinned_to_home,
+				is_pinned_to_home: payload.is_pinned_to_home ?? note.is_pinned_to_home,
 				is_trashed: payload.is_trashed ?? note.is_trashed,
 				tags: payload.tags ?? note.tags,
 				updated_at: now,

@@ -32,7 +32,9 @@ const Login = () => {
 		setForm({ ...form, [e.target.name]: e.target.value.trim() });
 	};
 
-	const submit = async (e: React.SubmitEvent<HTMLFormElement>): Promise<void> => {
+	const submit = async (
+		e: React.SubmitEvent<HTMLFormElement>
+	): Promise<void> => {
 		e.preventDefault();
 		setErrors(null);
 

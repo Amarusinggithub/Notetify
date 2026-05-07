@@ -256,7 +256,9 @@ export const Editor = () => {
 			lastLoadedId.current = noteId;
 			const dbContent = currentUserNote.note?.content || EMPTY_NOTE;
 			isLoadingContent.current = true;
-			editor.commands.setContent(dbContent, false, { errorOnInvalidContent: false });
+			editor.commands.setContent(dbContent, false, {
+				errorOnInvalidContent: false,
+			});
 			isLoadingContent.current = false;
 		}
 
@@ -274,7 +276,7 @@ export const Editor = () => {
 			<div className="bg-editor flex h-full flex-col">
 				<EditorHeader currentNoteId={currentUserNote?.id} />
 				<EditorToolbar />
-				<div className="relative flex-1 overflow-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border hover:scrollbar-thumb-muted-foreground/40">
+				<div className="scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border hover:scrollbar-thumb-muted-foreground/40 relative flex-1 overflow-auto">
 					<div
 						className={cn(
 							'h-full w-full',
@@ -282,13 +284,12 @@ export const Editor = () => {
 								'invisible absolute top-0 left-0 h-0 overflow-hidden'
 						)}
 					>
-
-							<EditorContent
-								editor={editor}
-								className={cn(
-									'bg-editor text-editor-foreground mx-auto min-h-full w-full border-0 shadow-lg'
-								)}
-							/>
+						<EditorContent
+							editor={editor}
+							className={cn(
+								'bg-editor text-editor-foreground mx-auto min-h-full w-full border-0 shadow-lg'
+							)}
+						/>
 					</div>
 					{!currentUserNote && (
 						<div className="text-muted-foreground flex h-full items-center justify-center text-sm">
@@ -401,4 +402,3 @@ const TitleExtension = Extension.create({
 		];
 	},
 });
-

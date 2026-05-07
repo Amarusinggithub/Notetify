@@ -1,7 +1,7 @@
 import { createRoot } from 'react-dom/client';
 
 import { TanStackDevtools } from '@tanstack/react-devtools';
-import  "./utils/i18n"
+import './utils/i18n';
 import './index.css';
 
 import { StrictMode } from 'react';
@@ -13,9 +13,7 @@ createRoot(document.getElementById('root')!).render(
 		<TanStackDevtools
 			config={{ hideUntilHover: true }}
 			eventBusConfig={{ debug: true }}
-			plugins={[
-
-			]}
+			plugins={[]}
 		/>
 	</StrictMode>
 );

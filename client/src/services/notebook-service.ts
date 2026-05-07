@@ -13,7 +13,7 @@ export async function fetchNotebook({
 }: QueryFunctionContext<
 	ReturnType<typeof notebookQueryKeys.detail>
 >): Promise<UserNotebook> {
-	const [,, notebookId] = queryKey;
+	const [, , notebookId] = queryKey;
 
 	const response = await axiosInstance.get<UserNotebook>(
 		`notebooks/${notebookId}`
@@ -29,7 +29,7 @@ export async function fetchNotebooksPage({
 	ReturnType<typeof notebookQueryKeys.list>,
 	number
 >): Promise<PaginatedNotebooksResponse> {
-	const [,, search, sortBy] = queryKey;
+	const [, , search, sortBy] = queryKey;
 	const params = new URLSearchParams({
 		page: String(pageParam),
 		sort_by: sortBy,

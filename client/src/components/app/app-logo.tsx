@@ -6,7 +6,7 @@ export default function AppLogo() {
 			<div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-md">
 				<AppLogoIcon className="size-5 fill-current text-white dark:text-black" />
 			</div>
-			<span className="truncate text-sm font-semibold leading-tight">
+			<span className="truncate text-sm leading-tight font-semibold">
 				Notetify
 			</span>
 		</div>

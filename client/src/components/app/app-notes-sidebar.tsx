@@ -38,7 +38,12 @@ import { EnsureNotes, useFetchNotes } from '@/hooks/use-note.ts';
 import { useStore } from '@/stores/index.ts';
 
 import NoteCard from '@/components/app/note-card';
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
+import {
+	Card,
+	CardContent,
+	CardFooter,
+	CardHeader,
+} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import {
 	Select,
@@ -49,14 +54,24 @@ import {
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Switch } from '@/components/ui/switch';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from '@/components/ui/tooltip';
 import type { SortBy } from '@/types';
 
 export function notesLoader() {
 	return EnsureNotes();
 }
 
-function NotesCount({ search, sortBy }: { search: string; sortBy: SortBy| undefined }) {
+function NotesCount({
+	search,
+	sortBy,
+}: {
+	search: string;
+	sortBy: SortBy | undefined;
+}) {
 	const { data } = useFetchNotes(search, sortBy);
 	const count = data?.length ?? 0;
 	return (
@@ -71,10 +86,14 @@ function VirtualNotesList({
 	sortBy,
 }: {
 	search: string;
-	sortBy : SortBy| undefined;
+	sortBy: SortBy | undefined;
 }) {
-	const { data: allNotes, fetchNextPage, hasNextPage, isFetchingNextPage } =
-		useFetchNotes(search, sortBy);
+	const {
+		data: allNotes,
+		fetchNextPage,
+		hasNextPage,
+		isFetchingNextPage,
+	} = useFetchNotes(search, sortBy);
 
 	const parentRef = useRef<HTMLDivElement>(null);
 
@@ -83,7 +102,6 @@ function VirtualNotesList({
 		getScrollElement: () => parentRef.current,
 		estimateSize: () => 95,
 		overscan: 10,
-
 	});
 
 	const virtualItems = rowVirtualizer.getVirtualItems();
@@ -112,7 +130,7 @@ function VirtualNotesList({
 			<NotesSidebarContent>
 				<div
 					ref={parentRef}
-					className="h-full w-full overflow-y-auto overscroll-contain scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border hover:scrollbar-thumb-muted-foreground/40"
+					className="scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border hover:scrollbar-thumb-muted-foreground/40 h-full w-full overflow-y-auto overscroll-contain"
 				>
 					{allNotes.length === 0 ? (
 						<div className="text-muted-foreground flex h-full items-center justify-center text-sm">

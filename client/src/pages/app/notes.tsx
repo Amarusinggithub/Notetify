@@ -34,8 +34,6 @@ export default function Notes() {
 		}
 	}, [initialData, queryClient]);
 
-
-
 	useEffect(() => {
 		const routeNoteId = noteId ?? null;
 

@@ -41,10 +41,17 @@ import {
 	DropdownMenuSubTrigger,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { NotesSidebarTrigger, useNotesSidebar } from '@/components/ui/notes-sidebar';
+import {
+	NotesSidebarTrigger,
+	useNotesSidebar,
+} from '@/components/ui/notes-sidebar';
 import { Separator } from '@/components/ui/separator';
 import { useSidebar } from '@/components/ui/sidebar';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 function FullscreenToggle() {
 	const {
@@ -177,9 +184,7 @@ export function EditorHeader({
 			<div className="flex items-center gap-2">
 				<Avatar className="border-border size-8 border">
 					<AvatarImage src={currentUser?.avatar ?? ''} alt={ownerLabel} />
-					<AvatarFallback>
-						{ownerLabel.charAt(0).toUpperCase()}
-					</AvatarFallback>
+					<AvatarFallback>{ownerLabel.charAt(0).toUpperCase()}</AvatarFallback>
 				</Avatar>
 				<Badge variant="secondary" className="rounded-full px-3 py-1 text-xs">
 					Workspace note

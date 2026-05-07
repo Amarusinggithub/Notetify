@@ -1,9 +1,0 @@
-node_modules
-**/dist/**
-**/build/**
-**/npm/**
-!scripts/npm/**
-**/*.md
-**/node_modules
-.prettierignore
-

@@ -337,7 +337,7 @@ Do not introduce a third server-state layer (Redux, RTK Query, SWR). Do not put 
 ## Code Style Preferences
 
 - PHP: **Laravel Pint** is the formatter (`api/composer.json` includes it). Follow PSR-12 + Laravel conventions.
-- TypeScript: **Prettier** with `prettier-plugin-organize-imports` and `prettier-plugin-tailwindcss`; **ESLint** is enforced
+- TypeScript: **oxfmt** is the formatter and **oxlint** is the linter (migrated from Prettier + ESLint). See @docs/OXLINT.md and @docs/OXFMT.md. Type-aware lint rules are pending oxlint support — re-enable per @docs/OXLINT.md when available.
 - Tailwind v4 — use the existing utility classes; do not add a second styling system
 - Use shadcn/Radix primitives in `client/src/components/ui/` rather than introducing a second UI library
 - The following is critical: only add explanatory inline code comments if you are specifically asked to; the code should be self-explanatory

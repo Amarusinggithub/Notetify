@@ -32,16 +32,14 @@ export const spaceQueryKeys = {
 
 export const fileQueryKeys = {
 	all: ['files'] as const,
-	detail: (fileId: string) =>
-		[...fileQueryKeys.all, 'detail', fileId] as const,
+	detail: (fileId: string) => [...fileQueryKeys.all, 'detail', fileId] as const,
 	list: (search: string, sortBy: SortBy) =>
 		[...fileQueryKeys.all, 'list', search, sortBy] as const,
 };
 
 export const taskQueryKeys = {
 	all: ['tasks'] as const,
-	detail: (taskId: string) =>
-		[...taskQueryKeys.all, 'detail', taskId] as const,
+	detail: (taskId: string) => [...taskQueryKeys.all, 'detail', taskId] as const,
 	list: (search: string, sortBy: SortBy) =>
 		[...taskQueryKeys.all, 'list', search, sortBy] as const,
 };

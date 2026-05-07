@@ -105,7 +105,9 @@ describe('useCreateNote', () => {
 			expect(mockNavigate).toHaveBeenCalledWith('/notes/note-new');
 		});
 
-		expect(queryClient.getQueryData(noteQueryKeys.detail(created.id))).toEqual(created);
+		expect(queryClient.getQueryData(noteQueryKeys.detail(created.id))).toEqual(
+			created
+		);
 		expect(useStore.getState().selectedNoteId).toBe('note-old');
 
 		deferredNavigate.resolve();

@@ -24,14 +24,17 @@ import {
 } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
 
-
 function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
 	const [copied, setCopied] = useState(false);
 	const [detailsOpen, setDetailsOpen] = useState(false);
 
 	// Safely extract error info
-	const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-	const errorStack = error instanceof Error ? error.stack ?? 'No stack trace available' : 'No stack trace available';
+	const errorMessage =
+		error instanceof Error ? error.message : 'An unknown error occurred';
+	const errorStack =
+		error instanceof Error
+			? (error.stack ?? 'No stack trace available')
+			: 'No stack trace available';
 	const errorDetails = `Error: ${errorMessage}\n\nStack Trace:\n${errorStack}`;
 
 	const handleCopy = async () => {

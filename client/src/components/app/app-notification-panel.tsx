@@ -30,7 +30,11 @@ import {
 	SheetTrigger,
 } from '@/components/ui/sheet';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 
 type NotificationType =
@@ -65,10 +69,13 @@ const notificationIcons: Record<NotificationType, React.ReactNode> = {
 
 const notificationColors: Record<NotificationType, string> = {
 	share: 'bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-400',
-	comment: 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400',
-	mention: 'bg-violet-100 text-violet-600 dark:bg-violet-950 dark:text-violet-400',
+	comment:
+		'bg-emerald-100 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400',
+	mention:
+		'bg-violet-100 text-violet-600 dark:bg-violet-950 dark:text-violet-400',
 	invite: 'bg-amber-100 text-amber-600 dark:bg-amber-950 dark:text-amber-400',
-	starred: 'bg-yellow-100 text-yellow-600 dark:bg-yellow-950 dark:text-yellow-400',
+	starred:
+		'bg-yellow-100 text-yellow-600 dark:bg-yellow-950 dark:text-yellow-400',
 	trash: 'bg-red-100 text-red-600 dark:bg-red-950 dark:text-red-400',
 	system: 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
 };
@@ -83,7 +90,7 @@ function NotificationItem({
 	return (
 		<div
 			className={cn(
-				'group relative flex gap-3 px-5 py-3.5 transition-colors hover:bg-accent/50',
+				'group hover:bg-accent/50 relative flex gap-3 px-5 py-3.5 transition-colors',
 				!notification.read && 'bg-accent/30'
 			)}
 		>
@@ -203,7 +210,8 @@ const mockNotifications: Notification[] = [
 		id: '1',
 		type: 'share',
 		title: 'Alex shared a note with you',
-		message: 'Project kickoff meeting notes — includes action items and deadlines for Q3.',
+		message:
+			'Project kickoff meeting notes — includes action items and deadlines for Q3.',
 		timestamp: '2 minutes ago',
 		read: false,
 	},
@@ -211,7 +219,8 @@ const mockNotifications: Notification[] = [
 		id: '2',
 		type: 'comment',
 		title: 'New comment on "API Design Doc"',
-		message: 'Sarah left a comment: "Can we revisit the auth flow? I think there\'s a simpler approach."',
+		message:
+			'Sarah left a comment: "Can we revisit the auth flow? I think there\'s a simpler approach."',
 		timestamp: '15 minutes ago',
 		read: false,
 	},
@@ -219,7 +228,8 @@ const mockNotifications: Notification[] = [
 		id: '3',
 		type: 'mention',
 		title: 'You were mentioned in a note',
-		message: 'Jake mentioned you in "Sprint Retro": "@you can you take a look at the deployment issue?"',
+		message:
+			'Jake mentioned you in "Sprint Retro": "@you can you take a look at the deployment issue?"',
 		timestamp: '1 hour ago',
 		read: false,
 	},
@@ -235,7 +245,8 @@ const mockNotifications: Notification[] = [
 		id: '5',
 		type: 'starred',
 		title: 'Note added to favorites',
-		message: 'Your note "Component Library Overview" was starred by 3 team members.',
+		message:
+			'Your note "Component Library Overview" was starred by 3 team members.',
 		timestamp: 'Yesterday',
 		read: true,
 	},
@@ -243,7 +254,8 @@ const mockNotifications: Notification[] = [
 		id: '6',
 		type: 'system',
 		title: 'Storage almost full',
-		message: 'You\'ve used 90% of your storage. Consider upgrading or cleaning up old files.',
+		message:
+			"You've used 90% of your storage. Consider upgrading or cleaning up old files.",
 		timestamp: '2 days ago',
 		read: true,
 	},
@@ -257,8 +269,13 @@ const mockNotifications: Notification[] = [
 	},
 ];
 
-export function NotificationPanel({ hasUnread = false }: { hasUnread?: boolean }) {
-	const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
+export function NotificationPanel({
+	hasUnread = false,
+}: {
+	hasUnread?: boolean;
+}) {
+	const [notifications, setNotifications] =
+		useState<Notification[]>(mockNotifications);
 	const [isLoading] = useState(false);
 	const [isError] = useState(false);
 
@@ -292,7 +309,7 @@ export function NotificationPanel({ hasUnread = false }: { hasUnread?: boolean }
 						>
 							<Bell className="size-4" />
 							{showDot && (
-								<span className="absolute top-1.5 right-1.5 size-2 rounded-full bg-blue-500 ring-2 ring-background" />
+								<span className="ring-background absolute top-1.5 right-1.5 size-2 rounded-full bg-blue-500 ring-2" />
 							)}
 						</Button>
 					</SheetTrigger>

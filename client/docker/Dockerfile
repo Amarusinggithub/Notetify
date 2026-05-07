@@ -11,10 +11,14 @@ RUN corepack enable
 
 WORKDIR /usr/src/app
 
-COPY package.json pnpm-lock.yaml ./
+COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* .npmrc* ./
 
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
-    pnpm install --frozen-lockfile
+    if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
+    elif [ -f package-lock.json ]; then npm ci; \
+    elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm i --frozen-lockfile; \
+    else echo "Lockfile not found." && exit 1; \
+    fi
 
 ################################################################################
 # Build stage - Build the application
@@ -35,7 +39,12 @@ ENV VITE_WS_ORIGIN=${VITE_WS_ORIGIN}
 ENV VITE_APP_NAME=${VITE_APP_NAME}
 ENV VITE_CLIENT_URL=${VITE_CLIENT_URL}
 
-RUN pnpm build
+RUN \
+    if [ -f yarn.lock ]; then yarn run build; \
+    elif [ -f package-lock.json ]; then npm run build; \
+    elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm run build; \
+    else echo "Lockfile not found." && exit 1; \
+    fi
 
 ################################################################################
 # Development stage

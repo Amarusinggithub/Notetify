@@ -5,7 +5,6 @@ import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils.ts';
 import { type NavItem } from '@/types';
 
-
 const sidebarNavItems: NavItem[] = [
 	{
 		title: 'General',

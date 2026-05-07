@@ -1,6 +1,6 @@
-import { Skeleton } from "../ui/skeleton";
-import EditorFooter from "./editor-footer";
-import { EditorHeaderSkeleton } from "./editor-header";
+import { Skeleton } from '../ui/skeleton';
+import EditorFooter from './editor-footer';
+import { EditorHeaderSkeleton } from './editor-header';
 
 // Loading skeleton for suspense fallback
 export const EditorLoadingSkeleton = () => {

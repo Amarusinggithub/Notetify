@@ -1,4 +1,8 @@
-import { AppleIcon, GoogleIcon, MetaIcon } from '@/components/shared/auth-provider-icons';
+import {
+	AppleIcon,
+	GoogleIcon,
+	MetaIcon,
+} from '@/components/shared/auth-provider-icons';
 import { Button } from '@/components/ui/button';
 
 const providers = [

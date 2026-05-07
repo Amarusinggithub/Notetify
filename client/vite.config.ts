@@ -27,8 +27,7 @@ export default defineConfig({
 		rollupOptions: {
 			output: {
 				manualChunks: (id) => {
-                    if (id.includes('@tiptap')) 
-            return 'tiptap-vendor';
+					if (id.includes('@tiptap')) return 'tiptap-vendor';
 					if (id.includes('@tiptap/')) return 'tiptap';
 					if (id.includes('@radix-ui/')) return 'radix';
 					if (id.includes('katex')) return 'katex';

@@ -134,7 +134,7 @@ export default function NotFound() {
 								<Button
 									variant="outline"
 									size="lg"
-									className="gap-2 bg-background/70 backdrop-blur"
+									className="bg-background/70 gap-2 backdrop-blur"
 									onClick={handleGoBack}
 								>
 									<ArrowLeft className="size-4" />
@@ -144,33 +144,35 @@ export default function NotFound() {
 						</div>
 
 						<div className="mt-10 grid gap-4 sm:grid-cols-3">
-							{quickLinks.map(({ description, icon: Icon, label, to }, index) => (
-								<motion.div
-									key={to}
-									initial={{ opacity: 0, y: 18 }}
-									animate={{ opacity: 1, y: 0 }}
-									transition={{
-										delay: 0.2 + index * 0.08,
-										duration: 0.45,
-										ease: 'easeOut',
-									}}
-								>
-									<Link
-										to={to}
-										className="group bg-card/75 border-border/60 hover:border-primary/35 hover:bg-card flex h-full flex-col rounded-3xl border p-5 shadow-sm backdrop-blur transition-all duration-200"
+							{quickLinks.map(
+								({ description, icon: Icon, label, to }, index) => (
+									<motion.div
+										key={to}
+										initial={{ opacity: 0, y: 18 }}
+										animate={{ opacity: 1, y: 0 }}
+										transition={{
+											delay: 0.2 + index * 0.08,
+											duration: 0.45,
+											ease: 'easeOut',
+										}}
 									>
-										<div className="bg-primary/14 text-primary mb-4 flex size-11 items-center justify-center rounded-2xl">
-											<Icon className="size-5" />
-										</div>
-										<div className="space-y-2">
-											<p className="text-base font-semibold">{label}</p>
-											<p className="text-muted-foreground text-sm leading-6">
-												{description}
-											</p>
-										</div>
-									</Link>
-								</motion.div>
-							))}
+										<Link
+											to={to}
+											className="group bg-card/75 border-border/60 hover:border-primary/35 hover:bg-card flex h-full flex-col rounded-3xl border p-5 shadow-sm backdrop-blur transition-all duration-200"
+										>
+											<div className="bg-primary/14 text-primary mb-4 flex size-11 items-center justify-center rounded-2xl">
+												<Icon className="size-5" />
+											</div>
+											<div className="space-y-2">
+												<p className="text-base font-semibold">{label}</p>
+												<p className="text-muted-foreground text-sm leading-6">
+													{description}
+												</p>
+											</div>
+										</Link>
+									</motion.div>
+								)
+							)}
 						</div>
 					</motion.section>
 
@@ -199,7 +201,7 @@ export default function NotFound() {
 								<div className="relative overflow-hidden rounded-[1.75rem] border border-white/10 bg-neutral-950 px-6 py-8 text-white shadow-inner">
 									<div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,214,10,0.28),transparent_45%)]" />
 									<div className="relative">
-										<p className="text-white/60 text-sm uppercase tracking-[0.28em]">
+										<p className="text-sm tracking-[0.28em] text-white/60 uppercase">
 											404
 										</p>
 										<div className="mt-3 text-7xl font-semibold tracking-[-0.08em] sm:text-8xl">
@@ -226,23 +228,27 @@ export default function NotFound() {
 									</div>
 
 									<div className="space-y-3">
-										{quickLinks.map(({ description, icon: Icon, label, to }) => (
-											<Link
-												key={label}
-												to={to}
-												className="bg-background/70 border-border/60 hover:border-primary/35 flex items-center gap-4 rounded-2xl border p-4 transition-colors"
-											>
-												<div className="bg-muted flex size-10 items-center justify-center rounded-xl">
-													<Icon className="text-foreground size-[18px]" />
-												</div>
-												<div className="min-w-0">
-													<p className="truncate text-sm font-medium">{label}</p>
-													<p className="text-muted-foreground truncate text-xs">
-														{description}
-													</p>
-												</div>
-											</Link>
-										))}
+										{quickLinks.map(
+											({ description, icon: Icon, label, to }) => (
+												<Link
+													key={label}
+													to={to}
+													className="bg-background/70 border-border/60 hover:border-primary/35 flex items-center gap-4 rounded-2xl border p-4 transition-colors"
+												>
+													<div className="bg-muted flex size-10 items-center justify-center rounded-xl">
+														<Icon className="text-foreground size-[18px]" />
+													</div>
+													<div className="min-w-0">
+														<p className="truncate text-sm font-medium">
+															{label}
+														</p>
+														<p className="text-muted-foreground truncate text-xs">
+															{description}
+														</p>
+													</div>
+												</Link>
+											)
+										)}
 									</div>
 								</div>
 							</div>
