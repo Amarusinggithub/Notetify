@@ -88,6 +88,8 @@ RUN set -eux; \
         opcache \
         pcntl \
         pdo_pgsql \
+        posix \
+        sockets \
         zip; \
     pecl install redis; \
     docker-php-ext-enable redis; \

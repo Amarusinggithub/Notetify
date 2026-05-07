@@ -53,4 +53,19 @@ return [
         'redirect' => env('FACEBOOK_REDIRECT_URI'),
     ],
 
+    'collab' => [
+        'secret' => env('COLLAB_JWT_SECRET'),
+        'ttl' => env('COLLAB_JWT_TTL', 3600),
+        'ws_url' => env('COLLAB_WS_URL', 'ws://localhost:1234'),
+        'webhook_secret' => env('COLLAB_WEBHOOK_SECRET'),
+    ],
+
+    'rustfs' => [
+        'key' => env('RUSTFS_KEY'),
+        'secret' => env('RUSTFS_SECRET'),
+        'region' => env('RUSTFS_REGION', 'us-east-1'),
+        'bucket' => env('RUSTFS_BUCKET', 'notetify'),
+        'endpoint' => env('RUSTFS_ENDPOINT'),
+    ],
+
 ];

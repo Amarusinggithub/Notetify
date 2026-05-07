@@ -60,6 +60,19 @@ return [
             'report' => false,
         ],
 
+        'rustfs' => [
+            'driver' => 's3',
+            'key' => env('RUSTFS_KEY'),
+            'secret' => env('RUSTFS_SECRET'),
+            'region' => env('RUSTFS_REGION', 'us-east-1'),
+            'bucket' => env('RUSTFS_BUCKET', 'notetify'),
+            'url' => env('RUSTFS_URL'),
+            'endpoint' => env('RUSTFS_ENDPOINT'),
+            'use_path_style_endpoint' => env('RUSTFS_USE_PATH_STYLE_ENDPOINT', true),
+            'throw' => false,
+            'report' => false,
+        ],
+
     ],
 
     /*
