@@ -183,7 +183,7 @@ function NotesSidebar({
 			<div
 				data-slot="notes-sidebar-container"
 				className={cn(
-					'relative z-10 hidden h-svh w-(--notes-sidebar-width) transition-[left,right,width] duration-300 ease-in-out md:flex',
+					'relative z-10 hidden h-full w-(--notes-sidebar-width) transition-[left,right,width] duration-300 ease-in-out md:flex',
 					side === 'left'
 						? 'left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--notes-sidebar-width)*-1)]'
 						: 'right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--notes-sidebar-width)*-1)]',
