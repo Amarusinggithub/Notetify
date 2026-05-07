@@ -2,7 +2,6 @@ import { Link } from 'react-router';
 
 import {
 	BadgeCheck,
-	Bell,
 	CreditCard,
 	LogOut,
 	Settings,
@@ -73,10 +72,6 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
 				<DropdownMenuItem>
 					<CreditCard className="mr-2" />
 					Billing
-				</DropdownMenuItem>
-				<DropdownMenuItem>
-					<Bell className="mr-2" />
-					Notifications
 				</DropdownMenuItem>
 			</DropdownMenuGroup>
 			<DropdownMenuSeparator />

@@ -8,11 +8,10 @@ import { ModeToggle } from '@/components/shared/mode-toggle';
 import { Button } from '@/components/ui/button';
 
 const links = [
-	{ label: 'Features', links: '#features', id:'features' },
+	{ label: 'Features', links: '#features', id: 'features' },
 	{ label: 'How It Works', links: '#how-it-works', id: 'how-it-works' },
-	{ label: 'About Us', links: '#about', id: 'about' },
 	{ label: 'Pricing', links: '#pricing', id: 'pricing' },
-	{ label: 'Contact', links: '#contact', id: 'contact' },
+	{ label: 'About Us', links: '#about', id: 'about' },
 ];
 export const HeroHeader = () => {
 	const [menuState, setMenuState] = React.useState(false);

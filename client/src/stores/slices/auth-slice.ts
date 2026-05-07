@@ -351,6 +351,7 @@ export const createAuthSlice: StateCreator<StoreState, [], [], AuthSlice> = (
 			await authService.logout();
 		} finally {
 			set({ isLoading: false });
+			window.location.href = '/';
 		}
 	},
 

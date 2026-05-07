@@ -118,7 +118,7 @@ function NotesSidebarProvider({
 						} as React.CSSProperties
 					}
 					className={cn(
-						'group/sidebar-wrapper has-data-[variant=inset]:bg-sidebar flex h-svh w-full overflow-hidden',
+						'group/sidebar-wrapper has-data-[variant=inset]:bg-sidebar flex h-full w-full overflow-hidden',
 						className
 					)}
 					{...props}

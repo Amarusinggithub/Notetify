@@ -19,7 +19,7 @@ export default function AuthSimpleLayout({
 				<div className="flex flex-col gap-8">
 					<div className="flex flex-col items-center gap-4">
 						<Link
-							to={'/home'}
+							to={'/'}
 							className="flex flex-col items-center gap-2 font-medium"
 						>
 							<div className="mb-1 flex h-9 w-9 items-center justify-center rounded-md">
