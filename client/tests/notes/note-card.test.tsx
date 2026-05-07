@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { describe, expect, it, vi } from 'vitest';
-import NoteCard from '../../src/components/aap/note-card';
+import NoteCard from '@/components/app/note-card';
 
 const mockNavigate = vi.fn();
 
