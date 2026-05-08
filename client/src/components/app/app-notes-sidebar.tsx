@@ -440,7 +440,7 @@ export function EditorNotesSidebar() {
 					/>
 				)}
 			>
-				<Suspense fallback={<NotesSidebarSkeleton />}>
+				<Suspense fallback={<NotesSkeleton />}>
 					<VirtualNotesList />
 				</Suspense>
 			</ErrorBoundary>
