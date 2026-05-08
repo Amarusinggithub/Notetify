@@ -12,6 +12,10 @@ export default defineConfig({
 		host: true,
 		port: 5173,
 		allowedHosts: ['bingolaptop.taila14742.ts.net'],
+		watch: {
+			usePolling: true,
+			interval: 300,
+		},
 	},
 	resolve: {
 		alias: {

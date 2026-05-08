@@ -1,5 +1,6 @@
 import { LoaderCircle } from 'lucide-react';
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router';
 import AuthProviderButtons from '@/components/shared/auth-provider-buttons';
 import InputError from '@/components/shared/input-error.tsx';
 import TextLink from '@/components/shared/text-link.tsx';
@@ -28,6 +29,7 @@ const Register = () => {
 	});
 
 	const { SignUp, isLoading, errors, setErrors } = useStore();
+	const navigate = useNavigate();
 
 	function change(e: React.ChangeEvent<HTMLInputElement>) {
 		setForm({ ...form, [e.target.name]: e.target.value.trim() });
@@ -46,7 +48,13 @@ const Register = () => {
 			return;
 		}
 
-		await SignUp(form.first_name, form.last_name, form.email, form.password);
+		const ok = await SignUp(
+			form.first_name,
+			form.last_name,
+			form.email,
+			form.password
+		);
+		if (ok) navigate('/', { replace: true });
 	}
 
 	function handleOnLinkClick() {

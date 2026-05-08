@@ -79,8 +79,8 @@ class User extends Authenticatable  implements MustVerifyEmail
     protected function name(): Attribute
     {
         return Attribute::make(
-            get: fn (string $value) => ucwords($value),
-            set: fn (string $value) => strtolower($value),
+            get: fn (?string $value) => $value === null ? null : ucwords($value),
+            set: fn (?string $value) => $value === null ? null : strtolower($value),
         );
     }
 
