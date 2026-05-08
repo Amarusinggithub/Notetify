@@ -205,10 +205,7 @@ services:
   # Postgres for the /pulse dashboard.
   # ---------------------------------------------------------------------------
   pulse:
-    build:
-      context: ./api
-      dockerfile: docker/Dockerfile
-      target: production
+    image: notetify-api
     container_name: notetify-pulse
     networks:
       - notetify-net
@@ -243,6 +240,53 @@ services:
         reservations:
           cpus: "0.05"
           memory: 64m
+
+  # ---------------------------------------------------------------------------
+  # horizon — Laravel Horizon queue worker + supervisor
+  # Runs `php artisan horizon`, which spawns and supervises the worker pool
+  # defined in config/horizon.php. SIGTERM drains in-flight jobs cleanly.
+  # Dashboard is served by api at /horizon (gated in prod via
+  # HorizonServiceProvider::gate()).
+  # ---------------------------------------------------------------------------
+  horizon:
+    image: notetify-api
+    container_name: notetify-horizon
+    networks:
+      - notetify-net
+    restart: always
+    command: ["php", "artisan", "horizon"]
+    stop_signal: SIGTERM
+    stop_grace_period: 60s
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -f 'artisan horizon' > /dev/null"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    depends_on:
+      api:
+        condition: service_healthy
+    env_file:
+      - .env.production
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_DATABASE=notetify
+      - DB_USERNAME=postgres
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - QUEUE_CONNECTION=redis
+    logging: *default-logging
+    deploy:
+      resources:
+        limits:
+          cpus: "1.5"
+          memory: 768m
+        reservations:
+          cpus: "0.2"
+          memory: 192m
 
   # ---------------------------------------------------------------------------
   # collab — Hocuspocus (Yjs CRDT WebSocket server)

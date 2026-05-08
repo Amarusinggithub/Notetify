@@ -7,7 +7,7 @@ ARG NODE_VERSION=22.17.1
 ################################################################################
 FROM node:${NODE_VERSION}-alpine AS base
 
-RUN corepack enable
+RUN corepack enable && corepack prepare pnpm@11.0.8 --activate
 
 WORKDIR /usr/src/app
 
@@ -53,7 +53,7 @@ FROM node:${NODE_VERSION}-alpine AS development
 
 ENV NODE_ENV=development
 
-RUN corepack enable
+RUN corepack enable && corepack prepare pnpm@11.0.8 --activate
 
 WORKDIR /usr/src/app
 
@@ -62,12 +62,12 @@ COPY --from=base /usr/src/app/package.json ./package.json
 
 COPY . .
 
-COPY docker/entrypoint.sh .
-RUN chmod +x ./entrypoint.sh
+COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 EXPOSE 3000
 
-ENTRYPOINT ["sh", "entrypoint.sh"]
+ENTRYPOINT ["sh", "/usr/local/bin/entrypoint.sh"]
 
 ################################################################################
 # Production stage

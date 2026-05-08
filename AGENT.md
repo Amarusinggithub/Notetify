@@ -5,7 +5,7 @@
 - Notetify is a collaborative note-taking app with notebooks, tags, tasks, files, spaces, and sharing
 - Real-time multi-user editing is being added via Tiptap + Yjs + Hocuspocus (see @docs/COLLABORATION.md)
 - The repo is a monorepo with three deployable services: Laravel API, React/Vite SPA, and a Node Hocuspocus collab server
-- The API runs **Laravel 12** on **PHP 8.2** inside Docker
+- The API runs **Laravel 13** on **PHP 8.4** inside Docker
 - The client is **React 19 + Vite + TypeScript + Tiptap 3**, package-managed with **pnpm**
 - Auth is **Sanctum** (cookie sessions) plus **Laravel Fortify** for the registration/password/2FA flows; Fortify Actions live in `api/app/Actions/Fortify/`
 - Authorization uses **Laravel Policies** (one per resource: `NotePolicy`, `NotebookPolicy`, `TagPolicy`, `TaskPolicy`, `SpacePolicy`, etc.)
@@ -16,7 +16,7 @@
 - Postgres 17 is the primary database; `notes.content` is JSONB (Tiptap JSON), and `notes.ydoc_state` (BYTEA, Yjs CRDT) is the planned source of truth during collab
 - Redis 8 covers cache, sessions, queue, Pulse ingest, and Hocuspocus pub/sub
 - File attachments live in **RustFS** (S3-compatible) — only the URL ends up inside the Tiptap doc
-- Metrics on **Laravel Pulse**; debugging via **Telescope** (dev only)
+- Metrics on **Laravel Pulse**; debugging via **Telescope** (dev only); queue jobs run under **Laravel Horizon** (Redis-backed, dashboard at `/horizon`)
 - Mail: **Mailpit** in dev, **Amazon SES** in prod; logs can ship to **Seq** in dev
 - Local dev runs in Docker Compose (`docker-compose.dev.yaml`); the same pattern targets a single AWS EC2 host in prod, with a documented path to migrate db → RDS, redis → ElastiCache
 - The Hocuspocus collab service (Node) is partially scaffolded — client deps are installed (`@hocuspocus/provider`, `@tiptap/extension-collaboration`, `yjs`, `y-websocket`, `y-protocols`), the Node service itself is being built per @docs/COLLABORATION.md
@@ -25,7 +25,7 @@
 
 The repo root contains three deployable services and three Compose stacks. Each service has its own Dockerfile under `<service>/docker/Dockerfile` so build context stays scoped.
 
-- API: `./api` — Laravel 12 backend
+- API: `./api` — Laravel 13 backend
 - Client: `./client` — React + Vite SPA
 - Collab: `./collab` — Hocuspocus (Node.js) WebSocket server (per @docs/COLLABORATION.md)
 - Docs: `./docs` — architecture and design docs

@@ -149,6 +149,7 @@ services:
       start_period: 20s
     environment:
       ACCEPT_EULA: "Y"
+      SEQ_FIRSTRUN_NOAUTHENTICATION: "true"
     volumes:
       - seq-data:/data
     ports:
@@ -206,6 +207,7 @@ services:
   # JWT issuer, and the Hocuspocus persistence webhooks. Uses Postgres,
   # Redis, RustFS, and Mailpit.
   # API:        http://localhost:8000
+  # API:        http://localhost:8000/horizon
   # Telescope:  http://localhost:8000/telescope
   # Pulse:      http://localhost:8000/pulse
   # ---------------------------------------------------------------------------
@@ -279,10 +281,7 @@ services:
   # Dashboard is served by api at /pulse.
   # ---------------------------------------------------------------------------
   pulse:
-    build:
-      context: ./api
-      dockerfile: docker/Dockerfile
-      target: development
+    image: notetify-api
     container_name: notetify-pulse
     networks:
       - notetify-net
@@ -319,6 +318,54 @@ services:
         reservations:
           cpus: "0.05"
           memory: 64m
+
+  # ---------------------------------------------------------------------------
+  # horizon — Laravel Horizon queue worker + supervisor
+  # Reuses the api image; runs `php artisan horizon` which spawns and
+  # monitors the queue worker pool defined in config/horizon.php.
+  # Dashboard is served by api at /horizon.
+  # ---------------------------------------------------------------------------
+  horizon:
+    image: notetify-api
+    container_name: notetify-horizon
+    networks:
+      - notetify-net
+    restart: unless-stopped
+    command: ["php", "artisan", "horizon"]
+    stop_signal: SIGTERM
+    stop_grace_period: 30s
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -f 'artisan horizon' > /dev/null"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    depends_on:
+      api:
+        condition: service_healthy
+    volumes:
+      - ./api:/app
+      - api_vendor:/app/vendor
+      - api_storage:/app/storage
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_DATABASE=notetify
+      - DB_USERNAME=postgres
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - APP_ENV=local
+      - QUEUE_CONNECTION=redis
+    env_file:
+      - .env.development
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512m
+        reservations:
+          cpus: "0.1"
+          memory: 128m
 
   # ---------------------------------------------------------------------------
   # client — Vite dev server (React + Tiptap)

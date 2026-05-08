@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-ARG PHP_VERSION=8.2
+ARG PHP_VERSION=8.4
 
 ################################################################################
 # Composer dependencies stage - Production
@@ -129,6 +129,9 @@ FROM base AS development
 ENV APP_ENV=local \
     APP_DEBUG=true \
     COMPOSER_ALLOW_SUPERUSER=1
+
+# Composer binary for dev (so `docker compose exec api composer ...` works)
+COPY --from=composer:lts /usr/bin/composer /usr/local/bin/composer
 
 # Copy entrypoint script
 COPY docker/entrypoint.dev.sh /usr/local/bin/entrypoint.sh

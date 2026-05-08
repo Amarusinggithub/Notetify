@@ -91,6 +91,16 @@ docker compose -f docker-compose.dev.yaml up -d --build
 | RustFS console | http://localhost:9001 — login `rustfs` / `rustfs-secret` |
 | Telescope | http://localhost:8000/telescope |
 | Pulse | http://localhost:8000/pulse |
+| Horizon | http://localhost:8000/horizon |
+
+Ports that are **not** browser-friendly (programmatic only — opening in a browser will look "broken"):
+
+| Port | Protocol | Notes |
+|---|---|---|
+| 1025 | SMTP | Mailpit ingest. Use port 8025 for the UI. |
+| 5432 | Postgres wire protocol | Connect with a SQL client, not a browser. |
+| 6379 | Redis | `redis-cli`, not a browser. |
+| 9000 | S3 API (RustFS) | Returns `<Error><Code>AccessDenied</Code>...</Error>` to unsigned requests — that's normal S3 behavior. Use port 9001 for the UI. |
 
 ### Common operations
 
@@ -110,12 +120,61 @@ docker compose -f docker-compose.dev.yaml exec api composer require some/package
 # Open a shell in the API container
 docker compose -f docker-compose.dev.yaml exec api sh
 
+# Restart a single service (after editing config or installing a provider)
+docker compose -f docker-compose.dev.yaml restart api
+
+# Rebuild + recreate one service after a Dockerfile change
+docker compose -f docker-compose.dev.yaml up -d --build --force-recreate api
+
+# Show container status + port mappings for one service
+docker compose -f docker-compose.dev.yaml ps api
+
 # Stop without losing data
 docker compose -f docker-compose.dev.yaml down
 
 # Stop and wipe volumes (Postgres, Redis, RustFS data)
 docker compose -f docker-compose.dev.yaml down -v
 ```
+
+### Adding a Laravel package (Telescope, Horizon, etc.)
+
+Always run composer **inside the api container**. The Windows host PHP is a different version, missing `pcntl`/`posix`, and Windows Defender will lock files mid-install causing `Could not delete ...vendor/composer/...` errors. Inside the container, none of that applies.
+
+```bash
+# 1. Pull in the package
+docker compose -f docker-compose.dev.yaml exec api composer require laravel/horizon
+
+# 2. Run its publish command (publishes config, providers, migrations)
+docker compose -f docker-compose.dev.yaml exec api php artisan horizon:install
+
+# 3. Migrate (harmless if the package added no migrations)
+docker compose -f docker-compose.dev.yaml exec api php artisan migrate
+
+# 4. Restart api so the new service provider is picked up
+docker compose -f docker-compose.dev.yaml restart api
+```
+
+If `composer require` ever fails with a PHP version constraint error (e.g. `requires php ^8.4 but your php version (8.2.x) does not satisfy`), the api Dockerfile's `ARG PHP_VERSION` is out of sync with `composer.json`'s `require.php` constraint. Bump the Dockerfile, then drop the `api_vendor` named volume so vendor reinstalls cleanly:
+
+```bash
+docker compose -f docker-compose.dev.yaml stop api
+docker volume rm <project-prefix>_api_vendor   # find with `docker volume ls`
+docker compose -f docker-compose.dev.yaml up -d --build api
+```
+
+### Worker services (pulse, horizon)
+
+`pulse` and `horizon` reuse the `api` image but run a different `command:` — they're queue/aggregator workers, not HTTP services, so they don't publish ports. Their dashboards live on the api container at `/pulse` and `/horizon` respectively.
+
+```bash
+# Watch worker logs
+docker compose -f docker-compose.dev.yaml logs -f horizon
+
+# Restart a worker after editing its config
+docker compose -f docker-compose.dev.yaml restart horizon
+```
+
+Horizon needs `SIGTERM` (not `SIGKILL`) to drain in-flight jobs cleanly — the compose file already sets `stop_signal: SIGTERM` and `stop_grace_period: 30s`. Don't `docker kill` it; use `docker compose stop horizon`.
 
 ---
 
@@ -205,18 +264,18 @@ docker compose -p notetify-prod -f docker-compose.prod.yaml up -d --no-deps --bu
 
 ---
 
-## PHP extensions
+## PHP version & extensions
 
-The Dockerfile (`api/docker/Dockerfile`) installs the extensions Laravel +
-Pulse need:
+The api runs **PHP 8.4** (matches `composer.json`'s `require.php` constraint). Pinned via `ARG PHP_VERSION=8.4` at the top of `api/docker/Dockerfile`. If you bump Laravel and the framework requires a newer PHP, bump this arg too — see the troubleshooting row above.
+
+The Dockerfile installs the extensions Laravel + Pulse + Horizon need:
 
 ```
 bcmath  intl  opcache  pcntl  pdo_pgsql  posix  sockets  zip
 + pecl: redis
 ```
 
-To add another, edit `docker-compose.dev.yaml`'s `api/docker/Dockerfile` —
-look for the `docker-php-ext-install` block. Rebuild with:
+To add another, edit `api/docker/Dockerfile` — look for the `docker-php-ext-install` block. Rebuild with:
 
 ```bash
 docker compose -f docker-compose.dev.yaml build --no-cache api
@@ -253,14 +312,23 @@ docker compose -f docker-compose.dev.yaml up -d --build
 
 ## Troubleshooting
 
-| Symptom | Likely cause |
+| Symptom | Likely cause / fix |
 |---|---|
 | `pcntl` / `posix` extension missing | You're running PHP on the host (Windows). Run composer/artisan inside the container instead — see commands above. |
-| Port already in use | Another stack is up. Either bring it down, or use `-p` to namespace this one. |
+| `Could not delete ...vendor/composer/...` during `composer require` on host | Windows Defender / Search Indexer locked an extracted file mid-install. Either run composer **inside the container** (recommended), or add `C:\path\to\Notetify\api\vendor` as a Defender exclusion. |
+| `composer require` fails with `requires php ^X.Y but your php version is ^Z.W` | `ARG PHP_VERSION` in `api/docker/Dockerfile` doesn't match `composer.json`'s `require.php`. Bump the arg, drop `<prefix>_api_vendor` volume, rebuild api. |
+| `exec: "composer": executable file not found in $PATH` inside api container | The dev stage of `api/docker/Dockerfile` must include `COPY --from=composer:lts /usr/bin/composer /usr/local/bin/composer`. Production omits this on purpose. |
+| `sh: can't open 'entrypoint.sh': No such file or directory` (loop on client) | The Dockerfile copied `entrypoint.sh` into the workdir, but the bind mount `./client:/usr/src/app` shadowed it. Fix: copy to `/usr/local/bin/entrypoint.sh` (outside the bind mount) and `ENTRYPOINT ["sh", "/usr/local/bin/entrypoint.sh"]`. |
+| Vite crashes with `EACCES: permission denied, open '...vite.config.ts.timestamp-*.mjs'` | Orphan timestamp file from a prior crash held by a Windows process (Defender, Search Indexer, VS Code). Stop the container, delete the `vite.config.ts.timestamp-*.mjs` files in `client/`, restart. Durable fix: move repo to WSL2 native filesystem (`~/dev/Notetify`). |
+| Vite logs `Corepack is about to download pnpm-X.Y.Z.tgz` on every start | The Dockerfile's `RUN corepack enable` doesn't bake in a specific pnpm. Add `&& corepack prepare pnpm@<version> --activate` in the same RUN to download once at build time. |
+| `localhost:3000` returns `ERR_EMPTY_RESPONSE` while the container is up | (a) Vite still starting — wait for `VITE vX.Y ready`. (b) `wslrelay.exe` is shadowing port 3000 because something inside a WSL distro is bound there. Run `wsl --shutdown` (Docker Desktop's WSL backend auto-restarts), or stop the offending process inside the distro. Verify with `Get-NetTCPConnection -LocalPort 3000 -State Listen`. |
+| Seq fails to start: `No default admin password was supplied` | Set `SEQ_FIRSTRUN_NOAUTHENTICATION: "true"` (dev) or `SEQ_FIRSTRUN_ADMINPASSWORDHASH` (anywhere else) in the `seq` service env. The first-run vars only apply when `/data` is empty — wipe the `seq-data` volume after changing them. |
+| Random `pensive_<name>` container appears alongside compose-managed ones | Docker Desktop's "play" button on an image starts an unmanaged container with no port mapping. `docker rm -f <name>` and bring up via compose instead. |
+| Port already in use | Another stack is up, or a leftover unmanaged container is binding the port. Either bring it down, or use `-p` to namespace this stack. |
 | `permission denied` on `storage/` | Entrypoint runs `chown` on each up, but if you bind-mount `./api` from a Windows host, file modes don't translate. Use WSL2's native filesystem (`~/dev/Notetify`) instead of `/mnt/c/...`. |
 | Compose says `services.api: Additional property deploy is not allowed` | You're on Compose v1. Upgrade to Compose v2 (`docker compose` plugin). |
-| `rustfs` healthcheck failing | The `/minio/health/live` path may differ across RustFS versions — check the image's docs or swap to `wget /` in the healthcheck. |
-| Mail not arriving in dev | Make sure `MAIL_HOST=mailpit` in env, then check http://localhost:8025. |
+| `rustfs` healthcheck reports unhealthy / 9000 returns AccessDenied | RustFS doesn't expose `/minio/health/live` at all — the AccessDenied XML is an S3 fallthrough for any unknown path. Replace the healthcheck with one that hits a path RustFS actually serves, or do `wget --spider :9000` and accept any response. |
+| Mail not arriving in dev | Make sure `MAIL_HOST=mailpit` in env, then check http://localhost:8025. Port 1025 is SMTP-only — opening it in a browser will show `ERR_INVALID_HTTP_RESPONSE`. |
 
 For more, see [docs/COLLABORATION.md](docs/COLLABORATION.md) and
 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
