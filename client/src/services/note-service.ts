@@ -1,82 +1,82 @@
-import type { QueryFunctionContext } from '@tanstack/react-query';
-import api from '@/lib/api';
+import type { QueryFunctionContext } from "@tanstack/react-query";
+import api from "@/lib/api";
 import type {
-	CreateUserNote,
-	PaginatedNotesResponse,
-	UpdateUserNotePayload,
-	UserNote,
-} from '@/types';
-import type { noteQueryKeys } from '@/utils/queryKeys';
+    CreateUserNote,
+    PaginatedNotesResponse,
+    UpdateUserNotePayload,
+    UserNote,
+} from "@/types";
+import type { noteQueryKeys } from "@/utils/query-keys";
 
 export async function fetchNote({
-	queryKey,
+    queryKey,
 }: QueryFunctionContext<
-	ReturnType<typeof noteQueryKeys.detail>
+    ReturnType<typeof noteQueryKeys.detail>
 >): Promise<UserNote> {
-	const [, , noteId] = queryKey;
+    const [, , noteId] = queryKey;
 
-	const response = await api.get<UserNote>(`notes/${noteId}`);
+    const response = await api.get<UserNote>(`notes/${noteId}`);
 
-	return response.data;
+    return response.data;
 }
 
 export async function fetchNotesPage({
-	queryKey,
-	pageParam = 1,
+    queryKey,
+    pageParam = 1,
 }: QueryFunctionContext<
-	ReturnType<typeof noteQueryKeys.list>,
-	number
+    ReturnType<typeof noteQueryKeys.list>,
+    number
 >): Promise<PaginatedNotesResponse> {
-	const [, , search, sortBy] = queryKey;
-	const params = new URLSearchParams({
-		page: String(pageParam),
-		sort_by: sortBy,
-		sort_direction: 'desc',
-	});
+    const [, , search, sortBy] = queryKey;
+    const params = new URLSearchParams({
+        page: String(pageParam),
+        sort_by: sortBy,
+        sort_direction: "desc",
+    });
 
-	if (!params.get('page')) {
-		params.set('page', '1');
-	}
+    if (!params.get("page")) {
+        params.set("page", "1");
+    }
 
-	if (search) {
-		params.set('search', search);
-	}
+    if (search) {
+        params.set("search", search);
+    }
 
-	const response = await api.get<PaginatedNotesResponse>(
-		`notes?${params.toString()}`
-	);
-	return response.data;
+    const response = await api.get<PaginatedNotesResponse>(
+        `notes?${params.toString()}`,
+    );
+    return response.data;
 }
 
 export async function updateNote(
-	userNoteId: string,
-	payload: UpdateUserNotePayload
+    userNoteId: string,
+    payload: UpdateUserNotePayload,
 ): Promise<UserNote> {
-	const response = await api.put<UserNote>(`notes/${userNoteId}`, payload);
-	return response.data;
+    const response = await api.put<UserNote>(`notes/${userNoteId}`, payload);
+    return response.data;
 }
 
 export async function deleteNote(userNoteId: string): Promise<void> {
-	await api.delete(`notes/${userNoteId}`);
+    await api.delete(`notes/${userNoteId}`);
 }
 
 export const createNote = async (note: CreateUserNote): Promise<UserNote> => {
-	try {
-		const payload: Record<string, any> = {
-			content: note.note_data?.content ?? '',
-			is_trashed: note.is_trashed,
-		};
+    try {
+        const payload: Record<string, any> = {
+            content: note.note_data?.content ?? "",
+            is_trashed: note.is_trashed,
+        };
 
-		if (note.is_pinned_to_home !== undefined)
-			payload.is_pinned_to_home = note.is_pinned_to_home;
-		if (note.tags && note.tags.length > 0) {
-			payload.tags = note.tags.map((t) => t.name);
-		}
+        if (note.is_pinned_to_home !== undefined)
+            payload.is_pinned_to_home = note.is_pinned_to_home;
+        if (note.tags && note.tags.length > 0) {
+            payload.tags = note.tags.map((t) => t.name);
+        }
 
-		const response = await api.post('notes/', payload);
-		return response.data as UserNote;
-	} catch (e) {
-		console.error(e);
-		throw e;
-	}
+        const response = await api.post("notes/", payload);
+        return response.data as UserNote;
+    } catch (e) {
+        console.error(e);
+        throw e;
+    }
 };

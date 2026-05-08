@@ -1,294 +1,311 @@
 import {
-	useMutation,
-	useQueryClient,
-	useSuspenseInfiniteQuery,
-	useSuspenseQuery,
-	type InfiniteData,
-} from '@tanstack/react-query';
-import { useNavigate, useRevalidator } from 'react-router';
-import { queryClient } from '@/./components/provider/query-provider';
+    useMutation,
+    useQueryClient,
+    useSuspenseInfiniteQuery,
+    useSuspenseQuery,
+    type InfiniteData,
+} from "@tanstack/react-query";
+import { useNavigate, useRevalidator } from "react-router";
+import { queryClient } from "@/./components/provider/query-provider";
 import {
-	createNotebook,
-	deleteNotebook,
-	fetchNotebook,
-	fetchNotebooksPage,
-	updateNotebook,
-} from '@/services/notebook-service.ts';
-import { useStore } from '@/stores/index.ts';
+    createNotebook,
+    deleteNotebook,
+    fetchNotebook,
+    fetchNotebooksPage,
+    updateNotebook,
+} from "@/services/notebook-service.ts";
+import { useStore } from "@/stores/index.ts";
 import {
-	type CreateUserNotebook,
-	type PaginatedNotebooksResponse,
-	type SortBy,
-	type UpdateUserNotebookPayload,
-	type UserNotebook,
-} from '@/types/index.ts';
-import { notebookQueryKeys } from '@/utils/queryKeys.ts';
+    type CreateUserNotebook,
+    type PaginatedNotebooksResponse,
+    type SortBy,
+    type UpdateUserNotebookPayload,
+    type UserNotebook,
+} from "@/types/index.ts";
+import { notebookQueryKeys } from "@/utils/query-keys";
 
 type NotebooksType =
-	| UserNotebook[]
-	| { results: UserNotebook[] }
-	| { pages: { results: UserNotebook[] }[]; pageParams: unknown[] }
-	| undefined;
+    | UserNotebook[]
+    | { results: UserNotebook[] }
+    | { pages: { results: UserNotebook[] }[]; pageParams: unknown[] }
+    | undefined;
 
 export const notebooksQueryOptions = (
-	search: string = '',
-	sortby: SortBy = 'updated_at'
+    search: string = "",
+    sortby: SortBy = "updated_at",
 ) => ({
-	queryKey: notebookQueryKeys.list(search, sortby),
-	queryFn: fetchNotebooksPage,
-	initialPageParam: 1,
-	getNextPageParam: (lastPage: PaginatedNotebooksResponse) => lastPage.nextPage,
+    queryKey: notebookQueryKeys.list(search, sortby),
+    queryFn: fetchNotebooksPage,
+    initialPageParam: 1,
+    getNextPageParam: (lastPage: PaginatedNotebooksResponse) =>
+        lastPage.nextPage,
 });
 
 export const notebookQueryOptions = (noteId: string) => ({
-	queryKey: notebookQueryKeys.detail(noteId),
-	queryFn: fetchNotebook,
+    queryKey: notebookQueryKeys.detail(noteId),
+    queryFn: fetchNotebook,
 });
 
 export const useFetchNotebook = (noteId: string) => {
-	const { data } = useSuspenseQuery(notebookQueryOptions(noteId));
-	return { data };
+    const { data } = useSuspenseQuery(notebookQueryOptions(noteId));
+    return { data };
 };
 
 export const useFetchNotebooks = (
-	search: string = '',
-	sortBy: SortBy = 'updated_at'
+    search: string = "",
+    sortBy: SortBy = "updated_at",
 ) => {
-	const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-		useSuspenseInfiniteQuery(notebooksQueryOptions(search, sortBy));
-	return { data, fetchNextPage, hasNextPage, isFetchingNextPage };
+    const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+        useSuspenseInfiniteQuery(notebooksQueryOptions(search, sortBy));
+    return { data, fetchNextPage, hasNextPage, isFetchingNextPage };
 };
 
 export const prefetchNotebooks = async (
-	search: string = '',
-	sortBy: SortBy = 'updated_at'
+    search: string = "",
+    sortBy: SortBy = "updated_at",
 ) => {
-	await queryClient.prefetchInfiniteQuery(
-		notebooksQueryOptions(search, sortBy)
-	);
+    await queryClient.prefetchInfiniteQuery(
+        notebooksQueryOptions(search, sortBy),
+    );
 };
 
 export const EnsureNotebooks = (
-	search: string = '',
-	sortBy: SortBy = 'updated_at'
+    search: string = "",
+    sortBy: SortBy = "updated_at",
 ) => {
-	return queryClient.ensureInfiniteQueryData<
-		PaginatedNotebooksResponse,
-		Error,
-		InfiniteData<PaginatedNotebooksResponse>,
-		ReturnType<typeof notebookQueryKeys.list>,
-		number
-	>(notebooksQueryOptions(search, sortBy));
+    return queryClient.ensureInfiniteQueryData<
+        PaginatedNotebooksResponse,
+        Error,
+        InfiniteData<PaginatedNotebooksResponse>,
+        ReturnType<typeof notebookQueryKeys.list>,
+        number
+    >(notebooksQueryOptions(search, sortBy));
 };
 
 type UpdateNotebookInput = {
-	id: string;
-	payload: UpdateUserNotebookPayload;
+    id: string;
+    payload: UpdateUserNotebookPayload;
 };
 
 export function useCreateNotebook() {
-	const revalidator = useRevalidator();
-	const queryClient = useQueryClient();
-	const navigate = useNavigate();
-	return useMutation({
-		mutationFn: (newNotebook: CreateUserNotebook) =>
-			createNotebook(newNotebook),
-		onMutate: async (newNotebook) => {
-			try {
-				await queryClient.cancelQueries({ queryKey: notebookQueryKeys.all });
-			} catch (e) {
-				console.error('Failed to cancel queries:', e);
-			}
-			const previous = snapshotNotebooks(queryClient);
-			const tempId = `temp-${Date.now()}`;
-			const now = new Date().toISOString();
-			const optimistic: UserNotebook = {
-				id: tempId,
-				user: 'me',
-				role: 'OWNER',
-				notebook: {
-					id: tempId,
-					name: newNotebook.notebook_data?.name ?? '',
-					is_pinned_to_space: false,
-					order: 0,
-					users: [],
-					is_shared: false,
-					created_at: now,
-					updated_at: now,
-				},
-				is_pinned: newNotebook.is_pinned,
-				is_trashed: newNotebook.is_trashed,
-				created_at: now,
-				updated_at: now,
-			};
+    const revalidator = useRevalidator();
+    const queryClient = useQueryClient();
+    const navigate = useNavigate();
+    return useMutation({
+        mutationFn: (newNotebook: CreateUserNotebook) =>
+            createNotebook(newNotebook),
+        onMutate: async (newNotebook) => {
+            try {
+                await queryClient.cancelQueries({
+                    queryKey: notebookQueryKeys.all,
+                });
+            } catch (e) {
+                console.error("Failed to cancel queries:", e);
+            }
+            const previous = snapshotNotebooks(queryClient);
+            const tempId = `temp-${Date.now()}`;
+            const now = new Date().toISOString();
+            const optimistic: UserNotebook = {
+                id: tempId,
+                user: "me",
+                role: "OWNER",
+                notebook: {
+                    id: tempId,
+                    name: newNotebook.notebook_data?.name ?? "",
+                    is_pinned_to_space: false,
+                    order: 0,
+                    users: [],
+                    is_shared: false,
+                    created_at: now,
+                    updated_at: now,
+                },
+                is_pinned: newNotebook.is_pinned,
+                is_trashed: newNotebook.is_trashed,
+                created_at: now,
+                updated_at: now,
+            };
 
-			updateNotebooksCaches(queryClient, (notebooks, pageIndex) =>
-				pageIndex && pageIndex > 0 ? notebooks : [optimistic, ...notebooks]
-			);
+            updateNotebooksCaches(queryClient, (notebooks, pageIndex) =>
+                pageIndex && pageIndex > 0
+                    ? notebooks
+                    : [optimistic, ...notebooks],
+            );
 
-			return { previous, tempId };
-		},
-		onSuccess: async (created, _input, context) => {
-			updateNotebooksCaches(queryClient, (notebooks) =>
-				notebooks.map((item) => (item.id === context?.tempId ? created : item))
-			);
+            return { previous, tempId };
+        },
+        onSuccess: async (created, _input, context) => {
+            updateNotebooksCaches(queryClient, (notebooks) =>
+                notebooks.map((item) =>
+                    item.id === context?.tempId ? created : item,
+                ),
+            );
 
-			const store = useStore.getState();
-			store.setSelectedNotebookId(created.id);
-			await navigate(`/notebooks/${created.id}`);
-			await revalidator.revalidate();
-		},
-		onError: (error, _input, context) => {
-			console.error('Failed to create notebook:', error);
-			restoreNotebooks(queryClient, context?.previous);
-		},
-		onSettled: async () => {
-			await queryClient.invalidateQueries({ queryKey: notebookQueryKeys.all });
-		},
-	});
+            const store = useStore.getState();
+            store.setSelectedNotebookId(created.id);
+            await navigate(`/notebooks/${created.id}`);
+            await revalidator.revalidate();
+        },
+        onError: (error, _input, context) => {
+            console.error("Failed to create notebook:", error);
+            restoreNotebooks(queryClient, context?.previous);
+        },
+        onSettled: async () => {
+            await queryClient.invalidateQueries({
+                queryKey: notebookQueryKeys.all,
+            });
+        },
+    });
 }
 
 export function useUpdateNotebook() {
-	const revalidator = useRevalidator();
-	const queryClient = useQueryClient();
-	return useMutation({
-		mutationFn: ({ id, payload }: UpdateNotebookInput) =>
-			updateNotebook(id, payload),
-		onMutate: async ({ id, payload }: UpdateNotebookInput) => {
-			await queryClient.cancelQueries({ queryKey: notebookQueryKeys.all });
-			const previous = snapshotNotebooks(queryClient);
-			const now = new Date().toISOString();
-			updateNotebooksCaches(queryClient, (notebooks) =>
-				notebooks.map((notebook) =>
-					notebook.id === id
-						? {
-								...notebook,
-								...payload,
-								updated_at: now,
-								notebook: {
-									...notebook.notebook,
-									updated_at: now,
-									...(payload.name !== undefined
-										? { name: payload.name ?? '' }
-										: {}),
-								},
-							}
-						: notebook
-				)
-			);
+    const revalidator = useRevalidator();
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ id, payload }: UpdateNotebookInput) =>
+            updateNotebook(id, payload),
+        onMutate: async ({ id, payload }: UpdateNotebookInput) => {
+            await queryClient.cancelQueries({
+                queryKey: notebookQueryKeys.all,
+            });
+            const previous = snapshotNotebooks(queryClient);
+            const now = new Date().toISOString();
+            updateNotebooksCaches(queryClient, (notebooks) =>
+                notebooks.map((notebook) =>
+                    notebook.id === id
+                        ? {
+                              ...notebook,
+                              ...payload,
+                              updated_at: now,
+                              notebook: {
+                                  ...notebook.notebook,
+                                  updated_at: now,
+                                  ...(payload.name !== undefined
+                                      ? { name: payload.name ?? "" }
+                                      : {}),
+                              },
+                          }
+                        : notebook,
+                ),
+            );
 
-			return { previous };
-		},
-		onSuccess: async (updated: UserNotebook) => {
-			updateNotebooksCaches(queryClient, (notebooks) =>
-				notebooks.map((notebook) =>
-					notebook.id === updated.id ? updated : notebook
-				)
-			);
+            return { previous };
+        },
+        onSuccess: async (updated: UserNotebook) => {
+            updateNotebooksCaches(queryClient, (notebooks) =>
+                notebooks.map((notebook) =>
+                    notebook.id === updated.id ? updated : notebook,
+                ),
+            );
 
-			await revalidator.revalidate();
-		},
-		onError: (error, _input, context) => {
-			console.error('Failed to update notebook:', error);
-			restoreNotebooks(queryClient, context?.previous);
-		},
-		onSettled: async () => {
-			await queryClient.invalidateQueries({ queryKey: notebookQueryKeys.all });
-		},
-	});
+            await revalidator.revalidate();
+        },
+        onError: (error, _input, context) => {
+            console.error("Failed to update notebook:", error);
+            restoreNotebooks(queryClient, context?.previous);
+        },
+        onSettled: async () => {
+            await queryClient.invalidateQueries({
+                queryKey: notebookQueryKeys.all,
+            });
+        },
+    });
 }
 
 export function useDeleteNotebook() {
-	const revalidator = useRevalidator();
-	const queryClient = useQueryClient();
-	return useMutation({
-		mutationFn: (notebookId: string) => deleteNotebook(notebookId),
-		onMutate: async (notebookId) => {
-			await queryClient.cancelQueries({ queryKey: notebookQueryKeys.all });
-			const previous = snapshotNotebooks(queryClient);
-			updateNotebooksCaches(queryClient, (notebooks) =>
-				notebooks.filter((notebook) => notebook.id !== notebookId)
-			);
+    const revalidator = useRevalidator();
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (notebookId: string) => deleteNotebook(notebookId),
+        onMutate: async (notebookId) => {
+            await queryClient.cancelQueries({
+                queryKey: notebookQueryKeys.all,
+            });
+            const previous = snapshotNotebooks(queryClient);
+            updateNotebooksCaches(queryClient, (notebooks) =>
+                notebooks.filter((notebook) => notebook.id !== notebookId),
+            );
 
-			return { previous };
-		},
-		onSuccess: async () => {
-			await revalidator.revalidate();
-		},
-		onError: (error, _input, context) => {
-			console.error('Failed to delete notebook:', error);
-			restoreNotebooks(queryClient, context?.previous);
-		},
-		onSettled: async () => {
-			await queryClient.invalidateQueries({ queryKey: notebookQueryKeys.all });
-		},
-	});
+            return { previous };
+        },
+        onSuccess: async () => {
+            await revalidator.revalidate();
+        },
+        onError: (error, _input, context) => {
+            console.error("Failed to delete notebook:", error);
+            restoreNotebooks(queryClient, context?.previous);
+        },
+        onSettled: async () => {
+            await queryClient.invalidateQueries({
+                queryKey: notebookQueryKeys.all,
+            });
+        },
+    });
 }
 
 /*
  Snapshot the current state of the cache so we can rollback if the mutation fails.
  */
 function snapshotNotebooks(queryClient: ReturnType<typeof useQueryClient>) {
-	return queryClient.getQueriesData<NotebooksType>({
-		queryKey: notebookQueryKeys.all,
-	});
+    return queryClient.getQueriesData<NotebooksType>({
+        queryKey: notebookQueryKeys.all,
+    });
 }
 
 /**
   Restore the cache to the previous state using the snapshot.
  */
 function restoreNotebooks(
-	queryClient: ReturnType<typeof useQueryClient>,
-	previous: [readonly unknown[], NotebooksType][] | undefined
+    queryClient: ReturnType<typeof useQueryClient>,
+    previous: [readonly unknown[], NotebooksType][] | undefined,
 ) {
-	if (previous) {
-		previous.forEach(([queryKey, data]) => {
-			queryClient.setQueryData(queryKey, data);
-		});
-	}
+    if (previous) {
+        previous.forEach(([queryKey, data]) => {
+            queryClient.setQueryData(queryKey, data);
+        });
+    }
 }
 
 /**
  Update the cache across all queries (search, pagination, etc.)
  */
 function updateNotebooksCaches(
-	queryClient: ReturnType<typeof useQueryClient>,
-	updater: (oldNotes: UserNotebook[], pageIndex?: number) => UserNotebook[]
+    queryClient: ReturnType<typeof useQueryClient>,
+    updater: (oldNotes: UserNotebook[], pageIndex?: number) => UserNotebook[],
 ) {
-	// Get all matching queries and update them individually
-	const queries = queryClient.getQueriesData<NotebooksType>({
-		queryKey: notebookQueryKeys.all,
-	});
+    // Get all matching queries and update them individually
+    const queries = queryClient.getQueriesData<NotebooksType>({
+        queryKey: notebookQueryKeys.all,
+    });
 
-	for (const [queryKey, oldData] of queries) {
-		if (!oldData) continue;
+    for (const [queryKey, oldData] of queries) {
+        if (!oldData) continue;
 
-		let newData: NotebooksType;
+        let newData: NotebooksType;
 
-		// Handle if your API returns an Array directly
-		if (Array.isArray(oldData)) {
-			newData = updater(oldData);
-		}
-		// Handle infinite query data (e.g. { pages: [...], pageParams: [...] })
-		else if ('pages' in oldData && Array.isArray(oldData.pages)) {
-			newData = {
-				...oldData,
-				pages: oldData.pages.map((page, index) => ({
-					...page,
-					results: updater(page.results, index),
-				})),
-			};
-		}
-		// Handle if your API returns a paginated object (e.g. { results: [...] })
-		else if ('results' in oldData && Array.isArray(oldData.results)) {
-			newData = {
-				...oldData,
-				results: updater(oldData.results),
-			};
-		}
+        // Handle if your API returns an Array directly
+        if (Array.isArray(oldData)) {
+            newData = updater(oldData);
+        }
+        // Handle infinite query data (e.g. { pages: [...], pageParams: [...] })
+        else if ("pages" in oldData && Array.isArray(oldData.pages)) {
+            newData = {
+                ...oldData,
+                pages: oldData.pages.map((page, index) => ({
+                    ...page,
+                    results: updater(page.results, index),
+                })),
+            };
+        }
+        // Handle if your API returns a paginated object (e.g. { results: [...] })
+        else if ("results" in oldData && Array.isArray(oldData.results)) {
+            newData = {
+                ...oldData,
+                results: updater(oldData.results),
+            };
+        }
 
-		if (newData) {
-			queryClient.setQueryData(queryKey, newData);
-		}
-	}
+        if (newData) {
+            queryClient.setQueryData(queryKey, newData);
+        }
+    }
 }

@@ -39,7 +39,7 @@ Route::prefix('auth')->group(function () {
     });
 });
 
-Route::middleware(['auth:sanctum'])->group(function () {
+Route::middleware(['auth:sanctum','verified'])->group(function () {
     Route::resource('notes', NoteController::class);
     Route::resource('notebooks', NotebookController::class)->except(['show']);
     Route::resource('tags', TagController::class)->except(['show']);

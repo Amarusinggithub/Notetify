@@ -19,6 +19,7 @@ import {
     Tag,
     Trash2,
 } from "lucide-react";
+import { useMutationState } from "@tanstack/react-query";
 import {
     useDeleteNote,
     useFetchNote,
@@ -51,6 +52,41 @@ import {
     TooltipContent,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
+function SaveStatusBadge() {
+    const statuses = useMutationState({
+        filters: { mutationKey: ["updateNote"] },
+        select: (mutation) => mutation.state.status,
+    });
+    const latest = statuses[statuses.length - 1];
+
+    if (latest === "pending") {
+        return (
+            <Badge
+                variant="secondary"
+                className="gap-1.5 rounded-full px-3 py-1 text-xs"
+            >
+                Saving...
+            </Badge>
+        );
+    }
+
+    if (latest === "error") {
+        return (
+            <Badge
+                variant="destructive"
+                className="rounded-full px-3 py-1 text-xs"
+            >
+                Save failed
+            </Badge>
+        );
+    }
+
+    return (
+        <Badge variant="secondary" className="rounded-full px-3 py-1 text-xs">
+            Saved
+        </Badge>
+    );
+}
 
 function FullscreenToggle() {
     const {
@@ -188,12 +224,7 @@ export function EditorHeader({
                         {ownerLabel.charAt(0).toUpperCase()}
                     </AvatarFallback>
                 </Avatar>
-                <Badge
-                    variant="secondary"
-                    className="rounded-full px-3 py-1 text-xs"
-                >
-                    Saved
-                </Badge>
+                <SaveStatusBadge />
             </div>
 
             <div className="ml-auto flex items-center gap-3">
