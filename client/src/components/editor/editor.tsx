@@ -256,7 +256,8 @@ export const Editor = () => {
 			lastLoadedId.current = noteId;
 			const dbContent = currentUserNote.note?.content || EMPTY_NOTE;
 			isLoadingContent.current = true;
-			editor.commands.setContent(dbContent, false, {
+			editor.commands.setContent(dbContent, {
+				emitUpdate: false,
 				errorOnInvalidContent: false,
 			});
 			isLoadingContent.current = false;

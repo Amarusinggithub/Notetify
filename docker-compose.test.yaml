@@ -96,7 +96,7 @@ services:
       - notetify-net
     restart: "no"
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80/api/health"]
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80/api/up"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -198,14 +198,15 @@ services:
     profiles:
       - e2e
     restart: "no"
+    command: ["pnpm",  "test"]
     ports:
       - "3001:3000"
     depends_on:
       api:
         condition: service_healthy
     volumes:
-      - ./client:/usr/src/app
-      - node_modules_client:/usr/src/app/node_modules
+      - ./client:/app
+      - node_modules:/app/node_modules
     environment:
       - VITE_BASE_URL=http://localhost:8001/api/
       - VITE_WS_ORIGIN=ws://localhost:8001
@@ -243,4 +244,4 @@ networks:
 # between runs so `up` is fast. Everything else is tmpfs or unmounted.
 volumes:
   api_vendor:
-  node_modules_client:
+  node_modules:
