@@ -1,5 +1,5 @@
 import type { QueryFunctionContext } from '@tanstack/react-query';
-import axiosInstance from '@/lib/axios';
+import api from '@/lib/api';
 import type {
 	CreateUserTag,
 	PaginatedTagResponse,
@@ -15,7 +15,7 @@ export async function fetchTag({
 >): Promise<UserTag> {
 	const [, , tagId] = queryKey;
 
-	const response = await axiosInstance.get<UserTag>(`tags/${tagId}`);
+	const response = await api.get<UserTag>(`tags/${tagId}`);
 
 	return response.data;
 }
@@ -42,7 +42,7 @@ export async function fetchTagsPage({
 		params.set('search', search);
 	}
 
-	const response = await axiosInstance.get<PaginatedTagResponse>(
+	const response = await api.get<PaginatedTagResponse>(
 		`tags?${params.toString()}`
 	);
 	return response.data;
@@ -52,20 +52,17 @@ export async function updateTag(
 	userTagId: string,
 	payload: UpdateUserTagPayload
 ): Promise<UserTag> {
-	const response = await axiosInstance.put<UserTag>(
-		`tags/${userTagId}`,
-		payload
-	);
+	const response = await api.put<UserTag>(`tags/${userTagId}`, payload);
 	return response.data;
 }
 
 export async function deleteTag(userTagId: string): Promise<void> {
-	await axiosInstance.delete(`tags/${userTagId}`);
+	await api.delete(`tags/${userTagId}`);
 }
 
 export const createTag = async (tag: CreateUserTag): Promise<UserTag> => {
 	try {
-		const response = await axiosInstance.post('tags/', {
+		const response = await api.post('tags/', {
 			name: tag.tag_data?.name ?? '',
 		});
 		return response.data as UserTag;

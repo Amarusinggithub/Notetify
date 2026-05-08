@@ -1,5 +1,5 @@
 import type { QueryFunctionContext } from '@tanstack/react-query';
-import axiosInstance from '@/lib/axios';
+import api from '@/lib/api';
 import type {
 	CreateUserNotebook,
 	PaginatedNotebooksResponse,
@@ -15,9 +15,7 @@ export async function fetchNotebook({
 >): Promise<UserNotebook> {
 	const [, , notebookId] = queryKey;
 
-	const response = await axiosInstance.get<UserNotebook>(
-		`notebooks/${notebookId}`
-	);
+	const response = await api.get<UserNotebook>(`notebooks/${notebookId}`);
 
 	return response.data;
 }
@@ -44,7 +42,7 @@ export async function fetchNotebooksPage({
 		params.set('search', search);
 	}
 
-	const response = await axiosInstance.get<PaginatedNotebooksResponse>(
+	const response = await api.get<PaginatedNotebooksResponse>(
 		`notebooks?${params.toString()}`
 	);
 	return response.data;
@@ -54,7 +52,7 @@ export async function updateNotebook(
 	userNotebookId: string,
 	payload: UpdateUserNotebookPayload
 ): Promise<UserNotebook> {
-	const response = await axiosInstance.put<UserNotebook>(
+	const response = await api.put<UserNotebook>(
 		`notebooks/${userNotebookId}`,
 		payload
 	);
@@ -62,7 +60,7 @@ export async function updateNotebook(
 }
 
 export async function deleteNotebook(userNotebookId: string): Promise<void> {
-	await axiosInstance.delete(`notebooks/${userNotebookId}`);
+	await api.delete(`notebooks/${userNotebookId}`);
 }
 
 export const createNotebook = async (
@@ -70,7 +68,7 @@ export const createNotebook = async (
 ): Promise<UserNotebook> => {
 	try {
 		// Map legacy CreateUserNote shape to API contract
-		const response = await axiosInstance.post('notebooks/', {
+		const response = await api.post('notebooks/', {
 			content: userNotebook.notebook_data?.name ?? '',
 		});
 		return response.data as UserNotebook;

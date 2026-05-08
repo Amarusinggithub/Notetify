@@ -31,8 +31,8 @@ export const notesQueryOptions = (
 	queryKey: noteQueryKeys.list(search, sortby),
 	queryFn: fetchNotesPage,
 	initialPageParam: 1,
-	maxPages: 5,
 	getNextPageParam: (lastPage: PaginatedNotesResponse) => lastPage.nextPage,
+	maxPages: 5,
 });
 
 export const noteQueryOptions = (noteId: string) => ({
@@ -68,12 +68,16 @@ export const useFetchNotes = (
 	search: string = '',
 	sortBy: SortBy = 'updated_at'
 ) => {
-	const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-		useSuspenseInfiniteQuery({
-			...notesQueryOptions(search, sortBy),
-			select: (data) => data.pages.flatMap((page) => page.results),
-		});
-	return { data, fetchNextPage, hasNextPage, isFetchingNextPage };
+	const {
+		data: notes,
+		fetchNextPage,
+		hasNextPage,
+		isFetchingNextPage,
+	} = useSuspenseInfiniteQuery({
+		...notesQueryOptions(search, sortBy),
+		select: (data) => data.pages.flatMap((page) => page.results),
+	});
+	return { data: notes, fetchNextPage, hasNextPage, isFetchingNextPage };
 };
 
 export const prefetchNotes = async (
@@ -109,7 +113,9 @@ export function useCreateNote() {
 		mutationFn: (newNote: CreateUserNote) => createNote(newNote),
 		onMutate: async (newNote) => {
 			try {
-				await queryClient.cancelQueries({ queryKey: noteQueryKeys.all });
+				await queryClient.cancelQueries({
+					queryKey: noteQueryKeys.all,
+				});
 			} catch (e) {
 				console.error('Failed to cancel queries:', e);
 			}
@@ -158,7 +164,9 @@ export function useCreateNote() {
 			restoreNotes(queryClient, context?.previous);
 		},
 		onSettled: async () => {
-			await queryClient.invalidateQueries({ queryKey: noteQueryKeys.all });
+			await queryClient.invalidateQueries({
+				queryKey: noteQueryKeys.all,
+			});
 		},
 	});
 }
@@ -217,7 +225,9 @@ export function useUpdateNote() {
 			restoreNotes(queryClient, context?.previous);
 		},
 		onSettled: async () => {
-			await queryClient.invalidateQueries({ queryKey: noteQueryKeys.all });
+			await queryClient.invalidateQueries({
+				queryKey: noteQueryKeys.all,
+			});
 		},
 	});
 }
@@ -244,7 +254,9 @@ export function useDeleteNote() {
 			restoreNotes(queryClient, context?.previous);
 		},
 		onSettled: async () => {
-			await queryClient.invalidateQueries({ queryKey: noteQueryKeys.all });
+			await queryClient.invalidateQueries({
+				queryKey: noteQueryKeys.all,
+			});
 		},
 	});
 }

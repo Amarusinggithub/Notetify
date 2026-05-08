@@ -1,5 +1,5 @@
 import axios from 'axios';
-import axiosInstance, { ensureCSRFToken } from '@/lib/axios';
+import api, { ensureCSRFToken } from '@/lib/api';
 import type { SharedData, User } from '@/types';
 
 type LoginParams = { email: string; password: string; remember?: boolean };
@@ -38,7 +38,7 @@ export function buildSharedData(apiResponse: any): SharedData {
 
 export async function signUp(params: SignUpParams): Promise<SharedData> {
 	await ensureCSRFToken();
-	const response = await axiosInstance.post('register', {
+	const response = await api.post('register', {
 		first_name: params.first_name.trim(),
 		last_name: params.last_name.trim(),
 		email: params.email.trim().toLowerCase(),
@@ -54,7 +54,7 @@ export async function login(
 	await ensureCSRFToken();
 
 	try {
-		const response = await axiosInstance.post('login', {
+		const response = await api.post('login', {
 			email: params.email.trim().toLowerCase(),
 			password: params.password,
 			remember: params.remember,
@@ -64,7 +64,7 @@ export async function login(
 			return { requiresTwoFactor: true };
 		}
 
-		const userResponse = await axiosInstance.get('user');
+		const userResponse = await api.get('user');
 		return buildSharedData(userResponse.data);
 	} catch (error) {
 		if (axios.isAxiosError(error) && error.response?.status === 423) {
@@ -75,19 +75,19 @@ export async function login(
 }
 
 export async function logout(): Promise<void> {
-	await axiosInstance.post('logout');
+	await api.post('logout');
 }
 
 export async function confirmPassword(password: string): Promise<void> {
 	await ensureCSRFToken();
-	await axiosInstance.post('user/confirm-password', { password });
+	await api.post('user/confirm-password', { password });
 }
 
 export async function passwordReset(
 	params: PasswordResetParams
 ): Promise<number> {
 	await ensureCSRFToken();
-	const response = await axiosInstance.post('reset-password', {
+	const response = await api.post('reset-password', {
 		token: params.token,
 		email: params.email,
 		password: params.password,
@@ -99,7 +99,7 @@ export async function passwordReset(
 
 export async function forgotPassword(email: string): Promise<void> {
 	await ensureCSRFToken();
-	await axiosInstance.post('forgot-password', {
+	await api.post('forgot-password', {
 		email: email.trim().toLowerCase(),
 	});
 }
@@ -108,7 +108,7 @@ export async function updatePassword(
 	current: string,
 	newPassword: string
 ): Promise<void> {
-	await axiosInstance.put('user/password', {
+	await api.put('user/password', {
 		current_password: current,
 		password: newPassword,
 		password_confirmation: newPassword,
@@ -116,36 +116,36 @@ export async function updatePassword(
 }
 
 export async function getTwoFactorQrCode(): Promise<string> {
-	const response = await axiosInstance.get('user/two-factor-qr-code');
+	const response = await api.get('user/two-factor-qr-code');
 	return response.data.svg;
 }
 
 export async function updateProfile(params): Promise<void> {
-	await axiosInstance.put('user/profile-information', params);
+	await api.put('user/profile-information', params);
 }
 
 // Resend verification email
 export async function resendVerificationEmail(): Promise<void> {
 	await ensureCSRFToken();
-	await axiosInstance.post('email/verification-notification');
+	await api.post('email/verification-notification');
 }
 
 export async function verifyEmail(email: string): Promise<string> {
 	await ensureCSRFToken();
-	const response = await axiosInstance.post('auth/verify-email/', {
+	const response = await api.post('auth/verify-email/', {
 		email: email.trim().toLowerCase(),
 	});
 	return response.data.token || 'success';
 }
 
 export async function getMe(): Promise<SharedData> {
-	const response = await axiosInstance.get('user');
+	const response = await api.get('user');
 	return buildSharedData(response.data);
 }
 
 export async function submitTwoFactorCode(code: string): Promise<SharedData> {
 	await ensureCSRFToken();
-	const response = await axiosInstance.post('two-factor-challenge', { code });
+	const response = await api.post('two-factor-challenge', { code });
 	return buildSharedData(response.data);
 }
 
@@ -153,42 +153,39 @@ export async function submitRecoveryCode(
 	recoveryCode: string
 ): Promise<SharedData> {
 	await ensureCSRFToken();
-	const response = await axiosInstance.post('two-factor-challenge', {
+	const response = await api.post('two-factor-challenge', {
 		recovery_code: recoveryCode,
 	});
 	return buildSharedData(response.data);
 }
 
 export async function getRecoveryCodes(): Promise<string[]> {
-	const response = await axiosInstance.get('user/two-factor-recovery-codes');
+	const response = await api.get('user/two-factor-recovery-codes');
 	return response.data;
 }
 
 export async function regenerateRecoveryCodes(): Promise<string[]> {
 	await ensureCSRFToken();
-	const response = await axiosInstance.post('user/two-factor-recovery-codes');
+	const response = await api.post('user/two-factor-recovery-codes');
 	return response.data;
 }
 export async function enableTwoFactor(): Promise<number> {
 	await ensureCSRFToken();
-	const response = await axiosInstance.post('user/two-factor-authentication');
+	const response = await api.post('user/two-factor-authentication');
 	return response.status;
 }
 
 export async function disableTwoFactor(): Promise<number> {
 	await ensureCSRFToken();
-	const response = await axiosInstance.delete('user/two-factor-authentication');
+	const response = await api.delete('user/two-factor-authentication');
 	return response.status;
 }
 
 export async function confirmTwoFactor(code: string): Promise<number> {
 	await ensureCSRFToken();
-	const response = await axiosInstance.post(
-		'user/confirmed-two-factor-authentication',
-		{
-			code,
-		}
-	);
+	const response = await api.post('user/confirmed-two-factor-authentication', {
+		code,
+	});
 
 	return response.status;
 }

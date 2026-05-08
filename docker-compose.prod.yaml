@@ -153,7 +153,7 @@ services:
   api:
     build:
       context: ./api
-      dockerfile: docker/Dockerfile
+      dockerfile: docker/Dockerfile.prod
       target: production
     container_name: notetify-api
     networks:
@@ -298,7 +298,7 @@ services:
   collab:
     build:
       context: ./collab
-      dockerfile: docker/Dockerfile
+      dockerfile: docker/Dockerfile,prod
       target: production
     container_name: notetify-collab
     networks:
@@ -346,7 +346,7 @@ services:
   client:
     build:
       context: ./client
-      dockerfile: docker/Dockerfile
+      dockerfile: docker/Dockerfile.prod
       target: production
       args:
         - VITE_BASE_URL=${CLIENT_BASE_URL:-https://localhost/api/}
@@ -358,7 +358,7 @@ services:
       - notetify-net
     restart: always
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/healthz"]
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/up"]
       interval: 30s
       timeout: 5s
       retries: 3

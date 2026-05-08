@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import axiosInstance from '../../src/lib/axios';
+import api from '../../src/lib/api';
 import * as notes from '../../src/services/note-service';
 
 vi.mock('../../src/lib/axios', () => {
@@ -20,14 +20,14 @@ describe('notes api', () => {
 			pageParam: 2,
 			queryKey: ['notes', 'list', 'abc', 'updated_at'],
 		} as any);
-		expect((axiosInstance as any).get).toHaveBeenCalledWith(
+		expect((api as any).get).toHaveBeenCalledWith(
 			'notes?page=2&sort_by=updated_at&sort_direction=desc&search=abc'
 		);
 	});
 
 	it('updateNote calls PUT with content', async () => {
 		const data = await notes.updateNote('id-1', { content: '<p>x</p>' });
-		expect((axiosInstance as any).put).toHaveBeenCalledWith('notes/id-1', {
+		expect((api as any).put).toHaveBeenCalledWith('notes/id-1', {
 			content: '<p>x</p>',
 		});
 		expect(data).toEqual({ content: '<p>x</p>' });
@@ -35,6 +35,6 @@ describe('notes api', () => {
 
 	it('deleteNote calls DELETE endpoint', async () => {
 		await notes.deleteNote('note-1');
-		expect((axiosInstance as any).delete).toHaveBeenCalledWith('notes/note-1');
+		expect((api as any).delete).toHaveBeenCalledWith('notes/note-1');
 	});
 });

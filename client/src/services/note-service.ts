@@ -1,5 +1,5 @@
 import type { QueryFunctionContext } from '@tanstack/react-query';
-import axiosInstance from '@/lib/axios';
+import api from '@/lib/api';
 import type {
 	CreateUserNote,
 	PaginatedNotesResponse,
@@ -15,7 +15,7 @@ export async function fetchNote({
 >): Promise<UserNote> {
 	const [, , noteId] = queryKey;
 
-	const response = await axiosInstance.get<UserNote>(`notes/${noteId}`);
+	const response = await api.get<UserNote>(`notes/${noteId}`);
 
 	return response.data;
 }
@@ -42,7 +42,7 @@ export async function fetchNotesPage({
 		params.set('search', search);
 	}
 
-	const response = await axiosInstance.get<PaginatedNotesResponse>(
+	const response = await api.get<PaginatedNotesResponse>(
 		`notes?${params.toString()}`
 	);
 	return response.data;
@@ -52,15 +52,12 @@ export async function updateNote(
 	userNoteId: string,
 	payload: UpdateUserNotePayload
 ): Promise<UserNote> {
-	const response = await axiosInstance.put<UserNote>(
-		`notes/${userNoteId}`,
-		payload
-	);
+	const response = await api.put<UserNote>(`notes/${userNoteId}`, payload);
 	return response.data;
 }
 
 export async function deleteNote(userNoteId: string): Promise<void> {
-	await axiosInstance.delete(`notes/${userNoteId}`);
+	await api.delete(`notes/${userNoteId}`);
 }
 
 export const createNote = async (note: CreateUserNote): Promise<UserNote> => {
@@ -76,7 +73,7 @@ export const createNote = async (note: CreateUserNote): Promise<UserNote> => {
 			payload.tags = note.tags.map((t) => t.name);
 		}
 
-		const response = await axiosInstance.post('notes/', payload);
+		const response = await api.post('notes/', payload);
 		return response.data as UserNote;
 	} catch (e) {
 		console.error(e);

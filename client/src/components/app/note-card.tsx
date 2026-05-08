@@ -6,12 +6,13 @@ import { noteQueryOptions } from '@/hooks/use-note.ts';
 import { cn } from '@/lib/utils';
 import { useStore } from '@/stores/index.ts';
 import type { UserNote } from '@/types';
+
 import {
 	Card,
-	CardContent,
-	CardFooter,
 	CardHeader,
 	CardTitle,
+	CardContent,
+	CardFooter,
 } from '@/components/ui/card';
 
 type NoteCardProp = {
@@ -26,7 +27,7 @@ const NoteCard = memo(
 		const setSelectedNoteId = useStore((s) => s.setSelectedNoteId);
 		const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-		const title = getTitleFromHtml(userNote.note.content);
+		const title = getTitlePreview(userNote.note.content);
 		const content = getContentPreview(userNote.note.content);
 		const updatedLabel = userNote.updated_at
 			? formatDistanceToNow(new Date(userNote.updated_at), {
@@ -34,9 +35,9 @@ const NoteCard = memo(
 				})
 			: 'just now';
 
-		const startPrefetch = () => {
-			hoverTimer.current = setTimeout(() => {
-				queryClient.prefetchQuery(noteQueryOptions(userNote?.id));
+		const startPrefetch = async () => {
+			hoverTimer.current = setTimeout(async () => {
+				await queryClient.prefetchQuery(noteQueryOptions(userNote?.id));
 			}, 150);
 		};
 
@@ -67,7 +68,9 @@ const NoteCard = memo(
 				)}
 			>
 				<CardHeader className="flex flex-row items-center justify-between py-0">
-					<CardTitle className="text-base font-semibold">{title}</CardTitle>
+					<CardTitle className="text-base font-semibold">
+						{title || 'No Title'}
+					</CardTitle>
 				</CardHeader>
 				<CardContent className="text-muted-foreground line-clamp-3 text-sm">
 					{content || 'No Content'}
@@ -104,7 +107,7 @@ function getContentPreview(html: string, maxLength = 119): string {
 	return (lastSpace > 0 ? truncated.slice(0, lastSpace) : truncated) + '...';
 }
 
-const getTitleFromHtml = (html: string, maxLength = 50): string => {
+const getTitlePreview = (html: string, maxLength = 50): string => {
 	const match = html.match(/<h1[^>]*>(.*?)<\/h1>/i);
 	const title = match ? match[1].replace(/<[^>]*>/g, '').trim() : '';
 

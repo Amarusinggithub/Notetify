@@ -32,13 +32,7 @@ import {
 } from '@/components/ui/notes-sidebar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
-import {
-	Suspense,
-	useDeferredValue,
-	useEffect,
-	useRef,
-	useState,
-} from 'react';
+import { Suspense, useDeferredValue, useEffect, useRef, useState } from 'react';
 import useDebounce from '@/hooks/use-debounce';
 import { EnsureNotes, useFetchNotes } from '@/hooks/use-note.ts';
 import { useStore } from '@/stores/index.ts';

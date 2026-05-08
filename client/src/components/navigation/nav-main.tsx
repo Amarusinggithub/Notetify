@@ -13,14 +13,14 @@ import {
 type NavMainProps = { items: NavItem[] };
 
 const prefetchMap: Record<string, () => void> = {
-	'/notes': () => {
-		prefetchNotes();
+	'/notes': async () => {
+		await prefetchNotes();
 	},
-	'/notebooks': () => {
-		prefetchNotebooks();
+	'/notebooks': async () => {
+		await prefetchNotebooks();
 	},
-	'/tags': () => {
-		prefetchTags();
+	'/tags': async () => {
+		await prefetchTags();
 	},
 };
 export function NavMain({ items = [] }: NavMainProps) {
@@ -37,6 +37,7 @@ export function NavMain({ items = [] }: NavMainProps) {
 						>
 							<Link
 								to={item.href}
+								onFocus={() => prefetchMap[item.href]?.()}
 								onMouseEnter={() => prefetchMap[item.href]?.()}
 							>
 								{item.icon && <item.icon />}

@@ -20,7 +20,7 @@ const ROOT_URL = BASE_URL.replace(/\/api\/$/, '');
 
 export const API_BASE_URL = BASE_URL;
 
-const axiosInstance = axios.create({
+const api = axios.create({
 	baseURL: BASE_URL,
 	headers: {
 		'Content-Type': 'application/json',
@@ -31,7 +31,7 @@ const axiosInstance = axios.create({
 	withXSRFToken: true,
 });
 
-axiosInstance.interceptors.request.use(
+api.interceptors.request.use(
 	async (config) => {
 		const isWriteMethod =
 			config.method &&
@@ -46,7 +46,7 @@ axiosInstance.interceptors.request.use(
 	(error) => Promise.reject(error)
 );
 
-axiosInstance.interceptors.response.use(
+api.interceptors.response.use(
 	(response) => response,
 	(error) => Promise.reject(error)
 );
@@ -63,4 +63,4 @@ export async function ensureCSRFToken() {
 	}
 }
 
-export default axiosInstance;
+export default api;
