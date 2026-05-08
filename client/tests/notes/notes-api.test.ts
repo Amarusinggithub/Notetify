@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import api from '../../src/lib/api';
 import * as notes from '../../src/services/note-service';
 
-vi.mock('../../src/lib/axios', () => {
+vi.mock('../../src/lib/api', () => {
 	return {
 		default: {
 			get: vi.fn(async () => ({
