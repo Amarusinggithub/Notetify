@@ -5,7 +5,7 @@ import ErrorFallback from '@/pages/error.tsx';
 import AppRoutes from '@/routes/app-routes.tsx';
 import { Suspense } from 'react';
 import LoadingPage from './pages/loading';
-import { QueryProvider } from './components/provider/query-provider';
+import  QueryProvider  from './components/provider/query-provider';
 
 
 

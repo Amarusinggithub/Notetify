@@ -6,7 +6,7 @@ import {
 	type InfiniteData,
 } from '@tanstack/react-query';
 import { useNavigate, useRevalidator } from 'react-router';
-import { queryClient } from '@/App';
+import { queryClient } from '@/./components/provider/query-provider';
 import { fetchNote, fetchNotesPage } from '@/services/note-service';
 import { createNote, deleteNote, updateNote } from '@/services/note-service.ts';
 import { useStore } from '@/stores/index.ts';

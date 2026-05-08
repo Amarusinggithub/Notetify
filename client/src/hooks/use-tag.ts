@@ -6,7 +6,7 @@ import {
 	type InfiniteData,
 } from '@tanstack/react-query';
 import { useRevalidator } from 'react-router';
-import { queryClient } from '@/App';
+import { queryClient } from '@/./components/provider/query-provider';
 import {
 	createTag,
 	deleteTag,
