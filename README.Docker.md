@@ -57,7 +57,7 @@ own `.dockerignore` and the Dockerfile lives in `<context>/docker/Dockerfile`.
 
 | Stack | File | Purpose |
 |---|---|---|
-| **dev** | `docker-compose.dev.yaml` | Day-to-day local work. Hot-reload, full observability (Mailpit, Seq, Telescope, Horizon, Pulse). |
+| **dev** | `docker-compose.dev.yaml` | Day-to-day local work. Hot-reload, full observability (Mailpit, Seq, Telescope, Pulse). |
 | **test** | `docker-compose.test.yaml` | Ephemeral. Postgres on tmpfs, Redis no-persist, `MAIL_MAILER=array`. For PHPUnit/Pest + Cypress. |
 | **prod** | `docker-compose.prod.yaml` | AWS deployment. TLS via certbot, internal-only services, resource limits, JSON-file logging suitable for CloudWatch. |
 
@@ -90,7 +90,6 @@ docker compose -f docker-compose.dev.yaml up -d --build
 | Seq (log search) | http://localhost:5341 |
 | RustFS console | http://localhost:9001 — login `rustfs` / `rustfs-secret` |
 | Telescope | http://localhost:8000/telescope |
-| Horizon | http://localhost:8000/horizon |
 | Pulse | http://localhost:8000/pulse |
 
 ### Common operations
@@ -164,7 +163,7 @@ docker compose -p notetify-prod -f docker-compose.prod.yaml \
 
 ### What's published vs internal
 
-Only `client` exposes ports (80 / 443). Everything else (`api`, `horizon`,
+Only `client` exposes ports (80 / 443). Everything else (`api`,
 `pulse`, `collab`, `db`, `redis`, `rustfs`) is reachable only on the internal
 Docker network. nginx in `client` reverse-proxies:
 
@@ -190,7 +189,6 @@ The compose file works as-is on a single EC2 host, but for real load:
 ```bash
 # Logs (per service)
 docker compose -p notetify-prod -f docker-compose.prod.yaml logs -f api
-docker compose -p notetify-prod -f docker-compose.prod.yaml logs -f horizon
 
 # Migrate after a deploy
 docker compose -p notetify-prod -f docker-compose.prod.yaml exec api \
@@ -210,7 +208,7 @@ docker compose -p notetify-prod -f docker-compose.prod.yaml up -d --no-deps --bu
 ## PHP extensions
 
 The Dockerfile (`api/docker/Dockerfile`) installs the extensions Laravel +
-Horizon + Pulse need:
+Pulse need:
 
 ```
 bcmath  intl  opcache  pcntl  pdo_pgsql  posix  sockets  zip

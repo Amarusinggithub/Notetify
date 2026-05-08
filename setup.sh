@@ -216,7 +216,6 @@ case "$ENV" in
     echo -e "    Seq UI        http://localhost:5341"
     echo -e "    RustFS UI     http://localhost:9001"
     echo -e "    Telescope     http://localhost:8000/telescope"
-    echo -e "    Horizon       http://localhost:8000/horizon"
     echo -e "    Pulse         http://localhost:8000/pulse"
     ;;
   production)

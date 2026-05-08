@@ -11,7 +11,7 @@ RUN corepack enable
 
 WORKDIR /usr/src/app
 
-COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* .npmrc* ./
+COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* pnpm-workspace.yaml* .npmrc* ./
 
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
     if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
@@ -64,8 +64,6 @@ COPY . .
 
 COPY docker/entrypoint.sh .
 RUN chmod +x ./entrypoint.sh
-
-USER node
 
 EXPOSE 3000
 

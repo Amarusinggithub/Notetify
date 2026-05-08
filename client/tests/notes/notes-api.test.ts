@@ -18,7 +18,7 @@ describe('notes api', () => {
 	it('fetchNotesPage calls GET with page and query params', async () => {
 		await notes.fetchNotesPage({
 			pageParam: 2,
-			queryKey: ['notes', 'abc', 'updated_at'],
+			queryKey: ['notes', 'list', 'abc', 'updated_at'],
 		} as any);
 		expect((axiosInstance as any).get).toHaveBeenCalledWith(
 			'notes?page=2&sort_by=updated_at&sort_direction=desc&search=abc'

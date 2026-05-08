@@ -3,13 +3,6 @@
 	"private": true,
 	"version": "0.0.0",
 	"type": "module",
-	"pnpm": {
-		"onlyBuiltDependencies": [
-			"cypress",
-			"esbuild",
-			"@tailwindcss/oxide"
-		]
-	},
 	"scripts": {
 		"cy:open": "cypress open",
 		"dev": "vite",

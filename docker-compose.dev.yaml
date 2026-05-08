@@ -3,7 +3,7 @@
 # -----------------------------------------------------------------------------
 # Brings up the full local environment: Postgres, Redis, the Laravel API,
 # the React client, the Hocuspocus collab hand-off (run separately), plus
-# dev-only observability and storage tooling (Mailpit, Seq, RustFS, Horizon,
+# dev-only observability and storage tooling (Mailpit, Seq, RustFS,
 # Pulse).
 #
 # Bring up:   docker compose -f docker-compose.dev.yaml up --build
@@ -59,7 +59,7 @@ services:
 
   # ---------------------------------------------------------------------------
   # redis — Redis 8
-  # Multi-purpose: Laravel cache + sessions + queue (Horizon) + Pulse ingest +
+  # Multi-purpose: Laravel cache + sessions + queue + Pulse ingest +
   # Hocuspocus pub/sub for SSE invalidation.
   # Reachable on host: localhost:6379
   # ---------------------------------------------------------------------------
@@ -131,7 +131,7 @@ services:
   # seq — structured log store + search UI
   # Optional. Receives JSON logs from Laravel (configure via Monolog channel
   # pointing at http://seq:5341/api/events/raw). Use for searching across
-  # api, horizon, pulse logs from one UI.
+  # api, pulse logs from one UI.
   # Web UI:   http://localhost:5341
   # Ingest:   http://seq:5341  (from inside the network)
   # ---------------------------------------------------------------------------
@@ -207,7 +207,6 @@ services:
   # Redis, RustFS, and Mailpit.
   # API:        http://localhost:8000
   # Telescope:  http://localhost:8000/telescope
-  # Horizon:    http://localhost:8000/horizon
   # Pulse:      http://localhost:8000/pulse
   # ---------------------------------------------------------------------------
   api:
@@ -220,7 +219,7 @@ services:
       - notetify-net
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80/api/health"]
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1/up"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -272,54 +271,6 @@ services:
         reservations:
           cpus: "0.25"
           memory: 256m
-
-  # ---------------------------------------------------------------------------
-  # horizon — queue worker + dashboard supervisor
-  # Reuses the api image; runs `php artisan horizon` instead of the web
-  # server. Processes mail jobs, search reindex jobs, etc. Dashboard is
-  # served by api at /horizon.
-  # ---------------------------------------------------------------------------
-  horizon:
-    build:
-      context: ./api
-      dockerfile: docker/Dockerfile
-      target: development
-    container_name: notetify-horizon
-    networks:
-      - notetify-net
-    restart: unless-stopped
-    command: ["php", "artisan", "horizon"]
-    healthcheck:
-      test: ["CMD-SHELL", "php artisan horizon:status | grep -q running"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
-    depends_on:
-      api:
-        condition: service_healthy
-    volumes:
-      - ./api:/app
-      - api_vendor:/app/vendor
-      - api_storage:/app/storage
-    environment:
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DB_DATABASE=notetify
-      - DB_USERNAME=postgres
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - APP_ENV=local
-    env_file:
-      - .env.development
-    deploy:
-      resources:
-        limits:
-          cpus: "1.0"
-          memory: 512m
-        reservations:
-          cpus: "0.1"
-          memory: 128m
 
   # ---------------------------------------------------------------------------
   # pulse — Pulse aggregator
@@ -390,7 +341,7 @@ services:
       - notetify-net
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000"]
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:3000"]
       interval: 30s
       timeout: 10s
       retries: 3

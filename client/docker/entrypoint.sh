@@ -1,6 +1,4 @@
 #!/usr/bin/env sh
 set -eu
-#chown -R node:node /usr/src/app/
 
-
-exec pnpm preview
+exec pnpm dev --host 0.0.0.0 --port 3000

@@ -16,7 +16,7 @@
 #   - Ports are offset by +1 (5433/6380/8001/3001) for the same reason.
 #   - No Mailpit — Laravel uses MAIL_MAILER=array in tests (mails are
 #     captured in memory and asserted via Mail::fake() / assertSent()).
-#   - No Horizon, Pulse, RustFS, Seq — none are needed for unit/feature
+#   - No Pulse, RustFS, Seq — none are needed for unit/feature
 #     tests. Add them only if a specific test exercises them.
 # =============================================================================
 

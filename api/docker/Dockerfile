@@ -44,7 +44,8 @@ RUN --mount=type=cache,target=/tmp/cache \
         --no-interaction \
         --no-scripts \
         --no-autoloader \
-        --prefer-dist
+        --prefer-dist \
+        --ignore-platform-req=ext-pcntl
 
 COPY . .
 
@@ -80,6 +81,7 @@ RUN set -eux; \
         $PHPIZE_DEPS \
         icu-dev \
         libzip-dev \
+        linux-headers \
         postgresql-dev; \
     docker-php-ext-configure intl; \
     docker-php-ext-install -j"$(nproc)" \

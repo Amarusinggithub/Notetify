@@ -16,7 +16,7 @@
 - Postgres 17 is the primary database; `notes.content` is JSONB (Tiptap JSON), and `notes.ydoc_state` (BYTEA, Yjs CRDT) is the planned source of truth during collab
 - Redis 8 covers cache, sessions, queue, Pulse ingest, and Hocuspocus pub/sub
 - File attachments live in **RustFS** (S3-compatible) — only the URL ends up inside the Tiptap doc
-- Background jobs run on **Laravel Horizon**; metrics on **Laravel Pulse**; debugging via **Telescope** (dev only)
+- Metrics on **Laravel Pulse**; debugging via **Telescope** (dev only)
 - Mail: **Mailpit** in dev, **Amazon SES** in prod; logs can ship to **Seq** in dev
 - Local dev runs in Docker Compose (`docker-compose.dev.yaml`); the same pattern targets a single AWS EC2 host in prod, with a documented path to migrate db → RDS, redis → ElastiCache
 - The Hocuspocus collab service (Node) is partially scaffolded — client deps are installed (`@hocuspocus/provider`, `@tiptap/extension-collaboration`, `yjs`, `y-websocket`, `y-protocols`), the Node service itself is being built per @docs/COLLABORATION.md
@@ -356,7 +356,6 @@ Do not introduce a third server-state layer (Redux, RTK Query, SWR). Do not put 
 - Per-user note state (pin, order, favorite, notebook assignment) goes through `UserNote`, not `Note` directly — see existing migrations under `api/database/migrations/` for the column splits
 - After modifying `composer.json` or `package.json`, run the install inside the container so the lockfile matches the deployed runtime
 - After modifying `.env.development`, restart `api` so Laravel re-reads it: `docker compose -f docker-compose.dev.yaml restart api`
-- After adding or modifying queue jobs, restart `horizon`: `docker compose -f docker-compose.dev.yaml restart horizon`
 - When writing tests, make sure the tests pass — backend tests live in `api/tests/` (PHPUnit 11), frontend unit tests in `client/tests/` (Vitest), e2e in `client/cypress/`
 - IMPORTANT: before writing or modifying ANY code that touches `notes.content`, `notes.ydoc_state`, or the editor body, you MUST first read @docs/COLLABORATION.md in full. The data flow rules — BYTEA is the source of truth, JSONB is derived, body is never written via REST, title is the first H1 inside the doc — are non-obvious and easy to violate. Do not rely on inference from existing code; the guide is the authoritative source of truth.
 - IMPORTANT: do not add a `notes.title` column. Title lives inside `content` as the first H1; the sidebar extracts it via JSONB path query with an `'Untitled'` fallback.

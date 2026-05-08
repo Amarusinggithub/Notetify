@@ -175,7 +175,7 @@ export function AppSidebar() {
 								size="lg"
 								onClick={handleCreateNote}
 								disabled={createNoteMutation.isPending}
-								className="h-10 w-40 bg-[#00a82d] px-3 text-white hover:bg-[#009325]"
+								className="h-10 flex-1 bg-[#00a82d] px-3 text-white hover:bg-[#009325]"
 							>
 								<NotebookPen className="size-4" />
 								<span>Note</span>
@@ -222,7 +222,7 @@ export function AppSidebar() {
 								variant="outline"
 								onClick={handleCreateNote}
 								disabled={createNoteMutation.isPending}
-								className="h-10 w-26 border-[#c9bff5] px-4 hover:bg-[#f5f1ff]"
+								className="h-10 flex-1 border-[#c9bff5] px-4 hover:bg-[#f5f1ff]"
 							>
 								<CheckCircle2 className="size-4 text-[#6d4df0]" />
 								<span>Task</span>
@@ -233,7 +233,7 @@ export function AppSidebar() {
 								variant="outline"
 								onClick={handleCreateNote}
 								disabled={createNoteMutation.isPending}
-								className="h-10 w-26 border-[#ffd8bf] px-4 hover:bg-[#fff4ee]"
+								className="h-10 flex-1 border-[#ffd8bf] px-4 hover:bg-[#fff4ee]"
 							>
 								<CalendarPlus className="size-4 text-[#f0642d]" />
 								<span>Event</span>
