@@ -37,6 +37,30 @@ Pattern: "Test behavior, not implementation." For Laravel tests, hit the JSON en
 String IDs are used consistently across the client and backend, matching the Laravel UUID payloads and avoiding casing bugs.
 Shared helper types like UpdateUserNotePayload keep mutation functions flexible but type-safe.
 
+7. Transitions vs. useDeferredValue with Suspense + external stores
+
+Symptom: a debounced search input updates a Zustand store, the queryKey of `useSuspenseInfiniteQuery` changes, and the Suspense fallback (loading skeleton) flashes between every search even though we want the previous list to stay visible until new results arrive.
+
+Why `startTransition` does NOT fix this when the value lives in Zustand:
+
+- `startTransition` only marks updates that go through React's own scheduler (`useState`, `useReducer`, `use`) as low-priority and interruptible. If such an update suspends, React keeps the previous UI mounted instead of falling back to Suspense.
+- Zustand reads via `useSyncExternalStore`. The contract of that API is "the snapshot must always be in sync with the external store, no tearing." To honor it, React forces every external-store update to be synchronous and urgent and explicitly opts it out of transitions.
+- So `startTransition(() => setSearch(...))` calls Zustand's setState, notifies subscribers, schedules synchronous urgent renders, queryKey changes, useSuspenseInfiniteQuery suspends, Suspense unmounts to the fallback. The wrapper is silently ignored.
+
+Why `useDeferredValue` DOES fix it:
+
+- It operates on a value, not on an update. Sequence:
+  1. Zustand commits the new search synchronously (we can't stop that).
+  2. The component re-renders and reads the new search from the store.
+  3. `useDeferredValue(search)` returns the OLD search for this render. React then schedules a second render in the background with the new search.
+  4. The background render hits `useSuspenseInfiniteQuery` with the new queryKey and suspends.
+  5. A suspension during a deferred render does NOT trigger the Suspense fallback — React keeps showing the previous render's output until the new render's data is ready.
+  6. Once the query resolves, React commits the new render. No skeleton flash.
+
+Pattern: "Transitions are for state you write through React's setters; useDeferredValue is for values that come from external stores." Whenever a suspending value originates from Zustand, Redux, or any other `useSyncExternalStore`-backed source, reach for `useDeferredValue` at the read site, not `startTransition` at the write site.
+
+Bonus pattern from the same fix: isolate the input's local state in its own subcomponent so each keystroke only re-renders the input, not the whole sidebar tree (filters, dropdowns, count, list). Subscribe child components directly to the store rather than threading the value through the parent — that way the parent doesn't need to subscribe at all.
+
 How to apply these patterns yourself
 
 State normalization: Define your domain types once. Whenever you feel the urge to update local state and the query cache separately, extract a helper so every mutation follows the same shape.

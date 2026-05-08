@@ -32,7 +32,13 @@ import {
 } from '@/components/ui/notes-sidebar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
-import { Suspense, useEffect, useRef, useState } from 'react';
+import {
+	Suspense,
+	useDeferredValue,
+	useEffect,
+	useRef,
+	useState,
+} from 'react';
 import useDebounce from '@/hooks/use-debounce';
 import { EnsureNotes, useFetchNotes } from '@/hooks/use-note.ts';
 import { useStore } from '@/stores/index.ts';
@@ -59,19 +65,14 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from '@/components/ui/tooltip';
-import type { SortBy } from '@/types';
 
 export function notesLoader() {
 	return EnsureNotes();
 }
 
-function NotesCount({
-	search,
-	sortBy,
-}: {
-	search: string;
-	sortBy: SortBy | undefined;
-}) {
+function NotesCount() {
+	const search = useDeferredValue(useStore((s) => s.searchNotes));
+	const sortBy = useStore((s) => s.sortNotesBy);
 	const { data } = useFetchNotes(search, sortBy);
 	const count = data?.length ?? 0;
 	return (
@@ -81,13 +82,38 @@ function NotesCount({
 	);
 }
 
-function VirtualNotesList({
-	search,
-	sortBy,
-}: {
-	search: string;
-	sortBy: SortBy | undefined;
-}) {
+function NotesSearchInput() {
+	const search = useStore((s) => s.searchNotes);
+	const setSearch = useStore((s) => s.setSearch);
+	const [searchInput, setSearchInput] = useState(search);
+	const debouncedSearch = useDebounce(searchInput, 300);
+
+	useEffect(() => {
+		if (debouncedSearch !== search) {
+			setSearch(debouncedSearch);
+		}
+	}, [debouncedSearch, search, setSearch]);
+
+	useEffect(() => {
+		setSearchInput(search);
+	}, [search]);
+
+	return (
+		<div className="relative mr-auto hidden w-full max-w-sm md:flex">
+			<SearchIcon className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+			<Input
+				value={searchInput}
+				onChange={(event) => setSearchInput(event.target.value)}
+				placeholder="Search notes"
+				className="pl-9"
+			/>
+		</div>
+	);
+}
+
+function VirtualNotesList() {
+	const search = useDeferredValue(useStore((s) => s.searchNotes));
+	const sortBy = useStore((s) => s.sortNotesBy);
 	const {
 		data: allNotes,
 		fetchNextPage,
@@ -183,22 +209,8 @@ function VirtualNotesList({
 }
 
 export function EditorNotesSidebar() {
-	const search = useStore((s) => s.searchNotes);
 	const sortBy = useStore((s) => s.sortNotesBy);
 	const setSortBy = useStore((s) => s.setSortBy);
-	const setSearch = useStore((s) => s.setSearch);
-	const [searchInput, setSearchInput] = useState(search);
-	const debouncedSearch = useDebounce(searchInput, 300);
-
-	useEffect(() => {
-		if (debouncedSearch !== undefined) {
-			setSearch(debouncedSearch);
-		}
-	}, [debouncedSearch, setSearch]);
-
-	useEffect(() => {
-		setSearchInput(search);
-	}, [search]);
 
 	const [filters, setFilters] = useState({
 		tags: '',
@@ -216,19 +228,11 @@ export function EditorNotesSidebar() {
 					<Label className="scroll-m-20 text-2xl font-semibold tracking-tight">
 						Notes
 					</Label>
-					<NotesCount search={search} sortBy={sortBy} />
+					<NotesCount />
 				</div>
 
 				<div className="flex flex-1 items-center justify-end gap-2">
-					<div className="relative mr-auto hidden w-full max-w-sm md:flex">
-						<SearchIcon className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
-						<Input
-							value={searchInput}
-							onChange={(event) => setSearchInput(event.target.value)}
-							placeholder="Search notes"
-							className="pl-9"
-						/>
-					</div>
+					<NotesSearchInput />
 
 					<DropdownMenu>
 						<Tooltip>
@@ -437,7 +441,7 @@ export function EditorNotesSidebar() {
 				)}
 			>
 				<Suspense fallback={<NotesSidebarSkeleton />}>
-					<VirtualNotesList search={search} sortBy={sortBy} />
+					<VirtualNotesList />
 				</Suspense>
 			</ErrorBoundary>
 		</NotesSidebar>
