@@ -115,6 +115,8 @@ services:
       MP_MAX_MESSAGES: 5000
       MP_SMTP_AUTH_ACCEPT_ANY: 1
       MP_SMTP_AUTH_ALLOW_INSECURE: 1
+    env_file:
+      - .env.development
     ports:
       - "1025:1025"   # SMTP
       - "8025:8025"   # Web UI
@@ -150,6 +152,8 @@ services:
     environment:
       ACCEPT_EULA: "Y"
       SEQ_FIRSTRUN_NOAUTHENTICATION: "true"
+    env_file:
+      - .env.development
     volumes:
       - seq-data:/data
     ports:
@@ -187,6 +191,8 @@ services:
       RUSTFS_ROOT_USER: rustfs
       RUSTFS_ROOT_PASSWORD: rustfs-secret
       RUSTFS_VOLUMES: /data
+    env_file:
+      - .env.development
     volumes:
       - rustfs-data:/data
     ports:
@@ -248,7 +254,7 @@ services:
       - DB_USERNAME=postgres
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - APP_ENV=local
+      - APP_ENV=development
       - APP_DEBUG=true
       - MAIL_MAILER=smtp
       - MAIL_HOST=mailpit
@@ -263,7 +269,7 @@ services:
       - RUSTFS_REGION=us-east-1
       - RUSTFS_USE_PATH_STYLE_ENDPOINT=true
       - FILESYSTEM_DISK=rustfs
-      - CLIENT_URL=http://localhost:5173
+      - CLIENT_URL=http://localhost:5173/
     env_file:
       - .env.development
     deploy:
@@ -308,7 +314,7 @@ services:
       - DB_USERNAME=postgres
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - APP_ENV=local
+      - APP_ENV=development
     env_file:
       - .env.development
     deploy:
@@ -355,7 +361,7 @@ services:
       - DB_USERNAME=postgres
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - APP_ENV=local
+      - APP_ENV=development
       - QUEUE_CONNECTION=redis
     env_file:
       - .env.development

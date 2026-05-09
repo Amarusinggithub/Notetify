@@ -35,8 +35,8 @@ php artisan migrate --force
 
 
 # Run seeds
-echo "Seeding Database..."
-php artisan db:seed
+#echo "Seeding Database..."
+#php artisan db:seed --force
 
 # Clear and cache config for development
 echo "Clearing caches..."

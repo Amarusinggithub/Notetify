@@ -217,11 +217,8 @@ export const createAuthSlice: StateCreator<StoreState, [], [], AuthSlice> = (
                 password,
             });
 
-
             set({ isAuthenticated: true, sharedData: shared });
-            if (!shared.auth.user.is_verified) {
-                await authService.verifyEmail();
-            }
+           
             return true;
         } catch (error: any) {
             set({ errors: mapAxiosErrorToFieldErrors(error) });

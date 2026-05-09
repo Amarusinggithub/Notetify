@@ -30,7 +30,7 @@ The repo root contains three deployable services and three Compose stacks. Each 
 - Collab: `./collab` — Hocuspocus (Node.js) WebSocket server (per @docs/COLLABORATION.md)
 - Docs: `./docs` — architecture and design docs
 - Scripts: `./scripts` — operational shell scripts (TLS init, prod start, cleanup, logs)
-- Compose stacks: `docker-compose.dev.yaml`, `docker-compose.test.yaml`, `docker-compose.prod.yaml`
+- Compose stacks: `docker-compose.dev.yaml`, `docker-compose.test.yaml`, `docker-compose.prod.yaml`,`docker-compose.prod.local.yaml`
 - Setup wizard: `./setup.sh` — one-shot env + secrets bootstrap
 - Top-level Docker docs: @README.Docker.md
 

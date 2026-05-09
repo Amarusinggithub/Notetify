@@ -68,6 +68,8 @@ them with `-p` when running multiple stacks on the same host:
 docker compose -p notetify-dev  -f docker-compose.dev.yaml  up -d
 docker compose -p notetify-test -f docker-compose.test.yaml up -d
 docker compose -p notetify-prod -f docker-compose.prod.yaml up -d
+docker compose -p notetify-dev  -f docker-compose.prod.local.yaml  up -d
+
 ```
 
 ---
@@ -105,6 +107,10 @@ Ports that are **not** browser-friendly (programmatic only — opening in a brow
 ### Common operations
 
 ```bash
+
+# To seed database
+docker compose -f docker-compose.dev.yaml exec api php artisan db:seed
+
 # Tail one service's logs
 docker compose -f docker-compose.dev.yaml logs -f api
 
@@ -155,6 +161,7 @@ docker compose -f docker-compose.dev.yaml exec api php artisan migrate
 
 # 4. Restart api so the new service provider is picked up
 docker compose -f docker-compose.dev.yaml restart api
+
 ```
 
 If `composer require` ever fails with a PHP version constraint error (e.g. `requires php ^8.4 but your php version (8.2.x) does not satisfy`), the api Dockerfile's `ARG PHP_VERSION` is out of sync with `composer.json`'s `require.php` constraint. Bump the Dockerfile, then drop the `api_vendor` named volume so vendor reinstalls cleanly:

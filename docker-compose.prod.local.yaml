@@ -1,23 +1,10 @@
 # =============================================================================
 # Notetify — production stack (AWS deployment)
 # -----------------------------------------------------------------------------
-# Designed for a single-host EC2 deployment with Docker Compose. Bring up via:
 #
-#   docker compose -f docker-compose.prod.yaml --env-file .env.production up -d
+#   docker compose -f docker-compose.prod.yaml --env-file .env.production.local up -d
 #
-# Architectural notes for AWS:
-#   - For a real production load, migrate db -> RDS Postgres and
-#     redis -> ElastiCache. Update .env.production hosts accordingly and
-#     remove the corresponding services here. Keep this file as the
-#     application tier (api/pulse/collab/client/rustfs).
-#   - Mail in prod uses Amazon SES (Laravel's `ses` driver). MAIL_* vars in
-#     .env.production must be set; no Mailpit container in prod.
-#   - Logs default to json-file with rotation. To ship to CloudWatch, install
-#     the CloudWatch agent on the EC2 host or switch the logging driver here
-#     to `awslogs` and supply awslogs-group / awslogs-region env vars.
-#   - All internal services use `expose:` (not `ports:`) so only the client
-#     reverse proxy (80/443) is reachable from the public internet. Lock down
-#     the security group accordingly.
+
 # =============================================================================
 
 # Shared logging defaults — JSON file with rotation, suitable for CloudWatch
@@ -33,7 +20,7 @@ x-logging: &default-logging
 services:
 
   # ---------------------------------------------------------------------------
-  # db — Postgres 18.1
+  # db — Postgres 18-1
   # Primary datastore. For real production replace with Amazon RDS and remove
   # this service. RDS gives you automated backups, multi-AZ failover, and
   # point-in-time recovery — none of which a single container provides.
@@ -61,7 +48,7 @@ services:
     expose:
       - 5432
     env_file:
-      - .env.production
+      - .env.production.local
     logging: *default-logging
     deploy:
       resources:
@@ -97,7 +84,7 @@ services:
     expose:
       - 6379
     env_file:
-      - .env.production
+      - .env.production.local
     logging: *default-logging
     deploy:
       resources:
@@ -127,12 +114,12 @@ services:
       timeout: 5s
       retries: 10
       start_period: 15s
-    env_file:
-      - .env.production
     environment:
       RUSTFS_ROOT_USER: ${RUSTFS_KEY:?RUSTFS_KEY must be set in .env.production}
       RUSTFS_ROOT_PASSWORD: ${RUSTFS_SECRET:?RUSTFS_SECRET must be set in .env.production}
       RUSTFS_VOLUMES: /data
+    env_file:
+      - .env.production.local
     volumes:
       - rustfs-data:/data
     expose:
@@ -175,7 +162,7 @@ services:
       rustfs:
         condition: service_started
     env_file:
-      - .env.production
+      - .env.production.local
     environment:
       - APP_ENV=production
       - APP_DEBUG=false
@@ -223,7 +210,7 @@ services:
       api:
         condition: service_healthy
     env_file:
-      - .env.production
+      - .env.production.local
     environment:
       - APP_ENV=production
       - APP_DEBUG=false
@@ -269,7 +256,7 @@ services:
       api:
         condition: service_healthy
     env_file:
-      - .env.production
+      - .env.production.local
     environment:
       - APP_ENV=production
       - APP_DEBUG=false
@@ -318,7 +305,7 @@ services:
       api:
         condition: service_healthy
     env_file:
-      - .env.production
+      - .env.production.local
     environment:
       - PORT=1234
       - LARAVEL_URL=http://api:80
@@ -374,7 +361,7 @@ services:
       collab:
         condition: service_healthy
     env_file:
-      - .env.production
+      - .env.production.local
     environment:
       - DOMAIN=${DOMAIN:-localhost}
     volumes:

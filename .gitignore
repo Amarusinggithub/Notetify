@@ -2,7 +2,7 @@ ARCHITECTURE.md
 docker-compose.override.yml
 docker-compose.dev.yml
 docker-compose.test.yml
-GEMINI.md
+
 !Dockerfile
 !docker-compose.yml
 static
