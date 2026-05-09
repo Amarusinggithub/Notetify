@@ -12,13 +12,15 @@ use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Laravel\Fortify\Contracts\PasskeyUser;
+use Laravel\Fortify\PasskeyAuthenticatable;
 
 
 
-class User extends Authenticatable  implements MustVerifyEmail
+class User extends Authenticatable  implements MustVerifyEmail, PasskeyUser
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasApiTokens, HasFactory, Notifiable, HasUuids, SoftDeletes,TwoFactorAuthenticatable;
+    use HasApiTokens, HasFactory, Notifiable, HasUuids, SoftDeletes,TwoFactorAuthenticatable,PasskeyAuthenticatable;
 
     /**
      * The attributes that are mass assignable.
@@ -49,6 +51,8 @@ class User extends Authenticatable  implements MustVerifyEmail
         'remember_token',
     ];
 
+    protected $appends = ['is_verified','full_name'];
+
     /**
      * Get the attributes that should be cast.
      *
@@ -62,6 +66,10 @@ class User extends Authenticatable  implements MustVerifyEmail
             'is_active' => 'boolean',
 
         ];
+    }
+
+    public function getFullNameAttribute() {
+        return $this->first_name . ' ' . $this->last_name;
     }
 
     // Scopes
@@ -93,33 +101,16 @@ class User extends Authenticatable  implements MustVerifyEmail
         ]);
     }
 
-    public function isVerified(): bool
-    {
-        return $this->email_verified_at !== null;
-    }
+protected function isVerified(): Attribute
+{
+    return Attribute::make(
+        get: fn () => $this->email_verified_at !== null,
+    );
+}
 
 
-     // Rest omitted for brevity
 
-    /**
-     * Get the identifier that will be stored in the subject claim of the JWT.
-     *
-     * @return mixed
-     */
-    public function getJWTIdentifier()
-    {
-        return $this->getKey();
-    }
 
-    /**
-     * Return a key value array, containing any custom claims to be added to the JWT.
-     *
-     * @return array
-     */
-    public function getJWTCustomClaims()
-    {
-        return [];
-    }
 
 
 

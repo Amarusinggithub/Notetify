@@ -17,20 +17,20 @@
 services:
 
   # ---------------------------------------------------------------------------
-  # db — Postgres 17
+  # db — Postgres
   # Primary datastore. Holds users, notes (incl. content JSONB + ydoc_state
   # BYTEA), tags, sessions. Source of truth for everything except live CRDT
   # state in Hocuspocus memory.
   # Reachable on host: localhost:5432
   # ---------------------------------------------------------------------------
   db:
-    image: postgres:17-alpine
+    image: postgres:18.1-alpine
     container_name: notetify-db
     networks:
       - notetify-net
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "postgres", "-d",  '${POSTGRES_USER:-app}' ]
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER:-postgres}", "-d", "${POSTGRES_DB:-notetify}"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -39,13 +39,13 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_DB=notetify
+      - POSTGRES_DB=${DB_DATABASE:-notetify}
       - POSTGRES_USER=${DB_USERNAME:-postgres}
       - POSTGRES_PASSWORD=${DB_PASSWORD:-postgres}
     expose:
       - 5432
     ports:
-      - "5432:5432"
+      - "5433:5432"
     env_file:
       - .env.development
     deploy:
@@ -263,6 +263,7 @@ services:
       - RUSTFS_REGION=us-east-1
       - RUSTFS_USE_PATH_STYLE_ENDPOINT=true
       - FILESYSTEM_DISK=rustfs
+      - CLIENT_URL=http://localhost:5173
     env_file:
       - .env.development
     deploy:

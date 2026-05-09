@@ -23,18 +23,18 @@
 services:
 
   # ---------------------------------------------------------------------------
-  # db — Postgres 17 (tmpfs)
+  # db — Postgres 18.1 (tmpfs)
   # Throwaway test database. Data is in RAM via tmpfs so each `up` is clean
   # and migrations run fast. Database name: notetify_test.
   # ---------------------------------------------------------------------------
   db:
-    image: postgres:17-alpine
+    image: postgres:18.1-alpine
     container_name: notetify-db-test
     networks:
       - notetify-net
     restart: "no"
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "postgres", "-d", "notetify_test"]
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER:-postgres}", "-d", "${POSTGRES_DB:-notetify_test}"]
       interval: 5s
       timeout: 3s
       retries: 10

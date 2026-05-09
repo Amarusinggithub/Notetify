@@ -114,6 +114,9 @@ docker compose -f docker-compose.dev.yaml logs -f
 # Run an artisan command
 docker compose -f docker-compose.dev.yaml exec api php artisan migrate
 
+#Run an artisan to view route list
+docker compose -f docker-compose.dev.yaml exec api php artisan route:list
+
 # Composer install (pcntl/posix work here, unlike on Windows host)
 docker compose -f docker-compose.dev.yaml exec api composer require some/package
 

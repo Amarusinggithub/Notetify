@@ -40,13 +40,13 @@ services:
   # Internal only (no published port).
   # ---------------------------------------------------------------------------
   db:
-    image: postgres:17-alpine
+    image: postgres:18.1alpine
     container_name: notetify-db
     networks:
       - notetify-net
     restart: always
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "postgres", "-d", "notetify"]
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER:-postgres}", "-d", "${POSTGRES_DB:-notetify}"]
       interval: 10s
       timeout: 5s
       retries: 10

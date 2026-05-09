@@ -33,6 +33,11 @@ fi
 echo "Running migrations..."
 php artisan migrate --force
 
+
+# Run seeds
+echo "Seeding Database..."
+php artisan db:seed
+
 # Clear and cache config for development
 echo "Clearing caches..."
 php artisan config:clear
