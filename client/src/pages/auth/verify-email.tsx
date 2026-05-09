@@ -1,15 +1,17 @@
+import { useState } from 'react';
 import { LoaderCircle } from 'lucide-react';
-
-import TextLink from '@/components/shared/text-link';
 import { Button } from '@/components/ui/button.tsx';
 import AuthLayout from '@/layouts/auth-layout';
 import { useStore } from '@/stores/index.ts';
 
 export default function VerifyEmail() {
-	const { isLoading, VerifyEmail, sharedData } = useStore();
-	const submit = async (e: React.SubmitEvent<HTMLFormElement>) => {
+	const { isLoading, VerifyEmail, Logout } = useStore();
+	const [resent, setResent] = useState(false);
+
+	const handleResend = async (e: React.SubmitEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		await VerifyEmail(sharedData!.auth.user.email);
+		const result = await VerifyEmail();
+		if (result) setResent(true);
 	};
 
 	return (
@@ -17,22 +19,27 @@ export default function VerifyEmail() {
 			title="Verify email"
 			description="Please verify your email address by clicking on the link we just emailed to you."
 		>
-			{/* Status message handled elsewhere; removed undefined reference */}
-
 			<form
-				onSubmit={(e) => {
-					submit(e).catch(console.error);
-				}}
+				onSubmit={(e) => { handleResend(e).catch(console.error); }}
 				className="space-y-6 text-center"
 			>
-				<Button disabled={isLoading} variant="secondary">
+				{resent && (
+					<p className="text-sm text-green-600 dark:text-green-400">
+						A new verification link has been sent to your email.
+					</p>
+				)}
+
+				<Button disabled={isLoading || resent} variant="secondary">
 					{isLoading && <LoaderCircle className="h-4 w-4 animate-spin" />}
-					Resend verification email
+					{resent ? 'Email sent' : 'Resend verification email'}
 				</Button>
 
-				<TextLink to={'/logout'} className="mx-auto block text-sm">
+				<Button variant={"link"}
+					onClick={() => { Logout().catch(console.error); }}
+					className="mx-auto block text-sm underline"
+				>
 					Log out
-				</TextLink>
+				</Button>
 			</form>
 		</AuthLayout>
 	);

@@ -22,19 +22,35 @@ interface TwoFactorRequired {
 }
 
 export function buildSharedData(apiResponse: any): SharedData {
-	const user: User = {
-		id: apiResponse.id,
-		first_name: apiResponse.first_name,
-		last_name: apiResponse.last_name,
-		email: apiResponse.email,
-		is_active: apiResponse.is_active,
-	};
-	return {
-		auth: { user },
-		name: `${user.first_name} ${user.last_name}`,
-		sidebarOpen: false,
-	} as SharedData;
+    const user: User = {
+        id: apiResponse.id,
+        first_name: apiResponse.first_name,
+        last_name: apiResponse.last_name,
+        full_name: apiResponse.full_name,
+        email: apiResponse.email,
+        avatar: apiResponse.avatar,
+        timezone: apiResponse.timezone,
+        locale: apiResponse.locale,
+        preferred_language: apiResponse.preferred_language,
+        is_active: apiResponse.is_active,
+        is_verified: apiResponse.is_verified,
+        email_verified_at: apiResponse.email_verified_at,
+        two_factor_confirmed_at: apiResponse.two_factor_confirmed_at,
+        last_login_at: apiResponse.last_login_at,
+        last_login_ip: apiResponse.last_login_ip,
+        created_at: apiResponse.created_at,
+        updated_at: apiResponse.updated_at,
+        deleted_at: apiResponse.deleted_at,
+        two_factor_recovery_codes: apiResponse.two_factor_recovery_codes,
+        two_factor_secret: apiResponse.two_factor_secret,
+    };
+    return {
+        auth: { user },
+        name: user.full_name,
+        sidebarOpen: false,
+    } as SharedData;
 }
+
 
 export async function signUp(params: SignUpParams): Promise<SharedData> {
 	await ensureCSRFToken();
@@ -124,18 +140,10 @@ export async function updateProfile(params): Promise<void> {
 	await api.put('user/profile-information', params);
 }
 
-// Resend verification email
-export async function resendVerificationEmail(): Promise<void> {
-	await ensureCSRFToken();
-	await api.post('email/verification-notification');
-}
 
-export async function verifyEmail(email: string): Promise<string> {
+export async function verifyEmail() {
 	await ensureCSRFToken();
-	const response = await api.post('auth/verify-email/', {
-		email: email.trim().toLowerCase(),
-	});
-	return response.data.token || 'success';
+	 await api.post("email/verification-notification");
 }
 
 export async function getMe(): Promise<SharedData> {

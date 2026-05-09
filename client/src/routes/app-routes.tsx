@@ -39,6 +39,11 @@ const Landing = lazy(() => import('@/pages/landing'));
 function AppRoutes() {
 	const checkingAuth = useStore((state) => state.checkingAuth);
 	const isAuthenticated = useStore((state) => state.isAuthenticated);
+	const isVerified = useStore(
+        (state) => state.sharedData?.auth.user.is_verified,
+    );
+
+    const emailVerified = isAuthenticated && isVerified;
 
 	if (checkingAuth) return <LoadingPage message="Checking session..." />;
 
@@ -127,12 +132,26 @@ function AppRoutes() {
 		{ path: '*', Component: NotFound },
 	];
 
+	const verificationRoutes: RouteObject[] = [
+		{
+			path: 'verify-email',
+			Component: VerifyEmail,
+			HydrateFallback: LoadingPage,
+		},
+		{ path: '*', Component: () => <Navigate to="/verify-email" replace /> },
+	];
+
 	const router = createBrowserRouter(
-		isAuthenticated ? privateRoutes : publicRoutes
+		!isAuthenticated ? publicRoutes
+		: !emailVerified  ? verificationRoutes
+		: privateRoutes
 	);
 
 	return (
-		<RouterProvider router={router} key={isAuthenticated ? 'auth' : 'guest'} />
+		<RouterProvider
+			router={router}
+			key={!isAuthenticated ? 'guest' : !emailVerified ? 'unverified' : 'auth'}
+		/>
 	);
 }
 
