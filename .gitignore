@@ -1,8 +1,7 @@
-ARCHITECTURE.md
 docker-compose.override.yml
 docker-compose.dev.yml
 docker-compose.test.yml
-
+stats.html
 !Dockerfile
 !docker-compose.yml
 static
