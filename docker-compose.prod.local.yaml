@@ -142,7 +142,7 @@ services:
   api:
     build:
       context: ./api
-      dockerfile: docker/Dockerfile.prod
+      dockerfile: docker/Dockerfile.prod.local
       target: production
     container_name: notetify-api
     networks:
@@ -287,7 +287,7 @@ services:
   collab:
     build:
       context: ./collab
-      dockerfile: docker/Dockerfile.prod
+      dockerfile: docker/Dockerfile.prod.local
       target: production
     container_name: notetify-collab
     networks:
@@ -335,7 +335,7 @@ services:
   client:
     build:
       context: ./client
-      dockerfile: docker/Dockerfile.prod
+      dockerfile: docker/Dockerfile.prod.local
       target: production
       args:
         - VITE_BASE_URL=${CLIENT_BASE_URL:-https://localhost/api/}

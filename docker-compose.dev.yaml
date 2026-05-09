@@ -254,7 +254,7 @@ services:
       - DB_USERNAME=postgres
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - APP_ENV=development
+      - APP_ENV=local
       - APP_DEBUG=true
       - MAIL_MAILER=smtp
       - MAIL_HOST=mailpit
@@ -314,7 +314,7 @@ services:
       - DB_USERNAME=postgres
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - APP_ENV=development
+      - APP_ENV=local
     env_file:
       - .env.development
     deploy:
@@ -361,7 +361,7 @@ services:
       - DB_USERNAME=postgres
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - APP_ENV=development
+      - APP_ENV=local
       - QUEUE_CONNECTION=redis
     env_file:
       - .env.development

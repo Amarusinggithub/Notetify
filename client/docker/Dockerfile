@@ -6,7 +6,7 @@ FROM node:${NODE_VERSION}-alpine AS development
 
 ENV NODE_ENV=development
 
-RUN corepack enable && corepack prepare pnpm@11.0.8 --activate
+RUN corepack enable && corepack prepare pnpm@11.0.9 --activate
 
 WORKDIR /app
 
