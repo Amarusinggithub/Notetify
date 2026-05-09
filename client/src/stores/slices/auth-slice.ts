@@ -216,6 +216,8 @@ export const createAuthSlice: StateCreator<StoreState, [], [], AuthSlice> = (
                 email,
                 password,
             });
+
+
             set({ isAuthenticated: true, sharedData: shared });
             if (!shared.auth.user.is_verified) {
                 await authService.verifyEmail();

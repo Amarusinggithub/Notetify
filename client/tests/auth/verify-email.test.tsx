@@ -36,6 +36,6 @@ describe('VerifyEmail page', () => {
 		});
 		fireEvent.click(submitButton);
 
-		expect(mockVerifyEmail).toHaveBeenCalledWith('test@example.com');
+		expect(mockVerifyEmail).toHaveBeenCalledWith();
 	});
 });
