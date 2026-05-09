@@ -55,7 +55,7 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_DB=notetify
+      - POSTGRES_DB=${DB_DATABASE:-notetify}
       - POSTGRES_USER=${DB_USERNAME:-postgres}
       - POSTGRES_PASSWORD=${DB_PASSWORD:?DB_PASSWORD must be set in .env.production}
     expose:
