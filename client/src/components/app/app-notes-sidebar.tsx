@@ -32,7 +32,7 @@ import {
 } from "@/components/ui/notes-sidebar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-import { Suspense, useDeferredValue, useEffect, useRef, useState } from "react";
+import React, { Suspense, useDeferredValue, useEffect, useRef, useState } from "react";
 import { EnsureNotes, useFetchNotes } from "@/hooks/use-note.ts";
 import { useStore } from "@/stores/index.ts";
 
@@ -79,31 +79,26 @@ function NotesCount() {
 function NotesSearchInput() {
     const search = useStore((s) => s.searchNotes);
     const setSearch = useStore((s) => s.setSearch);
-    const [debouncedSearch, setDebouncedSearch] = useState(search);
+    const [localSearch, setLocalSearch] = useState(search);
 
-    useEffect(() => {
-        if (debouncedSearch !== search) {
-            useDebouncedCallback(
-                async () => {
-                    setSearch(debouncedSearch);
-                },
-                {
-                    wait: 300,
-                },
-            );
-        }
-    }, [debouncedSearch, search, setSearch]);
+    const debouncedSetSearch = useDebouncedCallback(
+        (value: string) => {
+            setSearch(value);
+        },
+        { wait: 300 },
+    );
 
-    useEffect(() => {
-        setDebouncedSearch(search);
-    }, [search]);
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setLocalSearch(event.target.value);
+        debouncedSetSearch(event.target.value);
+    };
 
     return (
         <div className="relative mr-auto hidden w-full max-w-sm md:flex">
             <SearchIcon className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
             <Input
-                value={debouncedSearch}
-                onChange={(event) => setDebouncedSearch(event.target.value)}
+                value={localSearch}
+                onChange={handleChange}
                 placeholder="Search notes"
                 className="pl-9"
             />
@@ -113,7 +108,7 @@ function NotesSearchInput() {
 
 function VirtualNotesList() {
     const search = useDeferredValue(useStore((s) => s.searchNotes));
-    const sortBy = useStore((s) => s.sortNotesBy);
+    const sortBy = useDeferredValue(useStore((s) => s.sortNotesBy));
     const {
         data: allNotes,
         fetchNextPage,

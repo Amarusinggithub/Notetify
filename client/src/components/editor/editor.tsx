@@ -266,7 +266,7 @@ export const Editor = () => {
 		// Only set the ref AFTER content is loaded so onUpdate always
 		// sees the correct note data matching the editor content
 		currentUserNoteRef.current = currentUserNote;
-	}, [editor, currentUserNote?.id]);
+	}, [editor, currentUserNote,currentUserNote?.id]);
 
 	if (!editor) {
 		return <EditorLoadingSkeleton />;
@@ -323,7 +323,7 @@ const TitleExtension = Extension.create({
 						let touchesFirstNode = false;
 
 						// Check if step affects positions within first node
-						stepMap.forEach((oldStart, oldEnd) => {
+						stepMap.forEach((oldStart, __oldEnd) => {
 							if (oldStart < firstNodeSize) {
 								touchesFirstNode = true;
 							}
@@ -362,7 +362,7 @@ const TitleExtension = Extension.create({
 					return true;
 				},
 
-				appendTransaction: (transactions, oldState, newState) => {
+				appendTransaction: (__transactions, __oldState, newState) => {
 					const { doc, tr } = newState;
 					const firstNode = doc.firstChild;
 					let modified = false;

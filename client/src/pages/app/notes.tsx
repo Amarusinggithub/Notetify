@@ -98,7 +98,7 @@ export default function Notes() {
         };
 
         handleNavigation();
-    }, [
+    }, [queryClient,
         noteId,
         selectedId,
         initialData,

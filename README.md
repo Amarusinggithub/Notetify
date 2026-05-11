@@ -135,33 +135,8 @@ A preview of the Notetify UI in action (add screenshot here).
 
 ---
 
-## Run Redis in Docker
 
-For caching & real-time broadcasting:
-
-```bash
-docker run -d --name redis-notetify -p 6379:6379 --rm redis:7-alpine
-```
-
-Get container ID:
-
-```bash
-docker ps
-```
-
-![container id](./screenshots/redis_container_id.png)
-
-Access Redis container:
-
-```bash
-docker exec -it <yourRedisContainerId> sh
-```
-
-![container id](./screenshots/enter_redis_container_terminal.png)
-
----
-
-## Run with Docker Compose (Optional)
+## Run with Docker Compose 
 
 Build & run all services:
 

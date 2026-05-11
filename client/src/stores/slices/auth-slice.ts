@@ -218,7 +218,7 @@ export const createAuthSlice: StateCreator<StoreState, [], [], AuthSlice> = (
             });
 
             set({ isAuthenticated: true, sharedData: shared });
-           
+
             return true;
         } catch (error: any) {
             set({ errors: mapAxiosErrorToFieldErrors(error) });
