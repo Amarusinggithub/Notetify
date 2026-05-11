@@ -1,0 +1,24 @@
+services:
+  devcontainer:
+    image: mcr.microsoft.com/devcontainers/base:ubuntu
+    container_name: notetify-devcontainer
+    networks:
+      - notetify-net
+    volumes:
+      - .:/workspaces/Notetify:cached
+      - pnpm-store:/home/vscode/.pnpm-store
+    command: sleep infinity
+    user: vscode
+    environment:
+      - COMPOSER_HOME=/home/vscode/.composer
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2g
+        reservations:
+          cpus: "0.25"
+          memory: 256m
+
+volumes:
+  pnpm-store:
