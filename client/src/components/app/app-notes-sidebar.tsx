@@ -1,576 +1,661 @@
-import { useVirtualizer } from '@tanstack/react-virtual';
+import { useVirtualizer } from "@tanstack/react-virtual";
 import {
-	AlertCircle,
-	ArrowUpDown,
-	Calendar,
-	FilterIcon,
-	Notebook,
-	RefreshCw,
-	Search as SearchIcon,
-	Tag as TagIcon,
-} from 'lucide-react';
-import { ErrorBoundary } from 'react-error-boundary';
-import { Button } from '@/components/ui/button';
+    AlertCircle,
+    ArrowUpDown,
+    Calendar,
+    FilterIcon,
+    Notebook,
+    RefreshCw,
+    Search as SearchIcon,
+    Tag as TagIcon,
+} from "lucide-react";
+import { ErrorBoundary } from "react-error-boundary";
+import { Button } from "@/components/ui/button";
 import {
-	DropdownMenu,
-	DropdownMenuCheckboxItem,
-	DropdownMenuContent,
-	DropdownMenuGroup,
-	DropdownMenuLabel,
-	DropdownMenuRadioGroup,
-	DropdownMenuRadioItem,
-	DropdownMenuSeparator,
-	DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Label } from '@/components/ui/label';
+    DropdownMenu,
+    DropdownMenuCheckboxItem,
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuLabel,
+    DropdownMenuRadioGroup,
+    DropdownMenuRadioItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Label } from "@/components/ui/label";
 import {
-	NotesSidebar,
-	NotesSidebarContent,
-	NotesSidebarFooter,
-	NotesSidebarHeader,
-	NotesSidebarSeparator,
-} from '@/components/ui/notes-sidebar';
-import { ScrollArea } from '@/components/ui/scroll-area';
+    NotesSidebar,
+    NotesSidebarContent,
+    NotesSidebarFooter,
+    NotesSidebarHeader,
+    NotesSidebarSeparator,
+} from "@/components/ui/notes-sidebar";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
-import { Suspense, useDeferredValue, useEffect, useRef, useState } from 'react';
-import useDebounce from '@/hooks/use-debounce';
-import { EnsureNotes, useFetchNotes } from '@/hooks/use-note.ts';
-import { useStore } from '@/stores/index.ts';
+import { Suspense, useDeferredValue, useEffect, useRef, useState } from "react";
+import { EnsureNotes, useFetchNotes } from "@/hooks/use-note.ts";
+import { useStore } from "@/stores/index.ts";
 
-import NoteCard from '@/components/app/note-card';
+import NoteCard from "@/components/app/note-card";
 import {
-	Card,
-	CardContent,
-	CardFooter,
-	CardHeader,
-} from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+    Card,
+    CardContent,
+    CardFooter,
+    CardHeader,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from '@/components/ui/select';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Switch } from '@/components/ui/switch';
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Switch } from "@/components/ui/switch";
 import {
-	Tooltip,
-	TooltipContent,
-	TooltipTrigger,
-} from '@/components/ui/tooltip';
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { useDebouncedCallback } from "@tanstack/react-pacer";
 
 export function notesLoader() {
-	return EnsureNotes();
+    return EnsureNotes();
 }
 
 function NotesCount() {
-	const search = useDeferredValue(useStore((s) => s.searchNotes));
-	const sortBy = useStore((s) => s.sortNotesBy);
-	const { data } = useFetchNotes(search, sortBy);
-	const count = data?.length ?? 0;
-	return (
-		<h3 className="muted-foreground scroll-m-20 text-xl font-semibold tracking-tight">
-			{count}
-		</h3>
-	);
+    const search = useDeferredValue(useStore((s) => s.searchNotes));
+    const sortBy = useStore((s) => s.sortNotesBy);
+    const { data } = useFetchNotes(search, sortBy);
+    const count = data?.length ?? 0;
+    return (
+        <h3 className="muted-foreground scroll-m-20 text-xl font-semibold tracking-tight">
+            {count}
+        </h3>
+    );
 }
 
 function NotesSearchInput() {
-	const search = useStore((s) => s.searchNotes);
-	const setSearch = useStore((s) => s.setSearch);
-	const [searchInput, setSearchInput] = useState(search);
-	const debouncedSearch = useDebounce(searchInput, 300);
+    const search = useStore((s) => s.searchNotes);
+    const setSearch = useStore((s) => s.setSearch);
+    const [debouncedSearch, setDebouncedSearch] = useState(search);
 
-	useEffect(() => {
-		if (debouncedSearch !== search) {
-			setSearch(debouncedSearch);
-		}
-	}, [debouncedSearch, search, setSearch]);
+    useEffect(() => {
+        if (debouncedSearch !== search) {
+            useDebouncedCallback(
+                async () => {
+                    setSearch(debouncedSearch);
+                },
+                {
+                    wait: 300,
+                },
+            );
+        }
+    }, [debouncedSearch, search, setSearch]);
 
-	useEffect(() => {
-		setSearchInput(search);
-	}, [search]);
+    useEffect(() => {
+        setDebouncedSearch(search);
+    }, [search]);
 
-	return (
-		<div className="relative mr-auto hidden w-full max-w-sm md:flex">
-			<SearchIcon className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
-			<Input
-				value={searchInput}
-				onChange={(event) => setSearchInput(event.target.value)}
-				placeholder="Search notes"
-				className="pl-9"
-			/>
-		</div>
-	);
+    return (
+        <div className="relative mr-auto hidden w-full max-w-sm md:flex">
+            <SearchIcon className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+            <Input
+                value={debouncedSearch}
+                onChange={(event) => setDebouncedSearch(event.target.value)}
+                placeholder="Search notes"
+                className="pl-9"
+            />
+        </div>
+    );
 }
 
 function VirtualNotesList() {
-	const search = useDeferredValue(useStore((s) => s.searchNotes));
-	const sortBy = useStore((s) => s.sortNotesBy);
-	const {
-		data: allNotes,
-		fetchNextPage,
-		hasNextPage,
-		isFetchingNextPage,
-	} = useFetchNotes(search, sortBy);
+    const search = useDeferredValue(useStore((s) => s.searchNotes));
+    const sortBy = useStore((s) => s.sortNotesBy);
+    const {
+        data: allNotes,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+    } = useFetchNotes(search, sortBy);
 
-	const parentRef = useRef<HTMLDivElement>(null);
+    const parentRef = useRef<HTMLDivElement>(null);
 
-	const rowVirtualizer = useVirtualizer({
-		count: allNotes.length,
-		getScrollElement: () => parentRef.current,
-		estimateSize: () => 95,
-		overscan: 10,
-	});
+    const rowVirtualizer = useVirtualizer({
+        count: allNotes.length,
+        getScrollElement: () => parentRef.current,
+        estimateSize: () => 95,
+        overscan: 10,
+    });
 
-	const virtualItems = rowVirtualizer.getVirtualItems();
+    const virtualItems = rowVirtualizer.getVirtualItems();
 
-	useEffect(() => {
-		const lastItem = virtualItems[virtualItems.length - 1];
-		if (!lastItem) return;
+    useEffect(() => {
+        const lastItem = virtualItems[virtualItems.length - 1];
+        if (!lastItem) return;
 
-		if (
-			lastItem.index >= allNotes.length - 1 &&
-			hasNextPage &&
-			!isFetchingNextPage
-		) {
-			fetchNextPage();
-		}
-	}, [
-		hasNextPage,
-		fetchNextPage,
-		allNotes.length,
-		isFetchingNextPage,
-		virtualItems,
-	]);
+        if (
+            lastItem.index >= allNotes.length - 1 &&
+            hasNextPage &&
+            !isFetchingNextPage
+        ) {
+            fetchNextPage();
+        }
+    }, [
+        hasNextPage,
+        fetchNextPage,
+        allNotes.length,
+        isFetchingNextPage,
+        virtualItems,
+    ]);
 
-	return (
-		<>
-			<NotesSidebarContent>
-				<div
-					ref={parentRef}
-					className="scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border hover:scrollbar-thumb-muted-foreground/40 h-full w-full overflow-y-auto overscroll-contain"
-				>
-					{allNotes.length === 0 ? (
-						<div className="text-muted-foreground flex h-full items-center justify-center text-sm">
-							No notes yet. Create one to get started.
-						</div>
-					) : (
-						<div
-							style={{
-								height: rowVirtualizer.getTotalSize(),
-								width: '100%',
-								position: 'relative',
-							}}
-						>
-							{virtualItems.map((virtualItem) => {
-								const note = allNotes[virtualItem.index];
-								return (
-									<div
-										key={virtualItem.key}
-										data-index={virtualItem.index}
-										ref={rowVirtualizer.measureElement}
-										style={{
-											position: 'absolute',
-											top: 0,
-											left: 0,
-											width: '100%',
-											transform: `translateY(${virtualItem.start}px)`,
-										}}
-									>
-										<NoteCard key={note.id} userNote={note} />
-									</div>
-								);
-							})}
-						</div>
-					)}
-				</div>
-			</NotesSidebarContent>
-			<NotesSidebarFooter>
-				{allNotes.length > 0 && (
-					<div className="text-muted-foreground w-full text-center text-xs">
-						{isFetchingNextPage
-							? 'Loading more...'
-							: !hasNextPage
-								? 'Nothing more to load'
-								: ''}
-					</div>
-				)}
-			</NotesSidebarFooter>
-		</>
-	);
+    return (
+        <>
+            <NotesSidebarContent>
+                <div
+                    ref={parentRef}
+                    className="scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border hover:scrollbar-thumb-muted-foreground/40 h-full w-full overflow-y-auto overscroll-contain"
+                >
+                    {allNotes.length === 0 ? (
+                        <div className="text-muted-foreground flex h-full items-center justify-center text-sm">
+                            No notes yet. Create one to get started.
+                        </div>
+                    ) : (
+                        <div
+                            style={{
+                                height: rowVirtualizer.getTotalSize(),
+                                width: "100%",
+                                position: "relative",
+                            }}
+                        >
+                            {virtualItems.map((virtualItem) => {
+                                const note = allNotes[virtualItem.index];
+                                return (
+                                    <div
+                                        key={virtualItem.key}
+                                        data-index={virtualItem.index}
+                                        ref={rowVirtualizer.measureElement}
+                                        style={{
+                                            position: "absolute",
+                                            top: 0,
+                                            left: 0,
+                                            width: "100%",
+                                            transform: `translateY(${virtualItem.start}px)`,
+                                        }}
+                                    >
+                                        <NoteCard
+                                            key={note.id}
+                                            userNote={note}
+                                        />
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
+                </div>
+            </NotesSidebarContent>
+            <NotesSidebarFooter>
+                {allNotes.length > 0 && (
+                    <div className="text-muted-foreground w-full text-center text-xs">
+                        {isFetchingNextPage
+                            ? "Loading more..."
+                            : !hasNextPage
+                              ? "Nothing more to load"
+                              : ""}
+                    </div>
+                )}
+            </NotesSidebarFooter>
+        </>
+    );
 }
 
 export function EditorNotesSidebar() {
-	const sortBy = useStore((s) => s.sortNotesBy);
-	const setSortBy = useStore((s) => s.setSortBy);
+    const sortBy = useStore((s) => s.sortNotesBy);
+    const setSortBy = useStore((s) => s.setSortBy);
 
-	const [filters, setFilters] = useState({
-		tags: '',
-		notebook: '',
-		created: '',
-		updated: '',
-		showShared: false,
-		showSpaces: false,
-	});
+    const [filters, setFilters] = useState({
+        tags: "",
+        notebook: "",
+        created: "",
+        updated: "",
+        showShared: false,
+        showSpaces: false,
+    });
 
-	return (
-		<NotesSidebar collapsible="offcanvas" variant="sidebar">
-			<NotesSidebarHeader>
-				<div className="flex flex-row items-center gap-x-1">
-					<Label className="scroll-m-20 text-2xl font-semibold tracking-tight">
-						Notes
-					</Label>
-					<NotesCount />
-				</div>
+    return (
+        <NotesSidebar collapsible="offcanvas" variant="sidebar">
+            <NotesSidebarHeader>
+                <div className="flex flex-row items-center gap-x-1">
+                    <Label className="scroll-m-20 text-2xl font-semibold tracking-tight">
+                        Notes
+                    </Label>
+                    <NotesCount />
+                </div>
 
-				<div className="flex flex-1 items-center justify-end gap-2">
-					<NotesSearchInput />
+                <div className="flex flex-1 items-center justify-end gap-2">
+                    <NotesSearchInput />
 
-					<DropdownMenu>
-						<Tooltip>
-							<TooltipTrigger asChild>
-								<DropdownMenuTrigger asChild>
-									<Button size={'sm'} variant="ghost">
-										<FilterIcon />
-									</Button>
-								</DropdownMenuTrigger>
-							</TooltipTrigger>
-							<TooltipContent>
-								<p>Add Filters</p>
-							</TooltipContent>
-						</Tooltip>
-						<DropdownMenuContent className="min-w-110 p-0">
-							<div className="flex items-center justify-between px-4 py-3">
-								<h4 className="text-sm font-semibold">Add Filters</h4>
-								<button
-									className="text-primary text-xs font-medium hover:underline"
-									onClick={(e) => {
-										e.preventDefault();
-										setFilters({
-											tags: '',
-											notebook: '',
-											created: '',
-											updated: '',
-											showShared: false,
-											showSpaces: false,
-										});
-									}}
-								>
-									Clear all
-								</button>
-							</div>
-							<DropdownMenuGroup className="space-y-3 px-4 pb-3">
-								<div className="flex items-center justify-between gap-4">
-									<div className="flex items-center gap-2 text-sm">
-										<TagIcon className="size-4" />
-										<span>Tags</span>
-									</div>
-									<Select
-										value={filters.tags}
-										onValueChange={(v) =>
-											setFilters((s) => ({ ...s, tags: v }))
-										}
-									>
-										<SelectTrigger size="sm" className="w-48">
-											<SelectValue placeholder="Select" />
-										</SelectTrigger>
-										<SelectContent>
-											<SelectItem value="work">Work</SelectItem>
-											<SelectItem value="personal">Personal</SelectItem>
-											<SelectItem value="ideas">Ideas</SelectItem>
-										</SelectContent>
-									</Select>
-								</div>
+                    <DropdownMenu>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <DropdownMenuTrigger asChild>
+                                    <Button size={"sm"} variant="ghost">
+                                        <FilterIcon />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>Add Filters</p>
+                            </TooltipContent>
+                        </Tooltip>
+                        <DropdownMenuContent className="min-w-110 p-0">
+                            <div className="flex items-center justify-between px-4 py-3">
+                                <h4 className="text-sm font-semibold">
+                                    Add Filters
+                                </h4>
+                                <button
+                                    className="text-primary text-xs font-medium hover:underline"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        setFilters({
+                                            tags: "",
+                                            notebook: "",
+                                            created: "",
+                                            updated: "",
+                                            showShared: false,
+                                            showSpaces: false,
+                                        });
+                                    }}
+                                >
+                                    Clear all
+                                </button>
+                            </div>
+                            <DropdownMenuGroup className="space-y-3 px-4 pb-3">
+                                <div className="flex items-center justify-between gap-4">
+                                    <div className="flex items-center gap-2 text-sm">
+                                        <TagIcon className="size-4" />
+                                        <span>Tags</span>
+                                    </div>
+                                    <Select
+                                        value={filters.tags}
+                                        onValueChange={(v) =>
+                                            setFilters((s) => ({
+                                                ...s,
+                                                tags: v,
+                                            }))
+                                        }
+                                    >
+                                        <SelectTrigger
+                                            size="sm"
+                                            className="w-48"
+                                        >
+                                            <SelectValue placeholder="Select" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="work">
+                                                Work
+                                            </SelectItem>
+                                            <SelectItem value="personal">
+                                                Personal
+                                            </SelectItem>
+                                            <SelectItem value="ideas">
+                                                Ideas
+                                            </SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
 
-								<div className="flex items-center justify-between gap-4">
-									<div className="flex items-center gap-2 text-sm">
-										<Notebook className="size-4" />
-										<span>Located in</span>
-									</div>
-									<Select
-										value={filters.notebook}
-										onValueChange={(v) =>
-											setFilters((s) => ({ ...s, notebook: v }))
-										}
-									>
-										<SelectTrigger size="sm" className="w-48">
-											<SelectValue placeholder="Notebook" />
-										</SelectTrigger>
-										<SelectContent>
-											<SelectItem value="general">General</SelectItem>
-											<SelectItem value="work">Work</SelectItem>
-											<SelectItem value="personal">Personal</SelectItem>
-										</SelectContent>
-									</Select>
-								</div>
+                                <div className="flex items-center justify-between gap-4">
+                                    <div className="flex items-center gap-2 text-sm">
+                                        <Notebook className="size-4" />
+                                        <span>Located in</span>
+                                    </div>
+                                    <Select
+                                        value={filters.notebook}
+                                        onValueChange={(v) =>
+                                            setFilters((s) => ({
+                                                ...s,
+                                                notebook: v,
+                                            }))
+                                        }
+                                    >
+                                        <SelectTrigger
+                                            size="sm"
+                                            className="w-48"
+                                        >
+                                            <SelectValue placeholder="Notebook" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="general">
+                                                General
+                                            </SelectItem>
+                                            <SelectItem value="work">
+                                                Work
+                                            </SelectItem>
+                                            <SelectItem value="personal">
+                                                Personal
+                                            </SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
 
-								<div className="flex items-center justify-between gap-4">
-									<div className="flex items-center gap-2 text-sm">
-										<Calendar className="size-4" />
-										<span>Created</span>
-									</div>
-									<Select
-										value={filters.created}
-										onValueChange={(v) =>
-											setFilters((s) => ({ ...s, created: v }))
-										}
-									>
-										<SelectTrigger size="sm" className="w-48">
-											<SelectValue placeholder="Date" />
-										</SelectTrigger>
-										<SelectContent>
-											<SelectItem value="today">Today</SelectItem>
-											<SelectItem value="yesterday">Yesterday</SelectItem>
-											<SelectItem value="7d">Last 7 days</SelectItem>
-											<SelectItem value="30d">Last 30 days</SelectItem>
-										</SelectContent>
-									</Select>
-								</div>
+                                <div className="flex items-center justify-between gap-4">
+                                    <div className="flex items-center gap-2 text-sm">
+                                        <Calendar className="size-4" />
+                                        <span>Created</span>
+                                    </div>
+                                    <Select
+                                        value={filters.created}
+                                        onValueChange={(v) =>
+                                            setFilters((s) => ({
+                                                ...s,
+                                                created: v,
+                                            }))
+                                        }
+                                    >
+                                        <SelectTrigger
+                                            size="sm"
+                                            className="w-48"
+                                        >
+                                            <SelectValue placeholder="Date" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="today">
+                                                Today
+                                            </SelectItem>
+                                            <SelectItem value="yesterday">
+                                                Yesterday
+                                            </SelectItem>
+                                            <SelectItem value="7d">
+                                                Last 7 days
+                                            </SelectItem>
+                                            <SelectItem value="30d">
+                                                Last 30 days
+                                            </SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
 
-								<div className="flex items-center justify-between gap-4">
-									<div className="flex items-center gap-2 text-sm">
-										<Calendar className="size-4" />
-										<span>Updated</span>
-									</div>
-									<Select
-										value={filters.updated}
-										onValueChange={(v) =>
-											setFilters((s) => ({ ...s, updated: v }))
-										}
-									>
-										<SelectTrigger size="sm" className="w-48">
-											<SelectValue placeholder="Date" />
-										</SelectTrigger>
-										<SelectContent>
-											<SelectItem value="today">Today</SelectItem>
-											<SelectItem value="yesterday">Yesterday</SelectItem>
-											<SelectItem value="7d">Last 7 days</SelectItem>
-											<SelectItem value="30d">Last 30 days</SelectItem>
-										</SelectContent>
-									</Select>
-								</div>
-							</DropdownMenuGroup>
+                                <div className="flex items-center justify-between gap-4">
+                                    <div className="flex items-center gap-2 text-sm">
+                                        <Calendar className="size-4" />
+                                        <span>Updated</span>
+                                    </div>
+                                    <Select
+                                        value={filters.updated}
+                                        onValueChange={(v) =>
+                                            setFilters((s) => ({
+                                                ...s,
+                                                updated: v,
+                                            }))
+                                        }
+                                    >
+                                        <SelectTrigger
+                                            size="sm"
+                                            className="w-48"
+                                        >
+                                            <SelectValue placeholder="Date" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="today">
+                                                Today
+                                            </SelectItem>
+                                            <SelectItem value="yesterday">
+                                                Yesterday
+                                            </SelectItem>
+                                            <SelectItem value="7d">
+                                                Last 7 days
+                                            </SelectItem>
+                                            <SelectItem value="30d">
+                                                Last 30 days
+                                            </SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </DropdownMenuGroup>
 
-							<div className="space-y-3 border-t px-4 py-3">
-								<div className="flex items-center justify-between">
-									<button className="text-primary text-sm font-medium">
-										Show notes shared with me
-									</button>
-									<Switch
-										checked={filters.showShared}
-										onCheckedChange={(v) =>
-											setFilters((s) => ({ ...s, showShared: Boolean(v) }))
-										}
-									/>
-								</div>
-								<div className="flex items-center justify-between">
-									<button className="text-primary text-sm font-medium">
-										Show notes in Spaces
-									</button>
-									<Switch
-										checked={filters.showSpaces}
-										onCheckedChange={(v) =>
-											setFilters((s) => ({ ...s, showSpaces: Boolean(v) }))
-										}
-									/>
-								</div>
-							</div>
-						</DropdownMenuContent>
-					</DropdownMenu>
+                            <div className="space-y-3 border-t px-4 py-3">
+                                <div className="flex items-center justify-between">
+                                    <button className="text-primary text-sm font-medium">
+                                        Show notes shared with me
+                                    </button>
+                                    <Switch
+                                        checked={filters.showShared}
+                                        onCheckedChange={(v) =>
+                                            setFilters((s) => ({
+                                                ...s,
+                                                showShared: Boolean(v),
+                                            }))
+                                        }
+                                    />
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <button className="text-primary text-sm font-medium">
+                                        Show notes in Spaces
+                                    </button>
+                                    <Switch
+                                        checked={filters.showSpaces}
+                                        onCheckedChange={(v) =>
+                                            setFilters((s) => ({
+                                                ...s,
+                                                showSpaces: Boolean(v),
+                                            }))
+                                        }
+                                    />
+                                </div>
+                            </div>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
 
-					<DropdownMenu>
-						<Tooltip>
-							<TooltipTrigger asChild>
-								<DropdownMenuTrigger asChild>
-									<Button size={'sm'} variant="ghost">
-										<ArrowUpDown />
-									</Button>
-								</DropdownMenuTrigger>
-							</TooltipTrigger>
-							<TooltipContent>
-								<p>Sort Options</p>
-							</TooltipContent>
-						</Tooltip>
-						<DropdownMenuContent className="min-w-56">
-							<DropdownMenuLabel>Sort by</DropdownMenuLabel>
-							<DropdownMenuRadioGroup
-								value={sortBy}
-								onValueChange={(v) => {
-									if (v === 'created_at' || v === 'updated_at') {
-										setSortBy(v);
-									}
-								}}
-							>
-								<DropdownMenuRadioItem value="title">
-									Title
-								</DropdownMenuRadioItem>
-								<DropdownMenuRadioItem value="updated_at">
-									Date updated
-								</DropdownMenuRadioItem>
-								<DropdownMenuRadioItem value="created_at">
-									Date created
-								</DropdownMenuRadioItem>
-							</DropdownMenuRadioGroup>
+                    <DropdownMenu>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <DropdownMenuTrigger asChild>
+                                    <Button size={"sm"} variant="ghost">
+                                        <ArrowUpDown />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>Sort Options</p>
+                            </TooltipContent>
+                        </Tooltip>
+                        <DropdownMenuContent className="min-w-56">
+                            <DropdownMenuLabel>Sort by</DropdownMenuLabel>
+                            <DropdownMenuRadioGroup
+                                value={sortBy}
+                                onValueChange={(v) => {
+                                    if (
+                                        v === "created_at" ||
+                                        v === "updated_at"
+                                    ) {
+                                        setSortBy(v);
+                                    }
+                                }}
+                            >
+                                <DropdownMenuRadioItem value="title">
+                                    Title
+                                </DropdownMenuRadioItem>
+                                <DropdownMenuRadioItem value="updated_at">
+                                    Date updated
+                                </DropdownMenuRadioItem>
+                                <DropdownMenuRadioItem value="created_at">
+                                    Date created
+                                </DropdownMenuRadioItem>
+                            </DropdownMenuRadioGroup>
 
-							<DropdownMenuSeparator />
-							<DropdownMenuGroup>
-								<DropdownMenuCheckboxItem disabled>
-									Show notes in groups
-								</DropdownMenuCheckboxItem>
-							</DropdownMenuGroup>
-						</DropdownMenuContent>
-					</DropdownMenu>
-				</div>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuGroup>
+                                <DropdownMenuCheckboxItem disabled>
+                                    Show notes in groups
+                                </DropdownMenuCheckboxItem>
+                            </DropdownMenuGroup>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
 
-				<NotesSidebarSeparator />
-			</NotesSidebarHeader>
-			<ErrorBoundary
-				fallbackRender={({ error, resetErrorBoundary }) => (
-					<NotesError
-						error={error instanceof Error ? error : new Error(String(error))}
-						reset={resetErrorBoundary}
-					/>
-				)}
-			>
-				<Suspense fallback={<NotesSkeleton />}>
-					<VirtualNotesList />
-				</Suspense>
-			</ErrorBoundary>
-		</NotesSidebar>
-	);
+                <NotesSidebarSeparator />
+            </NotesSidebarHeader>
+            <ErrorBoundary
+                fallbackRender={({ error, resetErrorBoundary }) => (
+                    <NotesError
+                        error={
+                            error instanceof Error
+                                ? error
+                                : new Error(String(error))
+                        }
+                        reset={resetErrorBoundary}
+                    />
+                )}
+            >
+                <Suspense fallback={<NotesSkeleton />}>
+                    <VirtualNotesList />
+                </Suspense>
+            </ErrorBoundary>
+        </NotesSidebar>
+    );
 }
 
 function NoteCardSkeleton() {
-	return (
-		<Card className="gap-2 rounded-none border-x-0 border-t-0 py-3">
-			<CardHeader className="py-0">
-				<Skeleton className="h-5 w-3/4" />
-			</CardHeader>
-			<CardContent className="space-y-2">
-				<Skeleton className="h-4 w-full" />
-				<Skeleton className="h-4 w-full" />
-				<Skeleton className="h-4 w-2/3" />
-			</CardContent>
-			<CardFooter>
-				<Skeleton className="h-3 w-24" />
-			</CardFooter>
-		</Card>
-	);
+    return (
+        <Card className="gap-2 rounded-none border-x-0 border-t-0 py-3">
+            <CardHeader className="py-0">
+                <Skeleton className="h-5 w-3/4" />
+            </CardHeader>
+            <CardContent className="space-y-2">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-2/3" />
+            </CardContent>
+            <CardFooter>
+                <Skeleton className="h-3 w-24" />
+            </CardFooter>
+        </Card>
+    );
 }
 
 export function NotesSkeleton() {
-	return (
-		<NotesSidebarContent>
-			<ScrollArea className="h-full w-full">
-				<div className="flex flex-col">
-					{Array.from({ length: 6 }).map((_, i) => (
-						<NoteCardSkeleton key={i} />
-					))}
-				</div>
-			</ScrollArea>
-		</NotesSidebarContent>
-	);
+    return (
+        <NotesSidebarContent>
+            <ScrollArea className="h-full w-full">
+                <div className="flex flex-col">
+                    {Array.from({ length: 6 }).map((_, i) => (
+                        <NoteCardSkeleton key={i} />
+                    ))}
+                </div>
+            </ScrollArea>
+        </NotesSidebarContent>
+    );
 }
 
 export function NotesSidebarSkeleton() {
-	return (
-		<NotesSidebar collapsible="offcanvas" variant="inset">
-			<NotesSidebarHeader>
-				<div className="flex flex-row items-center gap-x-1">
-					<Label className="scroll-m-20 text-2xl font-semibold tracking-tight">
-						Notes
-					</Label>
-				</div>
-				<NotesSidebarSeparator />
-			</NotesSidebarHeader>
+    return (
+        <NotesSidebar collapsible="offcanvas" variant="inset">
+            <NotesSidebarHeader>
+                <div className="flex flex-row items-center gap-x-1">
+                    <Label className="scroll-m-20 text-2xl font-semibold tracking-tight">
+                        Notes
+                    </Label>
+                </div>
+                <NotesSidebarSeparator />
+            </NotesSidebarHeader>
 
-			<NotesSidebarContent>
-				<ScrollArea className="h-full w-full">
-					<div className="flex flex-col">
-						{Array.from({ length: 6 }).map((_, i) => (
-							<NoteCardSkeleton key={i} />
-						))}
-					</div>
-				</ScrollArea>
-			</NotesSidebarContent>
+            <NotesSidebarContent>
+                <ScrollArea className="h-full w-full">
+                    <div className="flex flex-col">
+                        {Array.from({ length: 6 }).map((_, i) => (
+                            <NoteCardSkeleton key={i} />
+                        ))}
+                    </div>
+                </ScrollArea>
+            </NotesSidebarContent>
 
-			<NotesSidebarFooter />
-		</NotesSidebar>
-	);
+            <NotesSidebarFooter />
+        </NotesSidebar>
+    );
 }
 
 export function NotesSidebarError({
-	error,
-	reset,
+    error,
+    reset,
 }: {
-	error?: Error;
-	reset?: () => void;
+    error?: Error;
+    reset?: () => void;
 }) {
-	return (
-		<NotesSidebar collapsible="offcanvas" variant="inset">
-			<NotesSidebarHeader>
-				<div className="flex flex-row items-center gap-x-1">
-					<Label className="scroll-m-20 text-2xl font-semibold tracking-tight">
-						Notes
-					</Label>
-				</div>
-				<NotesSidebarSeparator />
-			</NotesSidebarHeader>
+    return (
+        <NotesSidebar collapsible="offcanvas" variant="inset">
+            <NotesSidebarHeader>
+                <div className="flex flex-row items-center gap-x-1">
+                    <Label className="scroll-m-20 text-2xl font-semibold tracking-tight">
+                        Notes
+                    </Label>
+                </div>
+                <NotesSidebarSeparator />
+            </NotesSidebarHeader>
 
-			<NotesSidebarContent>
-				<div className="flex h-full flex-col items-center justify-center gap-4 p-6 text-center">
-					<div className="bg-destructive/10 rounded-full p-3">
-						<AlertCircle className="text-destructive h-8 w-8" />
-					</div>
-					<div className="space-y-2">
-						<h3 className="text-lg font-semibold">Failed to load notes</h3>
-						<p className="text-muted-foreground text-sm">
-							{error?.message ||
-								'Something went wrong while loading your notes.'}
-						</p>
-					</div>
-					{reset && (
-						<Button variant="outline" onClick={reset} className="gap-2">
-							<RefreshCw className="h-4 w-4" />
-							Try again
-						</Button>
-					)}
-				</div>
-			</NotesSidebarContent>
+            <NotesSidebarContent>
+                <div className="flex h-full flex-col items-center justify-center gap-4 p-6 text-center">
+                    <div className="bg-destructive/10 rounded-full p-3">
+                        <AlertCircle className="text-destructive h-8 w-8" />
+                    </div>
+                    <div className="space-y-2">
+                        <h3 className="text-lg font-semibold">
+                            Failed to load notes
+                        </h3>
+                        <p className="text-muted-foreground text-sm">
+                            {error?.message ||
+                                "Something went wrong while loading your notes."}
+                        </p>
+                    </div>
+                    {reset && (
+                        <Button
+                            variant="outline"
+                            onClick={reset}
+                            className="gap-2"
+                        >
+                            <RefreshCw className="h-4 w-4" />
+                            Try again
+                        </Button>
+                    )}
+                </div>
+            </NotesSidebarContent>
 
-			<NotesSidebarFooter />
-		</NotesSidebar>
-	);
+            <NotesSidebarFooter />
+        </NotesSidebar>
+    );
 }
 
 export function NotesError({
-	error,
-	reset,
+    error,
+    reset,
 }: {
-	error?: Error;
-	reset?: () => void;
+    error?: Error;
+    reset?: () => void;
 }) {
-	return (
-		<NotesSidebarContent>
-			<div className="flex h-full flex-col items-center justify-center gap-4 p-6 text-center">
-				<div className="bg-destructive/10 rounded-full p-3">
-					<AlertCircle className="text-destructive h-8 w-8" />
-				</div>
-				<div className="space-y-2">
-					<h3 className="text-lg font-semibold">Failed to load notes</h3>
-					<p className="text-muted-foreground text-sm">
-						{error?.message || 'Something went wrong while loading your notes.'}
-					</p>
-				</div>
-				{reset && (
-					<Button variant="outline" onClick={reset} className="gap-2">
-						<RefreshCw className="h-4 w-4" />
-						Try again
-					</Button>
-				)}
-			</div>
-		</NotesSidebarContent>
-	);
+    return (
+        <NotesSidebarContent>
+            <div className="flex h-full flex-col items-center justify-center gap-4 p-6 text-center">
+                <div className="bg-destructive/10 rounded-full p-3">
+                    <AlertCircle className="text-destructive h-8 w-8" />
+                </div>
+                <div className="space-y-2">
+                    <h3 className="text-lg font-semibold">
+                        Failed to load notes
+                    </h3>
+                    <p className="text-muted-foreground text-sm">
+                        {error?.message ||
+                            "Something went wrong while loading your notes."}
+                    </p>
+                </div>
+                {reset && (
+                    <Button variant="outline" onClick={reset} className="gap-2">
+                        <RefreshCw className="h-4 w-4" />
+                        Try again
+                    </Button>
+                )}
+            </div>
+        </NotesSidebarContent>
+    );
 }
