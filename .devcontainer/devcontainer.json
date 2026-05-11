@@ -1,0 +1,102 @@
+{
+    "name": "Notetify",
+    "dockerComposeFile": [
+        "../docker-compose.dev.yaml",
+        "docker-compose.devcontainer.yaml"
+    ],
+    "service": "devcontainer",
+    "workspaceFolder": "/workspaces/Notetify",
+    "remoteUser": "vscode",
+
+    "features": {
+        "ghcr.io/devcontainers/features/php:1": {
+            "version": "8.4",
+            "installComposer": true
+        },
+        "ghcr.io/devcontainers/features/node:1": {
+            "version": "22"
+        },
+        "ghcr.io/devcontainers/features/git:1": {}
+    },
+
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                // PHP / Laravel
+                "bmewburn.vscode-intelephense-client",
+                "xdebug.php-debug",
+                "devsense.composer-php-vscode",
+                "devsense.profiler-php-vscode",
+                // TypeScript / React
+                "dsznajder.es7-react-js-snippets",
+                "burkeholland.simple-react-snippets",
+                "jawandarajbir.react-vscode-extension-pack",
+                "jasonnutter.search-node-modules",
+                "yoavbls.pretty-ts-errors",
+                "wix.vscode-import-cost",
+                // Tailwind / CSS
+                "bradlc.vscode-tailwindcss",
+                "zignd.html-css-class-completion",
+                // Linting / formatting
+                "dbaeumer.vscode-eslint",
+                "esbenp.prettier-vscode",
+                "usernamehw.errorlens",
+                "streetsidesoftware.code-spell-checker",
+                // Editor quality-of-life
+                "formulahendry.auto-close-tag",
+                "formulahendry.auto-rename-tag",
+                "christian-kohler.path-intellisense",
+                "christian-kohler.npm-intellisense",
+                "aaron-bond.better-comments",
+                "oderwat.indent-rainbow",
+                "mikestead.dotenv",
+                "pflannery.vscode-versionlens",
+                // Git
+                "eamodio.gitlens",
+                "mhutchie.git-graph",
+                "donjayamanne.githistory",
+                "waderyan.gitblame",
+                "github.vscode-pull-request-github",
+                // Docker
+                "ms-azuretools.vscode-docker",
+                "ms-azuretools.vscode-containers",
+                // Testing
+                "vitest.explorer",
+                "ms-playwright.playwright",
+                // Misc
+                "redhat.vscode-yaml",
+                "pkief.material-icon-theme",
+                "github.github-vscode-theme",
+                "gruntfuggly.todo-tree",
+                "editorconfig.editorconfig",
+                "davidanson.vscode-markdownlint",
+                "yzhang.markdown-all-in-one",
+                "kisstkondoros.vscode-gutter-preview"
+            ],
+            "settings": {
+                "php.validate.executablePath": "/usr/local/bin/php",
+                "php.executablePath": "/usr/local/bin/php",
+                "intelephense.environment.phpVersion": "8.4.0",
+                "js/ts.tsdk.path": "client/node_modules/typescript/lib",
+                "editor.formatOnSave": true,
+                "editor.defaultFormatter": "esbenp.prettier-vscode",
+                "[php]": {
+                    "editor.defaultFormatter": "bmewburn.vscode-intelephense-client"
+                }
+            }
+        }
+    },
+
+    "forwardPorts": [8000, 5173, 8025, 5341, 9001],
+    "portsAttributes": {
+        "8000": { "label": "API" },
+        "5173": { "label": "Client" },
+        "8025": { "label": "Mailpit" },
+        "5341": { "label": "Seq" },
+        "9001": { "label": "RustFS Console" }
+    },
+
+    "postCreateCommand": "bash .devcontainer/postCreate.sh",
+
+    "shutdownAction": "stopCompose"
+}
