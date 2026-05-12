@@ -25,11 +25,6 @@ class NoteShare extends Model
         'accepted' => 'boolean',
     ];
 
-     public function isValid()
-    {
-        return !$this->accepted && now()->lessThan($this->expires_at);
-    }
-
     public function note()
     {
         return $this->belongsTo(Note::class);
@@ -60,9 +55,5 @@ class NoteShare extends Model
                      });
     }
 
-    public function shares()
-{
-    return $this->hasMany(NoteShare::class);
 }
 
-}

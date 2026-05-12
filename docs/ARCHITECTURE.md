@@ -62,8 +62,7 @@ Each level supports:
 | **Personal Pin** | `UserNote.is_pinned` | Only the user |
 | **Personal Tags** | `UserNoteTag` | Only the user |
 | **Personal Favorite** | `UserNote.is_favorite` | Only the user |
-| **Shared Pin** | `NoteShare.is_pinned` | All users with access |
-| **Shared Tags** | Future: `NoteShareTag` | All users with access |
+| **Broadcast Highlight** | `NoteShare.is_highlighted` | Owner broadcasts importance to all collaborators |
 
 ---
 
@@ -85,7 +84,7 @@ Each level supports:
 │  Sharing: SpaceShare (future)                                   │
 └─────────────────────────────────────────────────────────────────┘
                                 │
-                                │ contains (via space_notebook)
+                                │ contains (via notebook.space_id)
                                 ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                         NOTEBOOK                                 │
@@ -115,6 +114,29 @@ Each level supports:
 
 ## Data Models
 
+### Tag
+
+Tags are personal — each tag is owned by a single user. There are no shared or global tags.
+
+```php
+Tag {
+    id: uuid (primary)
+    user_id: uuid (foreign → users)
+    name: string
+    color: string (nullable)  // hex color
+    order: integer (nullable) // display order
+
+    // Relations
+    user(): belongsTo → User
+    userNotes(): belongsToMany → UserNote (via user_note_tag)
+}
+```
+
+> `UserTag` is not needed — color and order live directly on `Tag` since tags are per-user.
+> Tags are never shared with collaborators; each user manages their own tag set independently.
+
+---
+
 ### Primary Entities
 
 #### User
@@ -129,10 +151,10 @@ User {
     password: string (hashed)
 
     // Relations
-    spaces(): hasMany → Space
+    spaces(): belongsToMany → Space (via user_space)
     notebooks(): belongsToMany → Notebook (via user_notebook)
     notes(): belongsToMany → Note (via user_note)
-    tags(): belongsToMany → Tag (via user_tag)
+    tags(): hasMany → Tag
     tasks(): hasMany → Task
     files(): hasMany → File
 }
@@ -144,19 +166,16 @@ Top-level organizational container.
 ```php
 Space {
     id: uuid (primary)
-    user_id: uuid (foreign → users)
+    created_by_user_id: uuid (foreign → users)  // original creator; never changes
     name: string
     description: text (nullable)
-    icon: string (nullable) // emoji or icon name
+    icon: string (nullable)  // emoji or icon name
     color: string (nullable) // hex color
-    is_default: boolean
-    order: integer
 
     // Relations
-    user(): belongsTo → User
-    notebooks(): belongsToMany → Notebook (via space_notebook)
-
-    // Future
+    creator(): belongsTo → User
+    users(): belongsToMany → User (via user_space)
+    notebooks(): hasMany → Notebook
     shares(): hasMany → SpaceShare
 }
 ```
@@ -167,12 +186,15 @@ Collection of related notes.
 ```php
 Notebook {
     id: uuid (primary)
+    created_by_user_id: uuid (foreign → users)  // original creator; never changes
+    space_id: uuid (foreign → spaces, nullable)  // the one space this notebook belongs to
     name: string
 
     // Relations
+    creator(): belongsTo → User
+    space(): belongsTo → Space
     users(): belongsToMany → User (via user_notebook)
     notes(): hasMany → Note (via user_note where notebook_id = this)
-    spaces(): belongsToMany → Space (via space_notebook)
     shares(): hasMany → NotebookShare
 }
 ```
@@ -183,15 +205,27 @@ The core content entity.
 ```php
 Note {
     id: uuid (primary)
-    content: longText
+    created_by_user_id: uuid (foreign → users)  // original creator; never changes
+
+    // Body — two representations of the same content (planned: collab via Hocuspocus)
+    content: jsonb        // Tiptap JSON — derived from ydoc_state, used for reads/search
+    ydoc_state: bytea     // Yjs CRDT binary — source of truth during live collaboration;
+                          // written by Hocuspocus persistence webhook, never via REST
 
     // Relations
+    creator(): belongsTo → User
     userNotes(): hasMany → UserNote
     tasks(): hasMany → Task
     files(): belongsToMany → File (via file_note)
     shares(): hasMany → NoteShare
 }
 ```
+
+> **Content rule**: `ydoc_state` is the authoritative source during collaboration. `content`
+> is derived from it (via Hocuspocus → persistence webhook → Laravel) and is what the REST
+> API reads from. Body edits — including title changes — must never be written via `PUT /notes/:id`;
+> they go through Hocuspocus. The note title is the first H1 inside `content`, extracted via
+> JSONB path query with an `'Untitled'` fallback — there is no separate `title` column.
 
 ### User Metadata Models (Pivot Tables with Rich Data)
 
@@ -219,6 +253,9 @@ UserNote {
     is_trashed: boolean
     trashed_at: timestamp (nullable)
 
+    // Ownership
+    is_owner: boolean (default: true for creator, false for collaborators)
+
     // Ordering
     order: integer (nullable)
 
@@ -240,6 +277,38 @@ UserNote {
 }
 ```
 
+#### UserSpace
+User-specific space metadata. Follows the same pattern as `UserNote` and `UserNotebook`.
+
+```php
+UserSpace {
+    id: uuid (primary)
+    user_id: uuid (foreign → users)
+    space_id: uuid (foreign → spaces)
+
+    // Ownership
+    is_owner: boolean  // true for creator, false for collaborators
+
+    // Permission (for collaborators; null for owner who has full access)
+    permission: enum('view', 'comment', 'edit') (nullable)
+
+    // Personal metadata
+    is_favorite: boolean
+    is_pinned: boolean
+    is_trashed: boolean
+    is_default: boolean  // user's default space
+    order: integer (nullable)
+
+    favorite_at: timestamp (nullable)
+    pinned_at: timestamp (nullable)
+    trashed_at: timestamp (nullable)
+
+    // Relations
+    user(): belongsTo → User
+    space(): belongsTo → Space
+}
+```
+
 #### UserNotebook
 User-specific notebook metadata.
 
@@ -248,6 +317,8 @@ UserNotebook {
     id: uuid (primary)
     user_id: uuid (foreign → users)
     notebook_id: uuid (foreign → notebooks)
+
+    is_owner: boolean (default: true for creator, false for collaborators)
 
     is_favorite: boolean
     is_pinned: boolean
@@ -260,24 +331,6 @@ UserNotebook {
     // Relations
     user(): belongsTo → User
     notebook(): belongsTo → Notebook
-}
-```
-
-#### UserTag
-User-specific tag styling.
-
-```php
-UserTag {
-    id: uuid (primary)
-    user_id: uuid (foreign → users)
-    tag_id: uuid (foreign → tags)
-
-    color: string (nullable) // hex color for this user
-    order: integer (nullable) // display order for this user
-
-    // Relations
-    user(): belongsTo → User
-    tag(): belongsTo → Tag
 }
 ```
 
@@ -333,9 +386,10 @@ NoteShare {
     expires_at: timestamp (nullable)
     accepted: boolean (default: false)
 
-    // Shared state (visible to all with access)
-    is_pinned: boolean (default: false)        // TODO: Add
-    pinned_at: timestamp (nullable)            // TODO: Add
+    // Broadcast pin — set by the owner to highlight this note for all collaborators
+    // Each collaborator can still independently pin/unpin via their own UserNote
+    is_highlighted: boolean (default: false)
+    highlighted_at: timestamp (nullable)
 
     // Relations
     note(): belongsTo → Note
@@ -361,9 +415,10 @@ NotebookShare {
     expires_at: timestamp (nullable)
     accepted: boolean (default: false)
 
-    // Shared state
-    is_pinned: boolean (default: false)        // TODO: Add
-    pinned_at: timestamp (nullable)            // TODO: Add
+    // Broadcast pin — set by the owner to highlight this notebook for all collaborators
+    // Each collaborator can still independently pin/unpin via their own UserNotebook
+    is_highlighted: boolean (default: false)
+    highlighted_at: timestamp (nullable)
 
     // Relations
     notebook(): belongsTo → Notebook
@@ -492,8 +547,8 @@ When checking if User B can access Note X:
 
 ```python
 def can_access(user, note, required_permission):
-    # 1. Is user the owner?
-    if note.owner_id == user.id:
+    # 1. Is user the creator?
+    if note.created_by_user_id == user.id:
         return True
 
     # 2. Direct note share?
@@ -506,8 +561,8 @@ def can_access(user, note, required_permission):
     if note_share and note_share.permission >= required_permission:
         return True
 
-    # 3. Notebook share? (note's notebook)
-    user_note = UserNote.where(note_id=note.id, user_id=owner.id).first()
+    # 3. Notebook share? (note's notebook — look up via creator's UserNote)
+    user_note = UserNote.where(note_id=note.id, user_id=note.created_by_user_id).first()
     if user_note and user_note.notebook_id:
         notebook_share = NotebookShare.where(
             notebook_id=user_note.notebook_id,
@@ -562,9 +617,9 @@ def can_access(user, note, required_permission):
 │ note_shares  │                        │notebook_share│
 └──────────────┘                        └──────────────┘
 
-┌──────────┐       ┌───────────────┐       ┌──────────┐
-│  spaces  │───────│space_notebook │───────│notebooks │
-└──────────┘  1:N  └───────────────┘  N:1  └──────────┘
+┌──────────┐                               ┌──────────┐
+│  spaces  │──────────────────────────────▶│notebooks │
+└──────────┘          1:N (space_id)       └──────────┘
 ```
 
 ### Key Tables Summary
@@ -572,17 +627,16 @@ def can_access(user, note, required_permission):
 | Table | Purpose | Key Fields |
 |-------|---------|------------|
 | `users` | Authentication | email, password |
-| `spaces` | Workspaces | user_id, name, color, is_default |
-| `notebooks` | Note collections | name |
-| `notes` | Documents | content |
-| `tags` | Tag definitions | name |
+| `spaces` | Workspaces | created_by_user_id, name, color |
+| `user_space` | User↔Space metadata | is_owner, permission, is_pinned, is_favorite, is_default |
+| `notebooks` | Note collections | created_by_user_id, space_id, name |
+| `notes` | Documents | created_by_user_id, content (jsonb), ydoc_state (bytea) |
+| `tags` | Per-user tag definitions | user_id, name, color, order |
 | `tasks` | Todos/Events | type, status, due_at |
 | `files` | Uploads | path, mime_type |
-| `user_note` | User↔Note metadata | is_pinned, is_favorite, notebook_id |
-| `user_notebook` | User↔Notebook metadata | is_pinned, is_favorite |
-| `user_tag` | User↔Tag styling | color, order |
+| `user_note` | User↔Note metadata | is_owner, is_pinned, is_favorite, notebook_id |
+| `user_notebook` | User↔Notebook metadata | is_owner, is_pinned, is_favorite |
 | `user_note_tag` | User's note tags | user_note_id, tag_id |
-| `space_notebook` | Space↔Notebook | order |
 | `note_shares` | Note sharing | permission, accepted |
 | `notebook_shares` | Notebook sharing | permission, accepted |
 | `file_note` | File↔Note | order |
@@ -739,15 +793,11 @@ GET /notes?
    - When User B gets access via NotebookShare, do we create UserNote records immediately for all notes, or lazily on first access?
    - **Recommendation**: Lazy creation to avoid bloat
 
-2. **Shared Tags Implementation**
-   - Should shared tags be stored on `NoteShare` or a separate `NoteShareTag` table?
-   - **Recommendation**: Separate table for flexibility
-
-3. **Permission Override Granularity**
+2. **Permission Override Granularity**
    - Can a note in a shared notebook have different permissions than the notebook?
    - **Recommendation**: Yes, allow restriction (not elevation)
 
-4. **Deletion Cascade Behavior**
+3. **Deletion Cascade Behavior**
    - When owner deletes a shared note, what happens?
    - **Options**:
      - A) Delete for everyone
@@ -755,17 +805,14 @@ GET /notes?
      - C) Keep as "orphaned" for collaborators
    - **Recommendation**: Option A with soft-delete grace period
 
-5. **Space Ownership Model**
+4. **Space Ownership Model**
    - Can a Space be transferred to another user?
    - Can a Space have multiple owners?
    - **Recommendation**: Single owner initially, evaluate team needs later
 
 ### Technical Debt
 
-1. **Fix `user_tag` migration** - Missing `color` column
-2. **Fix `NoteShare.isValid()` logic** - Currently inverted
-3. **Standardize column naming** - `is_pinned__to_home` has double underscore
-4. **Remove orphaned models** - `NoteTag`, `NotebookNote` if not used
+None outstanding.
 
 ---
 
