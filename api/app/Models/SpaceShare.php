@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\Permission;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -22,13 +23,9 @@ class SpaceShare extends Model
 
     protected $casts = [
         'expires_at' => 'datetime',
-        'accepted' => 'boolean',
+        'accepted'   => 'boolean',
+        'permission' => Permission::class,
     ];
-
-     public function isValid()
-    {
-        return !$this->accepted && now()->lessThan($this->expires_at);
-    }
 
     public function space()
     {
@@ -60,8 +57,4 @@ class SpaceShare extends Model
                      });
     }
 
-    public function shares()
-{
-    return $this->hasMany(SpaceShare::class);
-}
 }

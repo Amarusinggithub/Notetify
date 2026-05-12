@@ -5,7 +5,7 @@ Notetify using **Tiptap + Yjs + Hocuspocus**, while keeping **Laravel (PHP) as
 the source of truth** for authentication, authorization, and persistent storage.
 
 Hocuspocus is a Node.js server — it cannot run inside PHP-FPM. We add a small
-Node service alongside the existing `api_dev` container; Laravel keeps owning
+Node service alongside the existing `api` container; Laravel keeps owning
 auth and the canonical note state.
 
 ---
@@ -23,8 +23,8 @@ auth and the canonical note state.
                           ▼
         ┌────────────────────────────────────────┐
         │   nginx / Vite proxy                   │
-        │   - /api/*    → Laravel (api_dev)      │
-        │   - /collab   → Hocuspocus (collab_dev)│
+        │   - /api/*    → Laravel (api)          │
+        │   - /collab   → Hocuspocus (collab)    │
         └─────────┬───────────────────┬──────────┘
                   │                   │
                   ▼                   ▼
@@ -252,26 +252,31 @@ the Hocuspocus webhook.
 Notetify does **not** store the title in a separate column. The title is the
 first `<h1>` node inside the Tiptap document. This means:
 
-- Renaming a note can only happen **inside the editor** (no inline rename in
-  the sidebar). The editor opens a WS, the user edits the H1, Hocuspocus
-  flushes — same path as any other body edit.
-- The sidebar reads the title by extracting the first H1 from the JSONB:
+- Renaming a note can only happen **inside the editor** — the user edits the
+  H1 directly. There is no inline rename in the sidebar; the sidebar title is
+  read-only. The editor opens a WS, the user edits the H1, Hocuspocus flushes
+  — same path as any other body edit.
+- The sidebar reads the title by extracting the first H1 from the JSONB.
+  Because notes are accessed through the `UserNote` pivot (which covers both
+  owned and shared notes), the query JOINs accordingly:
 
   ```sql
   -- Postgres expression for "first h1 text" in a Tiptap doc
   SELECT
-    id,
+    n.id,
     COALESCE(
       jsonb_path_query_first(
-        content,
+        n.content,
         '$.content[*] ? (@.type == "heading" && @.attrs.level == 1).content[*].text'
       ) #>> '{}',
       'Untitled'
     ) AS title,
-    updated_at
-  FROM notes
-  WHERE user_id = :uid
-  ORDER BY updated_at DESC;
+    n.updated_at
+  FROM notes n
+  INNER JOIN user_notes un ON un.note_id = n.id
+  WHERE un.user_id = :uid
+    AND un.is_trashed = false
+  ORDER BY n.updated_at DESC;
   ```
 
   Wrap this in an Eloquent accessor or a dedicated SQL view so the rest of
@@ -303,7 +308,7 @@ public function up(): void
 Run it with:
 
 ```bash
-docker compose -f docker-compose.dev.yaml exec api_dev php artisan migrate
+docker compose -f docker-compose.dev.yaml exec api php artisan migrate
 ```
 
 ### 3.3 Attachments via RustFS
@@ -321,7 +326,7 @@ RustFS endpoint:
     'secret'   => env('RUSTFS_SECRET'),
     'region'   => env('RUSTFS_REGION', 'us-east-1'),
     'bucket'   => env('RUSTFS_BUCKET', 'notetify'),
-    'endpoint' => env('RUSTFS_ENDPOINT'), // e.g. http://rustfs_dev:9000
+    'endpoint' => env('RUSTFS_ENDPOINT'), // e.g. http://rustfs:9000
     'use_path_style_endpoint' => true,
 ],
 ```
@@ -344,7 +349,7 @@ note content searchable.
 - [ ] `notes.title` column dropped (title is now the first H1 inside `content`).
 - [ ] `COLLAB_JWT_SECRET` and `COLLAB_WEBHOOK_SECRET` generated and shared
       between Laravel and Hocuspocus.
-- [ ] RustFS reachable from `api_dev` and a bucket created for attachments.
+- [ ] RustFS reachable from `api` and a bucket created for attachments.
 
 ---
 
@@ -353,7 +358,7 @@ note content searchable.
 ### Step 1 — Install JWT support in Laravel
 
 ```bash
-docker compose -f docker-compose.dev.yaml exec api_dev \
+docker compose -f docker-compose.dev.yaml exec api \
   composer require firebase/php-jwt
 ```
 
@@ -365,8 +370,8 @@ COLLAB_JWT_TTL=3600
 COLLAB_WEBHOOK_SECRET=<openssl rand -hex 32>
 ```
 
-Mirror these into `docker-compose.dev.yaml` `api_dev.environment` and the new
-`collab_dev` service we add in Step 6.
+Mirror these into `docker-compose.dev.yaml` `api.environment` and the new
+`collab` service we add in Step 6.
 
 ### Step 2 — Add the collab token endpoint (Laravel)
 
@@ -405,13 +410,52 @@ class CollabController extends Controller
             'docId'  => "note:{$note->id}",
         ]);
     }
+
+    public function viewerToken(Request $request, string $noteId)
+    {
+        $user = $request->user();
+        $note = Note::findOrFail($noteId);
+        $this->authorize('view', $note); // read-only share check
+
+        $now = time();
+        $payload = [
+            'sub'    => (string) $user->id,
+            'name'   => $user->name,
+            'noteId' => (string) $note->id,
+            'role'   => 'viewer',  // Hocuspocus rejects writes for this role
+            'iat'    => $now,
+            'exp'    => $now + (int) config('services.collab.ttl', 3600),
+        ];
+
+        return response()->json([
+            'token'  => JWT::encode($payload, config('services.collab.secret'), 'HS256'),
+            'wsUrl'  => config('services.collab.ws_url'),
+            'docId'  => "note:{$note->id}",
+        ]);
+    }
 }
 ```
 
-Register it in `api/routes/api.php` inside the `auth:sanctum` group:
+> **JWT `role` vs `Permission` enum.** The collab JWT carries a `role` string
+> (`'editor'` or `'viewer'`), not a `Permission` enum value. The mapping is:
+>
+> | `Permission` (REST / DB) | JWT `role` (collab WS) |
+> |---|---|
+> | `view` | `'viewer'` — read-only WS, `editable: false` |
+> | `comment` | `'viewer'` — comments go through REST, not the doc body |
+> | `edit` | `'editor'` — full read/write WS |
+> | owner (`is_owner = true`) | `'editor'` — same as edit for collab purposes |
+>
+> `CollabController@token` inspects the user's `Permission` on the relevant
+> `NoteShare` (or falls back to owner check) and sets the JWT role accordingly.
+> Hocuspocus only cares about read vs. read-write; the finer `comment` distinction
+> is enforced at the REST layer, not inside the CRDT.
+
+Register in `api/routes/api.php` inside the `auth:sanctum` group:
 
 ```php
-Route::post('collab/token/{note}', [CollabController::class, 'token']);
+Route::post('collab/token/{note}',        [CollabController::class, 'token']);
+Route::post('collab/token/{note}/viewer', [CollabController::class, 'viewerToken']);
 ```
 
 Add to `api/config/services.php`:
@@ -477,7 +521,9 @@ collab/
   "dependencies": {
     "@hocuspocus/server": "^2.13.0",
     "@hocuspocus/extension-redis": "^2.13.0",
+    "@hocuspocus/transformer": "^2.13.0",
     "jsonwebtoken": "^9.0.2",
+    "redis": "^4.7.0",
     "undici": "^6.19.8",
     "yjs": "^13.6.18"
   },
@@ -485,7 +531,7 @@ collab/
     "tsx": "^4.19.0",
     "typescript": "^5.5.0",
     "@types/jsonwebtoken": "^9.0.6",
-    "@types/node": "^20.0.0"
+    "@types/node": "^22.0.0"
   }
 }
 ```
@@ -495,7 +541,9 @@ collab/
 ```ts
 import { Server } from '@hocuspocus/server';
 import { Redis } from '@hocuspocus/extension-redis';
+import { TiptapTransformer } from '@hocuspocus/transformer';
 import jwt from 'jsonwebtoken';
+import { createClient } from 'redis';
 import { fetch } from 'undici';
 import * as Y from 'yjs';
 
@@ -503,14 +551,17 @@ const {
   PORT = '1234',
   JWT_SECRET,
   WEBHOOK_SECRET,
-  LARAVEL_URL = 'http://api_dev:80',
-  REDIS_HOST = 'redis_dev',
+  LARAVEL_URL = 'http://api:80',
+  REDIS_HOST = 'redis',
   REDIS_PORT = '6379',
 } = process.env;
 
 if (!JWT_SECRET || !WEBHOOK_SECRET) {
   throw new Error('JWT_SECRET and WEBHOOK_SECRET are required');
 }
+
+const pub = createClient({ url: `redis://${REDIS_HOST}:${REDIS_PORT}` });
+await pub.connect();
 
 const server = new Server({
   port: Number(PORT),
@@ -544,21 +595,38 @@ const server = new Server({
     return doc;
   },
 
-  async onStoreDocument({ documentName, document }) {
+  async onStoreDocument({ documentName, document, context }) {
     const noteId = documentName.replace(/^note:/, '');
-    const state = Buffer.from(Y.encodeStateAsUpdate(document)).toString('base64');
-    // Optional: also extract a JSON snapshot for search/exports.
+    const userId = (context as { user: { id: string } }).user.id;
+
+    const ydocState = Buffer.from(Y.encodeStateAsUpdate(document)).toString('base64');
+    const content   = TiptapTransformer.fromYdoc(document);
+
     await fetch(`${LARAVEL_URL}/api/collab/notes/${noteId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         'X-Collab-Secret': WEBHOOK_SECRET,
       },
-      body: JSON.stringify({ ydocState: state }),
+      body: JSON.stringify({ ydocState, content }),
     });
+
+    await pub.publish(
+      `notes:user:${userId}`,
+      JSON.stringify({ type: 'note.updated', noteId, at: Date.now(), by: userId }),
+    );
   },
 
-  // Debounce + max-wait: store at most every 2s, force every 10s.
+  // Reject write operations for viewer-role connections.
+  async onStateless({ payload, connection }) {
+    // Hocuspocus doesn't block writes based on role natively; enforce it here.
+    // Viewers connect with role='viewer' in the JWT context set during onAuthenticate.
+    const role = (connection.readOnly as unknown as string) ?? 'editor';
+    if (role === 'viewer') {
+      connection.readOnly = true;
+    }
+  },
+
   debounce: 2000,
   maxDebounce: 10000,
 });
@@ -566,10 +634,17 @@ const server = new Server({
 server.listen();
 ```
 
+> **Viewer read-only enforcement:** Set `connection.readOnly = true` for any
+> connection whose JWT `role` is `'viewer'`. Hocuspocus will still stream the
+> document to the viewer and keep them in sync, but will reject any update
+> messages they send. The client should also set `editable: false` on the
+> Tiptap instance when the role is `'viewer'` to prevent the editor from
+> accepting input in the first place.
+
 `collab/Dockerfile`:
 
 ```dockerfile
-FROM node:20-alpine AS base
+FROM node:22-alpine AS base
 WORKDIR /app
 RUN corepack enable && corepack prepare pnpm@latest --activate
 COPY package.json pnpm-lock.yaml* ./
@@ -586,37 +661,37 @@ EXPOSE 1234
 CMD ["pnpm", "start"]
 ```
 
-### Step 5 — Add `collab_dev` to docker-compose
+### Step 5 — Add `collab` to docker-compose
 
 Append to `docker-compose.dev.yaml`:
 
 ```yaml
-  collab_dev:
+  collab:
     build:
       context: ./collab
       dockerfile: Dockerfile
       target: development
-    container_name: notetify-collab-dev
+    container_name: notetify-collab
     networks:
-      - notetify-net-dev
+      - notetify-net
     restart: unless-stopped
     depends_on:
-      redis_dev:
+      redis:
         condition: service_healthy
-      api_dev:
+      api:
         condition: service_healthy
     volumes:
       - ./collab:/app
-      - node_modules_collab_dev:/app/node_modules
+      - node_modules_collab:/app/node_modules
     ports:
       - "1234:1234"
     environment:
-      - PORT=1234
-      - JWT_SECRET=${COLLAB_JWT_SECRET}
-      - WEBHOOK_SECRET=${COLLAB_WEBHOOK_SECRET}
-      - LARAVEL_URL=http://api_dev:80
-      - REDIS_HOST=redis_dev
-      - REDIS_PORT=6379
+      PORT: ${COLLAB_PORT:-1234}
+      JWT_SECRET: ${COLLAB_JWT_SECRET}
+      WEBHOOK_SECRET: ${COLLAB_WEBHOOK_SECRET}
+      LARAVEL_URL: ${COLLAB_LARAVEL_URL:-http://api:80}
+      REDIS_HOST: ${REDIS_HOST:-redis}
+      REDIS_PORT: ${REDIS_PORT:-6379}
     env_file:
       - .env.development
 ```
@@ -625,7 +700,7 @@ And add the volume:
 
 ```yaml
 volumes:
-  node_modules_collab_dev:
+  node_modules_collab:
 ```
 
 ### Step 6 — Wire the React client
@@ -633,7 +708,7 @@ volumes:
 Install:
 
 ```bash
-docker compose -f docker-compose.dev.yaml exec client_dev \
+docker compose -f docker-compose.dev.yaml exec client \
   pnpm add @hocuspocus/provider @tiptap/extension-collaboration \
            @tiptap/extension-collaboration-cursor yjs
 ```
@@ -668,7 +743,12 @@ const provider = new HocuspocusProvider({
   document: ydoc,
 });
 
+// For viewer sessions, fetch via /collab/token/:id/viewer instead,
+// then set editable: false on the editor.
+const isViewer = session.role === 'viewer';
+
 const editor = new Editor({
+  editable: !isViewer,
   extensions: [
     StarterKit.configure({ history: false }), // collab provides history
     Collaboration.configure({ document: ydoc }),
@@ -680,7 +760,7 @@ const editor = new Editor({
 });
 ```
 
-Add `VITE_COLLAB_WS_URL=ws://localhost:1234` to the `client_dev` env, and use
+Add `VITE_COLLAB_WS_URL=ws://localhost:1234` to the `client` env, and use
 it as the fallback if the API doesn't return `wsUrl`.
 
 ### Step 7 — Verify locally
@@ -776,7 +856,7 @@ gap.
 > **Terminology note — webhook vs SSE.** This doc uses "webhook" in one
 > place only: the **server-to-server** call from Hocuspocus to Laravel
 > that persists the doc (`PUT /api/collab/notes/:id`). That's a real
-> webhook — a one-shot HTTP POST/PUT between two backends.
+> webhook — a one-shot HTTP PUT between two backends.
 >
 > The notification described here is **not** a webhook. Browsers can't
 > receive webhooks (they have no inbound URL). Instead, each browser
@@ -842,37 +922,8 @@ react-query keys and the sidebar re-fetches.
 - Hocuspocus already owns its WS for body sync; this stream serves the
   *list view*, not the editor, so keeping them separate is healthier.
 
-**Server side — Hocuspocus publish.** Extend `onStoreDocument` in
-`collab/src/index.ts`:
-
-```ts
-import { createClient } from 'redis';
-
-const pub = createClient({ url: `redis://${REDIS_HOST}:${REDIS_PORT}` });
-await pub.connect();
-
-// inside the Server config:
-async onStoreDocument({ documentName, document, context }) {
-  const noteId = documentName.replace(/^note:/, '');
-  const userId = context.user.id;
-
-  // ...existing PUT /api/collab/notes/:id...
-
-  await pub.publish(
-    `notes:user:${userId}`,
-    JSON.stringify({
-      type:   'note.updated',
-      noteId,
-      at:     Date.now(),
-      by:     userId, // sender, so clients can ignore self-echoes if desired
-    }),
-  );
-},
-```
-
-Eventually, when you add sharing, change the channel from
-`notes:user:<uid>` to `notes:note:<noteId>` and have Laravel fan out to
-each authorized user's channel — but per-user is fine for v1.
+**Server side — Hocuspocus publish.** Already included in `onStoreDocument`
+in Step 4 above — the `pub.publish(...)` call at the end of the handler.
 
 **Server side — Laravel SSE endpoint.** Add to `routes/api.php` inside the
 `auth:sanctum` group:
@@ -1036,13 +1087,14 @@ const { data: session } = useQuery({
 
 ## 6. Production checklist
 
-- [ ] Terminate WSS on nginx; proxy `/collab` → `collab_prod:1234` with
+- [ ] Terminate WSS on nginx; proxy `/collab` → `collab:1234` with
       `Upgrade`/`Connection` headers and a long `proxy_read_timeout` (e.g. 1h).
-- [ ] Run multiple `collab_prod` replicas; the Redis extension handles fanout.
+- [ ] Run multiple `collab` replicas; the Redis extension handles fanout.
 - [ ] Rotate `COLLAB_JWT_SECRET` and `COLLAB_WEBHOOK_SECRET` via your secret
       store; do not commit them.
 - [ ] Add a Laravel policy check inside `CollabController@token` for read-only
-      shares (set `role: 'viewer'` and reject writes server-side).
+      shares (set `role: 'viewer'` in the JWT and set `connection.readOnly = true`
+      in Hocuspocus `onAuthenticate`).
 - [ ] Snapshot a Tiptap JSON view of the doc on `onStoreDocument` (write to
       `notes.content` JSONB) for search indexing and non-collab consumers
       (mobile read-only, exports). The BYTEA `ydoc_state` is the source of
@@ -1064,12 +1116,13 @@ const { data: session } = useQuery({
 
 ---
 
-## 7. Open questions to resolve before starting
+## 7. Design decisions (v1)
 
-1. Do we need viewer-only ("share link, read-only") sessions in v1, or
-   editor-only?
-2. Do we want presence avatars / cursors in v1, or just convergent text?
-3. Should `onStoreDocument` write only the binary state, or also the rendered
-   Tiptap JSON for search? (Recommendation: both, JSON is cheap.)
-4. Are notes the only collaborative surface, or will notebooks/tasks join
-   later? (Affects `documentName` namespace design.)
+These were resolved before implementation began.
+
+| # | Question | Decision |
+|---|---|---|
+| 1 | Viewer-only ("share link, read-only") sessions in v1? | **Yes.** Viewer gets a live WS connection with the document fully synced but `editable: false` on Tiptap and `readOnly: true` enforced by Hocuspocus. JWT carries `role: 'viewer'`. |
+| 2 | Presence avatars / cursors in v1? | **Yes, full cursors.** Use `@tiptap/extension-collaboration-cursor` with name + color for every connected user. |
+| 3 | `documentName` namespace — notes only or broader? | **`note:<uuid>` permanently.** Tasks (Kanban) will be a separate future feature with its own namespace; they are not collaborative documents in v1. |
+| 4 | Inline rename from the sidebar? | **No inline rename.** Title is the first H1 inside the Tiptap doc. Renaming requires opening the note and editing the H1 — same path as any other body edit. Sidebar title is read-only. |

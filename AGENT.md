@@ -3,7 +3,7 @@
 ## Project Context
 
 - Notetify is a collaborative note-taking app with notebooks, tags, tasks, files, spaces, and sharing
-- Real-time multi-user editing is being added via Tiptap + Yjs + Hocuspocus (see @docs/COLLABORATION.md)
+- Real-time multi-user editing is being added via Tiptap + Yjs + Hocuspocus (see @docs/NOTE_COLLABORATION.md)
 - The repo is a monorepo with three deployable services: Laravel API, React/Vite SPA, and a Node Hocuspocus collab server
 - The API runs **Laravel 13** on **PHP 8.4** inside Docker
 - The client is **React 19 + Vite + TypeScript + Tiptap 3**, package-managed with **pnpm**
@@ -27,7 +27,7 @@ The repo root contains three deployable services and three Compose stacks. Each 
 
 - API: `./api` — Laravel 13 backend
 - Client: `./client` — React + Vite SPA
-- Collab: `./collab` — Hocuspocus (Node.js) WebSocket server (per @docs/COLLABORATION.md)
+- Collab: `./collab` — Hocuspocus (Node.js) WebSocket server (per @docs/NOTE_COLLABORATION.md)
 - Docs: `./docs` — architecture and design docs
 - Scripts: `./scripts` — operational shell scripts (TLS init, prod start, cleanup, logs)
 - Compose stacks: `docker-compose.dev.yaml`, `docker-compose.test.yaml`, `docker-compose.prod.yaml`,`docker-compose.prod.local.yaml`
@@ -75,7 +75,8 @@ The repo root contains three deployable services and three Compose stacks. Each 
 ### Docs
 
 - @docs/ARCHITECTURE.md — data model and sharing system
-- @docs/COLLABORATION.md — real-time collab (Yjs / Hocuspocus / SSE); **mandatory** before any change to the editor or note body
+- @docs/NOTE_COLLABORATION.md — real-time note collab (Yjs / Hocuspocus / SSE); **mandatory** before any change to the editor or note body
+- @docs/TASK_COLLABORATION.md — *(planned, not yet written)* future Kanban/task collaboration design; tasks will use a separate Hocuspocus namespace (`task:<id>`) and a board-level CRDT model distinct from note documents
 - @docs/TOLEARN.md — `UserNote` modelling background
 - @README.Docker.md — Docker stacks (dev/test/prod) and ops commands
 - @README.md — high-level project overview
@@ -357,7 +358,7 @@ Do not introduce a third server-state layer (Redux, RTK Query, SWR). Do not put 
 - After modifying `composer.json` or `package.json`, run the install inside the container so the lockfile matches the deployed runtime
 - After modifying `.env.development`, restart `api` so Laravel re-reads it: `docker compose -f docker-compose.dev.yaml restart api`
 - When writing tests, make sure the tests pass — backend tests live in `api/tests/` (PHPUnit 11), frontend unit tests in `client/tests/` (Vitest), e2e in `client/cypress/`
-- IMPORTANT: before writing or modifying ANY code that touches `notes.content`, `notes.ydoc_state`, or the editor body, you MUST first read @docs/COLLABORATION.md in full. The data flow rules — BYTEA is the source of truth, JSONB is derived, body is never written via REST, title is the first H1 inside the doc — are non-obvious and easy to violate. Do not rely on inference from existing code; the guide is the authoritative source of truth.
+- IMPORTANT: before writing or modifying ANY code that touches `notes.content`, `notes.ydoc_state`, or the editor body, you MUST first read @docs/NOTE_COLLABORATION.md in full. The data flow rules — BYTEA is the source of truth, JSONB is derived, body is never written via REST, title is the first H1 inside the doc — are non-obvious and easy to violate. Do not rely on inference from existing code; the guide is the authoritative source of truth.
 - IMPORTANT: do not add a `notes.title` column. Title lives inside `content` as the first H1; the sidebar extracts it via JSONB path query with an `'Untitled'` fallback.
 - IMPORTANT: `PUT /api/notes/:id` (REST) handles **metadata only** (`notebook_id`, `tags`, `is_pinned`, etc.). It must reject `content` and `ydoc_state`. All body edits — including renames — go through Hocuspocus.
 - IMPORTANT: never reintroduce `_dev` / `_prod` suffixes on Compose service, container, network, or volume names. Use `-p` for namespacing instead.

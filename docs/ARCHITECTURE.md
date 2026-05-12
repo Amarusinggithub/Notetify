@@ -59,9 +59,10 @@ Each level supports:
 
 | State Type | Storage Location | Visibility |
 |------------|------------------|------------|
-| **Personal Pin** | `UserNote.is_pinned` | Only the user |
+| **Pin in notebook** | `UserNote.is_pinned_in_notebook` | Only the user |
+| **Pin in space** | `UserNote.is_pinned_in_space` | Only the user |
+| **Pin to home** | `UserNote.is_pinned_to_home` | Only the user |
 | **Personal Tags** | `UserNoteTag` | Only the user |
-| **Personal Favorite** | `UserNote.is_favorite` | Only the user |
 | **Broadcast Highlight** | `NoteShare.is_highlighted` | Owner broadcasts importance to all collaborators |
 
 ---
@@ -132,7 +133,7 @@ Tag {
 }
 ```
 
-> `UserTag` is not needed — color and order live directly on `Tag` since tags are per-user.
+> Tags are already per-user (`Tag.user_id`), so no `UserTag` model is needed — `Tag` is the per-user model.
 > Tags are never shared with collaborators; each user manages their own tag set independently.
 
 ---
@@ -241,13 +242,14 @@ UserNote {
     note_id: uuid (foreign → notes)
     notebook_id: uuid (foreign → notebooks, nullable)
 
-    // Pinning (contextual)
-    is_pinned: boolean
-    pinned_at: timestamp (nullable)
+    // Pinning (contextual — three independent pin surfaces)
+    is_pinned_in_notebook: boolean  // pinned inside the notebook it belongs to
+    is_pinned_in_space: boolean     // pinned inside the space the notebook belongs to
+    is_pinned_to_home: boolean      // pinned to the user's home/dashboard
 
-    // Favoriting
-    is_favorite: boolean
-    favorite_at: timestamp (nullable)
+    pinned_in_notebook_at: timestamp (nullable)
+    pinned_in_space_at: timestamp (nullable)
+    pinned_to_home_at: timestamp (nullable)
 
     // Trash
     is_trashed: boolean
@@ -270,7 +272,9 @@ UserNote {
     withTag($tagName)
     search($term)
     whereFlag($flag, $value)
-    pinned()
+    pinnedInNotebook()
+    pinnedInSpace()
+    pinnedToHome()
     trashed()
     notTrashed()
     inNotebook($notebookId)
@@ -292,16 +296,10 @@ UserSpace {
     // Permission (for collaborators; null for owner who has full access)
     permission: enum('view', 'comment', 'edit') (nullable)
 
-    // Personal metadata
-    is_favorite: boolean
-    is_pinned: boolean
+    // Ordering / trash only — spaces cannot be pinned or favorited
     is_trashed: boolean
-    is_default: boolean  // user's default space
-    order: integer (nullable)
-
-    favorite_at: timestamp (nullable)
-    pinned_at: timestamp (nullable)
     trashed_at: timestamp (nullable)
+    order: integer (nullable)
 
     // Relations
     user(): belongsTo → User
@@ -320,12 +318,15 @@ UserNotebook {
 
     is_owner: boolean (default: true for creator, false for collaborators)
 
-    is_favorite: boolean
-    is_pinned: boolean
-    is_trashed: boolean
+    // Pinning (two independent pin surfaces)
+    is_pinned_in_space: boolean  // pinned inside the space the notebook belongs to
+    is_pinned_to_home: boolean   // pinned to the user's home/dashboard
 
-    favorite_at: timestamp (nullable)
-    pinned_at: timestamp (nullable)
+    pinned_in_space_at: timestamp (nullable)
+    pinned_to_home_at: timestamp (nullable)
+
+    is_trashed: boolean
+    is_default: boolean  // user's default notebook
     trashed_at: timestamp (nullable)
 
     // Relations
@@ -384,6 +385,7 @@ NoteShare {
 
     permission: enum('view', 'comment', 'edit')
     expires_at: timestamp (nullable)
+    accepted_at: timestamp (nullable)
     accepted: boolean (default: false)
 
     // Broadcast pin — set by the owner to highlight this note for all collaborators
@@ -413,6 +415,7 @@ NotebookShare {
 
     permission: enum('view', 'comment', 'edit')
     expires_at: timestamp (nullable)
+    accepted_at: timestamp (nullable)
     accepted: boolean (default: false)
 
     // Broadcast pin — set by the owner to highlight this notebook for all collaborators
@@ -443,6 +446,7 @@ SpaceShare {
 
     permission: enum('view', 'comment', 'edit')
     expires_at: timestamp (nullable)
+    accepted_at: timestamp (nullable)
     accepted: boolean (default: false)
 
     // Relations
@@ -524,6 +528,22 @@ SpaceShare {
 | `comment` | Yes | Yes | No | No | No |
 | `edit` | Yes | Yes | Yes | No | No |
 | `owner` | Yes | Yes | Yes | Yes | Yes |
+
+### Permission Enum
+
+Permissions are represented by a backed PHP enum `App\Enums\Permission`. The enum is cast on every model that carries a `permission` column (`NoteShare`, `NotebookShare`, `SpaceShare`, `UserSpace`). The DB columns for `note_shares` and `notebook_shares` are Postgres `ENUM` types; `space_shares.permission` should be migrated to match.
+
+```php
+// app/Enums/Permission.php
+enum Permission: string
+{
+    case View    = 'view';
+    case Comment = 'comment';
+    case Edit    = 'edit';
+}
+```
+
+The `owner` level is not a `Permission` value — ownership is expressed by `is_owner = true` on the relevant pivot (`UserNote`, `UserNotebook`, `UserSpace`) or `created_by_user_id` on the resource. Owners are never stored with a `Permission` value; they bypass the permission check entirely (see Access Resolution Algorithm below).
 
 ### Permission Inheritance
 
@@ -628,14 +648,14 @@ def can_access(user, note, required_permission):
 |-------|---------|------------|
 | `users` | Authentication | email, password |
 | `spaces` | Workspaces | created_by_user_id, name, color |
-| `user_space` | User↔Space metadata | is_owner, permission, is_pinned, is_favorite, is_default |
+| `user_space` | User↔Space metadata | is_owner, permission, is_trashed, order |
 | `notebooks` | Note collections | created_by_user_id, space_id, name |
 | `notes` | Documents | created_by_user_id, content (jsonb), ydoc_state (bytea) |
 | `tags` | Per-user tag definitions | user_id, name, color, order |
 | `tasks` | Todos/Events | type, status, due_at |
 | `files` | Uploads | path, mime_type |
-| `user_note` | User↔Note metadata | is_owner, is_pinned, is_favorite, notebook_id |
-| `user_notebook` | User↔Notebook metadata | is_owner, is_pinned, is_favorite |
+| `user_note` | User↔Note metadata | is_owner, is_pinned_in_notebook, is_pinned_in_space, is_pinned_to_home, notebook_id |
+| `user_notebook` | User↔Notebook metadata | is_owner, is_pinned_in_space, is_pinned_to_home |
 | `user_note_tag` | User's note tags | user_note_id, tag_id |
 | `note_shares` | Note sharing | permission, accepted |
 | `notebook_shares` | Notebook sharing | permission, accepted |
@@ -699,7 +719,9 @@ GET /notes?
     tag=work                     # Filter by tag
     search=meeting               # Search content
     notebook_id=xxx              # Filter by notebook
-    is_pinned=true               # Filter pinned
+    pinned_in_notebook=true      # Filter pinned in notebook
+    pinned_in_space=true         # Filter pinned in space
+    pinned_to_home=true          # Filter pinned to home
     is_trashed=false             # Exclude trash
     sort_by=updated_at           # Sort field
     sort_direction=desc          # Sort order
@@ -715,10 +737,11 @@ GET /notes?
     "id": "user-note-uuid",
     "note_id": "note-uuid",
     "notebook_id": "notebook-uuid",
-    "is_pinned": true,
-    "is_favorite": false,
+    "is_pinned_in_notebook": true,
+    "is_pinned_in_space": false,
+    "is_pinned_to_home": false,
     "is_trashed": false,
-    "pinned_at": "2026-01-12T10:00:00Z",
+    "pinned_in_notebook_at": "2026-01-12T10:00:00Z",
     "created_at": "2026-01-10T08:00:00Z",
     "updated_at": "2026-01-12T10:00:00Z",
     "note": {
@@ -851,7 +874,6 @@ api/
 │       ├── File.php
 │       ├── UserNote.php
 │       ├── UserNotebook.php
-│       ├── UserTag.php
 │       ├── UserNoteTag.php
 │       ├── NoteShare.php
 │       ├── NotebookShare.php
