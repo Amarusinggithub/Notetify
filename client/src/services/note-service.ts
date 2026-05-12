@@ -1,10 +1,10 @@
 import type { QueryFunctionContext } from "@tanstack/react-query";
 import api from "@/lib/api";
 import type {
-    CreateUserNote,
+    CreateNote,
+    UserNote,
     PaginatedNotesResponse,
     UpdateUserNotePayload,
-    UserNote,
 } from "@/types";
 import type { noteQueryKeys } from "@/utils/query-keys";
 
@@ -60,23 +60,9 @@ export async function deleteNote(userNoteId: string): Promise<void> {
     await api.delete(`notes/${userNoteId}`);
 }
 
-export const createNote = async (note: CreateUserNote): Promise<UserNote> => {
-    try {
-        const payload: Record<string, any> = {
-            content: note.note_data?.content ?? "",
-            is_trashed: note.is_trashed,
-        };
-
-        if (note.is_pinned_to_home !== undefined)
-            payload.is_pinned_to_home = note.is_pinned_to_home;
-        if (note.tags && note.tags.length > 0) {
-            payload.tags = note.tags.map((t) => t.name);
-        }
-
-        const response = await api.post("notes/", payload);
-        return response.data as UserNote;
-    } catch (e) {
-        console.error(e);
-        throw e;
-    }
+export const createNote = async (note: CreateNote): Promise<UserNote> => {
+    const response = await api.post<UserNote>("notes/", {
+        notebook_id: note.notebook_id ?? null,
+    });
+    return response.data;
 };

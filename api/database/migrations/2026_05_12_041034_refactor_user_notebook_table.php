@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -25,26 +26,40 @@ return new class extends Migration
             );
 
             if ($staleColumns) {
-                foreach (['user_note_user_id_is_pinned_index', 'user_notebook_user_id_is_pinned_index'] as $idx) {
-                    try { $table->dropIndex($idx); } catch (\Throwable) {}
-                }
-                foreach (['user_note_user_id_is_favorited_index', 'user_notebook_user_id_is_favorited_index'] as $idx) {
-                    try { $table->dropIndex($idx); } catch (\Throwable) {}
+                foreach ([
+                    'user_note_user_id_is_pinned_index',
+                    'user_notebook_user_id_is_pinned_index',
+                    'user_note_user_id_is_favorited_index',
+                    'user_notebook_user_id_is_favorited_index',
+                ] as $idx) {
+                    try { DB::statement("DROP INDEX IF EXISTS \"{$idx}\""); } catch (\Throwable) {}
                 }
                 $table->dropColumn(array_values($staleColumns));
             }
         });
 
         Schema::table('user_notebook', function (Blueprint $table) {
-            $table->boolean('is_owner')->default(false)->after('notebook_id');
-            $table->boolean('is_pinned_in_space')->default(false)->after('is_owner');
-            $table->timestamp('pinned_in_space_at')->nullable()->after('is_pinned_in_space');
-            $table->boolean('is_pinned_to_home')->default(false)->after('pinned_in_space_at');
-            $table->timestamp('pinned_to_home_at')->nullable()->after('is_pinned_to_home');
-            $table->boolean('is_default')->default(false)->after('pinned_to_home_at');
+            if (!Schema::hasColumn('user_notebook', 'is_owner')) {
+                $table->boolean('is_owner')->default(false)->after('notebook_id');
+            }
+            if (!Schema::hasColumn('user_notebook', 'is_pinned_in_space')) {
+                $table->boolean('is_pinned_in_space')->default(false)->after('is_owner');
+            }
+            if (!Schema::hasColumn('user_notebook', 'pinned_in_space_at')) {
+                $table->timestamp('pinned_in_space_at')->nullable()->after('is_pinned_in_space');
+            }
+            if (!Schema::hasColumn('user_notebook', 'is_pinned_to_home') && !Schema::hasColumn('user_notebook', 'is_pinned_in_home')) {
+                $table->boolean('is_pinned_to_home')->default(false)->after('pinned_in_space_at');
+            }
+            if (!Schema::hasColumn('user_notebook', 'pinned_to_home_at') && !Schema::hasColumn('user_notebook', 'pinned_in_home_at')) {
+                $table->timestamp('pinned_to_home_at')->nullable()->after('is_pinned_to_home');
+            }
+            if (!Schema::hasColumn('user_notebook', 'is_default')) {
+                $table->boolean('is_default')->default(false)->after('pinned_to_home_at');
+            }
 
-            $table->index(['user_id', 'is_pinned_in_space']);
-            $table->index(['user_id', 'is_pinned_to_home']);
+            try { $table->index(['user_id', 'is_pinned_in_space']); } catch (\Throwable) {}
+            try { $table->index(['user_id', 'is_pinned_to_home']); } catch (\Throwable) {}
         });
     }
 

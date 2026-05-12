@@ -10,9 +10,9 @@
         "coverage": "vitest run --coverage"
     },
     "dependencies": {
-        "@hocuspocus/extension-redis": "^2.15.3",
-        "@hocuspocus/server": "^2.15.3",
-        "@hocuspocus/transformer": "^2.15.3",
+        "@hocuspocus/extension-redis": "^4.0.0",
+        "@hocuspocus/server": "^4.0.0",
+        "@hocuspocus/transformer": "^4.0.0",
         "jsonwebtoken": "^9.0.3",
         "redis": "^4.7.1",
         "undici": "^6.25.0",

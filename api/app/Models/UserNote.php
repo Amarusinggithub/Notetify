@@ -26,10 +26,10 @@ class UserNote extends Model
         'order',
         'is_pinned_in_notebook',
         'is_pinned_in_space',
-        'is_pinned_to_home',
+        'is_pinned_in_home',
         'pinned_in_notebook_at',
         'pinned_in_space_at',
-        'pinned_to_home_at',
+        'pinned_in_home_at',
         'is_trashed',
         'trashed_at',
     ];
@@ -40,12 +40,12 @@ class UserNote extends Model
             'is_owner'              => 'boolean',
             'is_pinned_in_notebook' => 'boolean',
             'is_pinned_in_space'    => 'boolean',
-            'is_pinned_to_home'     => 'boolean',
+            'is_pinned_in_home'     => 'boolean',
             'is_trashed'            => 'boolean',
             'trashed_at'            => 'datetime',
             'pinned_in_notebook_at' => 'datetime',
             'pinned_in_space_at'    => 'datetime',
-            'pinned_to_home_at'     => 'datetime',
+            'pinned_in_home_at'     => 'datetime',
         ];
     }
 

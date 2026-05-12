@@ -164,7 +164,7 @@ export function EditorHeader({
         if (!currentUserNote) return;
         updateNoteMutation.mutate({
             id: currentUserNote.id,
-            payload: { is_pinned_to_home: !currentUserNote.is_pinned_to_home },
+            payload: { is_pinned_in_home: !currentUserNote.is_pinned_in_home },
         });
     };
 
@@ -173,7 +173,7 @@ export function EditorHeader({
         updateNoteMutation.mutate({
             id: currentUserNote.id,
             payload: {
-                is_pinned_to_home: !currentUserNote.is_pinned_to_home,
+                is_pinned_in_home: !currentUserNote.is_pinned_in_home,
             },
         });
     };
@@ -374,9 +374,7 @@ export function EditorHeader({
                                 <Copy className="mr-2 size-4" /> Duplicate
                             </DropdownMenuItem>
                         </DropdownMenuGroup>
-
                         <DropdownMenuSeparator className="my-2" />
-
                         <DropdownMenuGroup className="space-y-1">
                             <DropdownMenuItem
                                 onClick={() => console.log("Edit tags")}
@@ -397,13 +395,13 @@ export function EditorHeader({
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={handlePinToNotebook}>
                                 <NotebookIcon className="mr-2 size-4" />
-                                {currentUserNote?.is_pinned_to_home
+                                {currentUserNote?.is_pinned_in_home
                                     ? "Unpin from Notebook"
                                     : "Pin to Notebook"}
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={handlePinToHome}>
                                 <Home className="mr-2 size-4" />
-                                {currentUserNote?.is_pinned_to_home
+                                {currentUserNote?.is_pinned_in_home
                                     ? "Unpin from Home"
                                     : "Pin to Home"}
                             </DropdownMenuItem>

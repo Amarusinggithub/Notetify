@@ -19,6 +19,8 @@ class Note extends Model
         'ydoc_state',
     ];
 
+    protected $hidden = ['ydoc_state'];
+
     protected $appends = ['is_shared'];
 
     protected function casts(): array

@@ -14,8 +14,8 @@ trait HasPinScopes
         return $query->where("{$this->getTable()}.is_pinned_in_space", true);
     }
 
-    public function scopePinnedToHome($query)
+    public function scopePinnedInHome($query)
     {
-        return $query->where("{$this->getTable()}.is_pinned_to_home", true);
+        return $query->where("{$this->getTable()}.is_pinned_in_home", true);
     }
 }

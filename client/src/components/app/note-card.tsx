@@ -14,6 +14,7 @@ import {
 	CardContent,
 	CardFooter,
 } from '@/components/ui/card';
+import type { JSONContent } from '@tiptap/react';
 
 type NoteCardProp = {
 	userNote: UserNote;
@@ -27,8 +28,8 @@ const NoteCard = memo(
 		const setSelectedNoteId = useStore((s) => s.setSelectedNoteId);
 		const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-		const title = getTitlePreview(userNote.note.content);
-		const content = getContentPreview(userNote.note.content);
+		const title = getTitlePreview(userNote.note?.content ?? null);
+		const content = getContentPreview(userNote.note?.content ?? null);
 		const updatedLabel = userNote.updated_at
 			? formatDistanceToNow(new Date(userNote.updated_at), {
 					addSuffix: true,
@@ -89,36 +90,36 @@ const NoteCard = memo(
 		prev.userNote.updated_at === next.userNote.updated_at
 );
 
-function getContentPreview(html: string, maxLength = 119): string {
-	const preview = html
-		.replace(/<h1[^>]*>.*?<\/h1>/i, '')
-		.replace(/<[^>]+>/g, ' ')
-		.replace(/\s+/g, ' ')
-		.trim();
+const extractText = (node: JSONContent): string => {
+	if (node.type === 'text') return node.text ?? '';
+	return (node.content ?? []).map(extractText).join('');
+};
 
-	if (!preview) return 'No content';
+const truncate = (text: string, maxLength: number): string => {
+	if (text.length <= maxLength) return text;
+	const cut = text.slice(0, maxLength).trimEnd();
+	const lastSpace = cut.lastIndexOf(' ');
+	return (lastSpace > 0 ? cut.slice(0, lastSpace) : cut) + '...';
+};
 
-	if (preview.length <= maxLength) return preview;
-
-	// Cut at last space to avoid breaking words
-	const truncated = preview.slice(0, maxLength).trimEnd();
-	const lastSpace = truncated.lastIndexOf(' ');
-
-	return (lastSpace > 0 ? truncated.slice(0, lastSpace) : truncated) + '...';
+function getTitlePreview(content: JSONContent | null, maxLength = 50): string {
+	const h1 = content?.content?.find(
+		(n:JSONContent) => n.type === 'heading' && n.attrs?.level === 1
+	);
+	const title = h1 ? extractText(h1).trim() : '';
+	return title ? truncate(title, maxLength) : 'Untitled';
 }
 
-const getTitlePreview = (html: string, maxLength = 50): string => {
-	const match = html.match(/<h1[^>]*>(.*?)<\/h1>/i);
-	const title = match ? match[1].replace(/<[^>]*>/g, '').trim() : '';
-
-	if (!title) return 'Untitled';
-
-	if (title.length <= maxLength) return title;
-
-	const truncated = title.slice(0, maxLength).trimEnd();
-	const lastSpace = truncated.lastIndexOf(' ');
-
-	return (lastSpace > 0 ? truncated.slice(0, lastSpace) : truncated) + '...';
-};
+function getContentPreview(content: JSONContent | null, maxLength = 119): string {
+	const bodyNodes = (content?.content ?? []).filter(
+		(n: JSONContent) => !(n.type === 'heading' && n.attrs?.level === 1)
+	);
+	const preview = bodyNodes
+		.map(extractText)
+		.join(' ')
+		.replace(/\s+/g, ' ')
+		.trim();
+	return preview ? truncate(preview, maxLength) : 'No content';
+}
 
 export default NoteCard;

@@ -56,7 +56,7 @@ export async function storeDocument(
 ): Promise<void> {
     const noteId = documentName.replace(/^note:/, "");
     const ydocState = Buffer.from(Y.encodeStateAsUpdate(document)).toString("base64");
-    const content = TiptapTransformer.fromYdoc(document);
+    const content = TiptapTransformer.fromYdoc(document, 'default');
 
     const res = await fetch(`${laravelUrl}/api/collab/notes/${noteId}`, {
         method: "PUT",

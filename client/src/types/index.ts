@@ -1,3 +1,4 @@
+import type { JSONContent } from '@tiptap/react';
 import "axios";
 import type { LucideIcon } from "lucide-react";
 
@@ -70,35 +71,28 @@ export type CreateUser = {
 
 export interface User extends Omit<CreateUser, "password"> {
     id: string;
-
     first_name: string;
     last_name: string;
     full_name: string;
-
     is_active: boolean;
     is_verified: boolean;
     email_verified_at: string | null;
-
     remember?: boolean;
     two_factor_secret: string | null;
     two_factor_recovery_codes: string[] | null;
     two_factor_confirmed_at: string | null;
-
     avatar: string | null;
     timezone: string;
     locale: string;
     preferred_language: string | null;
-
     created_at: string;
     updated_at: string;
     deleted_at: string | null;
-
     last_login_at: string | null;
     last_login_ip: string | null;
-
-    emailNotificationEnabled?: boolean;
-    pushNotificationEnabled?: boolean;
-    marketingNotificationEnabled?: boolean;
+    email_notification_enabled?: boolean;
+    push_notification_enabled?: boolean;
+    marketing_notification_enabled?: boolean;
 }
 
 export interface SharedData {
@@ -196,6 +190,7 @@ export interface Notebook {
     created_by_user_id: string;
     space_id: string | null;
     name: string;
+    description: string;
     is_shared: boolean;
     created_at: string;
     updated_at: string;
@@ -222,6 +217,8 @@ export interface UserNotebook {
 
 export type CreateNotebook = {
     name: string;
+    description: string;
+
     space_id?: string;
 };
 
@@ -242,10 +239,11 @@ export type PaginatedNotebooksResponse = PaginatedResponse<UserNotebook>;
 
 // ─── Notes ────────────────────────────────────────────────────────────────────
 
+
 export interface Note {
     id: string;
     created_by_user_id: string;
-    content: Record<string, unknown> | null;
+    content: JSONContent | null;
     is_shared: boolean;
     created_at: string;
     updated_at: string;
@@ -265,8 +263,8 @@ export interface UserNote {
     pinned_in_notebook_at: string | null;
     is_pinned_in_space: boolean;
     pinned_in_space_at: string | null;
-    is_pinned_to_home: boolean;
-    pinned_to_home_at: string | null;
+    is_pinned_in_home: boolean;
+    pinned_in_home_at: string | null;
     is_trashed: boolean;
     trashed_at: string | null;
     created_at: string;
@@ -281,7 +279,7 @@ export type UpdateUserNotePayload = Partial<{
     notebook_id: string | null;
     is_pinned_in_notebook: boolean;
     is_pinned_in_space: boolean;
-    is_pinned_to_home: boolean;
+    is_pinned_in_home: boolean;
     is_trashed: boolean;
     order: number;
 }>;

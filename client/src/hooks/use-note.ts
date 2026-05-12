@@ -10,12 +10,8 @@ import { queryClient } from "@/./components/provider/query-provider";
 import { fetchNote, fetchNotesPage } from "@/services/note-service";
 import { createNote, deleteNote, updateNote } from "@/services/note-service.ts";
 import { useStore } from "@/stores/index.ts";
-import type { PaginatedNotesResponse, SortBy } from "@/types";
-import {
-    type CreateUserNote,
-    type UpdateUserNotePayload,
-    type UserNote,
-} from "@/types/index.ts";
+import type { CreateNote, PaginatedNotesResponse, SortBy } from "@/types";
+import { type UpdateUserNotePayload, type UserNote } from "@/types/index.ts";
 import { noteQueryKeys } from "@/utils/query-keys";
 
 type NotesType =
@@ -110,7 +106,7 @@ export function useCreateNote() {
     const queryClient = useQueryClient();
     const navigate = useNavigate();
     return useMutation({
-        mutationFn: (newNote: CreateUserNote) => createNote(newNote),
+        mutationFn: (newNote: CreateNote) => createNote(newNote),
         onMutate: async (newNote) => {
             try {
                 await queryClient.cancelQueries({
@@ -124,21 +120,29 @@ export function useCreateNote() {
             const now = new Date().toISOString();
             const optimistic: UserNote = {
                 id: tempId,
-                user: "me",
+                user_id: "me",
+                notebook_id: newNote.notebook_id ?? null,
+                is_pinned_in_notebook: false,
+                is_pinned_in_home: false,
+                is_pinned_in_space: false,
+                is_owner: true,
+                is_shared: false,
+                note_id: "temp-note-id",
+                pinned_in_notebook_at: null,
+                pinned_in_space_at: null,
+                pinned_in_home_at: null,
+                trashed_at: null,
+                order: 0,
                 note: {
                     id: tempId,
-                    content: newNote.note_data?.content ?? "",
-                    notebook_id: newNote.note_data?.notebook_id,
-                    is_pinned_to_notebook: false,
-                    order: 0,
-                    users: [],
+                    content: null,
                     is_shared: false,
                     created_at: now,
                     updated_at: now,
+                    deleted_at: null,
+                    created_by_user_id: "me",
                 },
-                is_pinned_to_home: newNote.is_pinned_to_home ?? false,
-                is_trashed: newNote.is_trashed,
-                tags: newNote.tags,
+                is_trashed: false,
                 created_at: now,
                 updated_at: now,
             };
@@ -187,18 +191,17 @@ export function useUpdateNote() {
 
             const optimisticUpdater = (note: UserNote): UserNote => ({
                 ...note,
-                is_pinned_to_home:
-                    payload.is_pinned_to_home ?? note.is_pinned_to_home,
+                is_pinned_in_home:
+                    payload.is_pinned_in_home ?? note.is_pinned_in_home,
+                is_pinned_in_space:
+                    payload.is_pinned_in_space ?? note.is_pinned_in_space,
+                is_pinned_in_notebook:
+                    payload.is_pinned_in_notebook ?? note.is_pinned_in_notebook,
                 is_trashed: payload.is_trashed ?? note.is_trashed,
-                tags: payload.tags ?? note.tags,
+                is_owner: note.is_owner,
+                is_shared: note.is_shared,
+                order: note.order,
                 updated_at: now,
-                note: {
-                    ...note.note,
-                    updated_at: now,
-                    ...(payload.content !== undefined
-                        ? { content: payload.content ?? "" }
-                        : {}),
-                },
             });
 
             updateNotesCaches(queryClient, (notes) =>

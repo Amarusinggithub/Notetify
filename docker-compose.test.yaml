@@ -214,8 +214,8 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - COLLAB_JWT_SECRET=${COLLAB_JWT_SECRET}
-      - COLLAB_JWT_TTL=${COLLAB_JWT_TTL:-3600}
-      - COLLAB_WEBHOOK_SECRET=${COLLAB_WEBHOOK_SECRET}
+      - WEBHOOK_SECRET=${COLLAB_WEBHOOK_SECRET}
+      - LARAVEL_URL=${LARAVEL_URL:-http://api:80}
     deploy:
       resources:
         limits:

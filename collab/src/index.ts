@@ -5,15 +5,15 @@ import { authenticate, applyRolePermissions, loadDocument, storeDocument, type A
 
 const {
     PORT = "1234",
-    JWT_SECRET,
+    COLLAB_JWT_SECRET,
     WEBHOOK_SECRET,
     LARAVEL_URL = "http://api:80",
     REDIS_HOST = "redis",
     REDIS_PORT = "6379",
 } = process.env;
 
-if (!JWT_SECRET || !WEBHOOK_SECRET) {
-    throw new Error("JWT_SECRET and WEBHOOK_SECRET are required");
+if (!COLLAB_JWT_SECRET || !WEBHOOK_SECRET) {
+    throw new Error("COLLAB_JWT_SECRET and WEBHOOK_SECRET are required");
 }
 
 const pub = createClient({ url: `redis://${REDIS_HOST}:${REDIS_PORT}` });
@@ -24,22 +24,19 @@ const server = new Server({
 
     extensions: [new Redis({ host: REDIS_HOST, port: Number(REDIS_PORT) })],
 
-    async onAuthenticate({ token, documentName }) {
-        return authenticate(token, documentName, JWT_SECRET);
+    async onAuthenticate({ token, documentName, connection }) {
+        const ctx = authenticate(token, documentName, COLLAB_JWT_SECRET);
+        applyRolePermissions(connection, ctx.user.role);
+        return ctx;
     },
 
     async onLoadDocument({ documentName }) {
         return loadDocument(documentName, LARAVEL_URL, WEBHOOK_SECRET);
     },
 
-    async onStoreDocument({ documentName, document, context }) {
-        const userId = (context as AuthContext).user.id;
+    async onStoreDocument({ documentName, document, lastContext }) {
+        const userId = (lastContext as AuthContext).user.id;
         await storeDocument(documentName, document, userId, LARAVEL_URL, WEBHOOK_SECRET, pub);
-    },
-
-    async onStateless({ connection, context }) {
-        const role = (context as AuthContext | undefined)?.user?.role;
-        applyRolePermissions(connection, role);
     },
 
     debounce: 2000,

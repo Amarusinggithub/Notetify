@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redis;
 
 class NoteController extends Controller
 {
@@ -18,9 +19,9 @@ class NoteController extends Controller
      * @var array<string, string>
      */
     private array $flagColumns = [
-        'is_pinned_to_home' => 'pinned_to_home_at',
-        'is_pinned_to_notebook' => 'pinned_to_notebook_at',
-        'is_pinned_to_space' => 'pinned_to_space_at',
+        'is_pinned_in_home' => 'pinned_in_home_at',
+        'is_pinned_in_notebook' => 'pinned_in_notebook_at',
+        'is_pinned_in_space' => 'pinned_in_space_at',
         'is_trashed' => 'trashed_at',
     ];
 
@@ -112,26 +113,24 @@ class NoteController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'content' => ['nullable', 'string'],
             'tags' => ['sometimes', 'array'],
             'notebook_id' => ['sometimes', 'nullable', 'uuid', 'exists:notebooks,id'],
             'space_id' => ['sometimes', 'nullable', 'uuid', 'exists:spaces,id'],
-            'is_pinned_to_home' => ['sometimes', 'boolean'],
-            'is_pinned_to_notebook' => ['sometimes', 'boolean'],
-            'is_pinned_to_space' => ['sometimes', 'boolean'],
+            'is_pinned_in_home' => ['sometimes', 'boolean'],
+            'is_pinned_in_notebook' => ['sometimes', 'boolean'],
+            'is_pinned_in_space' => ['sometimes', 'boolean'],
             'is_trashed' => ['sometimes', 'boolean'],
         ]);
 
         $tags = $validated['tags'] ?? [];
         unset($validated['tags']);
 
-        $note = Note::create([
-            'content' => $validated['content'] ?? '',
-        ]);
+        $note = Note::create(['created_by_user_id' => Auth::id()]);
 
         $createData = array_merge([
             'note_id' => $note->id,
             'user_id' => Auth::id(),
+            'is_owner' => true,
             'notebook_id' => $validated['notebook_id'] ?? null,
             'space_id' => $validated['space_id'] ?? null,
         ], $this->buildFlagPayload($validated));
@@ -163,23 +162,13 @@ class NoteController extends Controller
             ->firstOrFail();
 
         $validated = $request->validate([
-            'content' => ['sometimes', 'string', 'nullable'],
             'notebook_id' => ['sometimes', 'nullable', 'uuid', 'exists:notebooks,id'],
             'space_id' => ['sometimes', 'nullable', 'uuid', 'exists:spaces,id'],
-            'is_pinned_to_home' => ['sometimes', 'boolean'],
-            'is_pinned_to_notebook' => ['sometimes', 'boolean'],
-            'is_pinned_to_space' => ['sometimes', 'boolean'],
+            'is_pinned_in_home' => ['sometimes', 'boolean'],
+            'is_pinned_in_notebook' => ['sometimes', 'boolean'],
+            'is_pinned_in_space' => ['sometimes', 'boolean'],
             'is_trashed' => ['sometimes', 'boolean'],
         ]);
-
-        $notePayload = [];
-
-        if (array_key_exists('content', $validated)) {
-            $notePayload['content'] = $validated['content'] ?? '';
-        }
-        if (!empty($notePayload)) {
-            $userNote->note->fill($notePayload)->save();
-        }
 
         $flagPayload = $this->buildFlagPayload($validated);
         if (!empty($flagPayload)) {
@@ -206,10 +195,6 @@ class NoteController extends Controller
                      $userNote->added_to_space_at = null;
                  }
             }
-        }
-
-        if (array_key_exists('tags', $validated)) {
-            $this->syncTags($userNote, $validated['tags']);
         }
 
         $userNote->save();
@@ -265,6 +250,35 @@ class NoteController extends Controller
         return $payload;
     }
 
+
+    /**
+     * SSE stream — pushes note.updated events from the Redis pub/sub channel
+     * for the authenticated user. Hocuspocus publishes to notes:user:{userId}
+     * after every successful onStoreDocument.
+     */
+    public function stream(Request $request): \Symfony\Component\HttpFoundation\StreamedResponse
+    {
+        $userId = Auth::id();
+
+        return response()->stream(function () use ($userId) {
+            ignore_user_abort(false);
+
+            echo "event: ping\ndata: {}\n\n";
+            ob_flush();
+            flush();
+
+            Redis::subscribe(["notes:user:{$userId}"], function (string $message) {
+                echo "data: {$message}\n\n";
+                ob_flush();
+                flush();
+            });
+        }, 200, [
+            'Content-Type'      => 'text/event-stream',
+            'Cache-Control'     => 'no-cache',
+            'X-Accel-Buffering' => 'no',
+            'Connection'        => 'keep-alive',
+        ]);
+    }
 
     private function syncTags(UserNote $userNote, array $tagNames): void
     {

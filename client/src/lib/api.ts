@@ -20,7 +20,7 @@ const ROOT_URL = BASE_URL.replace(/\/api\/$/, '');
 
 export const API_BASE_URL = BASE_URL;
 
-const api = axios.create({
+export const api = axios.create({
 	baseURL: BASE_URL,
 	headers: {
 		'Content-Type': 'application/json',
