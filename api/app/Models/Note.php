@@ -7,48 +7,47 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Note extends Model
 {
-    use HasUuids ,HasFactory,SoftDeletes;
+    use HasUuids, HasFactory, SoftDeletes;
 
-    /** @use HasFactory<\Database\Factories\NoteFactory> */
-
-/**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
+        'created_by_user_id',
         'content',
-        'notebook_id',
-        'is_pinned_to_notebook',
-        'pinned_to_notebook_at',
-        'order',
+        'ydoc_state',
     ];
 
-    protected $casts = [
-        'is_pinned_to_notebook' => 'boolean',
-        'pinned_to_notebook_at' => 'datetime',
-    ];
+    protected $appends = ['is_shared'];
 
-
- //user_note
-    public function users(){
-        return $this->belongsToMany(User::class, 'user_note')
-                    ->using(UserNote::class)
-                    ->withTimestamps();
+    protected function casts(): array
+    {
+        return [
+            'content' => 'array',
+        ];
     }
 
+    public function getIsSharedAttribute(): bool
+    {
+        return $this->shares()->exists();
+    }
 
-    // tasks
-    public function tasks()
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by_user_id');
+    }
+
+    public function userNotes(): HasMany
+    {
+        return $this->hasMany(UserNote::class);
+    }
+
+    public function tasks(): HasMany
     {
         return $this->hasMany(Task::class);
     }
 
-    // files
     public function files()
     {
         return $this->belongsToMany(File::class, 'file_note')
@@ -56,15 +55,8 @@ class Note extends Model
             ->withTimestamps();
     }
 
-    public function userNotes()
+    public function shares(): HasMany
     {
-        return $this->hasMany(UserNote::class);
+        return $this->hasMany(NoteShare::class);
     }
-
-    public function notebook(): BelongsTo
-    {
-        return $this->belongsTo(Notebook::class);
-    }
-
-
 }

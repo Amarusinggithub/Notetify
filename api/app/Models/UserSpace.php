@@ -2,42 +2,50 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Enums\Permission;
+use App\Models\Concerns\HasTrashScopes;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class UserSpace extends Model
 {
     use HasFactory, SoftDeletes, HasUuids;
+    use HasTrashScopes;
 
     protected $table = 'user_space';
 
     protected $fillable = [
-        'space_id',
         'user_id',
+        'space_id',
+        'is_owner',
+        'permission',
         'is_trashed',
         'trashed_at',
-        'is_pinned_to_home',
-        'pinned_to_home_at',
         'is_default',
+        'order',
     ];
 
-    protected $casts = [
-        'is_pinned_to_home' => 'boolean',
-        'pinned_to_home_at' => 'datetime',
-        'is_trashed' => 'boolean',
-        'trashed_at' => 'datetime',
-        'is_default' => 'boolean',
-    ];
-
-    public function space()
+    protected function casts(): array
     {
-        return $this->belongsTo(Space::class, 'space_id');
+        return [
+            'is_owner'   => 'boolean',
+            'permission' => Permission::class,
+            'is_trashed' => 'boolean',
+            'trashed_at' => 'datetime',
+            'is_default' => 'boolean',
+        ];
     }
 
-    public function user()
+    public function space(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(Space::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 }

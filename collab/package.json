@@ -1,0 +1,29 @@
+{
+    "name": "notetify-collab",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "tsx watch src/index.ts",
+        "start": "node dist/index.js",
+        "build": "tsc -p .",
+        "test": "vitest",
+        "coverage": "vitest run --coverage"
+    },
+    "dependencies": {
+        "@hocuspocus/extension-redis": "^2.15.3",
+        "@hocuspocus/server": "^2.15.3",
+        "@hocuspocus/transformer": "^2.15.3",
+        "jsonwebtoken": "^9.0.3",
+        "redis": "^4.7.1",
+        "undici": "^6.25.0",
+        "yjs": "^13.6.30"
+    },
+    "devDependencies": {
+        "@types/jsonwebtoken": "^9.0.10",
+        "@types/node": "^22.19.18",
+        "@vitest/coverage-v8": "^4.1.5",
+        "tsx": "^4.21.0",
+        "typescript": "^5.9.3",
+        "vitest": "^4.1.5"
+    }
+}

@@ -1,8 +1,8 @@
 <?php
 
 namespace App\Models;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -11,47 +11,43 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Notebook extends Model
 {
-        /** @use HasFactory<\Database\Factories\NotebookFactory> */
+    use HasUuids, HasFactory, SoftDeletes;
 
-        use HasUuids,HasFactory,SoftDeletes;
-
-        /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
-        'name',
+        'created_by_user_id',
         'space_id',
-        'order','is_pinned_to_space',
-        'pinned_to_space_at',
-        'added_to_space_at',
-
+        'name',
     ];
 
-      protected $casts = [
-        'is_pinned_to_space' => 'boolean',
-        'pinned_to_space_at' => 'datetime',
-        'added_to_space_at' => 'datetime',
-    ];
+    protected $appends = ['is_shared'];
 
-     //user_notebook
-    public function users(){
-        return $this->belongsToMany(User::class)
-                    ->using(UserNotebook::class)
-                    ->withTimestamps();
+    public function getIsSharedAttribute(): bool
+    {
+        return $this->shares()->exists();
     }
 
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by_user_id');
+    }
 
-   public function notes(): HasMany
-{
-    return $this->hasMany(Note::class)->orderBy('order');
-}
-
-
-    // spaces
     public function space(): BelongsTo
-{
-    return $this->belongsTo(Space::class);
-}
+    {
+        return $this->belongsTo(Space::class);
+    }
+
+    public function userNotebooks(): HasMany
+    {
+        return $this->hasMany(UserNotebook::class);
+    }
+
+    public function userNotes(): HasMany
+    {
+        return $this->hasMany(UserNote::class);
+    }
+
+    public function shares(): HasMany
+    {
+        return $this->hasMany(NotebookShare::class);
+    }
 }

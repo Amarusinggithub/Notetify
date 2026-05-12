@@ -48,7 +48,14 @@ class File extends Model
 
     public function getUrlAttribute(): string
     {
-        return Storage::disk($this->disk)->url($this->path);
+        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
+        $disk = Storage::disk($this->disk);
+
+        if ($disk->providesTemporaryUrls()) {
+            return $disk->temporaryUrl($this->path, now()->addMinutes(60));
+        }
+
+        return $disk->url($this->path);
     }
 
     public function getFormattedSizeAttribute(): string

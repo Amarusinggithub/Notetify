@@ -2,51 +2,74 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasNoteScopes;
+use App\Models\Concerns\HasPinScopes;
+use App\Models\Concerns\HasTrashScopes;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class UserNote extends Model
 {
     use HasFactory, SoftDeletes, HasUuids;
+    use HasPinScopes, HasTrashScopes, HasNoteScopes;
 
     protected $table = 'user_note';
 
     protected $fillable = [
         'user_id',
         'note_id',
+        'notebook_id',
+        'is_owner',
+        'order',
+        'is_pinned_in_notebook',
+        'is_pinned_in_space',
         'is_pinned_to_home',
+        'pinned_in_notebook_at',
+        'pinned_in_space_at',
         'pinned_to_home_at',
         'is_trashed',
         'trashed_at',
     ];
 
-
-
-    protected $casts = [
-        'is_pinned_to_home' => 'boolean',
-        'is_trashed' => 'boolean',
-        'pinned_to_home_at' => 'datetime',
-        'trashed_at' => 'datetime',
-    ];
-
-
-
-        protected $with = ['note'];
-
-
-
-        public function note()
+    protected function casts(): array
     {
-        return $this->belongsTo(Note::class, 'note_id');
+        return [
+            'is_owner'              => 'boolean',
+            'is_pinned_in_notebook' => 'boolean',
+            'is_pinned_in_space'    => 'boolean',
+            'is_pinned_to_home'     => 'boolean',
+            'is_trashed'            => 'boolean',
+            'trashed_at'            => 'datetime',
+            'pinned_in_notebook_at' => 'datetime',
+            'pinned_in_space_at'    => 'datetime',
+            'pinned_to_home_at'     => 'datetime',
+        ];
     }
 
-    public function user()
+    protected $with = ['note'];
+
+    public function note(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(Note::class);
     }
 
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function notebook(): BelongsTo
+    {
+        return $this->belongsTo(Notebook::class);
+    }
+
+    public function space(): BelongsTo
+    {
+        return $this->belongsTo(Space::class);
+    }
 
     public function tags()
     {
@@ -54,94 +77,4 @@ class UserNote extends Model
             ->using(UserNoteTag::class)
             ->withTimestamps();
     }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Query Scopes
-    |--------------------------------------------------------------------------
-    |
-    | Query scopes are reusable query constraints you define on a model.
-    | They let you encapsulate common "where" clauses so your controllers
-    | stay clean. Scopes are methods prefixed with "scope" but called
-    | without that prefix:
-    |
-    |   UserNote::forUser($id)->pinned()->get();
-    |
-    | Laravel automatically passes the $query builder as the first argument.
-    |
-    */
-
-    /**
-     * Scope: Filter by the authenticated/given user.
-     *
-     * Usage: UserNote::forUser(Auth::id())->get();
-     */
-    public function scopeForUser($query, $userId)
-    {
-        return $query->where('user_note.user_id', $userId);
-    }
-
-    /**
-     * Scope: Filter notes that have a specific tag.
-     *
-     * Usage: UserNote::withTag('work')->get();
-     */
-    public function scopeWithTag($query, string $tagName)
-    {
-        return $query->whereHas('tags', function ($q) use ($tagName) {
-            $q->where('name', $tagName);
-        });
-    }
-
-    /**
-     * Scope: Search note content with a LIKE query.
-     *
-     * Usage: UserNote::search('meeting')->get();
-     */
-    public function scopeSearch($query, string $term)
-    {
-        $search = '%' . $term . '%';
-        return $query->where('notes.content', 'like', $search);
-    }
-
-    /**
-     * Scope: Filter by a boolean flag (is_pinned, is_trashed).
-     *
-     * Usage: UserNote::whereFlag('is_pinned', true)->get();
-     */
-    public function scopeWhereFlag($query, string $flag, bool $value)
-    {
-        return $query->where("user_note.{$flag}", $value);
-    }
-
-    /**
-     * Scope: Shortcut for pinned notes.
-     *
-     * Usage: UserNote::pinned()->get();
-     */
-    public function scopePinned($query)
-    {
-        return $query->where('user_note.is_pinned_to_home', true);
-    }
-
-    /**
-     * Scope: Shortcut for trashed notes.
-     *
-     * Usage: UserNote::trashed()->get();
-     */
-    public function scopeTrashed($query)
-    {
-        return $query->where('user_note.is_trashed', true);
-    }
-
-    /**
-     * Scope: Shortcut for non-trashed notes.
-     *
-     * Usage: UserNote::notTrashed()->get();
-     */
-    public function scopeNotTrashed($query)
-    {
-        return $query->where('user_note.is_trashed', false);
-    }
-
 }

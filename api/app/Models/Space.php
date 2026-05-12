@@ -14,30 +14,37 @@ class Space extends Model
     use HasUuids, HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'user_id',
+        'created_by_user_id',
         'name',
         'description',
         'icon',
         'color',
-        'order',
     ];
 
-    protected function casts(): array
+    protected $appends = ['is_shared'];
+
+    public function getIsSharedAttribute(): bool
     {
-        return [
-            'order' => 'integer',
-        ];
+        return $this->shares()->exists();
     }
 
-    public function user(): BelongsTo
+    public function creator(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'created_by_user_id');
     }
-
 
     public function notebooks(): HasMany
-{
-    return $this->hasMany(Notebook::class)->orderBy('order');
-}
+    {
+        return $this->hasMany(Notebook::class);
+    }
 
+    public function userSpaces(): HasMany
+    {
+        return $this->hasMany(UserSpace::class);
+    }
+
+    public function shares(): HasMany
+    {
+        return $this->hasMany(SpaceShare::class);
+    }
 }

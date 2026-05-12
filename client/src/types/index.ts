@@ -1,39 +1,65 @@
 import "axios";
 import type { LucideIcon } from "lucide-react";
 
-// Constants
+// ─── Constants ────────────────────────────────────────────────────────────────
+
 export const CSRF_TOKEN_COOKIE_NAME = "XSRF-TOKEN";
 
-// Common Types
-export type Role = "OWNER" | "EDITOR" | "MEMBER";
-export type Permission = "view" | "edit" | "admin";
-export type OAuthProvider = "GOOGLE" | "GITHUB" | "FACEBOOK";
+// ─── Shared primitives ────────────────────────────────────────────────────────
+
+export interface PaginatedResponse<T> {
+    results: T[];
+    nextPage: number | null;
+    hasNextPage: boolean;
+}
+
+// ─── Enum-like unions (mirror backend enums/string columns) ───────────────────
+
+export type Permission = "view" | "comment" | "edit";
+export type OAuthProvider = "google" | "github" | "facebook";
 export type Theme = "dark" | "light" | "system";
 export type Language = "en" | "de" | "es" | "fr" | "ja";
+
+export type TaskStatus = "pending" | "in_progress" | "completed" | "cancelled";
+export type TaskPriority = "low" | "medium" | "high" | "urgent";
+export type TaskType = "task" | "reminder" | "deadline";
+
+export type EventRepeat = "none" | "daily" | "weekly" | "monthly" | "yearly";
+
 export type SortBy =
     | "updated_at"
     | "created_at"
-    | "title"
-    | "is_pinned"
+    | "is_pinned_in_notebook"
+    | "is_pinned_in_space"
+    | "is_pinned_to_home"
+    | "pinned_in_notebook_at"
+    | "pinned_in_space_at"
+    | "pinned_to_home_at"
     | "is_trashed";
 
-// Auth & User Types
-export type CreateOAuthAccount = {
-    OAuthProvider: OAuthProvider;
-    access_token?: string;
-    refresh_token?: string;
-    expires_at?: string;
-};
+// ─── Auth & User ──────────────────────────────────────────────────────────────
 
 export interface OAuthAccount {
     id: string;
-    user: number;
-    OAuthProvider: OAuthProvider;
-    access_token?: string;
-    refresh_token?: string;
-    expires_at?: string;
+    user_id: string;
+    provider: OAuthProvider;
+    provider_user_id: string;
+    token_expires_at: string | null;
+    name: string | null;
+    email: string | null;
+    avatar: string | null;
     created_at: string;
+    updated_at: string;
 }
+
+export type CreateOAuthAccount = {
+    provider: OAuthProvider;
+    provider_user_id: string;
+    token_expires_at?: string;
+    name?: string;
+    email?: string;
+    avatar?: string;
+};
 
 export type CreateUser = {
     first_name?: string;
@@ -86,54 +112,60 @@ export interface Auth {
     user: User;
 }
 
-// Tag Types
+// ─── Tags ─────────────────────────────────────────────────────────────────────
+
 export interface Tag {
-    id: string;
-    name: string;
-    created_at: string;
-    updated_at: string;
-    schedule_delete_at?: string;
-    removed_at?: string;
-}
-
-export type CreateUserTag = {
-    tag_data: {
-        name: string;
-    };
-};
-
-export interface UserTag extends Omit<CreateUserTag, "tag_data"> {
-    id: string;
-    tag: Tag;
-    user: string;
-    created_at: string;
-    is_trashed: boolean;
-    updated_at: string;
-}
-
-export type UpdateUserTagPayload = Partial<{
-    name: string;
-    is_trashed: boolean;
-}>;
-
-export interface PaginatedTagResponse {
-    results: UserTag[];
-    nextPage: number | null;
-    hasNextPage: boolean;
-}
-
-// Space Types
-export interface Space {
     id: string;
     user_id: string;
     name: string;
-    description?: string;
-    icon?: string;
-    color?: string;
-    order: number;
+    color: string | null;
+    order: number | null;
     created_at: string;
     updated_at: string;
+    deleted_at: string | null;
+}
+
+export type CreateTag = {
+    name: string;
+    color?: string;
+};
+
+export type UpdateTagPayload = Partial<{
+    name: string;
+    color: string | null;
+    order: number;
+}>;
+
+export type PaginatedTagsResponse = PaginatedResponse<Tag>;
+
+// ─── Spaces ───────────────────────────────────────────────────────────────────
+
+export interface Space {
+    id: string;
+    created_by_user_id: string;
+    name: string;
+    description: string | null;
+    icon: string | null;
+    color: string | null;
     is_shared: boolean;
+    created_at: string;
+    updated_at: string;
+    deleted_at: string | null;
+}
+
+export interface UserSpace {
+    id: string;
+    user_id: string;
+    space_id: string;
+    space: Space;
+    is_owner: boolean;
+    permission: Permission | null;
+    is_shared: boolean;
+    is_trashed: boolean;
+    trashed_at: string | null;
+    order: number | null;
+    created_at: string;
+    updated_at: string;
 }
 
 export type CreateSpace = {
@@ -143,160 +175,140 @@ export type CreateSpace = {
     color?: string;
 };
 
-export interface UserSpace {
-    id: string;
-    space_id: string;
-    space: Space;
-    user: string;
-    is_pinned_to_home: boolean;
-    pinned_to_home_at?: string;
-    is_trashed: boolean;
-    trashed_at?: string;
-    is_default: boolean;
-    created_at: string;
-    updated_at: string;
-}
-
-export type UpdateUserSpacePayload = Partial<{
+export type UpdateSpacePayload = Partial<{
     name: string;
     description: string | null;
     icon: string | null;
     color: string | null;
-    is_pinned_to_home: boolean;
-    is_trashed: boolean;
-    is_default: boolean;
 }>;
 
-export interface PaginatedSpacesResponse {
-    results: UserSpace[];
-    nextPage: number | null;
-    hasNextPage: boolean;
-}
+export type UpdateUserSpacePayload = Partial<{
+    is_trashed: boolean;
+    order: number;
+}>;
 
-// Notebook Types
+export type PaginatedSpacesResponse = PaginatedResponse<UserSpace>;
+
+// ─── Notebooks ────────────────────────────────────────────────────────────────
+
 export interface Notebook {
     id: string;
+    created_by_user_id: string;
+    space_id: string | null;
     name: string;
-    space_id?: string;
-    is_pinned_to_space: boolean;
-    pinned_to_space_at?: string;
-    added_to_space_at?: string;
-    order: number;
-    users?: string[];
+    is_shared: boolean;
     created_at: string;
     updated_at: string;
-    is_shared: boolean;
+    deleted_at: string | null;
 }
-
-export type CreateUserNotebook = {
-    notebook_data: { name: string; users?: number[] };
-    is_pinned: boolean;
-    is_trashed: boolean;
-};
 
 export interface UserNotebook {
     id: string;
-    role: Role;
-    user: string;
-    notes?: string[];
+    user_id: string;
+    notebook_id: string;
     notebook: Notebook;
+    is_owner: boolean;
+    is_shared: boolean;
+    is_pinned_in_space: boolean;
+    pinned_in_space_at: string | null;
+    is_pinned_to_home: boolean;
+    pinned_to_home_at: string | null;
     is_trashed: boolean;
-    trashed_at?: string;
+    trashed_at: string | null;
+    is_default: boolean;
     created_at: string;
     updated_at: string;
-    is_pinned: boolean;
-    pinned_at?: string;
-    shared_from?: string;
-    shared_at?: string;
 }
 
-export type UpdateUserNotebookPayload = Partial<{
+export type CreateNotebook = {
     name: string;
-    is_trashed: boolean;
+    space_id?: string;
+};
+
+export type UpdateNotebookPayload = Partial<{
+    name: string;
+    space_id: string | null;
 }>;
 
-export interface PaginatedNotebooksResponse {
-    results: UserNotebook[];
-    nextPage: number | null;
-    hasNextPage: boolean;
-}
+export type UpdateUserNotebookPayload = Partial<{
+    is_pinned_in_space: boolean;
+    is_pinned_to_home: boolean;
+    is_trashed: boolean;
+    is_default: boolean;
+    order: number;
+}>;
 
-// Note Types
+export type PaginatedNotebooksResponse = PaginatedResponse<UserNotebook>;
+
+// ─── Notes ────────────────────────────────────────────────────────────────────
+
 export interface Note {
     id: string;
-    content: string;
-    notebook_id?: string;
-    is_pinned_to_notebook: boolean;
-    pinned_to_notebook_at?: string;
-    order: number;
-    users: string[];
+    created_by_user_id: string;
+    content: Record<string, unknown> | null;
     is_shared: boolean;
     created_at: string;
     updated_at: string;
+    deleted_at: string | null;
 }
 
-export type CreateUserNote = {
-    note_data: {
-        content: string;
-        notebook_id?: string;
-    };
-    tags: Tag[];
-    is_pinned_to_home?: boolean;
-    is_trashed: boolean;
-};
-
-export interface NoteTag {
+export interface UserNote {
     id: string;
+    user_id: string;
+    note_id: string;
     note: Note;
-    tag: Tag;
-    created_at: string;
-}
-
-export interface NoteBookNote {
-    id: string;
-    note: Note;
-    note_book: Notebook;
-    created_at: string;
-    added_at: string;
-    removed_at?: string;
-}
-
-export interface UserNote extends Omit<CreateUserNote, "note_data"> {
-    id: string;
-    note: Note;
-    user: string;
+    notebook_id: string | null;
+    is_owner: boolean;
+    is_shared: boolean;
+    order: number | null;
+    is_pinned_in_notebook: boolean;
+    pinned_in_notebook_at: string | null;
+    is_pinned_in_space: boolean;
+    pinned_in_space_at: string | null;
     is_pinned_to_home: boolean;
-    pinned_to_home_at?: string;
+    pinned_to_home_at: string | null;
     is_trashed: boolean;
-    trashed_at?: string;
+    trashed_at: string | null;
     created_at: string;
     updated_at: string;
-    tags: Tag[];
 }
+
+export type CreateNote = {
+    notebook_id?: string;
+};
 
 export type UpdateUserNotePayload = Partial<{
-    content: string | null;
+    notebook_id: string | null;
+    is_pinned_in_notebook: boolean;
+    is_pinned_in_space: boolean;
     is_pinned_to_home: boolean;
     is_trashed: boolean;
-    tags: Tag[];
+    order: number;
 }>;
 
-export interface PaginatedNotesResponse {
-    results: UserNote[];
-    nextPage: number | null;
-    hasNextPage: boolean;
+export type PaginatedNotesResponse = PaginatedResponse<UserNote>;
+
+// ─── Collab ───────────────────────────────────────────────────────────────────
+
+export interface CollabSession {
+    token: string;
+    wsUrl: string;
+    docId: string;
 }
 
-// Share Types
-export interface SpaceShare {
+// ─── Shares ───────────────────────────────────────────────────────────────────
+export interface NoteShare {
     id: string;
-    space_id: string;
-    space: Space;
+    note_id: string;
+    note: Note;
     shared_by_user_id: string;
     shared_with_user_id: string;
     permission: Permission;
-    expires_at?: string;
+    expires_at: string | null;
     accepted: boolean;
+    accepted_at: string | null;
+    is_highlighted: boolean;
+    highlighted_at: string | null;
     created_at: string;
     updated_at: string;
 }
@@ -308,48 +320,48 @@ export interface NotebookShare {
     shared_by_user_id: string;
     shared_with_user_id: string;
     permission: Permission;
-    expires_at?: string;
+    expires_at: string | null;
     accepted: boolean;
+    accepted_at: string | null;
+    is_highlighted: boolean;
+    highlighted_at: string | null;
     created_at: string;
     updated_at: string;
 }
 
-export interface NoteShare {
+export interface SpaceShare {
     id: string;
-    note_id: string;
-    note: Note;
+    space_id: string;
+    space: Space;
     shared_by_user_id: string;
     shared_with_user_id: string;
     permission: Permission;
-    expires_at?: string;
+    expires_at: string | null;
     accepted: boolean;
+    accepted_at: string | null;
     created_at: string;
     updated_at: string;
 }
 
-// Task Types
-
-export type TaskStatus = "pending" | "in_progress" | "completed" | "cancelled";
-export type TaskPriority = "low" | "medium" | "high" | "urgent";
-export type TaskType = "task" | "reminder" | "deadline";
+// ─── Tasks ────────────────────────────────────────────────────────────────────
 
 export interface Task {
     id: string;
     user_id: string;
-    note_id?: string;
+    note_id: string | null;
     title: string;
-    description?: string;
+    description: string | null;
     type: TaskType;
     status: TaskStatus;
     priority: TaskPriority;
-    start_at?: string;
-    end_at?: string;
-    due_at?: string;
-    reminder_at?: string;
-    completed_at?: string;
+    start_at: string | null;
+    end_at: string | null;
+    due_at: string | null;
+    reminder_at: string | null;
+    completed_at: string | null;
     is_all_day: boolean;
-    recurrence_rule?: string;
-    color?: string;
+    recurrence_rule: string | null;
+    color: string | null;
     created_at: string;
     updated_at: string;
 }
@@ -372,26 +384,21 @@ export type CreateTask = {
 
 export type UpdateTaskPayload = Partial<CreateTask & { completed_at: string }>;
 
-export interface PaginatedTasksResponse {
-    results: Task[];
-    nextPage: number | null;
-    hasNextPage: boolean;
-}
+export type PaginatedTasksResponse = PaginatedResponse<Task>;
 
-// Event Types
-export type EventRepeat = "none" | "daily" | "weekly" | "monthly" | "yearly";
+// ─── Events ───────────────────────────────────────────────────────────────────
 
 export interface Event {
     id: string;
     user_id: string;
     title: string;
-    description?: string;
+    description: string | null;
     start_date: string;
-    end_date?: string;
+    end_date: string | null;
     is_all_day: boolean;
     repeat: EventRepeat;
-    reminder?: string;
-    timezone?: string;
+    reminder: string | null;
+    timezone: string | null;
     created_at: string;
     updated_at: string;
 }
@@ -409,15 +416,9 @@ export type CreateEvent = {
 
 export type UpdateEventPayload = Partial<CreateEvent>;
 
-export interface PaginatedEventsResponse {
-    results: Event[];
-    nextPage: number | null;
-    hasNextPage: boolean;
-}
+export type PaginatedEventsResponse = PaginatedResponse<Event>;
 
-// =============================================================================
-// File Types
-// =============================================================================
+// ─── Files ────────────────────────────────────────────────────────────────────
 
 export interface File {
     id: string;
@@ -429,7 +430,7 @@ export interface File {
     mime_type: string;
     size: number;
     extension: string;
-    metadata?: Record<string, unknown>;
+    metadata: Record<string, unknown> | null;
     url: string;
     created_at: string;
     updated_at: string;
@@ -440,15 +441,9 @@ export type CreateFile = {
     note_id?: string;
 };
 
-export interface PaginatedFilesResponse {
-    results: File[];
-    nextPage: number | null;
-    hasNextPage: boolean;
-}
+export type PaginatedFilesResponse = PaginatedResponse<File>;
 
-// =============================================================================
-// UI Types
-// =============================================================================
+// ─── UI ───────────────────────────────────────────────────────────────────────
 
 export interface BreadcrumbItem {
     title: string;

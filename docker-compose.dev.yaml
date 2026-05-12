@@ -401,7 +401,7 @@ services:
         condition: service_healthy
     volumes:
       - ./client:/app
-      - node_modules:/app/node_modules
+      - client_node_modules:/app/node_modules
     ports:
       - "5173:5173"
     environment:
@@ -422,6 +422,56 @@ services:
           cpus: "0.25"
           memory: 256m
 
+  # ---------------------------------------------------------------------------
+  # collab — Hocuspocus WebSocket server
+  # Handles real-time collaborative editing via Y.js CRDT. Clients connect
+  # over WS, Hocuspocus syncs document state and fans out updates via Redis.
+  # Persistence webhooks are handled by the api service.
+  # WS: ws://localhost:1234
+  # ---------------------------------------------------------------------------
+  collab:
+    build:
+      context: ./collab
+      dockerfile: docker/Dockerfile
+      target: development
+    container_name: notetify-collab
+    networks:
+      - notetify-net
+    restart: unless-stopped
+    command: ["pnpm", "dev"]
+    healthcheck:
+      test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://127.0.0.1:1234 || exit 0"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    depends_on:
+      redis:
+        condition: service_healthy
+      api:
+        condition: service_healthy
+    volumes:
+      - ./collab:/app
+      - collab_node_modules:/app/node_modules
+    ports:
+      - "1234:1234"
+    environment:
+      - REDIS_HOST=${REDIS_HOST:-redis}
+      - REDIS_PORT=${REDIS_PORT:-6379}
+      - COLLAB_JWT_SECRET=${COLLAB_JWT_SECRET}
+      - COLLAB_JWT_TTL=${COLLAB_JWT_TTL:-3600}
+      - COLLAB_WEBHOOK_SECRET=${COLLAB_WEBHOOK_SECRET}
+    env_file:
+      - .env
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256m
+        reservations:
+          cpus: "0.1"
+          memory: 64m
+
 networks:
   notetify-net:
     driver: bridge
@@ -429,7 +479,8 @@ networks:
 volumes:
   redis-data:
   db-data:
-  node_modules:
+  client_node_modules:
+  collab_node_modules:
   api_vendor:
   api_storage:
   rustfs-data:
