@@ -8,31 +8,34 @@ export function useNoteStream() {
 
     useEffect(() => {
         const url = `${API_BASE_URL}notes/stream`;
-        const es = new EventSource(url, { withCredentials: true });
+        let es: EventSource;
+        let retryTimeout: ReturnType<typeof setTimeout>;
 
-        es.addEventListener("message", (e) => {
-            try {
-                const { type, noteId } = JSON.parse(e.data) as {
-                    type: string;
-                    noteId: string;
-                };
-                if (type === "note.updated" && noteId) {
-                    queryClient.invalidateQueries({
-                        queryKey: noteQueryKeys.detail(noteId),
-                    });
-                    queryClient.invalidateQueries({
-                        queryKey: noteQueryKeys.all,
-                    });
+        const connect = () => {
+            es = new EventSource(url, { withCredentials: true });
+
+            es.addEventListener("message", (e) => {
+                try {
+                    const { type } = JSON.parse(e.data) as { type: string };
+                    if (type === "note.updated") {
+                        queryClient.invalidateQueries({ queryKey: noteQueryKeys.all });
+                    }
+                } catch {
+                    // malformed message — ignore
                 }
-            } catch {
-                // malformed message — ignore
-            }
-        });
+            });
 
-        es.addEventListener("error", () => {
+            es.addEventListener("error", () => {
+                es.close();
+                retryTimeout = setTimeout(connect, 3000);
+            });
+        };
+
+        connect();
+
+        return () => {
+            clearTimeout(retryTimeout);
             es.close();
-        });
-
-        return () => es.close();
+        };
     }, [queryClient]);
 }

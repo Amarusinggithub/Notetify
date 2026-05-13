@@ -267,11 +267,17 @@ class NoteController extends Controller
             ob_flush();
             flush();
 
-            Redis::subscribe(["notes:user:{$userId}"], function (string $message) {
-                echo "data: {$message}\n\n";
-                ob_flush();
-                flush();
-            });
+            try {
+                error_log('[SSE] starting subscribe for user ' . $userId);
+                Redis::subscribe(["notes:user:{$userId}"], function (string $message) {
+                    echo "data: {$message}\n\n";
+                    ob_flush();
+                    flush();
+                });
+                error_log('[SSE] subscribe returned (should not happen)');
+            } catch (\Throwable $e) {
+                error_log('[SSE] exception: ' . $e->getMessage() . ' at ' . $e->getFile() . ':' . $e->getLine());
+            }
         }, 200, [
             'Content-Type'      => 'text/event-stream',
             'Cache-Control'     => 'no-cache',

@@ -1,7 +1,7 @@
 import type { QueryFunctionContext } from "@tanstack/react-query";
 import api from "@/lib/api";
 import type {
-    CreateUserNotebook,
+    CreateNotebook,
     PaginatedNotebooksResponse,
     UpdateUserNotebookPayload,
     UserNotebook,
