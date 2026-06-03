@@ -10,7 +10,7 @@ import { queryClient } from "@/./components/provider/query-provider";
 import { fetchNote, fetchNotesPage } from "@/services/note-service";
 import { createNote, deleteNote, updateNote } from "@/services/note-service.ts";
 import { useStore } from "@/store";
-import type { PaginatedNotesResponse, SortBy } from "@/types";
+import type { PaginatedResponse, ResourceType, SortBy } from "@/types";
 import {
     type CreateUserNote,
     type UpdateUserNotePayload,
@@ -18,11 +18,8 @@ import {
 } from "@/types/index.ts";
 import { noteQueryKeys } from "@/utils/query-keys";
 
-type NotesType =
-    | UserNote[]
-    | { results: UserNote[] }
-    | { pages: { results: UserNote[] }[]; pageParams: unknown[] }
-    | undefined;
+type PaginatedNotesResponse = PaginatedResponse<UserNote>;
+type NotesType = ResourceType<UserNote>;
 
 export const notesQueryOptions = (
     search: string = "",

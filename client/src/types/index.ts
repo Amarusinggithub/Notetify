@@ -75,6 +75,17 @@ export interface User extends Omit<CreateUser, "password"> {
     marketingNotificationEnabled?: boolean;
 }
 
+export interface PaginatedResponse<T> {
+    results: T[];
+    nextPage: number | null;
+    hasNextPage: boolean;
+}
+export type ResourceType<T> =
+    | T[]
+    | { results: T[] }
+    | { pages: { results: T[] }[]; pageParams: unknown[] }
+    | undefined;
+
 export interface SharedData {
     name: string;
     auth: Auth;
@@ -116,11 +127,7 @@ export type UpdateUserTagPayload = Partial<{
     is_trashed: boolean;
 }>;
 
-export interface PaginatedTagResponse {
-    results: UserTag[];
-    nextPage: number | null;
-    hasNextPage: boolean;
-}
+export type PaginatedTagResponse = PaginatedResponse<UserTag>;
 
 // Space Types
 export interface Space {
@@ -167,11 +174,7 @@ export type UpdateUserSpacePayload = Partial<{
     is_default: boolean;
 }>;
 
-export interface PaginatedSpacesResponse {
-    results: UserSpace[];
-    nextPage: number | null;
-    hasNextPage: boolean;
-}
+export type PaginatedSpacesResponse = PaginatedResponse<UserSpace>;
 
 // Notebook Types
 export interface Notebook {
@@ -215,11 +218,7 @@ export type UpdateUserNotebookPayload = Partial<{
     is_trashed: boolean;
 }>;
 
-export interface PaginatedNotebooksResponse {
-    results: UserNotebook[];
-    nextPage: number | null;
-    hasNextPage: boolean;
-}
+export type PaginatedNotebooksResponse = PaginatedResponse<UserNotebook>;
 
 // Note Types
 export interface Note {
@@ -280,12 +279,6 @@ export type UpdateUserNotePayload = Partial<{
     is_trashed: boolean;
     tags: Tag[];
 }>;
-
-export interface PaginatedNotesResponse {
-    results: UserNote[];
-    nextPage: number | null;
-    hasNextPage: boolean;
-}
 
 // Share Types
 export interface SpaceShare {
@@ -440,11 +433,7 @@ export type CreateFile = {
     note_id?: string;
 };
 
-export interface PaginatedFilesResponse {
-    results: File[];
-    nextPage: number | null;
-    hasNextPage: boolean;
-}
+export type PaginatedFilesResponse = PaginatedResponse<File>;
 
 // =============================================================================
 // UI Types
