@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button.tsx";
 import { Input } from "@/components/ui/input.tsx";
 import { Label } from "@/components/ui/label.tsx";
 import AuthLayout from "@/layouts/auth-layout.tsx";
-import { useStore } from "@/stores/index.ts";
+import { useStore } from "@/store";
 import { registerSchema } from "@/utils/validators.ts";
 
 type RegisterForm = {

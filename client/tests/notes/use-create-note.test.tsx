@@ -3,7 +3,7 @@ import { renderHook, waitFor } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useCreateNote } from "../../src/hooks/use-note.ts";
-import { useStore } from "../../src/stores/index.ts";
+import { useStore } from "../../src/store/index.ts";
 import { noteQueryKeys } from "../../src/utils/query-keys.ts";
 
 const mockNavigate = vi.fn();

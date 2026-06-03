@@ -14,7 +14,7 @@ import {
     fetchTagsPage,
     updateTag,
 } from "@/services/tag-service";
-import { useStore } from "@/stores/index";
+import { useStore } from "@/store/index";
 import type { PaginatedTagResponse, SortBy } from "@/types";
 import {
     type CreateUserTag,

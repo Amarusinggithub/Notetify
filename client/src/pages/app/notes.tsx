@@ -2,7 +2,7 @@ import {
     EditorNotesSidebar,
     NotesSidebarError,
     NotesSidebarSkeleton,
-} from "@/components/app/app-notes-sidebar";
+} from "@/components/note/app-notes-sidebar";
 import { EditorError } from "@/components/editor/editor-error.tsx";
 import { EditorLoadingSkeleton } from "@/components/editor/editor-loading-skeleton.tsx";
 import {
@@ -10,7 +10,7 @@ import {
     NotesSidebarProvider,
 } from "@/components/ui/notes-sidebar";
 import { noteQueryOptions, useCreateNote } from "@/hooks/use-note.ts";
-import { useStore } from "@/stores/index.ts";
+import { useStore } from "@/store";
 import { noteQueryKeys } from "@/utils/query-keys";
 import { useQueryClient } from "@tanstack/react-query";
 import { lazy, Suspense, useEffect, useRef } from "react";
@@ -98,7 +98,8 @@ export default function Notes() {
         };
 
         handleNavigation();
-    }, [queryClient,
+    }, [
+        queryClient,
         noteId,
         selectedId,
         initialData,

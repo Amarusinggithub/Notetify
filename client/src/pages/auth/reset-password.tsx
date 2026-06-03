@@ -1,102 +1,114 @@
-import { LoaderCircle } from 'lucide-react';
-import { useState } from 'react';
-import { useParams } from 'react-router';
-import InputError from '@/components/shared/input-error';
-import { Button } from '@/components/ui/button.tsx';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import AuthLayout from '@/layouts/auth-layout';
-import { useStore } from '@/stores/index.ts';
-import { resetPasswordSchema } from '@/utils/validators.ts';
+import { LoaderCircle } from "lucide-react";
+import { useState } from "react";
+import { useParams } from "react-router";
+import InputError from "@/components/shared/input-error";
+import { Button } from "@/components/ui/button.tsx";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import AuthLayout from "@/layouts/auth-layout";
+import { useStore } from "@/store";
+import { resetPasswordSchema } from "@/utils/validators.ts";
 
 type ResetPasswordForm = {
-	password: string;
-	confirmPassword: string;
+    password: string;
+    confirmPassword: string;
 };
 
 export default function ResetPassword() {
-	const { token } = useParams();
-	const { sharedData } = useStore();
+    const { token } = useParams();
+    const { sharedData } = useStore();
 
-	const [form, setForm] = useState<ResetPasswordForm>({
-		password: '',
-		confirmPassword: '',
-	});
+    const [form, setForm] = useState<ResetPasswordForm>({
+        password: "",
+        confirmPassword: "",
+    });
 
-	const { isLoading, errors, PasswordReset, setErrors } = useStore();
+    const { isLoading, errors, PasswordReset, setErrors } = useStore();
 
-	const submit = async (e: React.SubmitEvent<HTMLFormElement>) => {
-		e.preventDefault();
-		setErrors(null);
+    const submit = async (e: React.SubmitEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setErrors(null);
 
-		const validationResult = resetPasswordSchema.safeParse(form);
+        const validationResult = resetPasswordSchema.safeParse(form);
 
-		if (!validationResult.success) {
-			const formattedErrors = validationResult.error.flatten().fieldErrors;
-			setErrors(formattedErrors);
-			return;
-		}
-		await PasswordReset(token, form.password, sharedData!.auth.user.email);
-	};
+        if (!validationResult.success) {
+            const formattedErrors =
+                validationResult.error.flatten().fieldErrors;
+            setErrors(formattedErrors);
+            return;
+        }
+        await PasswordReset(token, form.password, sharedData!.auth.user.email);
+    };
 
-	function change(e: React.ChangeEvent<HTMLInputElement>) {
-		setForm({ ...form, [e.target.name]: e.target.value.trim() });
-	}
-	return (
-		<AuthLayout
-			title="Reset password"
-			description="Please enter your new password below"
-		>
-			<form
-				onSubmit={(e) => {
-					submit(e).catch(console.error);
-				}}
-			>
-				<div className="grid gap-6">
-					<div className="grid gap-2">
-						<Label htmlFor="password">Password</Label>
-						<Input
-							id="password"
-							type="password"
-							name="password"
-							autoComplete="new-password"
-							value={form.password}
-							className="mt-1 block w-full"
-							autoFocus
-							onChange={change}
-							placeholder="Password"
-						/>
-						{errors?.password && (
-							<InputError message={errors.password[0]} className="mt-2" />
-						)}
-					</div>
+    function change(e: React.ChangeEvent<HTMLInputElement>) {
+        setForm({ ...form, [e.target.name]: e.target.value.trim() });
+    }
+    return (
+        <AuthLayout
+            title="Reset password"
+            description="Please enter your new password below"
+        >
+            <form
+                onSubmit={(e) => {
+                    submit(e).catch(console.error);
+                }}
+            >
+                <div className="grid gap-6">
+                    <div className="grid gap-2">
+                        <Label htmlFor="password">Password</Label>
+                        <Input
+                            id="password"
+                            type="password"
+                            name="password"
+                            autoComplete="new-password"
+                            value={form.password}
+                            className="mt-1 block w-full"
+                            autoFocus
+                            onChange={change}
+                            placeholder="Password"
+                        />
+                        {errors?.password && (
+                            <InputError
+                                message={errors.password[0]}
+                                className="mt-2"
+                            />
+                        )}
+                    </div>
 
-					<div className="grid gap-2">
-						<Label htmlFor="confirmPassword">Confirm password</Label>
-						<Input
-							id="confirmPassword"
-							type="password"
-							name="confirmPassword"
-							autoComplete="new-password"
-							value={form.confirmPassword}
-							className="mt-1 block w-full"
-							onChange={change}
-							placeholder="Confirm password"
-						/>
-						{errors?.confirmPassword && (
-							<InputError
-								message={errors.confirmPassword[0]}
-								className="mt-2"
-							/>
-						)}
-					</div>
+                    <div className="grid gap-2">
+                        <Label htmlFor="confirmPassword">
+                            Confirm password
+                        </Label>
+                        <Input
+                            id="confirmPassword"
+                            type="password"
+                            name="confirmPassword"
+                            autoComplete="new-password"
+                            value={form.confirmPassword}
+                            className="mt-1 block w-full"
+                            onChange={change}
+                            placeholder="Confirm password"
+                        />
+                        {errors?.confirmPassword && (
+                            <InputError
+                                message={errors.confirmPassword[0]}
+                                className="mt-2"
+                            />
+                        )}
+                    </div>
 
-					<Button type="submit" className="mt-4 w-full" disabled={isLoading}>
-						{isLoading && <LoaderCircle className="h-4 w-4 animate-spin" />}
-						Reset password
-					</Button>
-				</div>
-			</form>
-		</AuthLayout>
-	);
+                    <Button
+                        type="submit"
+                        className="mt-4 w-full"
+                        disabled={isLoading}
+                    >
+                        {isLoading && (
+                            <LoaderCircle className="h-4 w-4 animate-spin" />
+                        )}
+                        Reset password
+                    </Button>
+                </div>
+            </form>
+        </AuthLayout>
+    );
 }

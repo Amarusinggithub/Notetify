@@ -25,7 +25,7 @@ import {
     useFetchNote,
     useUpdateNote,
 } from "@/hooks/use-note.ts";
-import { useStore } from "@/stores/index.ts";
+import { useStore } from "@/store/index";
 import { Breadcrumbs } from "@/components/navigation/breadcrumbs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -139,7 +139,6 @@ function FullscreenToggle() {
 export function EditorHeader({
     currentNoteId = null,
 }: {
-
     currentNoteId?: string | null;
 }) {
     const currentUser = useStore((s) => s.sharedData?.auth.user);
@@ -211,7 +210,6 @@ export function EditorHeader({
                 <FullscreenToggle />
 
                 <Separator orientation="vertical" />
-
             </div>
 
             <div className="flex items-center gap-2">

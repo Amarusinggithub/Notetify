@@ -31,7 +31,7 @@ import {
     UsersRound,
 } from "lucide-react";
 import { useCreateNote } from "@/hooks/use-note.ts";
-import { useStore } from "@/stores/index.ts";
+import { useStore } from "@/store/index";
 import { type NavItem } from "@/types";
 import AppLogo from "@/components/app/app-logo";
 import { NavMain } from "@/components/navigation/nav-main";

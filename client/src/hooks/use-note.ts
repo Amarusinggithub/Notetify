@@ -9,7 +9,7 @@ import { useNavigate, useRevalidator } from "react-router";
 import { queryClient } from "@/./components/provider/query-provider";
 import { fetchNote, fetchNotesPage } from "@/services/note-service";
 import { createNote, deleteNote, updateNote } from "@/services/note-service.ts";
-import { useStore } from "@/stores/index.ts";
+import { useStore } from "@/store";
 import type { PaginatedNotesResponse, SortBy } from "@/types";
 import {
     type CreateUserNote,

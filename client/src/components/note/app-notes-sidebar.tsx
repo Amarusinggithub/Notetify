@@ -32,11 +32,17 @@ import {
 } from "@/components/ui/notes-sidebar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-import React, { Suspense, useDeferredValue, useEffect, useRef, useState } from "react";
+import React, {
+    Suspense,
+    useDeferredValue,
+    useEffect,
+    useRef,
+    useState,
+} from "react";
 import { EnsureNotes, useFetchNotes } from "@/hooks/use-note.ts";
-import { useStore } from "@/stores/index.ts";
+import { useStore } from "@/store";
 
-import NoteCard from "@/components/app/note-card";
+import NoteCard from "@/components/note/note-card";
 import {
     Card,
     CardContent,

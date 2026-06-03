@@ -1,34 +1,35 @@
-import type { StoreState } from 'stores';
-import type { StateCreator } from 'zustand';
-import type { SortBy } from '@/types';
+import type { StoreState } from "@/store/index";
+import type { StateCreator } from "zustand";
+import type { SortBy } from "@/types";
 
 export type NotebookSliceState = {
-	selectedNotebookId: string | null;
-	searchNotebooks: string;
-	sortNotebooksBy: SortBy;
+    selectedNotebookId: string | null;
+    searchNotebooks: string;
+    sortNotebooksBy: SortBy;
 };
 
 export type NotebookSliceActions = {
-	setSelectedNotebookId: (id: string | null) => void;
-	setNotebookSearch: (q: string) => void;
-	setNotebookSortBy: (s: SortBy) => void;
+    setSelectedNotebookId: (id: string | null) => void;
+    setNotebookSearch: (q: string) => void;
+    setNotebookSortBy: (s: SortBy) => void;
 };
 
 export type NotebookSlice = NotebookSliceState & NotebookSliceActions;
 
 export const createNotebookSlice: StateCreator<
-	StoreState,
-	[],
-	[],
-	NotebookSlice
+    StoreState,
+    [],
+    [],
+    NotebookSlice
 > = (set) => ({
-	selectedNotebookId: null,
-	searchNotebooks: '',
-	sortNotebooksBy: 'updated_at',
-	setSelectedNotebookId: (id: string | null) => set({ selectedNotebookId: id }),
+    selectedNotebookId: null,
+    searchNotebooks: "",
+    sortNotebooksBy: "updated_at",
+    setSelectedNotebookId: (id: string | null) =>
+        set({ selectedNotebookId: id }),
 
-	setNotebookSearch: (q: string) => set({ searchNotebooks: q }),
-	setNotebookSortBy: (s: SortBy) => set({ sortNotebooksBy: s }),
+    setNotebookSearch: (q: string) => set({ searchNotebooks: q }),
+    setNotebookSortBy: (s: SortBy) => set({ sortNotebooksBy: s }),
 });
 
 /*

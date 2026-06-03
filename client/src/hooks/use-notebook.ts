@@ -14,7 +14,7 @@ import {
     fetchNotebooksPage,
     updateNotebook,
 } from "@/services/notebook-service.ts";
-import { useStore } from "@/stores/index.ts";
+import { useStore } from "@/store";
 import {
     type CreateUserNotebook,
     type PaginatedNotebooksResponse,

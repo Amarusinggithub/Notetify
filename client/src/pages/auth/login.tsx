@@ -9,7 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox.tsx";
 import { Input } from "@/components/ui/input.tsx";
 import { Label } from "@/components/ui/label.tsx";
 import AuthLayout from "@/layouts/auth-layout.tsx";
-import { useStore } from "@/stores/index.ts";
+import { useStore } from "@/store";
 import { loginSchema } from "@/utils/validators.ts";
 
 type LoginForm = {
