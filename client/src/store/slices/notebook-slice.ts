@@ -1,4 +1,4 @@
-import type { StoreState } from 'stores';
+import type { StoreState } from '@/store/index';
 import type { StateCreator } from 'zustand';
 import type { SortBy } from '@/types';
 

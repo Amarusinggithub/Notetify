@@ -76,7 +76,7 @@ The repo root contains three deployable services and three Compose stacks. Each 
 
 - @docs/ARCHITECTURE.md — data model and sharing system
 - @docs/NOTE_COLLABORATION.md — real-time note collab (Yjs / Hocuspocus / SSE); **mandatory** before any change to the editor or note body
-- @docs/TASK_COLLABORATION.md — *(planned, not yet written)* future Kanban/task collaboration design; tasks will use a separate Hocuspocus namespace (`task:<id>`) and a board-level CRDT model distinct from note documents
+- @docs/TASK_COLLABORATION.md — _(planned, not yet written)_ future Kanban/task collaboration design; tasks will use a separate Hocuspocus namespace (`task:<id>`) and a board-level CRDT model distinct from note documents
 - @docs/TOLEARN.md — `UserNote` modelling background
 - @README.Docker.md — Docker stacks (dev/test/prod) and ops commands
 - @README.md — high-level project overview
@@ -109,17 +109,17 @@ If something is genuinely missing, add it to `ui/` (if it's a generic primitive)
 
 The theme is defined in `client/src/index.css` via CSS custom properties. Always reference them through Tailwind's semantic tokens:
 
-| Use this | Not this |
-|---|---|
-| `bg-background` / `text-foreground` | `bg-white` / `text-black` |
-| `bg-card` / `text-card-foreground` | hard-coded greys |
-| `bg-primary` / `text-primary-foreground` | `bg-blue-600` |
-| `bg-muted` / `text-muted-foreground` | `bg-gray-100` |
-| `bg-destructive` | `bg-red-500` |
-| `border-border` / `border-input` | `border-gray-200` |
-| `ring-ring` | custom focus rings |
-| `font-sans` (Instrument Sans) | importing another font |
-| `rounded-lg` / `-md` / `-sm` (token-derived) | `rounded-[6px]` |
+| Use this                                     | Not this                  |
+| -------------------------------------------- | ------------------------- |
+| `bg-background` / `text-foreground`          | `bg-white` / `text-black` |
+| `bg-card` / `text-card-foreground`           | hard-coded greys          |
+| `bg-primary` / `text-primary-foreground`     | `bg-blue-600`             |
+| `bg-muted` / `text-muted-foreground`         | `bg-gray-100`             |
+| `bg-destructive`                             | `bg-red-500`              |
+| `border-border` / `border-input`             | `border-gray-200`         |
+| `ring-ring`                                  | custom focus rings        |
+| `font-sans` (Instrument Sans)                | importing another font    |
+| `rounded-lg` / `-md` / `-sm` (token-derived) | `rounded-[6px]`           |
 
 Editor surfaces have their own token set (`--editor`, `--editor-foreground`, `--editor-accent`, etc.) — use those inside the Tiptap editor area.
 
@@ -131,7 +131,7 @@ Internalise these and most micro-decisions follow:
 
 1. **Content is the hero.** Chrome is quiet. Keep contrast on data, not on toolbars. Sidebars and headers use `bg-sidebar` / `bg-muted`, not `bg-primary`.
 2. **Hierarchy through typography and spacing, not boxes.** Prefer larger type and more whitespace over more borders. One visual border per "unit" is usually enough.
-3. **One accent at a time.** `--primary` is the focal colour for the *one* important action on screen. Stacking three primary buttons is a smell.
+3. **One accent at a time.** `--primary` is the focal colour for the _one_ important action on screen. Stacking three primary buttons is a smell.
 4. **Density reflects task.** Reading = generous (lg/xl spacing, leading-relaxed). Listing/scanning = tight (sm spacing, single-line truncation with `text-ellipsis`). Don't pick density at random.
 5. **Motion is functional.** Animate state transitions (open/close, mount/unmount, drag), not decoration. Use `tailwindcss-animate` utilities + Radix's built-in transitions. Default duration ~150–200ms, ease-out. Respect `prefers-reduced-motion`.
 6. **Feedback is immediate.** Every action gets a response within 100ms — optimistic update, skeleton, spinner, or toast (`sonner`). Never leave the user uncertain.
@@ -179,32 +179,32 @@ Notetify animations should feel **smooth, intentional, and invisible-when-they-n
 #### 7.1 The two rules that override everything
 
 1. **Smooth, never laggy.** Drop a frame and the whole UI feels broken. Animate only `transform` and `opacity` on the hot path; everything else (width, height, top, left, margin, color of large surfaces) is either layout or paint and will jank under load.
-2. **Don't overdo it.** If removing the animation makes the UX worse, keep it. If removing it makes no difference, delete it. A page with seven simultaneous entrance animations is a page that loads slowly *and* communicates nothing.
+2. **Don't overdo it.** If removing the animation makes the UX worse, keep it. If removing it makes no difference, delete it. A page with seven simultaneous entrance animations is a page that loads slowly _and_ communicates nothing.
 
-If you can't articulate what an animation is *telling the user* (state changed, focus moved, item arrived, action confirmed), it shouldn't be there.
+If you can't articulate what an animation is _telling the user_ (state changed, focus moved, item arrived, action confirmed), it shouldn't be there.
 
 #### 7.2 Tools available — pick the lightest one that works
 
 The project has three animation tools, listed in order of preference:
 
 1. **Tailwind utility classes + `tailwindcss-animate` + `tw-animate-css`** — for the 80% case. CSS-only, no JS overhead.
-   - Hover/focus transitions: `transition-colors`, `transition-transform`, `transition-opacity`, `duration-150`, `ease-out`
-   - Enter/exit on Radix primitives: classes like `data-[state=open]:animate-in`, `data-[state=closed]:animate-out`, `fade-in-0`, `zoom-in-95`, `slide-in-from-top-2` (already wired into shadcn's `Dialog`, `Popover`, `Sheet`, etc. — don't replace them)
-   - Skeleton/pulse: `animate-pulse`, `animate-spin`
-   - Reach for this **first**.
+    - Hover/focus transitions: `transition-colors`, `transition-transform`, `transition-opacity`, `duration-150`, `ease-out`
+    - Enter/exit on Radix primitives: classes like `data-[state=open]:animate-in`, `data-[state=closed]:animate-out`, `fade-in-0`, `zoom-in-95`, `slide-in-from-top-2` (already wired into shadcn's `Dialog`, `Popover`, `Sheet`, etc. — don't replace them)
+    - Skeleton/pulse: `animate-pulse`, `animate-spin`
+    - Reach for this **first**.
 
 2. **Radix's built-in transitions** — already used by the shadcn primitives. They handle mount/unmount timing, `data-state` attributes, and reduced motion. **Never replace them with Motion.** When you use `Dialog`, `Sheet`, `Popover`, `DropdownMenu`, `HoverCard`, `Tooltip`, `Tabs` — the animation work is already done.
 
 3. **Motion (a.k.a. Framer Motion, package `motion`, v12)** — for the cases CSS genuinely can't do well:
-   - Layout animations across reorders (`layout` prop, `LayoutGroup`)
-   - Drag-and-drop with snap/spring physics
-   - Coordinated multi-element sequences (stagger, choreographed entrance on landing/auth)
-   - Scroll-linked effects (`useScroll`, `useTransform`)
-   - Gesture-driven UIs (swipe to dismiss, pull-to-refresh)
-   - Shared element transitions (`layoutId`)
-   - Interruptible animations that must reverse mid-flight
+    - Layout animations across reorders (`layout` prop, `LayoutGroup`)
+    - Drag-and-drop with snap/spring physics
+    - Coordinated multi-element sequences (stagger, choreographed entrance on landing/auth)
+    - Scroll-linked effects (`useScroll`, `useTransform`)
+    - Gesture-driven UIs (swipe to dismiss, pull-to-refresh)
+    - Shared element transitions (`layoutId`)
+    - Interruptible animations that must reverse mid-flight
 
-   Existing Motion-powered components: `text-effect`, `animated-group`, `infinite-slider`, `progressive-blur`. Use these on landing and auth surfaces; **do not** add similar entrance choreography to the main app shell or editor — they slow perceived load on the surfaces users see most.
+    Existing Motion-powered components: `text-effect`, `animated-group`, `infinite-slider`, `progressive-blur`. Use these on landing and auth surfaces; **do not** add similar entrance choreography to the main app shell or editor — they slow perceived load on the surfaces users see most.
 
 **Decision tree:**
 
@@ -233,15 +233,16 @@ Anything else?                               → Try Tailwind first, escalate to
 
 Match these unless you have a real reason to deviate:
 
-| Use case | Duration | Easing | Tailwind | Motion |
-|---|---|---|---|---|
-| Color / opacity hover | 150ms | ease-out | `transition-colors duration-150` | `transition={{ duration: 0.15 }}` |
-| Small element scale/move | 150–200ms | ease-out | `transition-transform duration-200` | `transition={{ duration: 0.2, ease: 'easeOut' }}` |
-| Modal / sheet open | 200–250ms | ease-out | shadcn defaults — leave them | `spring` with low stiffness |
-| Drag release / spring | natural | spring | n/a | `transition={{ type: 'spring', stiffness: 300, damping: 30 }}` |
-| Page entrance (landing) | 400–600ms | ease-out, staggered | n/a (use Motion) | `staggerChildren: 0.05` |
+| Use case                 | Duration  | Easing              | Tailwind                            | Motion                                                         |
+| ------------------------ | --------- | ------------------- | ----------------------------------- | -------------------------------------------------------------- |
+| Color / opacity hover    | 150ms     | ease-out            | `transition-colors duration-150`    | `transition={{ duration: 0.15 }}`                              |
+| Small element scale/move | 150–200ms | ease-out            | `transition-transform duration-200` | `transition={{ duration: 0.2, ease: 'easeOut' }}`              |
+| Modal / sheet open       | 200–250ms | ease-out            | shadcn defaults — leave them        | `spring` with low stiffness                                    |
+| Drag release / spring    | natural   | spring              | n/a                                 | `transition={{ type: 'spring', stiffness: 300, damping: 30 }}` |
+| Page entrance (landing)  | 400–600ms | ease-out, staggered | n/a (use Motion)                    | `staggerChildren: 0.05`                                        |
 
 Rules:
+
 - **Default duration: 150–200ms.** Anything > 300ms feels slow on repeat use. Reserve longer durations for once-per-session entrances.
 - **Always `ease-out` for entrances**, `ease-in` for exits, `ease-in-out` for back-and-forth.
 - **Springs for physical interactions** (drag, swipe, pull). Tweens for state transitions.
@@ -253,12 +254,10 @@ Some users have vestibular disorders. Animation that ignores `prefers-reduced-mo
 
 - `tailwindcss-animate` already respects the media query for its built-in classes — keep using its utilities.
 - For Motion, wrap the `MotionConfig`:
-  ```tsx
-  <MotionConfig reducedMotion="user">
-    {/* app */}
-  </MotionConfig>
-  ```
-  This tells Motion to honour the user's OS setting.
+    ```tsx
+    <MotionConfig reducedMotion="user">{/* app */}</MotionConfig>
+    ```
+    This tells Motion to honour the user's OS setting.
 - For custom `@keyframes`, wrap in `@media (prefers-reduced-motion: no-preference) { ... }` so the animation only runs when motion is allowed.
 - Reduced-motion does **not** mean no feedback — keep opacity fades and instant state changes; only remove translate/scale/rotate.
 
@@ -326,8 +325,8 @@ Do not introduce a third server-state layer (Redux, RTK Query, SWR). Do not put 
 - Prefer searching through the codebase before suggesting solutions
 - Use error checking after code edits
 - Always run Composer and Artisan inside the API container, not on the host (the host is missing `pcntl`/`posix` on Windows and may have a different PHP version):
-  - `docker compose -f docker-compose.dev.yaml exec api composer require ...`
-  - `docker compose -f docker-compose.dev.yaml exec api php artisan ...`
+    - `docker compose -f docker-compose.dev.yaml exec api composer require ...`
+    - `docker compose -f docker-compose.dev.yaml exec api php artisan ...`
 - Always run pnpm inside the client container or on a WSL host with the matching Node version (Node 22 per the Dockerfile)
 - Bring the dev stack up with: `docker compose -f docker-compose.dev.yaml up -d --build`
 - Run backend tests with: `docker compose -p notetify-test -f docker-compose.test.yaml run --rm test`
@@ -364,3 +363,6 @@ Do not introduce a third server-state layer (Redux, RTK Query, SWR). Do not put 
 - IMPORTANT: never reintroduce `_dev` / `_prod` suffixes on Compose service, container, network, or volume names. Use `-p` for namespacing instead.
 - IMPORTANT: never reintroduce file-based Docker secrets (`db/password.txt`, etc.). Secrets come from `.env.*` files via `env_file:` and `${VAR:?...}` interpolation; production refuses to start if required vars are unset.
 - IMPORTANT: per-user state (`is_pinned`, `is_favorite`, `order`, `notebook_id` from a user's perspective) lives on `UserNote`, not on `Note`. Adding such a column to `Note` is almost always wrong; check if the existing pivot already covers it before extending the schema.
+    > **🔒 IMPORTANT — NEVER read, open, print, or otherwise access the `.env` file (or any `.env.*` file).** It contains secrets (API keys, database credentials, JWT signing keys). Agents must not read it for any reason. To learn what configuration keys exist, read `src/config.py` and the per-domain `config.py` files instead — never the `.env` itself.
+
+---

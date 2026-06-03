@@ -18,10 +18,13 @@ export function useNoteStream() {
                 try {
                     const { type } = JSON.parse(e.data) as { type: string };
                     if (type === "note.updated") {
-                        queryClient.invalidateQueries({ queryKey: noteQueryKeys.all });
+                        queryClient.invalidateQueries({
+                            queryKey: noteQueryKeys.all,
+                            predicate:(query)=> query.queryKey[1]==="list",
+                        });
                     }
                 } catch {
-                    // malformed message — ignore
+                    return;
                 }
             });
 
