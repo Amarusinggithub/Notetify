@@ -2,45 +2,41 @@ import tailwindcss from '@tailwindcss/vite';
 import path from 'path';
 import { visualizer } from 'rollup-plugin-visualizer';
 import { defineConfig } from 'vite';
-import react from "@vitejs/plugin-react";
+import react from '@vitejs/plugin-react';
 
 // https://vite.dev/config/
 export default defineConfig({
-    plugins: [
-        react(),
-        tailwindcss(),
-        visualizer({ open: true, gzipSize: true }),
-    ],
-    assetsInclude: ["**/*.lottie"],
-    server: {
-        host: true,
-        port: 5173,
-        allowedHosts: ["bingolaptop.taila14742.ts.net"],
-        watch: {
-            usePolling: true,
-            interval: 300,
-        },
-    },
-    resolve: {
-        alias: {
-            "@": path.resolve(__dirname, "./src"),
-        },
-    },
-    envDir: path.resolve(__dirname, "../"),
-    envPrefix: "VITE_",
-    preview: {
-        port: 3000,
-    },
-    build: {
-        rollupOptions: {
-            output: {
-                manualChunks: (id) => {
-                    if (id.includes("@tiptap")) return "tiptap-vendor";
-                    if (id.includes("@tiptap/")) return "tiptap";
-                    if (id.includes("@radix-ui/")) return "radix";
-                    if (id.includes("katex")) return "katex";
-                },
-            },
-        },
-    },
+	plugins: [react(), tailwindcss(), visualizer({ open: true, gzipSize: true })],
+	assetsInclude: ['**/*.lottie'],
+	server: {
+		host: true,
+		port: 5173,
+		allowedHosts: ['bingolaptop.taila14742.ts.net'],
+		watch: {
+			usePolling: true,
+			interval: 300,
+		},
+	},
+	resolve: {
+		alias: {
+			'@': path.resolve(__dirname, './src'),
+		},
+	},
+	envDir: path.resolve(__dirname, '../'),
+	envPrefix: 'VITE_',
+	preview: {
+		port: 3000,
+	},
+	build: {
+		rollupOptions: {
+			output: {
+				manualChunks: (id) => {
+					if (id.includes('@tiptap')) return 'tiptap-vendor';
+					if (id.includes('@tiptap/')) return 'tiptap';
+					if (id.includes('@radix-ui/')) return 'radix';
+					if (id.includes('katex')) return 'katex';
+				},
+			},
+		},
+	},
 });

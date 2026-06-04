@@ -10,7 +10,7 @@ import { motion } from 'motion/react';
 import { Link } from 'react-router';
 import AppLogoIcon from '@/components/app/app-logo-icon';
 import { Button } from '@/components/ui/button';
-import { useStore } from '@/stores/index.ts';
+import { useStore } from '@/store/index.ts';
 
 type QuickLink = {
 	description: string;
@@ -106,7 +106,11 @@ export default function NotFound() {
 							<motion.div
 								initial={{ opacity: 0, scale: 0.94 }}
 								animate={{ opacity: 1, scale: 1 }}
-								transition={{ delay: 0.1, duration: 0.45, ease: 'easeOut' }}
+								transition={{
+									delay: 0.1,
+									duration: 0.45,
+									ease: 'easeOut',
+								}}
 								className="text-primary bg-primary/12 border-primary/20 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium"
 							>
 								<Search className="size-4" />
@@ -179,7 +183,11 @@ export default function NotFound() {
 					<motion.aside
 						initial={{ opacity: 0, x: 24 }}
 						animate={{ opacity: 1, x: 0 }}
-						transition={{ delay: 0.15, duration: 0.55, ease: 'easeOut' }}
+						transition={{
+							delay: 0.15,
+							duration: 0.55,
+							ease: 'easeOut',
+						}}
 						className="relative"
 					>
 						<div className="from-card/95 to-card/75 border-border/60 relative overflow-hidden rounded-[2rem] border bg-gradient-to-br p-6 shadow-2xl shadow-black/5 backdrop-blur sm:p-8">

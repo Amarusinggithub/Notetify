@@ -4,7 +4,7 @@ import { memo, useRef } from 'react';
 import { useNavigate } from 'react-router';
 import { noteQueryOptions } from '@/hooks/use-note.ts';
 import { cn } from '@/lib/utils';
-import { useStore } from '@/stores/index.ts';
+import { useStore } from '@/store/index.ts';
 import type { UserNote } from '@/types';
 
 import {
@@ -104,13 +104,16 @@ const truncate = (text: string, maxLength: number): string => {
 
 function getTitlePreview(content: JSONContent | null, maxLength = 50): string {
 	const h1 = content?.content?.find(
-		(n:JSONContent) => n.type === 'heading' && n.attrs?.level === 1
+		(n: JSONContent) => n.type === 'heading' && n.attrs?.level === 1
 	);
 	const title = h1 ? extractText(h1).trim() : '';
 	return title ? truncate(title, maxLength) : 'Untitled';
 }
 
-function getContentPreview(content: JSONContent | null, maxLength = 119): string {
+function getContentPreview(
+	content: JSONContent | null,
+	maxLength = 119
+): string {
 	const bodyNodes = (content?.content ?? []).filter(
 		(n: JSONContent) => !(n.type === 'heading' && n.attrs?.level === 1)
 	);

@@ -16,7 +16,7 @@ import {
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-import { useStore } from '@/stores/index.ts';
+import { useStore } from '@/store/index.ts';
 import {
 	NavigationMenu,
 	NavigationMenuItem,

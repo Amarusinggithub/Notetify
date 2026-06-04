@@ -1,6 +1,6 @@
 import { ChevronsUpDown } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { useStore } from '@/stores/index.ts';
+import { useStore } from '@/store/index.ts';
 import {
 	DropdownMenu,
 	DropdownMenuContent,

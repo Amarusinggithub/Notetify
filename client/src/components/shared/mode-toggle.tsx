@@ -1,6 +1,6 @@
 import { Monitor, Moon, Sun } from 'lucide-react';
 
-import { useStore } from '@/stores/index.ts';
+import { useStore } from '@/store/index.ts';
 import { Button } from '@/components/ui/button';
 import {
 	DropdownMenu,

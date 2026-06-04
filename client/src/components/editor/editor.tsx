@@ -19,7 +19,7 @@ import { NoteEditorProvider } from '@/context/editor-context.tsx';
 import { useFetchNote } from '@/hooks/use-note.ts';
 import { cn } from '@/lib/utils.ts';
 import type { User } from '@/types';
-import { useStore } from '@/stores/index.ts';
+import { useStore } from '@/store/index.ts';
 import { EditorHeader } from '@/components/editor/editor-header.tsx';
 import EditorToolbar from '@/components/editor/editor-toolbar.tsx';
 import suggestion from '@/components/shared/suggestion.tsx';
@@ -163,7 +163,10 @@ export const Editor = () => {
 						if (!cancelled) setCollabState({ ydoc, provider });
 					},
 					onAuthenticationFailed: () => {
-						if (!cancelled) setCollabError('Authentication failed. Check your collab server configuration.');
+						if (!cancelled)
+							setCollabError(
+								'Authentication failed. Check your collab server configuration.'
+							);
 					},
 					onClose: ({ event }) => {
 						if (cancelled) return;
@@ -177,7 +180,9 @@ export const Editor = () => {
 			})
 			.catch(() => {
 				if (cancelled) return;
-				setCollabError('Failed to reach the API. Check that the server is running.');
+				setCollabError(
+					'Failed to reach the API. Check that the server is running.'
+				);
 			});
 
 		return () => {
@@ -186,7 +191,12 @@ export const Editor = () => {
 	}, [currentNoteId, retryCount]);
 
 	// Destroy provider on unmount
-	useEffect(() => () => { providerRef.current?.destroy(); }, []);
+	useEffect(
+		() => () => {
+			providerRef.current?.destroy();
+		},
+		[]
+	);
 
 	if (currentNoteId && collabError) {
 		return (
@@ -209,7 +219,7 @@ export const Editor = () => {
 	if (!currentNoteId) {
 		return (
 			<div className="bg-editor flex h-full flex-col">
-				<div className="scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border hover:scrollbar-thumb-muted-foreground/40 relative flex-1 overflow-auto">
+				<div className="scrollbar-thumb-border hover:scrollbar-thumb-muted-foreground/40 relative flex-1 scrollbar-thin scrollbar-track-transparent overflow-auto">
 					<div className="text-muted-foreground flex h-full items-center justify-center text-sm">
 						Select or create a note to get started.
 					</div>
@@ -249,7 +259,8 @@ const EditorInner = ({ collabState, currentUser }: EditorInnerProps) => {
 		editorProps: {
 			attributes: {
 				spellcheck: 'false',
-				class: 'focus:outline-none print:border-0 bg-editor text-editor-foreground border border-editor-border flex-col min-h-[1054px] w-full pt-10 pr-14 pb-10 pl-14 cursor-text',
+				class:
+					'focus:outline-none print:border-0 bg-editor text-editor-foreground border border-editor-border flex-col min-h-[1054px] w-full pt-10 pr-14 pb-10 pl-14 cursor-text',
 			},
 		},
 		enableContentCheck: false,
@@ -265,7 +276,10 @@ const EditorInner = ({ collabState, currentUser }: EditorInnerProps) => {
 			Collaboration.configure({ document: collabState.ydoc }),
 			CollaborationCaret.configure({
 				provider: collabState.provider,
-				user: getCurrentUser(currentUser?.full_name ?? 'Anonymous', currentUser?.id ?? ''),
+				user: getCurrentUser(
+					currentUser?.full_name ?? 'Anonymous',
+					currentUser?.id ?? ''
+				),
 			}),
 			Highlight,
 			TitleExtension,
@@ -369,7 +383,7 @@ const EditorInner = ({ collabState, currentUser }: EditorInnerProps) => {
 			<div className="bg-editor flex h-full flex-col">
 				<EditorHeader currentNoteId={currentUserNote?.id} />
 				{currentUserNote?.is_trashed === false && <EditorToolbar />}
-				<div className="scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border hover:scrollbar-thumb-muted-foreground/40 relative flex-1 overflow-auto">
+				<div className="scrollbar-thumb-border hover:scrollbar-thumb-muted-foreground/40 relative flex-1 scrollbar-thin scrollbar-track-transparent overflow-auto">
 					<div
 						className={cn(
 							'h-full w-full',

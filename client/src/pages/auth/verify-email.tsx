@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { LoaderCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button.tsx';
 import AuthLayout from '@/layouts/auth-layout';
-import { useStore } from '@/stores/index.ts';
+import { useStore } from '@/store/index.ts';
 
 export default function VerifyEmail() {
 	const { isLoading, VerifyEmail, Logout } = useStore();
@@ -20,7 +20,9 @@ export default function VerifyEmail() {
 			description="Please verify your email address by clicking on the link we just emailed to you."
 		>
 			<form
-				onSubmit={(e) => { handleResend(e).catch(console.error); }}
+				onSubmit={(e) => {
+					handleResend(e).catch(console.error);
+				}}
 				className="space-y-6 text-center"
 			>
 				{resent && (
@@ -34,8 +36,11 @@ export default function VerifyEmail() {
 					{resent ? 'Email sent' : 'Resend verification email'}
 				</Button>
 
-				<Button variant={"link"}
-					onClick={() => { Logout().catch(console.error); }}
+				<Button
+					variant={'link'}
+					onClick={() => {
+						Logout().catch(console.error);
+					}}
 					className="mx-auto block text-sm underline"
 				>
 					Log out

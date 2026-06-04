@@ -40,10 +40,10 @@ function AppRoutes() {
 	const checkingAuth = useStore((state) => state.checkingAuth);
 	const isAuthenticated = useStore((state) => state.isAuthenticated);
 	const isVerified = useStore(
-        (state) => state.sharedData?.auth.user.is_verified,
-    );
+		(state) => state.sharedData?.auth.user.is_verified
+	);
 
-    const emailVerified = isAuthenticated && isVerified;
+	const emailVerified = isAuthenticated && isVerified;
 
 	if (checkingAuth) return <LoadingPage message="Checking session..." />;
 
@@ -142,9 +142,11 @@ function AppRoutes() {
 	];
 
 	const router = createBrowserRouter(
-		!isAuthenticated ? publicRoutes
-		: !emailVerified  ? verificationRoutes
-		: privateRoutes
+		!isAuthenticated
+			? publicRoutes
+			: !emailVerified
+				? verificationRoutes
+				: privateRoutes
 	);
 
 	return (

@@ -8,7 +8,7 @@ import {
 	Sparkles,
 } from 'lucide-react';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
-import { useStore } from '@/stores/index.ts';
+import { useStore } from '@/store/index.ts';
 import { type User } from '@/types';
 import {
 	AlertDialog,
