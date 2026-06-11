@@ -8,11 +8,13 @@ const mockSetErrors = vi.fn();
 
 vi.mock('@/app/store/index.ts', () => ({
 	useStore: () => ({
-		ForgotPassword: mockForgotPassword,
 		isLoading: false,
 		errors: null,
 		setErrors: mockSetErrors,
 	}),
+}));
+vi.mock('@/features/auth/hooks/use-forgot-password', () => ({
+	useForgotPassword: () => mockForgotPassword,
 }));
 
 describe('ForgotPassword page', () => {

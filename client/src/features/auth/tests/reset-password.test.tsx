@@ -8,7 +8,6 @@ const mockSetErrors = vi.fn();
 
 vi.mock('@/app/store/index.ts', () => ({
 	useStore: () => ({
-		PasswordReset: mockPasswordReset,
 		isLoading: false,
 		errors: null,
 		setErrors: mockSetErrors,
@@ -20,6 +19,9 @@ vi.mock('@/app/store/index.ts', () => ({
 			},
 		},
 	}),
+}));
+vi.mock('@/features/auth/hooks/use-password-reset', () => ({
+	usePasswordReset: () => mockPasswordReset,
 }));
 
 function renderWithRoute(path: string) {

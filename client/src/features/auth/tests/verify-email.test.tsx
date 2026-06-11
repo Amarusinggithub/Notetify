@@ -7,7 +7,6 @@ const mockVerifyEmail = vi.fn();
 
 vi.mock('@/app/store/index.ts', () => ({
 	useStore: () => ({
-		VerifyEmail: mockVerifyEmail,
 		isLoading: false,
 		sharedData: {
 			auth: {
@@ -17,6 +16,10 @@ vi.mock('@/app/store/index.ts', () => ({
 			},
 		},
 	}),
+}));
+vi.mock('@/features/auth/hooks/use-verify-email', () => ({
+	useVerifyEmail: () => mockVerifyEmail,
+	useLogout: () => vi.fn(),
 }));
 
 describe('VerifyEmail page', () => {

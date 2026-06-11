@@ -1,78 +1,85 @@
 // Components
-import { LoaderCircle } from 'lucide-react';
-import { useState } from 'react';
+import { LoaderCircle } from "lucide-react";
+import { useState } from "react";
 
-import InputError from '@/shared/components/shared/input-error';
-import { Button } from '@/shared/components/ui/button.tsx';
-import { Input } from '@/shared/components/ui/input';
-import { Label } from '@/shared/components/ui/label';
-import AuthLayout from '@/app/layouts/auth-layout';
-import { useStore } from '@/app/store/index.ts';
-import { confirmPasswordSchema } from '@/shared/utils/validators.ts';
+import InputError from "@/shared/components/shared/input-error";
+import { Button } from "@/shared/components/ui/button.tsx";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
+import AuthLayout from "@/app/layouts/auth-layout";
+import { useStore } from "@/app/store/index.ts";
+import confirmPassword from "@/features/auth/hooks/use-confirm-password";
+import { confirmPasswordSchema } from "@/features/auth/utils/validators";
 
 type ConfirmPasswordType = { password: string };
 
 export default function ConfirmPassword() {
-	const [form, setForm] = useState<ConfirmPasswordType>({
-		password: '',
-	});
-	const { isLoading, setErrors, errors, ConfirmPassword } = useStore();
+    const [form, setForm] = useState<ConfirmPasswordType>({
+        password: "",
+    });
+    const { isLoading, setErrors, errors } = useStore();
 
-	const submit = async (e: React.SubmitEvent<HTMLFormElement>) => {
-		e.preventDefault();
-		setErrors(null);
+    const submit = async (e: React.SubmitEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setErrors(null);
 
-		const validationResult = confirmPasswordSchema.safeParse(form);
+        const validationResult = confirmPasswordSchema.safeParse(form);
 
-		if (!validationResult.success) {
-			const formattedErrors = validationResult.error.flatten().fieldErrors;
-			setErrors(formattedErrors);
-			return;
-		}
-		await ConfirmPassword(form.password);
-	};
+        if (!validationResult.success) {
+            const formattedErrors =
+                validationResult.error.flatten().fieldErrors;
+            setErrors(formattedErrors);
+            return;
+        }
+        await confirmPassword(form.password);
+    };
 
-	function change(e: React.ChangeEvent<HTMLInputElement>) {
-		setForm({ ...form, [e.target.name]: e.target.value.trim() });
-	}
+    function change(e: React.ChangeEvent<HTMLInputElement>) {
+        setForm({ ...form, [e.target.name]: e.target.value.trim() });
+    }
 
-	return (
-		<AuthLayout
-			title="Confirm your password"
-			description="This is a secure area of the application. Please confirm your password before continuing."
-		>
-			<form
-				onSubmit={(e) => {
-					submit(e).catch(console.error);
-				}}
-			>
-				<div className="space-y-6">
-					<div className="grid gap-2">
-						<Label htmlFor="password">Password</Label>
-						<Input
-							id="password"
-							type="password"
-							name="password"
-							placeholder="Password"
-							autoComplete="current-password"
-							value={form.password}
-							autoFocus
-							onChange={change}
-						/>
+    return (
+        <AuthLayout
+            title="Confirm your password"
+            description="This is a secure area of the application. Please confirm your password before continuing."
+        >
+            <form
+                onSubmit={(e) => {
+                    submit(e).catch(console.error);
+                }}
+            >
+                <div className="space-y-6">
+                    <div className="grid gap-2">
+                        <Label htmlFor="password">Password</Label>
+                        <Input
+                            id="password"
+                            type="password"
+                            name="password"
+                            placeholder="Password"
+                            autoComplete="current-password"
+                            value={form.password}
+                            autoFocus
+                            onChange={change}
+                        />
 
-						{errors?.password && (
-							<InputError message={errors.password[0]} className="mt-2" />
-						)}
-					</div>
+                        {errors?.password && (
+                            <InputError
+                                message={errors.password[0]}
+                                className="mt-2"
+                            />
+                        )}
+                    </div>
 
-					<div className="flex items-center">
-						<Button className="w-full" disabled={isLoading}>
-							{isLoading && <LoaderCircle className="h-4 w-4 animate-spin" />}
-							Confirm password
-						</Button>
-					</div>
-				</div>
-			</form>
-		</AuthLayout>
-	);
+                    <div className="flex items-center">
+                        <Button className="w-full" disabled={isLoading}>
+                            {isLoading && (
+                                <LoaderCircle className="h-4 w-4 animate-spin" />
+                            )}
+                            Confirm password
+                        </Button>
+                    </div>
+                </div>
+            </form>
+        </AuthLayout>
+    );
 }

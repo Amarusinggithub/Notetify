@@ -8,11 +8,13 @@ const mockSetErrors = vi.fn();
 
 vi.mock('@/app/store/index.ts', () => ({
 	useStore: () => ({
-		ConfirmPassword: mockConfirmPassword,
 		isLoading: false,
 		errors: null,
 		setErrors: mockSetErrors,
 	}),
+}));
+vi.mock('@/features/auth/hooks/use-confirm-password', () => ({
+	useConfirmPassword: () => mockConfirmPassword,
 }));
 
 describe('ConfirmPassword page', () => {

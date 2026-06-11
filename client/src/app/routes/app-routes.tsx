@@ -37,7 +37,7 @@ const VerifyEmail = lazy(() => import("@/features/auth/pages/verify-email"));
 const TwoFactorVerification = lazy(
     () => import("@/features/auth/pages/two-factor-verification"),
 );
-const Register = lazy(() => import("@/features/auth/pages/register"));
+const Register = lazy(() => import("@/features/auth/pages/signup"));
 const Login = lazy(() => import("@/features/auth/pages/login"));
 const Home = lazy(() => import("@/features/dashboard/pages/home"));
 const Landing = lazy(() => import("@/features/landing/pages/landing"));

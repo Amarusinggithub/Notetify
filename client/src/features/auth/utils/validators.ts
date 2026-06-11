@@ -51,3 +51,9 @@ export const confirmPasswordSchema = z.object({
 		.string()
 		.min(8, { message: 'Password must be at least 8 characters long.' }),
 });
+
+ export const InputOTPFormSchema = z.object({
+    pin: z.string().min(6, {
+        message: 'Your one-time password must be 6 characters.',
+    }),
+});
