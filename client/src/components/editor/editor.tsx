@@ -11,8 +11,7 @@ import { TableKit } from '@tiptap/extension-table';
 import TextAlign from '@tiptap/extension-text-align';
 import { FontSize, TextStyle } from '@tiptap/extension-text-style';
 import Youtube from '@tiptap/extension-youtube';
-import { Plugin, PluginKey } from '@tiptap/pm/state';
-import { EditorContent, Extension, useEditor } from '@tiptap/react';
+import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { useEffect, useRef, useState } from 'react';
 import { NoteEditorProvider } from '@/context/editor-context.tsx';
@@ -25,104 +24,13 @@ import EditorToolbar from '@/components/editor/editor-toolbar.tsx';
 import suggestion from '@/components/shared/suggestion.tsx';
 import EditorFooter from '@/components/editor/editor-footer';
 import { EditorLoadingSkeleton } from './editor-loading-skeleton';
+import TitleExtension from './title-extension';
 import { HocuspocusProvider } from '@hocuspocus/provider';
 import Collaboration from '@tiptap/extension-collaboration';
 import { CollaborationCaret } from '@tiptap/extension-collaboration-caret';
 import * as Y from 'yjs';
 import { getCollabSession } from '@/services/collab-service';
 import { getCurrentUser } from '@/utils/helpers';
-
-// ─── TitleExtension ───────────────────────────────────────────────────────────
-
-const TitleExtension = Extension.create({
-	name: 'title',
-
-	addProseMirrorPlugins() {
-		return [
-			new Plugin({
-				key: new PluginKey('title'),
-
-				filterTransaction: (transaction, state) => {
-					if (!transaction.docChanged) return true;
-
-					const firstNodeSize = state.doc.firstChild?.nodeSize ?? 0;
-
-					for (const step of transaction.steps) {
-						const stepMap = step.getMap();
-						let touchesFirstNode = false;
-
-						stepMap.forEach((oldStart, __oldEnd) => {
-							if (oldStart < firstNodeSize) {
-								touchesFirstNode = true;
-							}
-						});
-
-						// @ts-ignore
-						const from = step.from ?? step.pos ?? 0;
-						// @ts-ignore
-						const to = step.to ?? from;
-
-						if (from < firstNodeSize || to < firstNodeSize) {
-							touchesFirstNode = true;
-						}
-
-						if (touchesFirstNode) {
-							const newFirstNode = transaction.doc.firstChild;
-
-							if (
-								newFirstNode &&
-								(newFirstNode.type.name !== 'heading' ||
-									newFirstNode.attrs.level !== 1)
-							) {
-								return false;
-							}
-
-							// @ts-ignore
-							if (step.mark || step.constructor.name === 'AddMarkStep') {
-								return false;
-							}
-						}
-					}
-
-					return true;
-				},
-
-				appendTransaction: (__transactions, __oldState, newState) => {
-					const { doc, tr } = newState;
-					const firstNode = doc.firstChild;
-					let modified = false;
-
-					if (!firstNode) return null;
-
-					const firstNodeEnd = firstNode.nodeSize;
-
-					if (
-						firstNode.type.name !== 'heading' ||
-						firstNode.attrs.level !== 1
-					) {
-						const headingType = newState.schema.nodes.heading;
-						tr.setNodeMarkup(0, headingType, { level: 1 });
-						modified = true;
-					}
-
-					if (firstNode.content.size > 0) {
-						const from = 1;
-						const to = firstNodeEnd - 1;
-						const markTypes = Object.values(newState.schema.marks);
-						markTypes.forEach((markType) => {
-							if (tr.doc.rangeHasMark(from, to, markType)) {
-								tr.removeMark(from, to, markType);
-								modified = true;
-							}
-						});
-					}
-
-					return modified ? tr : null;
-				},
-			}),
-		];
-	},
-});
 
 // Types
 
@@ -131,7 +39,6 @@ interface CollabState {
 	provider: HocuspocusProvider;
 }
 
-//  Editor (outer shell: manages collab session lifecycle)
 
 export const Editor = () => {
 	const currentNoteId = useStore((s) => s.selectedNoteId);
@@ -237,7 +144,6 @@ export const Editor = () => {
 	);
 };
 
-// ─── EditorInner (tiptap editor, keyed per note) ──────────────────────────────
 
 interface EditorInnerProps {
 	collabState: CollabState;
