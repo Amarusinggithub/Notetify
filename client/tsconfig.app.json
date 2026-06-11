@@ -11,7 +11,10 @@
 		"moduleResolution": "bundler",
 		"rootDir": "./" /* Specify the root folder within your source files. */,
 		"paths": {
-			"@/*": ["./src/*"]
+			"@/*": ["./src/*"],
+			"@app/*": ["./src/app/*"],
+			"@features/*": ["./src/features/*"],
+			"@shared/*": ["./src/shared/*"]
 		},
 		"outDir": "./dist" /* Specify an output folder for all emitted files. */,
 		"allowImportingTsExtensions": true,

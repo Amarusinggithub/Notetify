@@ -1,0 +1,334 @@
+import {
+	useMutation,
+	useQueryClient,
+	useSuspenseInfiniteQuery,
+	useSuspenseQuery,
+	type InfiniteData,
+} from '@tanstack/react-query';
+import { useNavigate, useRevalidator } from 'react-router';
+import { queryClient } from '@/app/providers/query-provider';
+import { fetchNote, fetchNotesPage } from '@/features/notes/services/note-service';
+import { createNote, deleteNote, updateNote } from '@/features/notes/services/note-service.ts';
+import { useStore } from '@/app/store/index.ts';
+import type {
+	CreateNote,
+	PaginatedNotesResponse,
+	ResourceType,
+	SortBy,
+} from '@/shared/types';
+import { type UpdateUserNotePayload, type UserNote } from '@/shared/types/index.ts';
+import { noteQueryKeys } from '@/shared/utils/query-keys';
+
+type NotesType = ResourceType<UserNote>;
+export const notesQueryOptions = (
+	search: string = '',
+	sortby: SortBy = 'updated_at'
+) => ({
+	queryKey: noteQueryKeys.list(search, sortby),
+	queryFn: fetchNotesPage,
+	initialPageParam: 1,
+	getNextPageParam: (lastPage: PaginatedNotesResponse) => lastPage.nextPage,
+	maxPages: 5,
+});
+
+export const noteQueryOptions = (noteId: string) => ({
+	queryKey: noteQueryKeys.detail(noteId),
+	queryFn: fetchNote,
+	initialData: () => {
+		const queries = queryClient.getQueriesData<
+			InfiniteData<PaginatedNotesResponse>
+		>({ queryKey: ['notes', 'list'] });
+		for (const [, data] of queries) {
+			if (!data?.pages) continue;
+			for (const page of data.pages) {
+				const found = page.results.find((n) => n.id === noteId);
+				if (found) return found;
+			}
+		}
+		return undefined;
+	},
+	initialDataUpdatedAt: () => {
+		const queries = queryClient
+			.getQueryCache()
+			.findAll({ queryKey: ['notes', 'list'] });
+		return queries[0]?.state.dataUpdatedAt;
+	},
+});
+
+export const useFetchNote = (noteId: string) => {
+	const { data } = useSuspenseQuery(noteQueryOptions(noteId));
+	return { data };
+};
+
+export const useFetchNotes = (
+	search: string = '',
+	sortBy: SortBy = 'updated_at'
+) => {
+	const {
+		data: notes,
+		fetchNextPage,
+		hasNextPage,
+		isFetchingNextPage,
+	} = useSuspenseInfiniteQuery({
+		...notesQueryOptions(search, sortBy),
+		select: (data) => data.pages.flatMap((page) => page.results),
+	});
+	return { data: notes, fetchNextPage, hasNextPage, isFetchingNextPage };
+};
+
+export const prefetchNotes = async (
+	search: string = '',
+	sortBy: SortBy = 'updated_at'
+) => {
+	await queryClient.prefetchInfiniteQuery(notesQueryOptions(search, sortBy));
+};
+
+export const EnsureNotes = (
+	search: string = '',
+	sortBy: SortBy = 'updated_at'
+) => {
+	return queryClient.ensureInfiniteQueryData<
+		PaginatedNotesResponse,
+		Error,
+		InfiniteData<PaginatedNotesResponse>,
+		ReturnType<typeof noteQueryKeys.list>,
+		number
+	>(notesQueryOptions(search, sortBy));
+};
+
+type UpdateNoteInput = {
+	id: string;
+	payload: UpdateUserNotePayload;
+};
+
+export function useCreateNote() {
+	const revalidator = useRevalidator();
+	const queryClient = useQueryClient();
+	const navigate = useNavigate();
+	return useMutation({
+		mutationFn: (newNote: CreateNote) => createNote(newNote),
+		onMutate: async (newNote) => {
+			try {
+				await queryClient.cancelQueries({
+					queryKey: noteQueryKeys.all,
+				});
+			} catch (e) {
+				console.error('Failed to cancel queries:', e);
+			}
+			const previous = snapshotNotes(queryClient);
+			const tempId = `temp-${Date.now()}`;
+			const now = new Date().toISOString();
+			const optimistic: UserNote = {
+				id: tempId,
+				user_id: 'me',
+				notebook_id: newNote.notebook_id ?? null,
+				is_pinned_in_notebook: false,
+				is_pinned_in_home: false,
+				is_pinned_in_space: false,
+				is_owner: true,
+				is_shared: false,
+				note_id: 'temp-note-id',
+				pinned_in_notebook_at: null,
+				pinned_in_space_at: null,
+				pinned_in_home_at: null,
+				trashed_at: null,
+				order: 0,
+				note: {
+					id: tempId,
+					content: null,
+					is_shared: false,
+					created_at: now,
+					updated_at: now,
+					deleted_at: null,
+					created_by_user_id: 'me',
+				},
+				is_trashed: false,
+				created_at: now,
+				updated_at: now,
+			};
+
+			updateNotesCaches(queryClient, (notes, pageIndex) =>
+				pageIndex && pageIndex > 0 ? notes : [optimistic, ...notes]
+			);
+
+			return { previous, tempId };
+		},
+		onSuccess: async (created, _input, context) => {
+			updateNotesCaches(queryClient, (notes) =>
+				notes.map((item) => (item.id === context?.tempId ? created : item))
+			);
+
+			queryClient.setQueryData(noteQueryKeys.detail(created.id), created);
+			await navigate(`/notes/${created.id}`);
+			useStore.getState().setSelectedNoteId(created.id);
+			await revalidator.revalidate();
+		},
+		onError: (error, _input, context) => {
+			console.error('Failed to create note:', error);
+			restoreNotes(queryClient, context?.previous);
+		},
+		onSettled: async () => {
+			await queryClient.invalidateQueries({
+				queryKey: noteQueryKeys.all,
+			});
+		},
+	});
+}
+
+export function useUpdateNote() {
+	const revalidator = useRevalidator();
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationKey: ['updateNote'],
+		mutationFn: ({ id, payload }: UpdateNoteInput) => updateNote(id, payload),
+		onMutate: async ({ id, payload }: UpdateNoteInput) => {
+			await queryClient.cancelQueries({ queryKey: noteQueryKeys.all });
+			const previous = snapshotNotes(queryClient);
+			const now = new Date().toISOString();
+
+			const optimisticUpdater = (note: UserNote): UserNote => ({
+				...note,
+				is_pinned_in_home: payload.is_pinned_in_home ?? note.is_pinned_in_home,
+				is_pinned_in_space:
+					payload.is_pinned_in_space ?? note.is_pinned_in_space,
+				is_pinned_in_notebook:
+					payload.is_pinned_in_notebook ?? note.is_pinned_in_notebook,
+				is_trashed: payload.is_trashed ?? note.is_trashed,
+				is_owner: note.is_owner,
+				is_shared: note.is_shared,
+				order: note.order,
+				updated_at: now,
+			});
+
+			updateNotesCaches(queryClient, (notes) =>
+				notes.map((note) => (note.id === id ? optimisticUpdater(note) : note))
+			);
+
+			const prevDetail = queryClient.getQueryData<UserNote>(
+				noteQueryKeys.detail(id)
+			);
+			if (prevDetail) {
+				queryClient.setQueryData(
+					noteQueryKeys.detail(id),
+					optimisticUpdater(prevDetail)
+				);
+			}
+
+			return { previous };
+		},
+		onSuccess: async (updated: UserNote) => {
+			queryClient.setQueryData(noteQueryKeys.detail(updated.id), updated);
+			updateNotesCaches(queryClient, (notes) =>
+				notes.map((note) => (note.id === updated.id ? updated : note))
+			);
+
+			await revalidator.revalidate();
+		},
+		onError: (error, _input, context) => {
+			console.error('Failed to update note:', error);
+			restoreNotes(queryClient, context?.previous);
+		},
+		onSettled: async () => {
+			await queryClient.invalidateQueries({
+				queryKey: noteQueryKeys.all,
+			});
+		},
+	});
+}
+
+export function useDeleteNote() {
+	const revalidator = useRevalidator();
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: (noteId: string) => deleteNote(noteId),
+		onMutate: async (noteId) => {
+			await queryClient.cancelQueries({ queryKey: noteQueryKeys.all });
+			const previous = snapshotNotes(queryClient);
+			updateNotesCaches(queryClient, (notes) =>
+				notes.filter((note) => note.id !== noteId)
+			);
+
+			return { previous };
+		},
+		onSuccess: async () => {
+			await revalidator.revalidate();
+		},
+		onError: (error, _input, context) => {
+			console.error('Failed to delete note:', error);
+			restoreNotes(queryClient, context?.previous);
+		},
+		onSettled: async () => {
+			await queryClient.invalidateQueries({
+				queryKey: noteQueryKeys.all,
+			});
+		},
+	});
+}
+
+/*
+ Snapshot the current state of the cache so we can rollback if the mutation fails.
+ */
+function snapshotNotes(queryClient: ReturnType<typeof useQueryClient>) {
+	return queryClient.getQueriesData<NotesType>({
+		queryKey: noteQueryKeys.all,
+	});
+}
+
+/**
+  Restore the cache to the previous state using the snapshot.
+ */
+function restoreNotes(
+	queryClient: ReturnType<typeof useQueryClient>,
+	previous: [readonly unknown[], NotesType][] | undefined
+) {
+	if (previous) {
+		previous.forEach(([queryKey, data]) => {
+			queryClient.setQueryData(queryKey, data);
+		});
+	}
+}
+
+/**
+ Update the cache across all queries (search, pagination, etc.)
+ */
+function updateNotesCaches(
+	queryClient: ReturnType<typeof useQueryClient>,
+	updater: (oldNotes: UserNote[], pageIndex?: number) => UserNote[]
+) {
+	// Get all matching queries and update them individually
+	const queries = queryClient.getQueriesData<NotesType>({
+		queryKey: noteQueryKeys.all,
+	});
+
+	for (const [queryKey, oldData] of queries) {
+		if (!oldData) continue;
+
+		let newData: NotesType;
+
+		// Handle if your API returns an Array directly
+		if (Array.isArray(oldData)) {
+			newData = updater(oldData);
+		}
+		// Handle infinite query data (e.g. { pages: [...], pageParams: [...] })
+		else if ('pages' in oldData && Array.isArray(oldData.pages)) {
+			newData = {
+				...oldData,
+				pages: oldData.pages.map((page, index) => ({
+					...page,
+					results: updater(page.results, index),
+				})),
+			};
+		}
+		// Handle if your API returns a paginated object (e.g. { results: [...] })
+		else if ('results' in oldData && Array.isArray(oldData.results)) {
+			newData = {
+				...oldData,
+				results: updater(oldData.results),
+			};
+		}
+
+		if (newData) {
+			queryClient.setQueryData(queryKey, newData);
+		}
+	}
+}

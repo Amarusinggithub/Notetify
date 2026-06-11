@@ -4,7 +4,7 @@
 > **feature-based** layout (group by _domain_). Written as a living document — check off
 > phases as they land.
 
-**Status:** Planned, not started
+**Status:** Phases 0–3 complete (structure moved, builds no worse than baseline). Phase 4 (barrels + boundary lint) pending.
 **Scope:** `client/src` only (the React app). `api/` and `collab/` are untouched.
 **Last Updated:** 2026-06-11
 
@@ -168,7 +168,9 @@ and the place to enforce "features talk to features only through their public su
 | `pages/auth/*`                            | →   | `features/auth/pages/`                  |
 | `pages/settings/*`                        | →   | `features/settings/pages/`             |
 | `pages/app/{notes,home}`                  | →   | `features/notes/pages/`                 |
-| `pages/app/{notebook,tags,tasks,spaces,files,calender,shared,trash}` | → | matching feature `pages/` |
+| `pages/app/{notebook,tags,tasks,spaces,files,calender}` | → | matching feature `pages/` |
+| `pages/app/shared`                        | →   | `features/sharing/pages/` (cross-entity view) |
+| `pages/app/trash`                         | →   | `features/trash/pages/` (cross-entity view) |
 | `pages/{landing,error,loading,not-found}` | →   | `landing` feature / `app/` (see §6)     |
 | `layouts/*`                               | →   | `app/layouts/`                          |
 | `routes/app-routes`                       | →   | `app/routes/`                           |
@@ -216,9 +218,9 @@ bang. Tighten/remove it only at the end if desired.
 
 - **`use-file` / `file-service`** — does this belong to the `files` page feature, or to the
   `editor` (attachments)? Check imports; pick one owner. Listed under `files` provisionally.
-- **`pages/app/shared.tsx` and `trash.tsx`** — are these their own features, or views of
-  `notes`? If they're cross-entity (shared spaces+notebooks+notes), they may warrant a small
-  `sharing/` feature or live in `app/`.
+- **`pages/app/shared.tsx` and `trash.tsx`** — RESOLVED: these are cross-entity views (they
+  span notes, notebooks, spaces), so each got its own feature: `features/sharing/` and
+  `features/trash/`. They were *not* buried under `notes/`.
 - **`error`, `loading`, `not-found` pages** — app-level fallbacks, not a domain. Lean toward
   `app/pages/` (a new small folder) rather than a feature.
 - **`nav-notebook` / `nav-tag`** — feature-owned (chosen here) vs. `shared/navigation`. Either
@@ -304,4 +306,38 @@ app/*       may import anything
 ## 11. Progress log
 
 - 2026-06-11 — Plan drafted.
+- 2026-06-11 — **Phases 0–3 executed.** Moved 192 files into `app/` / `features/` / `shared/`
+  via a one-shot codemod (git-tracked renames, history preserved); rewrote ~145 files' `@/`
+  imports. Added `@app`/`@features`/`@shared` aliases to vite, tsconfig, vitest; pointed
+  `index.html` at `src/app/main.tsx`, vitest `include` at `src/**`, and `components.json` at the
+  new shared paths. Co-located `tests/auth` and `tests/notes` under their features
+  (`setup.ts` stays in `tests/`).
+  - **Resolved decisions:** `use-file` → `files`; `shared.tsx` → own `features/sharing/`,
+    `trash.tsx` → own `features/trash/` (both cross-entity views); `home.tsx` → `notes/pages`;
+    `error`/`loading`/`not-found` → `app/pages`;
+    `nav-notebook`/`nav-tag` → their feature; `assets/` left at `src/assets` (alias unchanged).
+  - **Verification:** typecheck diffed against a clean HEAD worktree — **0 new errors**, and the
+    move **fixed 16 pre-existing errors** (a long-standing `@/stores`→`@/store` import typo that
+    had been degrading the whole store to `any`). Fixing it surfaced 2 latent type bugs, also
+    fixed: `verify-email.tsx` tested a `void` return for truthiness; `app-header.tsx` passed
+    `string | null` avatar to a `string | undefined` prop. The 65 remaining tsc errors are all
+    pre-existing and unrelated to layout (missing deps like `react-loading-skeleton`,
+    never-created files like `@/hooks/use-appearance`, untyped `suggestion.tsx`/`emoji-list.tsx`,
+    tag-type drift). Vitest discovers all tests at the new paths.
+- 2026-06-11 — **Follow-up:** promoted `shared`/`trash` out of `notes/` into their own
+  `features/sharing/` and `features/trash/` (they're cross-entity views). Fixed a pre-existing
+  broken import in `app-routes.tsx` — `notesLoader` was imported from a never-existent
+  `@/components/app/app-notes-sidebar`; it actually lives in `notes/components/notes-sidebar.tsx`
+  (one more pre-existing error fixed; 65→64).
+- 2026-06-11 — **Dashboard feature added.** The home screen composes widgets from several
+  features (notes, tasks, calendar, notebooks), so it became its own `features/dashboard/`
+  rather than living under any one feature or bloating `app/`. Pattern established: each leaf
+  feature exposes a dashboard-ready widget (`RecentNotes`, `UpcomingTasks`, `MiniCalendar`,
+  `NotebookGrid`) through a new public `index.ts` barrel; `dashboard/pages/home.tsx` imports
+  those barrels and arranges them in a `DashboardGrid` shell. Route now lazy-loads
+  `@/features/dashboard/pages/home`. This is the first slice of the Phase 4 barrels work and
+  demonstrates the one-way rule: dashboard → feature barrels, no leaf feature depends on another.
+- **Remaining (Phase 4):** extend the `index.ts` barrels to each feature's full public surface
+  (§3), add the import-boundary lint rule (§9), then optionally narrow the catch-all `@/*`
+  alias. Deferred to keep changes low-risk and reviewable.
 ```

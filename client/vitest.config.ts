@@ -10,6 +10,9 @@ export default mergeConfig(
 		resolve: {
 			alias: {
 				'@': path.resolve(__dirname, './src'),
+				'@app': path.resolve(__dirname, './src/app'),
+				'@features': path.resolve(__dirname, './src/features'),
+				'@shared': path.resolve(__dirname, './src/shared'),
 			},
 		},
 		envDir: path.resolve(__dirname, '../'),
@@ -18,7 +21,7 @@ export default mergeConfig(
 			globals: true,
 			environment: 'jsdom',
 			setupFiles: ['./tests/setup.ts'],
-			include: ['tests/**/*.{test,spec}.{js,ts,jsx,tsx}'],
+			include: ['src/**/*.{test,spec}.{js,ts,jsx,tsx}'],
 		},
 	})
 );
