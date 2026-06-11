@@ -1,32 +1,4 @@
-# =============================================================================
-# Notetify — test stack
-# -----------------------------------------------------------------------------
-# Ephemeral environment for running PHPUnit/Pest and Cypress against a clean
-# Postgres + Redis. Designed to be brought up, run a test suite, and torn
-# down. Data lives in tmpfs (RAM) — every `up` starts from a blank schema.
-#
-# Bring up:           docker compose -p notetify-test -f docker-compose.test.yaml up -d --build
-# Run backend tests:  docker compose -p notetify-test -f docker-compose.test.yaml run --rm test
-# Run e2e tests:      docker compose -p notetify-test -f docker-compose.test.yaml --profile e2e up
-# Tear down:          docker compose -p notetify-test -f docker-compose.test.yaml down -v
-#
-# Notes:
-#   - Always pass `-p notetify-test` so this stack doesn't collide with dev's
-#     containers, networks, or volumes when both are running.
-#   - Ports are offset by +1 (5433/6380/8001/3001) for the same reason.
-#   - No Mailpit — Laravel uses MAIL_MAILER=array in tests (mails are
-#     captured in memory and asserted via Mail::fake() / assertSent()).
-#   - No Pulse, RustFS, Seq — none are needed for unit/feature
-#     tests. Add them only if a specific test exercises them.
-# =============================================================================
-
 services:
-
-  # ---------------------------------------------------------------------------
-  # db — Postgres 18.1 (tmpfs)
-  # Throwaway test database. Data is in RAM via tmpfs so each `up` is clean
-  # and migrations run fast. Database name: notetify_test.
-  # ---------------------------------------------------------------------------
   db:
     image: postgres:18.1-alpine
     container_name: notetify-db-test
@@ -34,7 +6,15 @@ services:
       - notetify-net
     restart: "no"
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER:-postgres}", "-d", "${POSTGRES_DB:-notetify_test}"]
+      test:
+        [
+          "CMD",
+          "pg_isready",
+          "-U",
+          "${POSTGRES_USER:-postgres}",
+          "-d",
+          "${POSTGRES_DB:-notetify_test}",
+        ]
       interval: 5s
       timeout: 3s
       retries: 10
@@ -54,11 +34,6 @@ services:
           cpus: "1.0"
           memory: 512m
 
-  # ---------------------------------------------------------------------------
-  # redis — Redis 8 (no persistence)
-  # Cache + session backend for tests. Persistence disabled, runs on a
-  # separate logical DB (15) to keep test state isolated.
-  # ---------------------------------------------------------------------------
   redis:
     image: redis:8.0.1-alpine
     container_name: notetify-redis-test
@@ -80,12 +55,6 @@ services:
           cpus: "0.25"
           memory: 128m
 
-  # ---------------------------------------------------------------------------
-  # api — Laravel API booted in testing mode
-  # Same image as dev. APP_ENV=testing flips Laravel into the test config:
-  # MAIL_MAILER=array, CACHE_STORE=array, etc. Used both as the target for
-  # feature tests run inside the container and as the backend for Cypress.
-  # ---------------------------------------------------------------------------
   api:
     build:
       context: ./api
@@ -96,7 +65,15 @@ services:
       - notetify-net
     restart: "no"
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80/api/up"]
+      test:
+        [
+          "CMD",
+          "wget",
+          "--quiet",
+          "--tries=1",
+          "--spider",
+          "http://localhost:80/api/up",
+        ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -135,13 +112,6 @@ services:
           cpus: "2.0"
           memory: 1g
 
-  # ---------------------------------------------------------------------------
-  # test — one-shot PHPUnit/Pest runner
-  # Runs `php artisan test` once and exits. Use:
-  #   docker compose -p notetify-test -f docker-compose.test.yaml run --rm test
-  # Reuses the api image. Does NOT start automatically with `up` — must be
-  # invoked via `run`. Inherits env from api so DB/redis/queue match.
-  # ---------------------------------------------------------------------------
   test:
     build:
       context: ./api
@@ -177,11 +147,6 @@ services:
       - ./api:/app
       - api_vendor:/app/vendor
 
-  # ---------------------------------------------------------------------------
-  # collab — Hocuspocus WebSocket server (e2e profile only)
-  # Real-time collaborative editing backend. Only needed for e2e tests that
-  # exercise the collaborative editor. Port offset +1 from dev (1235).
-  # ---------------------------------------------------------------------------
   collab:
     build:
       context: ./collab
@@ -195,7 +160,11 @@ services:
     restart: "no"
     command: ["pnpm", "dev"]
     healthcheck:
-      test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://127.0.0.1:1234 || exit 0"]
+      test:
+        [
+          "CMD-SHELL",
+          "wget --quiet --tries=1 --spider http://127.0.0.1:1234 || exit 0",
+        ]
       interval: 15s
       timeout: 5s
       retries: 5
@@ -222,11 +191,6 @@ services:
           cpus: "0.5"
           memory: 256m
 
-  # ---------------------------------------------------------------------------
-  # client — Vite SPA (e2e profile only)
-  # Only started for end-to-end tests. Backend-only test runs skip this to
-  # save resources. Activate with `--profile e2e`.
-  # ---------------------------------------------------------------------------
   client:
     build:
       context: ./client
@@ -243,7 +207,7 @@ services:
     profiles:
       - e2e
     restart: "no"
-    command: ["pnpm",  "test"]
+    command: ["pnpm", "test"]
     ports:
       - "3001:3000"
     depends_on:

@@ -1,23 +1,5 @@
 # =============================================================================
-# Notetify — production stack (AWS deployment)
-# -----------------------------------------------------------------------------
-# Designed for a single-host EC2 deployment with Docker Compose. Bring up via:
-#
-#   docker compose -f docker-compose.prod.yaml --env-file .env.production up -d
-#
-# Architectural notes for AWS:
-#   - For a real production load, migrate db -> RDS Postgres and
-#     redis -> ElastiCache. Update .env.production hosts accordingly and
-#     remove the corresponding services here. Keep this file as the
-#     application tier (api/pulse/collab/client/rustfs).
-#   - Mail in prod uses Amazon SES (Laravel's `ses` driver). MAIL_* vars in
-#     .env.production must be set; no Mailpit container in prod.
-#   - Logs default to json-file with rotation. To ship to CloudWatch, install
-#     the CloudWatch agent on the EC2 host or switch the logging driver here
-#     to `awslogs` and supply awslogs-group / awslogs-region env vars.
-#   - All internal services use `expose:` (not `ports:`) so only the client
-#     reverse proxy (80/443) is reachable from the public internet. Lock down
-#     the security group accordingly.
+# Notetify — production stack
 # =============================================================================
 
 # Shared logging defaults — JSON file with rotation, suitable for CloudWatch
@@ -31,14 +13,6 @@ x-logging: &default-logging
     tag: "{{.Name}}"
 
 services:
-
-  # ---------------------------------------------------------------------------
-  # db — Postgres 18.1
-  # Primary datastore. For real production replace with Amazon RDS and remove
-  # this service. RDS gives you automated backups, multi-AZ failover, and
-  # point-in-time recovery — none of which a single container provides.
-  # Internal only (no published port).
-  # ---------------------------------------------------------------------------
   db:
     image: postgres:18.1-alpine
     container_name: notetify-db
@@ -46,7 +20,15 @@ services:
       - notetify-net
     restart: always
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER:-postgres}", "-d", "${POSTGRES_DB:-notetify}"]
+      test:
+        [
+          "CMD",
+          "pg_isready",
+          "-U",
+          "${POSTGRES_USER:-postgres}",
+          "-d",
+          "${POSTGRES_DB:-notetify}",
+        ]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -72,86 +54,6 @@ services:
           cpus: "0.5"
           memory: 512m
 
-  # ---------------------------------------------------------------------------
-  # redis — Redis 8
-  # Cache + sessions + queue + Pulse ingest + Hocuspocus pub/sub. For real
-  # production replace with Amazon ElastiCache. Keep AOF persistence on so a
-  # restart doesn't drop in-flight queue jobs.
-  # Internal only.
-  # ---------------------------------------------------------------------------
-  redis:
-    image: redis:8.0.1-alpine
-    container_name: notetify-redis
-    networks:
-      - notetify-net
-    restart: always
-    command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "allkeys-lru"]
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-      start_period: 5s
-    volumes:
-      - redis-data:/data
-    expose:
-      - 6379
-    env_file:
-      - .env.production
-    logging: *default-logging
-    deploy:
-      resources:
-        limits:
-          cpus: "1.0"
-          memory: 1g
-        reservations:
-          cpus: "0.1"
-          memory: 128m
-
-  # ---------------------------------------------------------------------------
-  # rustfs — S3-compatible object storage
-  # Holds note attachments. EBS-backed volume on the host. If you'd rather
-  # use AWS S3 directly, swap Laravel's filesystem disk to `s3`, fill in
-  # AWS_* env vars, and delete this service.
-  # Internal only — Laravel reaches it on http://rustfs:9000.
-  # ---------------------------------------------------------------------------
-  rustfs:
-    image: rustfs/rustfs:latest
-    container_name: notetify-rustfs
-    networks:
-      - notetify-net
-    restart: always
-    healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9000/minio/health/live"]
-      interval: 15s
-      timeout: 5s
-      retries: 10
-      start_period: 15s
-    env_file:
-      - .env.production
-    environment:
-      RUSTFS_ROOT_USER: ${RUSTFS_KEY:?RUSTFS_KEY must be set in .env.production}
-      RUSTFS_ROOT_PASSWORD: ${RUSTFS_SECRET:?RUSTFS_SECRET must be set in .env.production}
-      RUSTFS_VOLUMES: /data
-    volumes:
-      - rustfs-data:/data
-    expose:
-      - 9000
-    logging: *default-logging
-    deploy:
-      resources:
-        limits:
-          cpus: "2.0"
-          memory: 2g
-        reservations:
-          cpus: "0.25"
-          memory: 256m
-
-  # ---------------------------------------------------------------------------
-  # api — Laravel HTTP API (PHP-FPM + nginx)
-  # Serves /api/*. Internal only — fronted by client's nginx which
-  # terminates TLS and proxies /api to this container.
-  # ---------------------------------------------------------------------------
   api:
     build:
       context: ./api
@@ -162,7 +64,15 @@ services:
       - notetify-net
     restart: always
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80/api/up"]
+      test:
+        [
+          "CMD",
+          "wget",
+          "--quiet",
+          "--tries=1",
+          "--spider",
+          "http://localhost:80/api/up",
+        ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -201,102 +111,6 @@ services:
           cpus: "0.5"
           memory: 512m
 
-  # ---------------------------------------------------------------------------
-  # pulse — Pulse aggregator
-  # Runs `php artisan pulse:work`. Aggregates Redis-buffered metrics into
-  # Postgres for the /pulse dashboard.
-  # ---------------------------------------------------------------------------
-  pulse:
-    image: notetify-api
-    container_name: notetify-pulse
-    networks:
-      - notetify-net
-    restart: always
-    command: ["php", "artisan", "pulse:work"]
-    healthcheck:
-      test: ["CMD-SHELL", "pgrep -f 'pulse:work' > /dev/null"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-      start_period: 20s
-    depends_on:
-      api:
-        condition: service_healthy
-    env_file:
-      - .env.production
-    environment:
-      - APP_ENV=production
-      - APP_DEBUG=false
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DB_DATABASE=notetify
-      - DB_USERNAME=postgres
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-    logging: *default-logging
-    deploy:
-      resources:
-        limits:
-          cpus: "0.5"
-          memory: 384m
-        reservations:
-          cpus: "0.05"
-          memory: 64m
-
-  # ---------------------------------------------------------------------------
-  # horizon — Laravel Horizon queue worker + supervisor
-  # Runs `php artisan horizon`, which spawns and supervises the worker pool
-  # defined in config/horizon.php. SIGTERM drains in-flight jobs cleanly.
-  # Dashboard is served by api at /horizon (gated in prod via
-  # HorizonServiceProvider::gate()).
-  # ---------------------------------------------------------------------------
-  horizon:
-    image: notetify-api
-    container_name: notetify-horizon
-    networks:
-      - notetify-net
-    restart: always
-    command: ["php", "artisan", "horizon"]
-    stop_signal: SIGTERM
-    stop_grace_period: 60s
-    healthcheck:
-      test: ["CMD-SHELL", "pgrep -f 'artisan horizon' > /dev/null"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-      start_period: 30s
-    depends_on:
-      api:
-        condition: service_healthy
-    env_file:
-      - .env.production
-    environment:
-      - APP_ENV=production
-      - APP_DEBUG=false
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DB_DATABASE=notetify
-      - DB_USERNAME=postgres
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - QUEUE_CONNECTION=redis
-    logging: *default-logging
-    deploy:
-      resources:
-        limits:
-          cpus: "1.5"
-          memory: 768m
-        reservations:
-          cpus: "0.2"
-          memory: 192m
-
-  # ---------------------------------------------------------------------------
-  # collab — Hocuspocus (Yjs CRDT WebSocket server)
-  # Real-time collaborative editing. Receives WS connections at /collab
-  # (proxied by client's nginx with Upgrade headers). Persists via
-  # webhook back to api. Multi-instance fanout via Redis.
-  # See docs/COLLABORATION.md for the full architecture.
-  # ---------------------------------------------------------------------------
   collab:
     build:
       context: ./collab
@@ -307,7 +121,15 @@ services:
       - notetify-net
     restart: always
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:1234/health"]
+      test:
+        [
+          "CMD",
+          "wget",
+          "--quiet",
+          "--tries=1",
+          "--spider",
+          "http://localhost:1234/health",
+        ]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -337,14 +159,6 @@ services:
           cpus: "0.1"
           memory: 128m
 
-  # ---------------------------------------------------------------------------
-  # client — nginx + static React build (public-facing)
-  # The only container with published ports. Terminates TLS via Let's Encrypt
-  # certs (mounted from ./certbot/conf), serves the SPA, and reverse-proxies:
-  #   /api    -> api:80
-  #   /collab -> collab:1234  (with Upgrade/Connection for WebSocket)
-  # Make sure client/nginx/*.conf includes both proxy blocks.
-  # ---------------------------------------------------------------------------
   client:
     build:
       context: ./client
@@ -360,7 +174,8 @@ services:
       - notetify-net
     restart: always
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
+      test:
+        ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -390,11 +205,6 @@ services:
           cpus: "0.1"
           memory: 64m
 
-  # ---------------------------------------------------------------------------
-  # certbot — Let's Encrypt cert renewal
-  # Runs continuously, attempting renewal every 12h. Activate with the
-  # `production` profile so it doesn't start in local prod-test runs.
-  # ---------------------------------------------------------------------------
   certbot:
     image: certbot/certbot
     container_name: certbot
@@ -411,13 +221,10 @@ services:
         limits:
           cpus: "0.25"
           memory: 128m
-
 networks:
   notetify-net:
     driver: bridge
 
 volumes:
   db-data:
-  redis-data:
-  rustfs-data:
   api-storage:

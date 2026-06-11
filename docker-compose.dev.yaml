@@ -1,28 +1,10 @@
 # =============================================================================
 # Notetify — development stack
-# -----------------------------------------------------------------------------
-# Brings up the full local environment: Postgres, Redis, the Laravel API,
-# the React client, the Hocuspocus collab hand-off (run separately), plus
-# dev-only observability and storage tooling (Mailpit, Seq, RustFS,
-# Pulse).
-#
 # Bring up:   docker compose -f docker-compose.dev.yaml up --build
 # Tear down:  docker compose -f docker-compose.dev.yaml down
-#
-# All resource limits are conservative dev defaults — bump them if a service
-# starts OOM-killing on your machine. They're applied via `deploy.resources`
-# which Docker Compose v2 honours even outside of swarm.
 # =============================================================================
 
 services:
-
-  # ---------------------------------------------------------------------------
-  # db — Postgres
-  # Primary datastore. Holds users, notes (incl. content JSONB + ydoc_state
-  # BYTEA), tags, sessions. Source of truth for everything except live CRDT
-  # state in Hocuspocus memory.
-  # Reachable on host: localhost:5432
-  # ---------------------------------------------------------------------------
   db:
     image: postgres:18.1-alpine
     container_name: notetify-db
@@ -57,12 +39,7 @@ services:
           cpus: "0.25"
           memory: 256m
 
-  # ---------------------------------------------------------------------------
-  # redis — Redis 8
-  # Multi-purpose: Laravel cache + sessions + queue + Pulse ingest +
-  # Hocuspocus pub/sub for SSE invalidation.
-  # Reachable on host: localhost:6379
-  # ---------------------------------------------------------------------------
+
   redis:
     image: redis:8.0.1-alpine
     container_name: notetify-redis-cache
@@ -94,10 +71,7 @@ services:
 
   # ---------------------------------------------------------------------------
   # mailpit — SMTP catcher + web UI
-  # Catches every outgoing email from Laravel in dev (verification, password
-  # reset, etc.) so nothing actually leaves the machine.
   # Web UI:   http://localhost:8025
-  # SMTP in:  mailpit:1025 (used by api MAIL_HOST)
   # ---------------------------------------------------------------------------
   mailpit:
     image: axllent/mailpit:latest
