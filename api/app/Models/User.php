@@ -15,8 +15,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Laravel\Fortify\Contracts\PasskeyUser;
 use Laravel\Fortify\PasskeyAuthenticatable;
 
-
-
 class User extends Authenticatable  implements MustVerifyEmail, PasskeyUser
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
@@ -28,7 +26,6 @@ class User extends Authenticatable  implements MustVerifyEmail, PasskeyUser
      * @var list<string>
      */
     protected $fillable = [
-
         'email',
         'password',
         'first_name',
@@ -36,9 +33,8 @@ class User extends Authenticatable  implements MustVerifyEmail, PasskeyUser
         'avatar',
         'timezone',
         'locale',
-        'preferredLanguage'
-
-
+        'preferredLanguage',
+        'last_login_ip'
     ];
 
     /**
@@ -48,6 +44,12 @@ class User extends Authenticatable  implements MustVerifyEmail, PasskeyUser
      */
     protected $hidden = [
         'password',
+        'two_factor_confirmed_at',
+        'two_factor_recovery_codes',
+        'two_factor_secret',
+        'last_login_ip',
+        'timezone',
+        'last_login_at',
         'remember_token',
     ];
 
@@ -64,7 +66,6 @@ class User extends Authenticatable  implements MustVerifyEmail, PasskeyUser
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_active' => 'boolean',
-
         ];
     }
 
@@ -109,12 +110,7 @@ protected function isVerified(): Attribute
 }
 
 
-
-
-
-
-
-    //user_note
+//user_note
      public function notes(){
 return $this->belongsToMany(Note::class)
                 ->using(UserNote::class)

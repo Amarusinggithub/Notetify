@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router';
-import { prefetchNotes } from '@/features/notes/hooks/use-note';
+import { prefetchNotes } from '@/features/notes/hooks/prefetch-notes';
 import { prefetchNotebooks } from '@/features/notebooks/hooks/use-notebook';
 import { prefetchTags } from '@/features/tags/hooks/use-tag';
 import { type NavItem } from '@/shared/types';

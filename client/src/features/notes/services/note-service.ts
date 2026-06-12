@@ -6,7 +6,7 @@ import type {
 	PaginatedNotesResponse,
 	UpdateUserNotePayload,
 } from '@/shared/types';
-import type { noteQueryKeys } from '@/shared/utils/query-keys';
+import type { noteQueryKeys } from '../utils/query-keys';
 
 export async function fetchNote({
 	queryKey,

@@ -15,8 +15,8 @@ class CollabController extends Controller
         $user = $request->user();
         $userNote = UserNote::where('id', $noteId)->where('user_id', $user->id)->firstOrFail();
         $note = $userNote->note;
-
         $now = time();
+        
         $payload = [
             'sub'    => (string) $user->id,
             'name'   => $user->name,
