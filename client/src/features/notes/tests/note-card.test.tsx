@@ -19,12 +19,12 @@ vi.mock('@lottiefiles/react-lottie-player', () => ({
 	Controls: () => null,
 }));
 
-vi.mock('@/features/notes/hooks/ensure-note', () => ({
-	ensureNote: vi.fn(() => Promise.resolve()),
-}));
-
 vi.mock('@/features/notes/hooks/prefetch-note', () => ({
 	prefetchNote: vi.fn(() => Promise.resolve()),
+}));
+
+vi.mock('@/features/editor/hooks/prefetch-collab-session', () => ({
+	prefetchCollabSession: vi.fn(),
 }));
 
 const queryClient = new QueryClient({

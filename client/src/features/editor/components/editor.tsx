@@ -29,8 +29,9 @@ import { HocuspocusProvider } from "@hocuspocus/provider";
 import Collaboration from "@tiptap/extension-collaboration";
 import { CollaborationCaret } from "@tiptap/extension-collaboration-caret";
 import * as Y from "yjs";
-import { getCollabSession } from "@/features/editor/services/collab-service";
+import { collabSessionQueryOptions } from "@/features/editor/utils/query-options";
 import { getCurrentUser } from "../utils/helpers";
+import { queryClient } from "@/app/providers/query-provider";
 
 interface CollabState {
     ydoc: Y.Doc;
@@ -54,7 +55,8 @@ export const Editor = () => {
         if (!currentNoteId) return;
 
         let cancelled = false;
-        getCollabSession(currentNoteId)
+        queryClient
+            .ensureQueryData(collabSessionQueryOptions(currentNoteId))
             .then(({ token, wsUrl, docId }) => {
                 if (cancelled) return;
                 const ydoc = new Y.Doc();
