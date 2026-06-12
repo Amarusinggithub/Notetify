@@ -6,7 +6,7 @@ import type {
 	UpdateUserNotebookPayload,
 	UserNotebook,
 } from '@/shared/types';
-import type { notebookQueryKeys } from '@/shared/utils/query-keys';
+import type { notebookQueryKeys } from '@/features/notebooks/utils/query-keys';
 
 export async function fetchNotebook({
 	queryKey,
@@ -64,12 +64,12 @@ export async function deleteNotebook(userNotebookId: string): Promise<void> {
 }
 
 export const createNotebook = async (
-	userNotebook: CreateUserNotebook
+	userNotebook: CreateNotebook
 ): Promise<UserNotebook> => {
 	try {
-		// Map legacy CreateUserNote shape to API contract
 		const response = await api.post('notebooks/', {
-			content: userNotebook.notebook_data?.name ?? '',
+			name: userNotebook.name,
+			space_id: userNotebook.space_id,
 		});
 		return response.data as UserNotebook;
 	} catch (e) {

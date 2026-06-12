@@ -1,16 +1,36 @@
 import { computePosition } from '@floating-ui/dom';
 import { ReactRenderer } from '@tiptap/react';
+import type { Editor } from '@tiptap/react';
+import type { EmojiItem } from '@tiptap/extension-emoji';
 
-import { EmojiList } from '@/shared/components/shared/emoji-list';
+import {
+	EmojiList,
+	type EmojiListProps,
+	type EmojiListRef,
+	type SuggestionKeyDownProps,
+} from '@/shared/components/shared/emoji-list';
+
+// Subset of TipTap's SuggestionProps that this renderer actually reads.
+// (@tiptap/suggestion is a transitive dep and isn't directly importable.)
+type EmojiSuggestionProps = EmojiListProps & {
+	editor: Editor;
+	clientRect?: (() => DOMRect | null) | null;
+};
 
 export default {
-	items: ({ editor, query }) => {
-		return editor.storage.emoji.emojis
-			.filter(({ shortcodes, tags }) => {
+	items: ({
+		editor,
+		query,
+	}: {
+		editor: Editor;
+		query: string;
+	}): EmojiItem[] => {
+		return (editor.storage.emoji.emojis as EmojiItem[])
+			.filter((item) => {
 				return (
-					shortcodes.find((shortcode) =>
+					item.shortcodes.find((shortcode) =>
 						shortcode.startsWith(query.toLowerCase())
-					) || tags.find((tag) => tag.startsWith(query.toLowerCase()))
+					) || item.tags.find((tag) => tag.startsWith(query.toLowerCase()))
 				);
 			})
 			.slice(0, 5);
@@ -19,10 +39,10 @@ export default {
 	allowSpaces: false,
 
 	render: () => {
-		let component;
+		let component: ReactRenderer<EmojiListRef, EmojiListProps>;
 
-		function repositionComponent(clientRect) {
-			if (!component || !component.element) {
+		function repositionComponent(clientRect: DOMRect | null) {
+			if (!component?.element || !clientRect) {
 				return;
 			}
 
@@ -32,10 +52,11 @@ export default {
 				},
 			};
 
-			computePosition(virtualElement, component.element, {
+			const element = component.element as HTMLElement;
+			computePosition(virtualElement, element, {
 				placement: 'bottom-start',
 			}).then((pos) => {
-				Object.assign(component.element.style, {
+				Object.assign(element.style, {
 					left: `${pos.x}px`,
 					top: `${pos.y}px`,
 					position: pos.strategy === 'fixed' ? 'fixed' : 'absolute',
@@ -44,22 +65,22 @@ export default {
 		}
 
 		return {
-			onStart: (props) => {
+			onStart: (props: EmojiSuggestionProps) => {
 				component = new ReactRenderer(EmojiList, {
 					props,
 					editor: props.editor,
 				});
 
 				document.body.appendChild(component.element);
-				repositionComponent(props.clientRect());
+				repositionComponent(props.clientRect?.() ?? null);
 			},
 
-			onUpdate(props) {
+			onUpdate(props: EmojiSuggestionProps) {
 				component.updateProps(props);
-				repositionComponent(props.clientRect());
+				repositionComponent(props.clientRect?.() ?? null);
 			},
 
-			onKeyDown(props) {
+			onKeyDown(props: SuggestionKeyDownProps) {
 				if (props.event.key === 'Escape') {
 					document.body.removeChild(component.element);
 					component.destroy();
@@ -67,7 +88,7 @@ export default {
 					return true;
 				}
 
-				return component.ref?.onKeyDown(props);
+				return component.ref?.onKeyDown(props) ?? false;
 			},
 
 			onExit() {

@@ -1,4 +1,4 @@
-import { motion } from 'motion';
+import { motion, type Variants } from 'motion/react';
 
 const farmerSteps = [
 	{
@@ -53,12 +53,12 @@ const buyerSteps = [
 	},
 ];
 
-const container = {
+const container: Variants = {
 	hidden: {},
 	show: { transition: { staggerChildren: 0.15 } },
 };
 
-const item = {
+const item: Variants = {
 	hidden: { opacity: 0, y: 20 },
 	show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
 };

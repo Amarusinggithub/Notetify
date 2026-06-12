@@ -1,21 +1,21 @@
 import type { QueryFunctionContext } from '@tanstack/react-query';
 import api from '@/shared/lib/api';
 import type {
-	CreateUserTag,
-	PaginatedTagResponse,
-	UpdateUserTagPayload,
-	UserTag,
+	CreateTag,
+	PaginatedTagsResponse,
+	Tag,
+	UpdateTagPayload,
 } from '@/shared/types';
-import type { tagQueryKeys } from '@/shared/utils/query-keys';
+import type { tagQueryKeys } from '@/features/tags/utils/query-keys';
 
 export async function fetchTag({
 	queryKey,
 }: QueryFunctionContext<
 	ReturnType<typeof tagQueryKeys.detail>
->): Promise<UserTag> {
+>): Promise<Tag> {
 	const [, , tagId] = queryKey;
 
-	const response = await api.get<UserTag>(`tags/${tagId}`);
+	const response = await api.get<Tag>(`tags/${tagId}`);
 
 	return response.data;
 }
@@ -26,7 +26,7 @@ export async function fetchTagsPage({
 }: QueryFunctionContext<
 	ReturnType<typeof tagQueryKeys.list>,
 	number
->): Promise<PaginatedTagResponse> {
+>): Promise<PaginatedTagsResponse> {
 	const [, , search, sortBy] = queryKey;
 	const params = new URLSearchParams({
 		page: String(pageParam),
@@ -42,30 +42,32 @@ export async function fetchTagsPage({
 		params.set('search', search);
 	}
 
-	const response = await api.get<PaginatedTagResponse>(
+	const response = await api.get<PaginatedTagsResponse>(
 		`tags?${params.toString()}`
 	);
 	return response.data;
 }
 
 export async function updateTag(
-	userTagId: string,
-	payload: UpdateUserTagPayload
-): Promise<UserTag> {
-	const response = await api.put<UserTag>(`tags/${userTagId}`, payload);
+	tagId: string,
+	payload: UpdateTagPayload
+): Promise<Tag> {
+	const response = await api.put<Tag>(`tags/${tagId}`, payload);
 	return response.data;
 }
 
-export async function deleteTag(userTagId: string): Promise<void> {
-	await api.delete(`tags/${userTagId}`);
+export async function deleteTag(tagId: string): Promise<void> {
+	await api.delete(`tags/${tagId}`);
 }
 
-export const createTag = async (tag: CreateUserTag): Promise<UserTag> => {
+export const createTag = async (tag: CreateTag): Promise<Tag> => {
 	try {
-		const response = await api.post('tags/', {
-			name: tag.tag_data?.name ?? '',
+		const response = await api.post<Tag>('tags/', {
+			name: tag.name,
+			color: tag.color,
+			order: tag.order,
 		});
-		return response.data as UserTag;
+		return response.data;
 	} catch (e) {
 		console.error(e);
 		throw e;

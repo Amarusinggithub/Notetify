@@ -14,7 +14,7 @@ vi.mock('@/app/store/index.ts', () => ({
 	}),
 }));
 vi.mock('@/features/auth/hooks/use-forgot-password', () => ({
-	useForgotPassword: () => mockForgotPassword,
+	default: (...args: any[]) => mockForgotPassword(...args),
 }));
 
 describe('ForgotPassword page', () => {

@@ -1,71 +1,95 @@
-import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
+import type { EmojiItem } from "@tiptap/extension-emoji";
 
-export const EmojiList = forwardRef((props, ref) => {
-	const [selectedIndex, setSelectedIndex] = useState(0);
+// Minimal shape of the props TipTap's suggestion utility passes to onKeyDown.
+// (@tiptap/suggestion is a transitive dep and isn't directly importable.)
+export type SuggestionKeyDownProps = { event: KeyboardEvent };
 
-	const selectItem = (index) => {
-		const item = props.items[index];
+export type EmojiListProps = {
+    items: EmojiItem[];
+    command: (props: { name: string }) => void;
+};
 
-		if (item) {
-			props.command({ name: item.name });
-		}
-	};
+export type EmojiListRef = {
+    onKeyDown: (props: SuggestionKeyDownProps) => boolean;
+};
 
-	const upHandler = () => {
-		setSelectedIndex(
-			(selectedIndex + props.items.length - 1) % props.items.length
-		);
-	};
+export const EmojiList = forwardRef<EmojiListRef, EmojiListProps>(
+    (props, ref) => {
+        const [selectedIndex, setSelectedIndex] = useState(0);
 
-	const downHandler = () => {
-		setSelectedIndex((selectedIndex + 1) % props.items.length);
-	};
+        const selectItem = (index: number) => {
+            const item = props.items[index];
 
-	const enterHandler = () => {
-		selectItem(selectedIndex);
-	};
+            if (item) {
+                props.command({ name: item.name });
+            }
+        };
 
-	useEffect(() => setSelectedIndex(0), [props.items]);
+        const upHandler = () => {
+            setSelectedIndex(
+                (selectedIndex + props.items.length - 1) % props.items.length,
+            );
+        };
 
-	useImperativeHandle(ref, () => {
-		return {
-			onKeyDown: (x) => {
-				if (x.event.key === 'ArrowUp') {
-					upHandler();
-					return true;
-				}
+        const downHandler = () => {
+            setSelectedIndex((selectedIndex + 1) % props.items.length);
+        };
 
-				if (x.event.key === 'ArrowDown') {
-					downHandler();
-					return true;
-				}
+        const enterHandler = () => {
+            selectItem(selectedIndex);
+        };
 
-				if (x.event.key === 'Enter') {
-					enterHandler();
-					return true;
-				}
+        useEffect(() => setSelectedIndex(0), [props.items]);
 
-				return false;
-			},
-		};
-	}, [upHandler, downHandler, enterHandler]);
+        useImperativeHandle(
+            ref,
+            () => {
+                return {
+                    onKeyDown: ({ event }: SuggestionKeyDownProps) => {
+                        if (event.key === "ArrowUp") {
+                            upHandler();
+                            return true;
+                        }
 
-	return (
-		<div className="dropdown-menu">
-			{props.items.map((item, index) => (
-				<button
-					className={index === selectedIndex ? 'is-selected' : ''}
-					key={index}
-					onClick={() => selectItem(index)}
-				>
-					{item.fallbackImage ? (
-						<img src={item.fallbackImage} align="absmiddle" />
-					) : (
-						item.emoji
-					)}
-					:{item.name}:
-				</button>
-			))}
-		</div>
-	);
-});
+                        if (event.key === "ArrowDown") {
+                            downHandler();
+                            return true;
+                        }
+
+                        if (event.key === "Enter") {
+                            enterHandler();
+                            return true;
+                        }
+
+                        return false;
+                    },
+                };
+            },
+            [upHandler, downHandler, enterHandler],
+        );
+
+        return (
+            <div className="dropdown-menu">
+                {props.items.map((item, index) => (
+                    <button
+                        className={index === selectedIndex ? "is-selected" : ""}
+                        key={index}
+                        onClick={() => selectItem(index)}
+                    >
+                        {item.fallbackImage ? (
+                            <img
+                                src={item.fallbackImage}
+                                style={{ verticalAlign: "middle" }}
+                                alt={item.name}
+                            />
+                        ) : (
+                            item.emoji
+                        )}
+                        :{item.name}:
+                    </button>
+                ))}
+            </div>
+        );
+    },
+);

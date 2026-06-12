@@ -1,6 +1,6 @@
 import { Dialog, DialogContent, DialogTitle } from '@radix-ui/react-dialog';
 import React, { useEffect, useRef, useState } from 'react';
-import useMutateTag from '@/features/tags/hooks/use-tag';
+import { useMutateTag } from '@/features/tags/hooks/use-mutate-tag';
 import { Button } from '@/shared/components/ui/button';
 import {
 	DialogClose,
@@ -17,7 +17,7 @@ const EditTagPopup = () => {
 
 	useEffect(() => {
 		if (selectedTag) {
-			setTagName(selectedTag.tag.name);
+			setTagName(selectedTag.name);
 
 			if (editInputRef.current) {
 				editInputRef.current.focus();
@@ -34,16 +34,11 @@ const EditTagPopup = () => {
 		if (TagName.trim() === '') return;
 
 		const updatedTag = {
-			...selectedTag!.tag,
+			...selectedTag!,
 			name: TagName.trim(),
 		};
 
-		const updatedUserTag = {
-			...selectedTag!,
-			tag: updatedTag,
-		};
-
-		editTag(updatedUserTag);
+		editTag(updatedTag);
 		setTagName('');
 		handleClose();
 	};

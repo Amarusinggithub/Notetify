@@ -49,9 +49,8 @@ const TitleExtension = Extension.create({
                             }
 
                             // Block mark additions (bold, italic, underline, fontSize, etc.)
-                            // @ts-ignore - Check if this is a mark step
                             if (
-                                step.mark ||
+                                "mark" in step ||
                                 step.constructor.name === "AddMarkStep"
                             ) {
                                 return false;

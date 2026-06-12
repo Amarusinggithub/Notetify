@@ -17,7 +17,7 @@ vi.mock("@/app/store/index.ts", () => ({
     ),
 }));
 vi.mock("@/features/auth/hooks/use-signup", () => ({
-    useSignUp: () => mockSignUp,
+    default: (...args: any[]) => mockSignUp(...args),
 }));
 
 describe("Register page", () => {

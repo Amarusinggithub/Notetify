@@ -18,8 +18,10 @@ vi.mock('@/app/store/index.ts', () => ({
 	}),
 }));
 vi.mock('@/features/auth/hooks/use-verify-email', () => ({
-	useVerifyEmail: () => mockVerifyEmail,
-	useLogout: () => vi.fn(),
+	default: (...args: any[]) => mockVerifyEmail(...args),
+}));
+vi.mock('@/features/auth/hooks/use-logout', () => ({
+	default: vi.fn(),
 }));
 
 describe('VerifyEmail page', () => {

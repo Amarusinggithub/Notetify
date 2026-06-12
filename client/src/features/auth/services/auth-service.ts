@@ -135,7 +135,9 @@ export async function getTwoFactorQrCode(): Promise<string> {
 	return response.data.svg;
 }
 
-export async function updateProfile(params): Promise<void> {
+export async function updateProfile(
+	params: Record<string, unknown>
+): Promise<void> {
 	await api.put('user/profile-information', params);
 }
 

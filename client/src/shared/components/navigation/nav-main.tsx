@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router';
 import { prefetchNotes } from '@/features/notes/hooks/prefetch-notes';
-import { prefetchNotebooks } from '@/features/notebooks/hooks/use-notebook';
-import { prefetchTags } from '@/features/tags/hooks/use-tag';
+import { prefetchNotebooks } from '@/features/notebooks/hooks/prefetch-notebooks';
+import { prefetchTags } from '@/features/tags/hooks/prefetch-tags';
 import { type NavItem } from '@/shared/types';
 import {
 	SidebarGroup,

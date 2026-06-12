@@ -49,9 +49,8 @@ describe("useUpdateNote", () => {
         updateNoteMock.mockReset();
     });
 
-    it("keeps the note detail cache in sync with optimistic content updates", async () => {
+    it("keeps the note detail cache in sync with optimistic flag updates", async () => {
         const noteId = "note-1";
-        const nextContent = "<h1>Updated</h1><p>Body</p>";
         const deferredUpdate = createDeferred<any>();
         const queryClient = new QueryClient({
             defaultOptions: {
@@ -96,22 +95,19 @@ describe("useUpdateNote", () => {
 
         result.current.mutate({
             id: noteId,
-            payload: { content: nextContent },
+            payload: { is_pinned_in_home: true },
         });
 
         await waitFor(() => {
             const cached = queryClient.getQueryData<any>(
                 noteQueryKeys.detail(noteId),
             );
-            expect(cached.note.content).toBe(nextContent);
+            expect(cached.is_pinned_in_home).toBe(true);
         });
 
         deferredUpdate.resolve({
             ...original,
-            note: {
-                ...original.note,
-                content: nextContent,
-            },
+            is_pinned_in_home: true,
         });
 
         await waitFor(() => {

@@ -290,8 +290,11 @@ class NoteController extends Controller
     {
         $tagIds = [];
         foreach ($tagNames as $name) {
-            // Find the tag by name, or create it if it doesn't exist
-            $tag = Tag::firstOrCreate(['name' => $name]);
+            // Find this user's tag by name, or create it if it doesn't exist
+            $tag = Tag::firstOrCreate([
+                'name' => $name,
+                'user_id' => Auth::id(),
+            ]);
             $tagIds[] = $tag->id;
         }
 

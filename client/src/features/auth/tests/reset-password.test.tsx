@@ -21,7 +21,7 @@ vi.mock('@/app/store/index.ts', () => ({
 	}),
 }));
 vi.mock('@/features/auth/hooks/use-password-reset', () => ({
-	usePasswordReset: () => mockPasswordReset,
+	default: (...args: any[]) => mockPasswordReset(...args),
 }));
 
 function renderWithRoute(path: string) {

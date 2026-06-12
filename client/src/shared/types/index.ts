@@ -114,6 +114,8 @@ export interface Auth {
 
 // ─── Tags ─────────────────────────────────────────────────────────────────────
 
+// Tags are the per-user entity directly (see docs/ARCHITECTURE.md):
+// there is no UserTag pivot — a Tag belongs to one user.
 export interface Tag {
 	id: string;
 	user_id: string;
@@ -127,7 +129,8 @@ export interface Tag {
 
 export type CreateTag = {
 	name: string;
-	color?: string;
+	color?: string | null;
+	order?: number | null;
 };
 
 export type UpdateTagPayload = Partial<{
@@ -196,7 +199,6 @@ export interface Notebook {
 	created_by_user_id: string;
 	space_id: string | null;
 	name: string;
-	description: string;
 	is_shared: boolean;
 	created_at: string;
 	updated_at: string;
@@ -212,8 +214,8 @@ export interface UserNotebook {
 	is_shared: boolean;
 	is_pinned_in_space: boolean;
 	pinned_in_space_at: string | null;
-	is_pinned_to_home: boolean;
-	pinned_to_home_at: string | null;
+	is_pinned_in_home: boolean;
+	pinned_in_home_at: string | null;
 	is_trashed: boolean;
 	trashed_at: string | null;
 	is_default: boolean;
@@ -223,7 +225,6 @@ export interface UserNotebook {
 
 export type CreateNotebook = {
 	name: string;
-	description: string;
 
 	space_id?: string;
 };

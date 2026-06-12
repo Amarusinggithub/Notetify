@@ -25,12 +25,12 @@ describe('notes api', () => {
 		);
 	});
 
-	it('updateNote calls PUT with content', async () => {
-		const data = await notes.updateNote('id-1', { content: '<p>x</p>' });
+	it('updateNote calls PUT with the flag payload', async () => {
+		const data = await notes.updateNote('id-1', { is_pinned_in_home: true });
 		expect((api as any).put).toHaveBeenCalledWith('notes/id-1', {
-			content: '<p>x</p>',
+			is_pinned_in_home: true,
 		});
-		expect(data).toEqual({ content: '<p>x</p>' });
+		expect(data).toEqual({ is_pinned_in_home: true });
 	});
 
 	it('deleteNote calls DELETE endpoint', async () => {

@@ -18,7 +18,7 @@ vi.mock("@/app/store/index.ts", () => ({
     ),
 }));
 vi.mock("@/features/auth/hooks/use-login", () => ({
-    useLogin: () => mockLogin,
+    default: (...args: any[]) => mockLogin(...args),
 }));
 
 describe("Login page", () => {

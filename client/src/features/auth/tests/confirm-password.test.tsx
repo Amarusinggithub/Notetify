@@ -14,7 +14,7 @@ vi.mock('@/app/store/index.ts', () => ({
 	}),
 }));
 vi.mock('@/features/auth/hooks/use-confirm-password', () => ({
-	useConfirmPassword: () => mockConfirmPassword,
+	default: (...args: any[]) => mockConfirmPassword(...args),
 }));
 
 describe('ConfirmPassword page', () => {
