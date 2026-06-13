@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class NoteController extends Controller
 {
@@ -25,11 +26,9 @@ class NoteController extends Controller
         'is_trashed' => 'trashed_at',
     ];
 
-
     /**
      * Returns a single note
      */
-
     public function show(string $id)
     {
         $userId = Auth::id();
@@ -53,11 +52,13 @@ class NoteController extends Controller
     {
         $userId = Auth::id();
 
+        // No join on notes: sorting and all filters use user_note columns or
+        // whereHas subqueries (see scopeSearch/scopeWithTag), so a notes join
+        // would just be dead weight on every list query.
         $query = UserNote::query()
             ->select('user_note.*')
             ->with(['note', 'tags'])
-            ->forUser($userId)
-            ->leftJoin('notes', 'notes.id', '=', 'user_note.note_id');
+            ->forUser($userId);
 
         if ($request->filled('tag')) {
             $query->withTag($request->string('tag')->toString());
@@ -136,20 +137,21 @@ class NoteController extends Controller
         ], $this->buildFlagPayload($validated));
 
         // Handle added_at timestamps
-        if (!empty($validated['notebook_id'])) {
+        if (! empty($validated['notebook_id'])) {
             $createData['added_to_notebook_at'] = now();
         }
-        if (!empty($validated['space_id'])) {
+        if (! empty($validated['space_id'])) {
             $createData['added_to_space_at'] = now();
         }
 
         $userNote = UserNote::create($createData);
 
-        if (!empty($tags)) {
+        if (! empty($tags)) {
             $this->syncTags($userNote, $tags);
         }
 
         $userNote->load(['note', 'tags']);
+
         return response()->json($userNote, 201);
     }
 
@@ -171,29 +173,29 @@ class NoteController extends Controller
         ]);
 
         $flagPayload = $this->buildFlagPayload($validated);
-        if (!empty($flagPayload)) {
+        if (! empty($flagPayload)) {
             $userNote->fill($flagPayload);
         }
 
         if (array_key_exists('notebook_id', $validated)) {
             if ($userNote->notebook_id !== $validated['notebook_id']) {
-                 $userNote->notebook_id = $validated['notebook_id'];
-                 if ($validated['notebook_id']) {
-                     $userNote->added_to_notebook_at = now();
-                 } else {
-                     $userNote->added_to_notebook_at = null;
-                 }
+                $userNote->notebook_id = $validated['notebook_id'];
+                if ($validated['notebook_id']) {
+                    $userNote->added_to_notebook_at = now();
+                } else {
+                    $userNote->added_to_notebook_at = null;
+                }
             }
         }
 
         if (array_key_exists('space_id', $validated)) {
-             if ($userNote->space_id !== $validated['space_id']) {
-                 $userNote->space_id = $validated['space_id'];
-                 if ($validated['space_id']) {
-                     $userNote->added_to_space_at = now();
-                 } else {
-                     $userNote->added_to_space_at = null;
-                 }
+            if ($userNote->space_id !== $validated['space_id']) {
+                $userNote->space_id = $validated['space_id'];
+                if ($validated['space_id']) {
+                    $userNote->added_to_space_at = now();
+                } else {
+                    $userNote->added_to_space_at = null;
+                }
             }
         }
 
@@ -201,7 +203,7 @@ class NoteController extends Controller
         $userNote->load(['note', 'tags']);
         $userNote->touch();
 
-        Cache::forget("user:" . Auth::id() . ":note:{$id}");
+        Cache::forget('user:'.Auth::id().":note:{$id}");
 
         return response()->json($userNote);
     }
@@ -220,12 +222,12 @@ class NoteController extends Controller
 
             $remaining = UserNote::where('note_id', $note->id)->exists();
 
-            if (!$remaining) {
+            if (! $remaining) {
                 $note->delete();
             }
         });
 
-        Cache::forget("user:" . Auth::id() . ":note:{$id}");
+        Cache::forget('user:'.Auth::id().":note:{$id}");
 
         return response()->json(['status' => 'deleted']);
     }
@@ -250,13 +252,12 @@ class NoteController extends Controller
         return $payload;
     }
 
-
     /**
      * SSE stream — pushes note.updated events from the Redis pub/sub channel
      * for the authenticated user. Hocuspocus publishes to notes:user:{userId}
      * after every successful onStoreDocument.
      */
-    public function stream(Request $request): \Symfony\Component\HttpFoundation\StreamedResponse
+    public function stream(Request $request): StreamedResponse
     {
         $userId = Auth::id();
 
@@ -268,7 +269,7 @@ class NoteController extends Controller
             flush();
 
             try {
-                error_log('[SSE] starting subscribe for user ' . $userId);
+                error_log('[SSE] starting subscribe for user '.$userId);
                 Redis::subscribe(["notes:user:{$userId}"], function (string $message) {
                     echo "data: {$message}\n\n";
                     ob_flush();
@@ -276,13 +277,13 @@ class NoteController extends Controller
                 });
                 error_log('[SSE] subscribe returned (should not happen)');
             } catch (\Throwable $e) {
-                error_log('[SSE] exception: ' . $e->getMessage() . ' at ' . $e->getFile() . ':' . $e->getLine());
+                error_log('[SSE] exception: '.$e->getMessage().' at '.$e->getFile().':'.$e->getLine());
             }
         }, 200, [
-            'Content-Type'      => 'text/event-stream',
-            'Cache-Control'     => 'no-cache',
+            'Content-Type' => 'text/event-stream',
+            'Cache-Control' => 'no-cache',
             'X-Accel-Buffering' => 'no',
-            'Connection'        => 'keep-alive',
+            'Connection' => 'keep-alive',
         ]);
     }
 

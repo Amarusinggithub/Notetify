@@ -19,9 +19,14 @@ class UserNoteFactory extends Factory
         return [
             'user_id' => User::factory(),
             'note_id' => Note::factory(),
-            'is_pinned' => false,
+            'is_owner' => true,
+            'is_pinned_in_notebook' => false,
+            'is_pinned_in_space' => false,
+            'is_pinned_in_home' => false,
+            'pinned_in_notebook_at' => null,
+            'pinned_in_space_at' => null,
+            'pinned_in_home_at' => null,
             'is_trashed' => false,
-            'pinned_at' => null,
             'trashed_at' => null,
         ];
     }

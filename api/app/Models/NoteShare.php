@@ -16,7 +16,7 @@ class NoteShare extends Model
         'note_id',
         'shared_by_user_id',
         'shared_with_user_id',
-        'permission',
+        'role_id',
         'expires_at',
         'accepted',
     ];
@@ -24,7 +24,6 @@ class NoteShare extends Model
     protected $casts = [
         'expires_at' => 'datetime',
         'accepted'   => 'boolean',
-        'permission' => Permission::class,
     ];
 
     public function note()

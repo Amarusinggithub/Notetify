@@ -5,13 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Note extends Model
 {
-    use HasUuids, HasFactory, SoftDeletes;
+    use HasFactory, HasUuids, SoftDeletes;
 
     protected $fillable = [
         'created_by_user_id',
@@ -19,7 +19,7 @@ class Note extends Model
         'ydoc_state',
     ];
 
-    protected $hidden = ['ydoc_state'];
+    protected $hidden = ['ydoc_state', 'shares_exists'];
 
     protected $appends = ['is_shared'];
 
@@ -32,7 +32,9 @@ class Note extends Model
 
     public function getIsSharedAttribute(): bool
     {
-        return $this->shares()->exists();
+        // Prefer the value resolved via withExists() on the note relation; fall
+        // back to a query only when the note was loaded without it.
+        return (bool) ($this->attributes['shares_exists'] ?? $this->shares()->exists());
     }
 
     public function creator(): BelongsTo

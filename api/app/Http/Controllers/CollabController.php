@@ -6,6 +6,7 @@ use App\Models\UserNote;
 use Firebase\JWT\JWT;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class CollabController extends Controller
@@ -13,46 +14,52 @@ class CollabController extends Controller
     public function token(Request $request, string $noteId)
     {
         $user = $request->user();
-        $userNote = UserNote::where('id', $noteId)->where('user_id', $user->id)->firstOrFail();
-        $note = $userNote->note;
+        $resolvedNoteId = UserNote::where('id', $noteId)
+            ->where('user_id', $user->id)
+            ->value('note_id');
+
+        abort_if($resolvedNoteId === null, 404);
+
         $now = time();
-        
         $payload = [
-            'sub'    => (string) $user->id,
-            'name'   => $user->name,
-            'noteId' => (string) $note->id,
-            'role'   => 'editor',
-            'iat'    => $now,
-            'exp'    => $now + (int) config('services.collab.ttl', 3600),
+            'sub' => (string) $user->id,
+            'name' => $user->name,
+            'noteId' => (string) $resolvedNoteId,
+            'role' => 'editor',
+            'iat' => $now,
+            'exp' => $now + (int) config('services.collab.ttl', 3600),
         ];
 
         return response()->json([
-            'token'  => JWT::encode($payload, config('services.collab.secret'), 'HS256'),
-            'wsUrl'  => config('services.collab.ws_url'),
-            'docId'  => "note:{$note->id}",
+            'token' => JWT::encode($payload, config('services.collab.secret'), 'HS256'),
+            'wsUrl' => config('services.collab.ws_url'),
+            'docId' => "note:{$resolvedNoteId}",
         ]);
     }
 
     public function viewerToken(Request $request, string $noteId)
     {
         $user = $request->user();
-        $userNote = UserNote::where('id', $noteId)->where('user_id', $user->id)->firstOrFail();
-        $note = $userNote->note;
+        $resolvedNoteId = UserNote::where('id', $noteId)
+            ->where('user_id', $user->id)
+            ->value('note_id');
+
+        abort_if($resolvedNoteId === null, 404);
 
         $now = time();
         $payload = [
-            'sub'    => (string) $user->id,
-            'name'   => $user->name,
-            'noteId' => (string) $note->id,
-            'role'   => 'viewer',
-            'iat'    => $now,
-            'exp'    => $now + (int) config('services.collab.ttl', 3600),
+            'sub' => (string) $user->id,
+            'name' => $user->name,
+            'noteId' => (string) $resolvedNoteId,
+            'role' => 'viewer',
+            'iat' => $now,
+            'exp' => $now + (int) config('services.collab.ttl', 3600),
         ];
 
         return response()->json([
-            'token'  => JWT::encode($payload, config('services.collab.secret'), 'HS256'),
-            'wsUrl'  => config('services.collab.ws_url'),
-            'docId'  => "note:{$note->id}",
+            'token' => JWT::encode($payload, config('services.collab.secret'), 'HS256'),
+            'wsUrl' => config('services.collab.ws_url'),
+            'docId' => "note:{$resolvedNoteId}",
         ]);
     }
 
@@ -86,7 +93,7 @@ class CollabController extends Controller
     {
         $validated = $request->validate([
             'ydocState' => ['required', 'string'],
-            'content'   => ['required', 'array'],
+            'content' => ['required', 'array'],
         ]);
 
         $affected = DB::statement(
@@ -94,11 +101,16 @@ class CollabController extends Controller
             [$validated['ydocState'], json_encode($validated['content']), $note]
         );
 
-        if (!$affected) {
+        if (! $affected) {
             return response()->json(['error' => 'Not found'], 404);
         }
 
-        // Bubble updated_at up to all user_note rows so list queries see the change.
+        // Bubble updated_at up to all user_note rows so list queries see the change,
+        // and bust the per-user show cache so GET /notes/:id returns fresh content.
+        $userNotes = UserNote::where('note_id', $note)->get(['id', 'user_id']);
+        foreach ($userNotes as $userNote) {
+            Cache::forget("user:{$userNote->user_id}:note:{$userNote->id}");
+        }
         UserNote::where('note_id', $note)->update(['updated_at' => now()]);
 
         return response()->json(['ok' => true]);

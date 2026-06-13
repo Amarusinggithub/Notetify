@@ -13,7 +13,7 @@ import { FontSize, TextStyle } from "@tiptap/extension-text-style";
 import Youtube from "@tiptap/extension-youtube";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { NoteEditorProvider } from "@/features/editor/context/editor-context.tsx";
 import { useFetchNote } from "@/features/notes/hooks/use-fetch-note";
 import { cn } from "@/shared/lib/utils.ts";
@@ -25,66 +25,69 @@ import suggestion from "@/shared/components/shared/suggestion.tsx";
 import EditorFooter from "@/features/editor/components/editor-footer";
 import { EditorLoadingSkeleton } from "./editor-loading-skeleton";
 import TitleExtension from "./editor-title-extension";
-import { HocuspocusProvider } from "@hocuspocus/provider";
 import Collaboration from "@tiptap/extension-collaboration";
 import { CollaborationCaret } from "@tiptap/extension-collaboration-caret";
-import * as Y from "yjs";
 import { collabSessionQueryOptions } from "@/features/editor/utils/query-options";
+import {
+    acquireCollab,
+    releaseCollab,
+    type CollabEntry,
+} from "@/features/editor/utils/collab-manager";
 import { getCurrentUser } from "../utils/helpers";
 import { queryClient } from "@/app/providers/query-provider";
-
-interface CollabState {
-    ydoc: Y.Doc;
-    provider: HocuspocusProvider;
-}
+import { updateNotesCaches } from "@/features/notes/utils/helpers";
 
 export const Editor = () => {
     const currentNoteId = useStore((s) => s.selectedNoteId);
     const currentUser = useStore((s) => s.sharedData?.auth.user);
-    const [collabState, setCollabState] = useState<CollabState | null>(null);
+    const [collab, setCollab] = useState<{
+        noteId: string;
+        entry: CollabEntry;
+    } | null>(null);
     const [collabError, setCollabError] = useState<string | null>(null);
     const [retryCount, setRetryCount] = useState(0);
-    const providerRef = useRef<HocuspocusProvider | null>(null);
 
     useEffect(() => {
-        providerRef.current?.destroy();
-        providerRef.current = null;
-        setCollabState(null);
+        setCollab(null);
         setCollabError(null);
 
         if (!currentNoteId) return;
 
+        const noteId = currentNoteId;
         let cancelled = false;
+        let detach: (() => void) | null = null;
+
         queryClient
-            .ensureQueryData(collabSessionQueryOptions(currentNoteId))
-            .then(({ token, wsUrl, docId }) => {
+            .ensureQueryData(collabSessionQueryOptions(noteId))
+            .then((session) => {
                 if (cancelled) return;
-                const ydoc = new Y.Doc();
-                const provider = new HocuspocusProvider({
-                    url: wsUrl,
-                    name: docId,
-                    token,
-                    document: ydoc,
-                    onSynced: () => {
-                        if (!cancelled) setCollabState({ ydoc, provider });
-                    },
-                    onAuthenticationFailed: () => {
-                        if (!cancelled)
-                            setCollabError(
-                                "Authentication failed. Check your collab server configuration.",
-                            );
-                    },
-                    onClose: ({ event }) => {
-                        if (cancelled) return;
-                        // code 1000 = normal close (e.g. navigating away); anything else is unexpected
-                        if (event.code !== 1000) {
-                            setCollabError(
-                                "Lost connection to the collaboration server.",
-                            );
-                        }
-                    },
-                });
-                providerRef.current = provider;
+                const entry = acquireCollab(noteId, session);
+                const { provider } = entry;
+
+                const handleSynced = () => {
+                    // Build the editor only once the Y.Doc is synced. Building on an
+                    // empty pre-sync doc lets the schema seed a default title node
+                    // that then conflicts with the synced content (title pushed down).
+                    if (!cancelled) setCollab({ noteId, entry });
+                };
+                const handleAuthFailed = () => {
+                    if (!cancelled)
+                        setCollabError(
+                            "Authentication failed. Check your collab server configuration.",
+                        );
+                };
+
+                if (provider.synced) {
+                    handleSynced();
+                } else {
+                    provider.on("synced", handleSynced);
+                }
+                provider.on("authenticationFailed", handleAuthFailed);
+
+                detach = () => {
+                    provider.off("synced", handleSynced);
+                    provider.off("authenticationFailed", handleAuthFailed);
+                };
             })
             .catch(() => {
                 if (cancelled) return;
@@ -95,16 +98,9 @@ export const Editor = () => {
 
         return () => {
             cancelled = true;
+            detach?.();
         };
     }, [currentNoteId, retryCount]);
-
-    // Destroy provider on unmount
-    useEffect(
-        () => () => {
-            providerRef.current?.destroy();
-        },
-        [],
-    );
 
     if (currentNoteId && collabError) {
         return (
@@ -112,7 +108,10 @@ export const Editor = () => {
                 <p className="text-muted-foreground text-sm">{collabError}</p>
                 <button
                     className="text-sm underline"
-                    onClick={() => setRetryCount((c) => c + 1)}
+                    onClick={() => {
+                        releaseCollab(currentNoteId);
+                        setRetryCount((c) => c + 1);
+                    }}
                 >
                     Retry
                 </button>
@@ -120,7 +119,14 @@ export const Editor = () => {
         );
     }
 
-    if (currentNoteId && !collabState) {
+    // Only treat the collab entry as ready when it belongs to the current note.
+    // Right after a switch, a render can pair the new currentNoteId with the
+    // previous note's entry before the effect resets it — guarding here prevents
+    // flashing the old note's content.
+    const activeEntry =
+        collab && collab.noteId === currentNoteId ? collab.entry : null;
+
+    if (currentNoteId && !activeEntry) {
         return <EditorLoadingSkeleton />;
     }
 
@@ -139,14 +145,14 @@ export const Editor = () => {
     return (
         <EditorInner
             key={currentNoteId}
-            collabState={collabState!}
+            collabState={activeEntry!}
             currentUser={currentUser}
         />
     );
 };
 
 interface EditorInnerProps {
-    collabState: CollabState;
+    collabState: CollabEntry;
     currentUser: User | undefined;
 }
 
@@ -286,6 +292,53 @@ const EditorInner = ({ collabState, currentUser }: EditorInnerProps) => {
             ),
         );
     }, [editor, currentUserNote?.id, currentUserNote?.is_trashed]);
+
+    // Live-sync the open note's sidebar card with the editor as you type, instead
+    // of waiting for the debounced collab flush → DB → SSE round trip. The note
+    // being edited is the only one whose content changes, so we patch just its
+    // entry in the list cache with the live document — and, when the list is
+    // sorted by recency, hoist it to the top so it mirrors the server's ordering.
+    useEffect(() => {
+        if (!editor || !currentNoteId) return;
+        let timer: ReturnType<typeof setTimeout>;
+        const syncCard = () => {
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+                const content = editor.getJSON();
+                const now = new Date().toISOString();
+                const moveToTop =
+                    useStore.getState().sortNotesBy === "updated_at";
+
+                updateNotesCaches(queryClient, (notes, pageIndex) => {
+                    const found = notes.find((n) => n.id === currentNoteId);
+                    if (!found || !found.note) return notes;
+
+                    const updated = {
+                        ...found,
+                        note: { ...found.note, content },
+                        updated_at: now,
+                    };
+
+                    // Most-recently-edited belongs first on the first page.
+                    if (pageIndex === 0 && moveToTop) {
+                        return [
+                            updated,
+                            ...notes.filter((n) => n.id !== currentNoteId),
+                        ];
+                    }
+
+                    return notes.map((n) =>
+                        n.id === currentNoteId ? updated : n,
+                    );
+                });
+            }, 300);
+        };
+        editor.on("update", syncCard);
+        return () => {
+            clearTimeout(timer);
+            editor.off("update", syncCard);
+        };
+    }, [editor, currentNoteId]);
 
     if (!editor) {
         return <EditorLoadingSkeleton />;

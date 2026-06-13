@@ -55,7 +55,7 @@ describe("useCreateNote", () => {
         createNoteMock.mockReset();
     });
 
-    it("caches the created note before selection changes and waits for navigation to finish", async () => {
+    it("caches the created note and navigates to it", async () => {
         const deferredNavigate = createDeferred();
         const created = {
             id: "note-new",
@@ -101,16 +101,18 @@ describe("useCreateNote", () => {
             expect(mockNavigate).toHaveBeenCalledWith("/notes/note-new");
         });
 
+        // The created note is cached so the editor has its metadata immediately.
         expect(
             queryClient.getQueryData(noteQueryKeys.detail(created.id)),
         ).toEqual(created);
+        // The hook does not touch selection — the route effect mirrors the URL
+        // into the store, so selection is unchanged here.
         expect(useStore.getState().selectedNoteId).toBe("note-old");
 
         deferredNavigate.resolve();
 
         await waitFor(() => {
-            expect(useStore.getState().selectedNoteId).toBe(created.id);
+            expect(result.current.isSuccess).toBe(true);
         });
-        expect(mockRevalidate).toHaveBeenCalled();
     });
 });

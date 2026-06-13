@@ -18,7 +18,6 @@ export default defineConfig({
 	server: {
 		host: true,
 		port: 5173,
-		allowedHosts: ['bingolaptop.taila14742.ts.net'],
 		warmup: {
 			clientFiles: [
 				'./src/features/landing/pages/landing.tsx',

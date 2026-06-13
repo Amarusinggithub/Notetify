@@ -1,7 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useNavigate, useRevalidator } from "react-router";
+import { useNavigate } from "react-router";
 import { createNote } from "@/features/notes/services/note-service.ts";
-import { useStore } from "@/app/store/index.ts";
 import type { CreateNote } from "@/shared/types";
 import { type UserNote } from "@/shared/types/index.ts";
 import {
@@ -10,9 +9,10 @@ import {
     updateNotesCaches,
 } from "../utils/helpers";
 import { noteQueryKeys } from "../utils/query-keys";
+import { prefetchCollabSession } from "@/features/editor/hooks/prefetch-collab-session";
 
 export const useCreateNote = () => {
-    const revalidator = useRevalidator();
+
     const queryClient = useQueryClient();
     const navigate = useNavigate();
     return useMutation({
@@ -71,9 +71,14 @@ export const useCreateNote = () => {
             );
 
             queryClient.setQueryData(noteQueryKeys.detail(created.id), created);
+            // Warm the collab token now so its POST overlaps navigation + editor
+            // mount instead of running serially once the editor effect starts.
+            prefetchCollabSession(created.id);
+            // Navigate only — the URL is the source of truth for selection and the
+            // route effect mirrors it into the store. Writing the store here would
+            // race the route and briefly re-show the previous note.
             await navigate(`/notes/${created.id}`);
-            useStore.getState().setSelectedNoteId(created.id);
-            await revalidator.revalidate();
+
         },
         onError: (error, _input, context) => {
             console.error("Failed to create note:", error);

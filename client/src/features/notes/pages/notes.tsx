@@ -45,56 +45,42 @@ export default function Notes() {
     }, [initialData, queryClient]);
 
     useEffect(() => {
-        const handleNavigation = async () => {
-            const routeNoteId = noteId ?? null;
-
-            // URL has a noteId - prefetch its data and sync store
-            if (routeNoteId) {
-                queryClient.prefetchQuery(noteQueryOptions(routeNoteId));
-                if (routeNoteId !== selectedId) {
-                    setSelected(routeNoteId);
-                }
-                return;
+        // The URL is the single source of truth for which note is open. The store
+        // only ever mirrors it (one-way), so selection can never be written ahead
+        // of the route and then reverted — which would flash the previous note.
+        if (noteId) {
+            queryClient.prefetchQuery(noteQueryOptions(noteId));
+            if (noteId !== selectedId) {
+                setSelected(noteId);
             }
+            return;
+        }
 
-            // No noteId in URL - try to navigate to selected or first note
-            if (selectedId) {
-                // Awaiting here ensures RRv7 finishes the transition
-                await navigate(`/notes/${selectedId}`, { replace: true });
-                return;
-            }
+        // No note in the URL — put one there. The store follows on the next run
+        // once the route updates.
+        if (selectedId) {
+            navigate(`/notes/${selectedId}`, { replace: true });
+            return;
+        }
 
-            // Navigate to first available note
-            const firstFromInitial = initialData?.pages?.[0]?.results?.[0];
-            if (firstFromInitial) {
-                setSelected(firstFromInitial.id);
-                await navigate(`/notes/${firstFromInitial.id}`, {
-                    replace: true,
-                });
-                return;
-            }
+        const firstFromInitial = initialData?.pages?.[0]?.results?.[0];
+        if (firstFromInitial) {
+            navigate(`/notes/${firstFromInitial.id}`, { replace: true });
+            return;
+        }
 
-            // No notes exist - create onee (use ref to prevent double creation)
-            if (!isCreating && !isCreatingRef.current) {
-                isCreatingRef.current = true;
-                createNote(
-                    {},
-                    {
-                        onSuccess: async (newNote) => {
-                            setSelected(newNote.id);
-                            await navigate(`/notes/${newNote.id}`, {
-                                replace: true,
-                            });
-                        },
-                        onSettled: () => {
-                            isCreatingRef.current = false;
-                        },
+        // No notes exist - create one (ref guards against double creation).
+        if (!isCreating && !isCreatingRef.current) {
+            isCreatingRef.current = true;
+            createNote(
+                {},
+                {
+                    onSettled: () => {
+                        isCreatingRef.current = false;
                     },
-                );
-            }
-        };
-
-        handleNavigation();
+                },
+            );
+        }
     }, [
         queryClient,
         noteId,

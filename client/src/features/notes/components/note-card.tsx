@@ -23,7 +23,6 @@ type NoteCardProp = {
 const NoteCard = ({ userNote }: NoteCardProp) => {
 	const navigate = useNavigate();
 	const isActive = useStore((s) => s.selectedNoteId === userNote.id);
-	const setSelectedNoteId = useStore((s) => s.setSelectedNoteId);
 	const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
 	const title = getTitlePreview(userNote.note?.content ?? null);
@@ -50,7 +49,8 @@ const NoteCard = ({ userNote }: NoteCardProp) => {
 
 	const handleSelectNote = () => {
 		cancelPrefetch();
-		setSelectedNoteId(userNote.id);
+		// Navigate only; the route effect mirrors the URL into the store. The
+		// collab token was warmed on hover, so the editor connects immediately.
 		void navigate(`/notes/${userNote.id}`);
 	};
 

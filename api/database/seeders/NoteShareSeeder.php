@@ -17,16 +17,16 @@ class NoteShareSeeder extends Seeder
         $alice = User::where('email', 'alice@example.com')->first();
         $bob = User::where('email', 'bob@example.com')->first();
 
-        if (!$alice || !$bob) {
+        if (! $alice || ! $bob) {
             return;
         }
 
         // Get Alice's note
-        $note = Note::whereHas('users', function ($query) use ($alice) {
-            $query->where('users.id', $alice->id);
+        $note = Note::whereHas('userNotes', function ($query) use ($alice) {
+            $query->where('user_id', $alice->id);
         })->first();
 
-        if (!$note) {
+        if (! $note) {
             return;
         }
 
